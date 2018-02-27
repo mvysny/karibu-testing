@@ -225,7 +225,7 @@ class MyUITest : DynaTest({
 
 ### Looking up components
 
-The library provides three methods for looking up components.
+This library provides three methods for looking up components.
 
 * `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
   if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`
@@ -258,7 +258,7 @@ Such methods are also useful for example when locking the lookup scope into a pa
 _get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } .value = "45"
 ```
 
-Since there is no way to see the UI with this kind of approach (since there's no browser), the lookup functions will dump the component tree
+Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
 on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
 ```
 java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name': []. Component tree:

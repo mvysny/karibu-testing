@@ -52,7 +52,7 @@ This is where the `karibu-testing` library comes handy - it provides you with me
 
 ## Testing an actual application
 
-Let's look at the [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) - a very sImple application
+Let's look at the [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) - a very simple application
 consisting of just the `UI` class and no views. Because of its simplicity it is an excellent testing grounds for your experiments -
 just clone the app and start experimenting. You can run the tests simply by running `./gradlew`; you can also right-click on the `MyUITest`
 class from your IDE and select 'Run MyUITest', to run and/or debug the tests from your IDE.

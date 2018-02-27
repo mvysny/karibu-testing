@@ -78,7 +78,7 @@ class MyUI : UI() {
 
 It will produce the following screen:
 
-![Karibu-DSL Helloworld App](../images/karibu_helloworld_app.png)
+![Karibu-DSL Helloworld App](../docs/images/karibu_helloworld_app.png)
 
 In order to test this app, we need to initialize `MyUI`. But it's not THAT simple: in order to properly initialize the `UI` class, a proper Vaadin
 environment needs to be prepared:

@@ -11,7 +11,7 @@ dependencies {
 }
 ```
 
-You will also need to add the Kotlin language support into your project, to at least compile the testing classes only: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
+You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
 ## Writing your first test
 
@@ -24,7 +24,8 @@ class GreetingLabel : Label() {
 }
 ```
 
-We want to test that calling `greet("world")` will properly set the label's value:
+We want to test the component so that a call to the `greet("world")` function will properly set the label's value:
+
 ```kotlin
 class MyUITest : DynaTest({
     test("proper greeting") {
@@ -35,10 +36,11 @@ class MyUITest : DynaTest({
 })
 ```
 
-Nothing special here - we have just instantiated the label as any other object, and then asserted that the value is updated properly.
-Congratulations - you've just tested a Vaadin component! It was *that* easy :)
+Nothing special here - we have just instantiated the component as we would a regular Java object, and then we asserted that the value is updated properly.
+The test actually works, no further setup is necessary.
 
-You can apply this approach to test even larger components; since views are components as well you can test individual views with this approach as well.
+You can apply this approach to test even larger components;
+since views are components as well you can test individual views with this approach as well.
 However, soon you will hit the limit:
 
 * Your components will probably start to fail at some point if they'll use `UI.getCurrent()` or `VaadinSession.getCurrent()`, since that will

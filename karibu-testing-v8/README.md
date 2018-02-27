@@ -191,9 +191,10 @@ test classes in the
 [Vaadin-on-Kotlin Example app](https://github.com/mvysny/vaadin-on-kotlin#example-project) on how that's done. In short:
 
 * Karibu-DSL provides the `@AutoView` annotation which you should annotate your views with
-* Then it contains the `AutoViewProvider` class which will use Servlet container to find all classes annotated with the `@AutoView` annotation.
-* Karibu-DSL also provides the `autoViewProvider` which will then resolve those views for Vaadin `Navigator`.
-* All you need to do in your UI is to set the view provider to the navigator, as follows:
+* Karibu-DSL also provides the `AutoViewProvider` class which will use Servlet container to find all classes annotated with the `@AutoView` annotation.
+* Karibu-DSL also provides the singleton `AutoViewProvider` value via the `autoViewProvider` global property,
+  which you register to the Navigator in your UI. That will make Navigator able to resolve all autoviews.
+* Therefore, all you need to do in your UI is to set the view provider to the navigator, as follows:
 
 ```kotlin
 navigator = Navigator(this, content as ViewDisplay)

@@ -41,7 +41,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String) {
 }
 
 /**
- * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
+ * Returns the formatted value as a String. Does not use renderer to render the value - simply calls the value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
  * @param columnId the column ID.

@@ -108,7 +108,7 @@ fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Uni
             result.size < spec.count.first -> "Too few (${result.size}) visible ${clazz.simpleName}s"
             else -> "Too many visible ${clazz.simpleName}s (${result.size})"
         }
-        throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: ${result.joinToString { it.toPrettyString() }}. Component tree:\n${toPrettyTree()}")
+        throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
     }
     return result.filterIsInstance(clazz)
 }
@@ -133,27 +133,7 @@ inline fun <reified T: Component> _find(noinline block: SearchSpec<T>.()->Unit =
 fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): List<T> =
         UI.getCurrent()._find(clazz, block)
 
-/**
- * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only or if no button (or too many buttons) matched.
- */
-fun Button._click() {
-    if (!isEffectivelyVisible()) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden")
-    }
-    if (!isEnabled) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is not enabled")
-    }
-    if (!isConnectorEnabled) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is nested in a disabled component")
-    }
-    if (this is HasValue<*> && this.isReadOnly) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is read-only")
-    }
-    click()
-}
-
-private fun Component.isEffectivelyVisible(): Boolean = isVisible && (parent == null || parent.isEffectivelyVisible())
+internal fun Component.isEffectivelyVisible(): Boolean = isVisible && (parent == null || parent.isEffectivelyVisible())
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> = walk().filter { predicate(it) }
 

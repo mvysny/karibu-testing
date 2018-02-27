@@ -22,7 +22,9 @@ The Serverless testing is an *approach* rather than a product, although it's bac
 You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use this approach; you don't even need to write your app in Kotlin.
 You can just plug this library in into your Java+Vaadin-based project as a test dependency, and write only the test code in Kotlin.
 
-## Getting started
+## Full Documentation
+
+For the Getting Started documentation and for the full API documentation:
 
 * If you are using Vaadin 8, head to [Getting Started with Vaadin 8](karibu-testing-v8).
 * If you are using Vaadin 10, head to [Getting Started with Vaadin 10](karibu-testing-v10).

@@ -119,21 +119,17 @@ to simulate a click on the button itself; then we can check that the click liste
 Obtaining the `TextField` in this simple project is easy; however typical Vaadin apps has much more complex structure, with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.
 
-Karibu-Testing library provides three functions for this purpose:
+Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
-* `_get<Button> { caption = "Click me" }` will find exactly one button with given caption. The function will fail
-  if there is no such component, or if there are too many of matching components.
-* `_find<VerticalLayout> { styles = "material" }` will find a list of VerticalLayouts containing given style. The function will return
-  an empty list if there is no such component.
-* `_expectNone<type of component> { criteria }` will expect that there is no component matching given criteria; the function will fail if
-  one or more components are matching.
+* `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
+  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
 
-Those functions will search for all components nested within `UI.getCurrent()`. You can also restrict the search to some particular layout
+This particular function will search for all components nested within `UI.getCurrent()`. You can call the function in a different way, which will restrict the search to some particular layout
 which is handy when you're testing a standalone custom UI component which is not attached to the UI:
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
 
-So, `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`
+So, `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
 
 With this arsenal at hand, we can rewrite the test:
 
@@ -209,3 +205,80 @@ class MyUITest : DynaTest({
 }
 ```
 
+## API
+
+### Looking up components
+
+The library provides three methods for looking up components.
+
+* `_get<type of component> { criteria }` will find exactly one component of given type in the current UI, matching given criteria. The function will fail
+  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
+* `_find<type of component> { criteria }` will find a list of matching components of given type in the current UI. The function will return
+  an empty list if there is no such component. For example: `_find<VerticalLayout> { styles = "material" }`
+* `_expectNone<type of component> { criteria }` will expect that there is no component matching given criteria in the current UI; the function will fail if
+  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
+
+This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
+in that component. There are `_get()`, `_find()` and `_expectNone()` counterparts, added to every Vaadin component as an extension metod. For example:
+
+```kotlin
+class AddNewPersonForm : VerticalLayout {
+    // nests fields, uses binder, etc etc
+}
+
+test("add new person happy flow") {
+    val form = AddNewPersonForm()
+    form._get<TextField> { caption = "Name:" } .value = "John Doe"
+    form._get<Button> { caption = "Create" } ._click()
+}
+```
+
+Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular tab of a tab sheet:
+```kotlin
+_get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } .value = "45"
+```
+
+Since there is no way to see the UI with this kind of approach (since there's no browser), the lookup functions will dump the component tree
+on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
+```
+java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name' and count=1..1: []. Component tree:
+└── MyUI[]
+    └── VerticalLayout[]
+        ├── TextField[caption='Type your name here:', value='']
+        └── Button[caption='Click Me']
+
+
+	at com.github.karibu.testing.LocatorKt._find(Locator.kt:102)
+	at com.github.karibu.testing.LocatorKt._get(Locator.kt:65)
+	at com.github.karibu.testing.LocatorKt._get(Locator.kt:86)
+	at org.test.MyUITest$1$2.invoke(MyUITest.kt:25)
+	at org.test.MyUITest$1$2.invoke(MyUITest.kt:12)
+```
+
+### Clicking Buttons
+
+Vaadin Button contains the `click()` method, however that method is not well fit for testing:
+
+* If the button is disabled, it will silently do nothing instead firing the click event. However, when writing the test,
+  we expect the button to be enabled and fully able to receive (and execute) clicks. In this case, an attempt to click such button
+  from a test should fail.
+* If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the `click()` method
+  will still run the listeners even though the user can't really interact with the button. In this case, the test should fail as well.
+ 
+It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
+all the above prior running the click listeners.
+
+### Support for Grid
+
+The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
+contents of the Grid.
+
+* You can retrieve a bean at particular index; for example `grid.dataProvider._get(0)` will return the first item.
+* You can check for the total amount of items shown in the grid, by calling `grid.dataProvider._size()`
+* You can click a button at a particular column (or any `ClickableRenderer` for that matter), by calling `grid._clickRenderer(0, "actions")`
+* You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
+  `List<String>`
+* You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
+  fail and will dump first 10 rows of the grid, so that you can see the contents of the grid.
+* You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
+  the function will fail with a grid dump.

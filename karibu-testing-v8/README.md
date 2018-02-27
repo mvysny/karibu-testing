@@ -158,6 +158,9 @@ class MyUITest : DynaTest({
 The [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) is a very simple project consisting of just
 one view and a single test for that view.
 
+The [Vaadin-on-Kotlin CRUD Exaple](https://github.com/mvysny/vaadin-on-kotlin#example-project) is a
+more complete full-stack app which demonstrates the Navigator and the Views as well.
+
 ## Advanced topics
 
 ### Navigation

@@ -98,7 +98,7 @@ class MyUITest : DynaTest({
 })
 ```
 
-> We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
+> **Tip:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
 testing library you prefer.
 
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `VerticalLayout` (since our
@@ -119,7 +119,8 @@ class MyUITest : DynaTest({
 We can now examine and assert on the layout's properties, and more importantly, discover its children (the `TextField` and `Button`, respectively).
 When we obtain the `TextField` instance, we can simply call the server-side `setValue("world")` API on it, to simulate the user input.
 Then, we can call `Button.click()`
-to simulate a click on the button itself; then we can check that the click listener was run and it had created the label.
+to simulate a click on the button itself. The `click()` method will execute all listeners and will block until
+all listeners are done; we can check that the click listener was run and it had created the label.
 
 Obtaining the `TextField` in this simple project is easy; however typical Vaadin apps has much more complex structure, with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.

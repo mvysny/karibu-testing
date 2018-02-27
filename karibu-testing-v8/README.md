@@ -11,7 +11,7 @@ dependencies {
 }
 ```
 
-You will also need to add Kotlin support to your project, even if it will compile the testing classes only: [Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
+You will also need to add the Kotlin language support into your project, to at least compile the testing classes only: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
 ## Writing your first test
 
@@ -36,15 +36,16 @@ class MyUITest : DynaTest({
 ```
 
 Nothing special here - we have just instantiated the label as any other object, and then asserted that the value is updated properly.
+Congratulations - you've just tested a Vaadin component! It was *that* easy :)
 
-With this approach you can test even larger components; since views are components as well you can test individual views with this approach as well.
+You can apply this approach to test even larger components; since views are components as well you can test individual views with this approach as well.
 However, soon you will hit the limit:
 
-* Your components will probably start to fail because `UI.getCurrent()` or `VaadinSession.getCurrent()`
-returns `null`;
-* Your views can't navigate because the Navigator has not been configured, etc.
+* Your components will probably start to fail at some point if they'll use `UI.getCurrent()` or `VaadinSession.getCurrent()`, since that will
+  just return `null`;
+* Your views can't perform a navigation because the `Navigator` has not been configured.
 
-We need to mock the Vaadin environment properly.
+In order to fix that, we need to mock the Vaadin environment properly.
 
 ## Testing an actual application
 

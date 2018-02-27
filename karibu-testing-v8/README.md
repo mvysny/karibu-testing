@@ -54,7 +54,7 @@ This is where the `karibu-testing` library comes handy - it provides you with me
 Let's look at the [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) - a very sample application
 consisting of just the UI - no views. Because of its simplicity it is an excellent testing grounds for your experiments -
 just clone the app and start experimenting. You can run the tests simply by running `./gradlew`; you can also right-click on the `MyUITest`
-class from your IDE and select 'Run MyUITest', to run and/or debug all the tests from your IDE.
+class from your IDE and select 'Run MyUITest', to run and/or debug the tests from your IDE.
 
 The UI class is simple:
 
@@ -98,9 +98,9 @@ class MyUITest : DynaTest({
 ```
 
 > We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
-testing library you wish.
+testing library you prefer.
 
-We can verify that everything is prepared, simply by obtaining the current UI contents and asserting that it is a `VerticalLayout` (since our
+We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `VerticalLayout` (since our
 simple testing app uses `VerticalLayout` as the root component):
 
 ```kotlin
@@ -113,12 +113,17 @@ class MyUITest : DynaTest({
 })
 ``` 
 
+### Simulating the user input
+
 We can now examine and assert on the layout's properties, and more importantly, discover its children (the `TextField` and `Button`, respectively).
-When we obtain the `TextField` instance, we can simply call `setValue("world")` on it, to simulate the user input. Then, we can call `Button.click()`
+When we obtain the `TextField` instance, we can simply call the server-side `setValue("world")` API on it, to simulate the user input.
+Then, we can call `Button.click()`
 to simulate a click on the button itself; then we can check that the click listener was run and it had created the label.
 
 Obtaining the `TextField` in this simple project is easy; however typical Vaadin apps has much more complex structure, with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.
+
+### Looking up the components
 
 Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
@@ -126,11 +131,11 @@ Karibu-Testing library provides three functions for this purpose; for now we are
   if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
 
 This particular function will search for all components nested within `UI.getCurrent()`. You can call the function in a different way, which will restrict the search to some particular layout
-which is handy when you're testing a standalone custom UI component which is not attached to the UI:
+which is handy when you're testing a standalone custom UI component outside of the `UI` class:
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
 
-So, `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
+> **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
 
 With this arsenal at hand, we can rewrite the test:
 
@@ -154,21 +159,22 @@ class MyUITest : DynaTest({
   "Click me" button is invisible. This is because the intent of the test is to populate/access the components as if it was the user who
   is accessing the application; and of course the user can't access the component if it is invisible.
 
-## Example project
+## Example projects
 
 The [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) is a very simple project consisting of just
-one view and a single test for that view.
+one view and a single test for that view. Because of its simplicity it's easy to experiment upon.
 
 The [Vaadin-on-Kotlin CRUD Exaple](https://github.com/mvysny/vaadin-on-kotlin#example-project) is a
-more complete full-stack app which demonstrates the Navigator and the Views as well.
+more complete full-stack app which demonstrates how to use the Navigator and the Views using serverless testing.
 
 ## Advanced topics
 
 ### Navigation
 
-A typical app will consist of multiple views. You can test those views using two different approaches:
+A typical app will consist of multiple views. You can test the views of such app using two different approaches:
 
-* Simply instantiate the view class yourself and test it as a component, as demostrated above with `GreetingLabel`. It typically extends `VerticalLayout` or some other layout anyway,
+* Simply instantiate the view class yourself and test it as a component, as demostrated above with `GreetingLabel`.
+  It typically extends `VerticalLayout` or some other layout anyway,
   which makes it a Vaadin component. The disadvantage is that `_get()` functions will not work unless you attach the component to the current UI;
   also the component may lazy-initialize itself by the means of the onAttach listener which only gets fired when the component is attached to a UI.
   Therefore, this approach should only be used for reusable components which do not depend on a particular UI.
@@ -177,7 +183,8 @@ A typical app will consist of multiple views. You can test those views using two
   this won't work unless the test itself will populate the Navigator.
 
 If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), populating the Navigator is quite simple. Just check out the
-[Vaadin-on-Kotlin Example app](https://github.com/mvysny/vaadin-on-kotlin#example-project) sources. In short:
+test classes in the
+[Vaadin-on-Kotlin Example app](https://github.com/mvysny/vaadin-on-kotlin#example-project) on how that's done. In short:
 
 * Karibu-DSL provides the `@AutoView` annotation with which you should annotate your views
 * Then it contains the `AutoViewProvider` class which will use Servlet container to find all classes annotated with the `@AutoView` annotation.
@@ -206,7 +213,7 @@ class MyUITest : DynaTest({
         val grid = _get<Grid<*>>()
         // etc etc
     }
-}
+})
 ```
 
 ## API
@@ -223,8 +230,8 @@ The library provides three methods for looking up components.
   one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
-  will look OK but the lookup method will claim the component is not there. Please bear in mind that
-  the lookup methods only search for visible components - they will simply ignore invisible ones.
+  will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
+  components - they will simply ignore invisible ones.
 
 This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
 in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin component as an extension metod. For example:

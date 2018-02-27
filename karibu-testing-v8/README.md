@@ -176,19 +176,21 @@ more complete full-stack app which demonstrates how to use the Navigator and the
 A typical app will consist of multiple views. You can test the views of such app using two different approaches:
 
 * Simply instantiate the view class yourself and test it as a component, as demostrated above with `GreetingLabel`.
-  It typically extends `VerticalLayout` or some other layout anyway,
+  The view typically extends `VerticalLayout` or some other layout anyway,
   which makes it a Vaadin component. The disadvantage is that `_get()` functions will not work unless you attach the component to the current UI;
   also the component may lazy-initialize itself by the means of the onAttach listener which only gets fired when the component is attached to a UI.
-  Therefore, this approach should only be used for reusable components which do not depend on a particular UI.
-* Make `MockVaadin.setup()` instantiate your UI, which should in turn initialize the Navigator anyway. Now you can simply use the Navigator's API
-  to perform the navigation to the view: `UI.getCurrent().navigator.navigateTo("books")`. However, if your UI does not configure the Navigator itself,
-  this won't work unless the test itself will populate the Navigator.
+  Therefore, this approach should only be used for reusable components which do not depend on a particular UI and do not
+  lazy-init themselves.
+* Properly set up your UI by calling `MockVaadin.setup({ MyUI() })`. Your UI then typically initializes the Navigator and outfits it with a `ViewProvider`.
+  Because of that, you can simply call the Navigator's API from your tests to perform the navigation to the view, such as `UI.getCurrent().navigator.navigateTo("books")`.
+  However, if the `ViewProvider` was not properly initialized for Navigator itself,
+  this won't work unless the test code itself will populate the `ViewProvider`.
 
-If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), populating the Navigator is quite simple. Just check out the
+If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), populating the `ViewProvider` is quite simple. Just check out the
 test classes in the
 [Vaadin-on-Kotlin Example app](https://github.com/mvysny/vaadin-on-kotlin#example-project) on how that's done. In short:
 
-* Karibu-DSL provides the `@AutoView` annotation with which you should annotate your views
+* Karibu-DSL provides the `@AutoView` annotation which you should annotate your views with
 * Then it contains the `AutoViewProvider` class which will use Servlet container to find all classes annotated with the `@AutoView` annotation.
 * Karibu-DSL also provides the `autoViewProvider` which will then resolve those views for Vaadin `Navigator`.
 * All you need to do in your UI is to set the view provider to the navigator, as follows:

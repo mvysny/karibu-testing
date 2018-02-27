@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mvysny/karibu-testing.svg?branch=master)](https://travis-ci.org/mvysny/karibu-testing)
+
 # Vaadin Serverless Testing
 
 Vaadin-on-Kotlin promotes a testing technique called *serverless (browserless) testing*. With this approach, it's not the browser you issue

@@ -26,11 +26,10 @@ You can just plug this library in into your Java+Vaadin-based project as a test 
 
 For the Getting Started documentation and for the full API documentation:
 
-* If you are using Vaadin 8, head to [Getting Started with Vaadin 8](karibu-testing-v8).
-* If you are using Vaadin 10, head to [Getting Started with Vaadin 10](karibu-testing-v10).
+* If you are using Vaadin 8, head to [Testing with Vaadin 8](karibu-testing-v8).
+* If you are using Vaadin 10, head to [Testing with Vaadin 10](karibu-testing-v10).
 
 ## More Resources
 
 * The [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) which explains everything behind the serverless testing technique.
 * The [Serverless web testing](http://mavi.logdown.com/posts/3147601) article describes this technique in more depth.
-

@@ -11,7 +11,7 @@ This approach has the following advantages:
 * Can be run after every commit since they're fast.
 * You don't even need to start the web server itself since we're bypassing the http parsing altogether!
 
-The [Serverless web testing](http://mavi.logdown.com/posts/3147601) article describes this technique in more depth.
+A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the serverless testing technique.
 
 ## The Testing library is Standalone
 
@@ -24,4 +24,9 @@ You can just plug this library in into your Java+Vaadin-based project as a test 
 
 * If you are using Vaadin 8, head to [Getting Started with Vaadin 8](docs/testing-v8.md).
 * If you are using Vaadin 10, head to [Getting Started with Vaadin 10](docs/testing-v10.md).
+
+## More Resources
+
+* The [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) which explains everything behind the serverless testing technique.
+* The [Serverless web testing](http://mavi.logdown.com/posts/3147601) article describes this technique in more depth.
 

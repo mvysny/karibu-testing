@@ -211,15 +211,19 @@ class MyUITest : DynaTest({
 
 The library provides three methods for looking up components.
 
-* `_get<type of component> { criteria }` will find exactly one component of given type in the current UI, matching given criteria. The function will fail
-  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
-* `_find<type of component> { criteria }` will find a list of matching components of given type in the current UI. The function will return
+* `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
+  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`
+* `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
   an empty list if there is no such component. For example: `_find<VerticalLayout> { styles = "material" }`
-* `_expectNone<type of component> { criteria }` will expect that there is no component matching given criteria in the current UI; the function will fail if
+* `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
   one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
 
+> I can't stress the **visible** enough. Often the dump will show the button, the caption will be correct and everything
+  will look OK but the lookup method will claim the component is not there. Please bear in mind that
+  the lookup methods only search for visible components - they will simply ignore invisible ones.
+
 This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
-in that component. There are `_get()`, `_find()` and `_expectNone()` counterparts, added to every Vaadin component as an extension metod. For example:
+in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin component as an extension metod. For example:
 
 ```kotlin
 class AddNewPersonForm : VerticalLayout {
@@ -241,7 +245,7 @@ _get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } .value 
 Since there is no way to see the UI with this kind of approach (since there's no browser), the lookup functions will dump the component tree
 on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
 ```
-java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name' and count=1..1: []. Component tree:
+java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name': []. Component tree:
 └── MyUI[]
     └── VerticalLayout[]
         ├── TextField[caption='Type your name here:', value='']

@@ -30,7 +30,7 @@ class SearchSpec<T : Component>(
         if (id != null) list.add("id='$id'")
         if (caption != null) list.add("caption='$caption'")
         if (text != null) list.add("text='$text'")
-        if (count != (0..Int.MAX_VALUE)) list.add("count=$count")
+        if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
         return list.joinToString(" and ")
     }
@@ -100,7 +100,7 @@ fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Uni
             result.size < spec.count.first -> "Too few (${result.size}) visible ${clazz.simpleName}s"
             else -> "Too many visible ${clazz.simpleName}s (${result.size})"
         }
-        throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: ${result.joinToString(prefix = "[", postfix = "]") { it.toPrettyString() }}. Component tree:\n${toPrettyTree()}")
+        throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
     }
     return result.filterIsInstance(clazz)
 }

@@ -30,7 +30,7 @@ class SearchSpec<T : Component>(
         if (id != null) list.add("id='$id'")
         if (caption != null) list.add("caption='$caption'")
         if (!styles.isNullOrBlank()) list.add("styles='$styles'")
-        if (count != (0..Int.MAX_VALUE)) list.add("count=$count")
+        if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
         return list.joinToString(" and ")
     }

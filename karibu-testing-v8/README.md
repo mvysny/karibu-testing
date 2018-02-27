@@ -164,7 +164,7 @@ class MyUITest : DynaTest({
 ## Example projects
 
 The [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) is a very simple project consisting of just
-one view and a single test for that view. Because of its simplicity it's easy to experiment upon.
+one `UI` and a single test for that UI. Because of its simplicity it's easy to experiment upon.
 
 The [Vaadin-on-Kotlin CRUD Exaple](https://github.com/mvysny/vaadin-on-kotlin#example-project) is a
 more complete full-stack app which demonstrates how to use the Navigator and the Views using serverless testing.

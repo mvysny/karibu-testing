@@ -15,8 +15,6 @@ You will also need to add the Kotlin language support into your project, to at l
 
 ## Writing your first test
 
-## Writing your first test
-
 Let's start by testing a custom component. Say that we have a `GreetingLabel` which greets the user nicely:
 ```kotlin
 class GreetingLabel : Div() {
@@ -60,7 +58,59 @@ consisting of just the `MainView` class. Because of its simplicity it is an exce
 just clone the app and start experimenting. You can run the tests simply by running `./gradlew`; you can also right-click on the `MainViewTest`
 class from your IDE and select 'Run MainViewTest', to run and/or debug the tests from your IDE.
 
-The UI class is simple:
+The `MainView` class is simple:
+
+```kotlin
+class MainView : VerticalLayout() {
+    private lateinit var template: ExampleTemplate
+    init {
+        button("Click me") {
+            onLeftClick {
+                template.value = "Clicked!"
+            }
+        }
+        template = exampleTemplate()
+    }
+}
+```
+
+It will produce the following screen:
+
+![Vaadin 10 Karibu-DSL Helloworld App](../docs/images/karibu10_helloworld_app.png)
+
+In order to test this app, we need to instantiate and initialize an `UI`. In order to properly initialize the `UI` class, a proper Vaadin
+environment needs to be prepared:
+
+* We need to prepare the `VaadinSession` in a way that `VaadinSession.getCurrent()` returns a proper session
+* We need to run the testing code with Vaadin lock obtained (since we're going to invoke Vaadin components and that can only be done on the UI thread)
+* We need to create the UI instance and initialize it properly - besides other things we need to call the `UI.doInit()` method.
+
+Luckily, this is exactly what the `MockVaadin.setup()` function does. It will prepare everything for us and even initialize the `UI`; we just need
+to provide the auto-detected set of `@Route`s to the function:
+
+```kotlin
+class MyUITest : DynaTest({
+    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+})
+```
+
+> **Tip:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
+testing library you prefer.
+
+We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `MainView` (since our
+simple testing app uses `MainView` as the root route):
+
+```kotlin
+class MyUITest : DynaTest({
+    beforeEach { MockVaadin.setup({ MyUI() }) }
+    test("simple UI test") {
+        val main = UI.getCurrent().children.findFirst().get() as MainView
+        expect(2) { main.children.count() }
+    }
+})
+``` 
+
+### Simulating the user input
 
 todo
 

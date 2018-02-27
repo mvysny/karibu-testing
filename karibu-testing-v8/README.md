@@ -218,7 +218,7 @@ The library provides three methods for looking up components.
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
   one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
 
-> I can't stress the **visible** enough. Often the dump will show the button, the caption will be correct and everything
+> I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
   will look OK but the lookup method will claim the component is not there. Please bear in mind that
   the lookup methods only search for visible components - they will simply ignore invisible ones.
 
@@ -270,19 +270,19 @@ Vaadin Button contains the `click()` method, however that method is not well fit
   will still run the listeners even though the user can't really interact with the button. In this case, the test should fail as well.
  
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
-all the above prior running the click listeners.
+all the above points, prior running the click listeners.
 
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
 contents of the Grid.
 
-* You can retrieve a bean at particular index; for example `grid.dataProvider._get(0)` will return the first item.
-* You can check for the total amount of items shown in the grid, by calling `grid.dataProvider._size()`
+* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
+* You can check for the total amount of items shown in the grid, by calling `grid._size()`
 * You can click a button at a particular column (or any `ClickableRenderer` for that matter), by calling `grid._clickRenderer(0, "actions")`
 * You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
   `List<String>`
 * You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
-  fail and will dump first 10 rows of the grid, so that you can see the contents of the grid.
+  fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
-  the function will fail with a grid dump.
+  the function will fail with a proper grid dump.

@@ -20,11 +20,23 @@ fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
 }
 
 /**
+ * Returns the item on given row. Fails if the row index is invalid.
+ * @param rowIndex the row, 0..size - 1
+ * @return the item at given row, not null.
+ */
+fun <T : Any> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex)
+
+/**
  * Returns the number of items in this data provider.
  */
 @Suppress("UNCHECKED_CAST")
 fun DataProvider<*, *>._size(): Int =
         (this as DataProvider<Any?, Any?>).size(Query(null))
+
+/**
+ * Returns the number of items in this data provider.
+ */
+fun Grid<*>._size(): Int = dataProvider._size()
 
 /**
  * Performs a click on a [ClickableRenderer] in given [grid] cell.

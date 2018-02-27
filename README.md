@@ -24,8 +24,8 @@ You can just plug this library in into your Java+Vaadin-based project as a test 
 
 ## Getting started
 
-* If you are using Vaadin 8, head to [Getting Started with Vaadin 8](docs/testing-v8.md).
-* If you are using Vaadin 10, head to [Getting Started with Vaadin 10](docs/testing-v10.md).
+* If you are using Vaadin 8, head to [Getting Started with Vaadin 8](karibu-testing-v8).
+* If you are using Vaadin 10, head to [Getting Started with Vaadin 10](karibu-testing-v10).
 
 ## More Resources
 

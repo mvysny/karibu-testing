@@ -40,7 +40,7 @@ Nothing special here - we have just instantiated the component as we would a reg
 The test actually works, no further setup is necessary.
 
 You can apply this approach to test even larger components;
-since views are components as well you can test individual views with this approach as well.
+since views are components as well, you can test individual views with this approach as well.
 However, soon you will hit the limit:
 
 * Your components will probably start to fail at some point if they'll use `UI.getCurrent()` or `VaadinSession.getCurrent()`, since that will
@@ -48,13 +48,12 @@ However, soon you will hit the limit:
 * Your views can't perform a navigation because the `Navigator` has not been configured.
 
 In order to fix that, we need to mock the Vaadin environment properly.
+This is where the `karibu-testing` library comes handy - it provides you with means of mocking the Vaadin environment.
 
 ## Testing an actual application
 
-This is where the `karibu-testing` library comes handy - it provides you with means of mocking the Vaadin environment.
-
-Let's look at the [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) - a very sample application
-consisting of just the UI - no views. Because of its simplicity it is an excellent testing grounds for your experiments -
+Let's look at the [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-helloworld-application) - a very sImple application
+consisting of just the `UI` class and no views. Because of its simplicity it is an excellent testing grounds for your experiments -
 just clone the app and start experimenting. You can run the tests simply by running `./gradlew`; you can also right-click on the `MyUITest`
 class from your IDE and select 'Run MyUITest', to run and/or debug the tests from your IDE.
 
@@ -83,7 +82,7 @@ It will produce the following screen:
 
 ![Karibu-DSL Helloworld App](../docs/images/karibu_helloworld_app.png)
 
-In order to test this app, we need to initialize `MyUI`. But it's not THAT simple: in order to properly initialize the `UI` class, a proper Vaadin
+In order to test this app, we need to instantiate and initialize `MyUI`. In order to properly initialize the `UI` class, a proper Vaadin
 environment needs to be prepared:
 
 * We need to prepare the `VaadinSession` in a way that `VaadinSession.getCurrent()` returns a proper session

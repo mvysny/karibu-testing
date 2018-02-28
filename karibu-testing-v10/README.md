@@ -124,9 +124,45 @@ so we can simply call `children.findFirst().get() as Button` to obtain the butto
 However, typical Vaadin apps has much more complex structure with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.
 
-todo
+### Looking up the components
 
-## A more complete example
+The Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
+
+* `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
+  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
+
+This particular function will search for all components nested within `UI.getCurrent()`.
+You can call the function in a different way, which will restrict the search to some particular layout
+which is handy when you're testing a standalone custom UI component outside of the `UI` class:
+
+* `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
+
+> **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
+
+With this arsenal at hand, we can rewrite the test:
+
+```kotlin
+/**
+ * Tests the UI. Uses the Serverless testing approach as provided by the [Karibu Testing](https://github.com/mvysny/karibu-testing) library.
+ */
+class MainViewTest: DynaTest({
+    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+
+    test("test greeting") {
+        // simulate a button click as if clicked by the user
+        _get<Button> { caption = "Click me" } ._click()
+
+        // look up the Example Template and assert on its value
+        expect("Clicked!") { _get<ExampleTemplate>().value }
+    }
+})
+``` 
+
+> **Important note:** The lookup methods will only consider *visible* components - for example `_get<Button>()` will fail if the
+  "Click me" button is invisible. This is because the intent of the test is to populate/access the components as if it was the user who
+  is accessing the application; and of course the user can't access the component if it is invisible.
+
+## Example projects
 
 The [Vaadin 10 Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu10-helloworld-application) is a very simple project consisting of just
 one view and a single test for that view.
@@ -134,3 +170,7 @@ one view and a single test for that view.
 Please head to the [Beverage Buddy](https://github.com/mvysny/beverage-buddy-vok/) for a more complete example application -
 it is a very simple Vaadin-on-Kotlin-based
 full-stack Vaadin 10 application which also sports a complete testing suite.
+
+## Advanced topics
+
+todo

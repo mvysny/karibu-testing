@@ -128,7 +128,7 @@ We need some kind of a lookup function which will find the appropriate component
 
 ### Looking up the components
 
-Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
+The Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
   if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`

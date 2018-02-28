@@ -112,6 +112,18 @@ class MyUITest : DynaTest({
 
 ### Simulating the user input
 
+We can now examine and assert on the MainView's properties, and more importantly,
+discover its children (the `ExampleTemplate` and `Button`, respectively).
+When we obtain the `Button` instance, we can simply call the server-side `click()` API on it, to simulate a click on the button itself.
+The `click()` method will execute all listeners and will block until
+all listeners are done; we can check that the click listener was run and it had changed the value
+of the template, by examining the value of `ExampleTemplate`.
+
+Obtaining the `Button` in this simple project is easy - it's the first child of the `MainView`
+so we can simply call `children.findFirst().get() as Button` to obtain the button.
+However, typical Vaadin apps has much more complex structure with lots of nested layouts.
+We need some kind of a lookup function which will find the appropriate component for us.
+
 todo
 
 ## A more complete example

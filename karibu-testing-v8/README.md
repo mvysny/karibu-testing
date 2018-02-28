@@ -122,7 +122,8 @@ Then, we can call `Button.click()`
 to simulate a click on the button itself. The `click()` method will execute all listeners and will block until
 all listeners are done; we can check that the click listener was run and it had created the label.
 
-Obtaining the `TextField` in this simple project is easy; however typical Vaadin apps has much more complex structure, with lots of nested layouts.
+Obtaining the `TextField` in this simple project is easy - it's the first child of the layout so we can call `getComponent(0) as TextField` to obtain the text field.
+However, typical Vaadin apps has much more complex structure with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.
 
 ### Looking up the components

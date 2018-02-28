@@ -82,6 +82,10 @@ It will produce the following screen:
 
 ![Karibu-DSL Helloworld App](../docs/images/karibu_helloworld_app.png)
 
+> **Note:** I've used the [Karibu-DSL](https://github.com/mvysny/karibu-dsl) library to define the UI, however
+  you are free to create your UI in any way you see fit: be it design html files, or even plain Java code.
+  All of those styles are compatible with the Karibu-Testing library - it doesn't matter how exactly the UI has been created.
+
 In order to test this app, we need to instantiate and initialize `MyUI`. In order to properly initialize the `UI` class, a proper Vaadin
 environment needs to be prepared:
 

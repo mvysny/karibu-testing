@@ -172,7 +172,7 @@ The [Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu-hellowo
 one `UI` and a single test for that UI. Because of its simplicity it's easy to experiment upon.
 
 The [Vaadin-on-Kotlin CRUD Exaple](https://github.com/mvysny/vaadin-on-kotlin#example-project) is a
-more complete full-stack app which demonstrates how to use the Navigator and the Views using serverless testing.
+more complete full-stack app which demonstrates how to use the Navigator and the Views using browserless testing.
 
 ## Advanced topics
 
@@ -206,7 +206,7 @@ navigator = Navigator(this, content as ViewDisplay)
 navigator.addProvider(autoViewProvider)
 ```
 
-With serverless tests there is no servlet container and nobody will discover the `@AutoView`s automatically.
+With browserless tests there is no servlet container and nobody will discover the `@AutoView`s automatically.
 Luckily Karibu-DSL provides means to discover those views, as a `autoDiscoverViews()` function. All you need to do in your tests is
 to call this function before all tests:
 

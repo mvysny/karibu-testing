@@ -146,9 +146,6 @@ which is handy when you're testing a standalone custom UI component outside of t
 With this arsenal at hand, we can rewrite the test:
 
 ```kotlin
-/**
- * Tests the UI. Uses the Serverless testing approach as provided by the [Karibu Testing](https://github.com/mvysny/karibu-testing) library.
- */
 class MainViewTest: DynaTest({
     beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
 
@@ -192,7 +189,7 @@ A typical app will consist of multiple views. You can test the views of such app
   Because of that, you can simply call the navigation from your tests to perform the navigation to the view, for example
   `UI.getCurrent().navigateTo("books")`.
 
-Typically Flow will rely on Servlet container to auto-discover all routes. However, with serverless tests there is no servlet container and
+Typically Flow will rely on Servlet container to auto-discover all routes. However, with browserless tests there is no servlet container and
 nobody will discover the `@Route`s automatically. That's why Karibu-Testing library provides means to discover those views, in the form of
 the `autoDiscoverViews()` function. All you need to do in your tests is
 to call this function before all tests:
@@ -270,7 +267,7 @@ java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching Text
 ### Clicking Buttons
 
 Vaadin Button contains the `click()` method, however that method actually invokes the browser-side click method which will then eventually
-fire server-side click listeners. However, with serverless testing there is no browser and nothing gets done.
+fire server-side click listeners. However, with browserless testing there is no browser and nothing gets done.
 
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which moreover
 checks the following points prior running the click listeners:

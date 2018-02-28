@@ -177,4 +177,120 @@ full-stack Vaadin 10 application which also sports a complete testing suite.
 
 ## Advanced topics
 
-todo
+### Navigation
+
+A typical app will consist of multiple views. You can test the views of such app using two different approaches:
+
+* Simply instantiate the view class yourself and test it as a component, as demonstrated above with `GreetingLabel`.
+  The view typically extends `VerticalLayout` or some other layout anyway,
+  which makes it a Vaadin component. The disadvantage is that `_get()` functions will not work unless you attach the component to the current UI;
+  also the component may lazy-initialize itself by the means of the `onAttach()` listener which only gets fired when the component is attached to a UI.
+  Therefore, this approach should only be used for reusable components which do not depend on a particular UI and do not
+  lazy-init themselves.
+* Properly set up your UI by calling `MockVaadin.setup(autoDiscoverViews("your.app.package"))`. The `autoDiscoverViews()` function will
+  automatically discover all of your `@Route`-annotated views; `MockVaadin` will then properly populate the internal Vaadin Flow `RouteRegistry`.
+  Because of that, you can simply call the navigation from your tests to perform the navigation to the view, for example
+  `UI.getCurrent().navigateTo("books")`.
+
+Typically Flow will rely on Servlet container to auto-discover all routes. However, with serverless tests there is no servlet container and
+nobody will discover the `@Route`s automatically. That's why Karibu-Testing library provides means to discover those views, in the form of
+the `autoDiscoverViews()` function. All you need to do in your tests is
+to call this function before all tests:
+
+```kotlin
+class MyUITest : DynaTest({
+    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+    test("simple test") {
+        // navigate to the "Categories" list route.
+        UI.getCurrent().navigateTo("categories")
+
+        // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
+        val grid = _get<Grid<*>>()
+        expect(1) { grid.dataProvider._size() }
+        // etc etc
+    }
+})
+```
+
+## API
+
+### Looking up components
+
+This library provides three methods for looking up components.
+
+* `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
+  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`
+* `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
+  an empty list if there is no such component. For example: `_find<VerticalLayout> { id = "form" }`
+* `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
+  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
+
+> I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
+  will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
+  components - they will simply ignore invisible ones.
+
+This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
+in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin
+component as an extension method. For example:
+
+```kotlin
+class AddNewPersonForm : VerticalLayout {
+    // nests fields, uses binder, etc etc
+}
+
+test("add new person happy flow") {
+    val form = AddNewPersonForm()
+    form._get<TextField> { caption = "Name:" } .value = "John Doe"
+    form._get<Button> { caption = "Create" } ._click()
+}
+```
+
+Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular layout:
+```kotlin
+_get<FlexLayout> { id = "form" } ._get<TextField> { caption = "Age" } .value = "45"
+```
+
+Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
+on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
+```
+java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name': []. Component tree:
+└── MyUI[]
+    └── VerticalLayout[]
+        ├── TextField[caption='Type your name here:', value='']
+        └── Button[caption='Click Me']
+
+
+	at com.github.karibu.testing.LocatorKt._find(Locator.kt:102)
+	at com.github.karibu.testing.LocatorKt._get(Locator.kt:65)
+	at com.github.karibu.testing.LocatorKt._get(Locator.kt:86)
+	at org.test.MyUITest$1$2.invoke(MyUITest.kt:25)
+	at org.test.MyUITest$1$2.invoke(MyUITest.kt:12)
+```
+
+### Clicking Buttons
+
+Vaadin Button contains the `click()` method, however that method actually invokes the browser-side click method which will then eventually
+fire server-side click listeners. However, with serverless testing there is no browser and nothing gets done.
+
+It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which moreover
+checks the following points prior running the click listeners:
+
+* When writing the test,
+  we expect the button to be enabled and fully able to receive (and execute) clicks. In this case, an attempt to click such button
+  from a test will fail.
+* If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the user can't really
+  interact with the button. In this case, the `_click()` method will fail as well.
+
+### Support for Grid
+
+The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
+contents of the Grid.
+
+* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
+* You can check for the total amount of items shown in the grid, by calling `grid._size()`
+* You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
+  `List<String>`
+* You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
+  fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
+* You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
+  the function will fail with a proper grid dump.

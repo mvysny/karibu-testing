@@ -180,14 +180,14 @@ more complete full-stack app which demonstrates how to use the Navigator and the
 
 A typical app will consist of multiple views. You can test the views of such app using two different approaches:
 
-* Simply instantiate the view class yourself and test it as a component, as demostrated above with `GreetingLabel`.
+* Simply instantiate the view class yourself and test it as a component, as demonstrated above with `GreetingLabel`.
   The view typically extends `VerticalLayout` or some other layout anyway,
   which makes it a Vaadin component. The disadvantage is that `_get()` functions will not work unless you attach the component to the current UI;
   also the component may lazy-initialize itself by the means of the onAttach listener which only gets fired when the component is attached to a UI.
   Therefore, this approach should only be used for reusable components which do not depend on a particular UI and do not
   lazy-init themselves.
 * Properly set up your UI by calling `MockVaadin.setup({ MyUI() })`. Your UI then typically initializes the Navigator and outfits it with a `ViewProvider`.
-  Because of that, you can simply call the Navigator's API from your tests to perform the navigation to the view, such as `UI.getCurrent().navigator.navigateTo("books")`.
+  Because of that, you can simply call the Navigator's API from your tests to perform the navigation to the view, for example `UI.getCurrent().navigator.navigateTo("books")`.
   However, if the `ViewProvider` was not properly initialized for Navigator itself,
   this won't work unless the test code itself will populate the `ViewProvider`.
 
@@ -244,7 +244,8 @@ This library provides three methods for looking up components.
   components - they will simply ignore invisible ones.
 
 This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
-in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin component as an extension metod. For example:
+in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin
+component as an extension method. For example:
 
 ```kotlin
 class AddNewPersonForm : VerticalLayout {
@@ -288,7 +289,8 @@ Vaadin Button contains the `click()` method, however that method is not well fit
   we expect the button to be enabled and fully able to receive (and execute) clicks. In this case, an attempt to click such button
   from a test should fail.
 * If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the `click()` method
-  will still run the listeners even though the user can't really interact with the button. In this case, the test should fail as well.
+  will still run the listeners even though the user can't really interact with the button. In this case, the `click()` method
+  should fail as well.
  
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
 all the above points, prior running the click listeners.

@@ -26,8 +26,8 @@ publishing {
             version project.version
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'Support for serverless Vaadin testing using the Kotlin language')
-                root.appendNode('name', 'Karibu Serverless Testing v8')
+                root.appendNode('description', 'Support for browserless Vaadin testing using the Kotlin language')
+                root.appendNode('name', 'Karibu Testing v8')
                 root.appendNode('url', 'https://github.com/mvysny/karibu-testing')
             }
             from components.java

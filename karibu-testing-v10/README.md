@@ -209,6 +209,30 @@ class MyUITest : DynaTest({
 })
 ```
 
+### Polymer Templates
+
+Testing components nested inside Polymer Templates with browserless approach is nearly impossible since the child components are either
+not accessible from the server-side altogether, or they are only a shallow version of components constructed server-side.
+
+Please read the discussion at [Can't look up components inside of PolymerTemplate](https://github.com/mvysny/karibu-testing/issues/1)
+for a technical explanation.
+
+In short, it is not possible to look up components inside of a Polymer Template, but it is possible to use the API of nested components
+to a degree. It is recommended that you publish your `@Id`-annotated fields as `public` or `internal` and access them from your tests
+in the following manner:
+
+```kotlin
+class ReviewsList : PolymerTemplate<TemplateModel>() {
+    @Id("search")
+    internal lateinit var search: TextField
+    // ...
+}
+test("create review") {
+   val list = ReviewsList()
+   list.addReview._click()
+}
+```
+
 ## API
 
 ### Looking up components

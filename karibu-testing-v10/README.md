@@ -227,9 +227,13 @@ class ReviewsList : PolymerTemplate<TemplateModel>() {
     internal lateinit var search: TextField
     // ...
 }
+
 test("create review") {
-   val list = ReviewsList()
-   list.addReview._click()
+   // this doesn't work because of https://github.com/mvysny/karibu-testing/issues/1
+   //  _get<Button> { caption = "New review" } ._click()
+   
+   // this will work:
+   _get<ReviewsList>().addReview._click()
 }
 ```
 

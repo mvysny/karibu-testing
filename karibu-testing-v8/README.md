@@ -7,7 +7,7 @@ repositories {
     maven { url "https://dl.bintray.com/mvysny/github" }
 }
 dependencies {
-    testCompile "com.github.kaributesting:karibu-testing-v8:0.4.0"
+    testCompile "com.github.kaributesting:karibu-testing-v8:0.4.1"
 }
 ```
 

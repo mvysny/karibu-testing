@@ -167,11 +167,12 @@ inline fun <reified T: Component> Component._expectNone(noinline block: SearchSp
  * @throws IllegalArgumentException if one or more components matched.
  */
 fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): Unit {
-    val result = _find(clazz) {
+    val result: List<T> = _find(clazz) {
         count = 0..0
         block()
         check(count == 0..0) { "You're calling _expectNone which expects 0 component, yet you tried to specify the count of $count" }
     }
+    check(result.isEmpty()) // safety check that _find works as expected
 }
 
 /**

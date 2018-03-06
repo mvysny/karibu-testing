@@ -34,7 +34,7 @@ class MockVaadinTest : DynaTest({
         // no need: when UI is initialized in MockVaadin.setup(), automatic navigation to "" is performed.
 //        UI.getCurrent().navigateTo("")
         _get<Text> { text = "Welcome!" }
-        UI.getCurrent().navigateTo("helloworld")
+        UI.getCurrent().navigate("helloworld")
         _get<Button> { caption = "Hello, World!" }
     }
 

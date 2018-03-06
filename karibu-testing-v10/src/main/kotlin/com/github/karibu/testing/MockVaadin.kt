@@ -6,7 +6,9 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.dialog.GeneratedVaadinDialog
 import com.vaadin.flow.dom.PropertyChangeEvent
 import com.vaadin.flow.dom.PropertyChangeListener
+import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
+import com.vaadin.flow.internal.ExecutionContext
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.startup.RouteRegistry
@@ -69,7 +71,7 @@ object MockVaadin {
  * We need to use a MockedUI, with [beforeClientResponse] overridden, otherwise opened dialogs will never appear in the UI.
  */
 class MockedUI : UI() {
-    override fun beforeClientResponse(component: Component, execution: Runnable): StateTree.ExecutionRegistration {
+    override fun beforeClientResponse(component: Component, execution: SerializableConsumer<ExecutionContext>): StateTree.ExecutionRegistration {
         if (component is Dialog && component.isOpened) {
             component.addOpenedChangeListener {
                 // not currently fired by Flow.
@@ -78,7 +80,7 @@ class MockedUI : UI() {
                 }
             }
         }
-        execution.run()
+        execution.accept(ExecutionContext(this, false))
         return object : StateTree.ExecutionRegistration {
             override fun remove() {
                 // no-op, cannot be canceled since it already ran

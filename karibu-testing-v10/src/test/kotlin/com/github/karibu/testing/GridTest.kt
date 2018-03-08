@@ -39,6 +39,7 @@ class GridTest : DynaTest({
         expect("") { grid.addColumn({ it }).header2 }
         expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo") }.header2 }
         expect("") { grid.addColumn({ it }).apply { setHeader(Text("Foo")) }.header2 }
+        expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo"); setSortProperty("name") }.header2 }
     }
 })
 

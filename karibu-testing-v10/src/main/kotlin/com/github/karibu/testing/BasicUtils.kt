@@ -3,8 +3,13 @@ package com.github.karibu.testing
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.dom.Element
+import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.router.Route
 import org.atmosphere.util.annotation.AnnotationDetector
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -106,3 +111,16 @@ fun Button._click() {
 
 private fun Component.isEffectivelyVisible(): Boolean = isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
 
+/**
+ * This function actually works, as opposed to [Element.getTextRecursively].
+ */
+val Element.textRecursively2: String get() {
+    // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
+    val node = ElementUtil.toJsoup(Document(""), this)
+    return node.textRecursively
+}
+
+val Node.textRecursively: String get() = when (this) {
+    is TextNode -> this.text()
+    else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
+}

@@ -6,9 +6,11 @@ import com.vaadin.flow.data.provider.DataGenerator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.Query
 import com.vaadin.flow.dom.Element
+import com.vaadin.flow.dom.ElementUtil
 import elemental.json.Json
 import elemental.json.JsonObject
 import elemental.json.JsonValue
+import org.jsoup.nodes.Document
 import kotlin.streams.toList
 
 /**
@@ -88,13 +90,19 @@ private val <T> Grid.Column<T>.internalId2: String get() = javaClass.getDeclared
     invoke(this@internalId2) as String
 }
 
+/**
+ * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String). The result value is undefined if a component has been set as the header.
+ */
 var <T> Grid.Column<T>.header2: String
     get() {
         val e = AbstractColumn::class.java.getDeclaredField("headerTemplate").run {
             isAccessible = true
             get(this@header2) as? Element
         }
-        return e?.getPropertyRaw("innerHTML")?.toString() ?: ""
+        // this would return "<vaadin-grid-sorter path='col5'>Foo</vaadin-grid-sorter>" for sortable columns
+//        return e?.getPropertyRaw("innerHTML")?.toString() ?: ""
+        // this doesn't work: e?.textRecursively  : https://github.com/vaadin/flow/issues/3668
+        return e?.textRecursively2 ?: ""
     }
     set(value) {
         setHeader(value)

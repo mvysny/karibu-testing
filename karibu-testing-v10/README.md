@@ -7,9 +7,11 @@ repositories {
     maven { url "https://dl.bintray.com/mvysny/github" }
 }
 dependencies {
-    testCompile "com.github.kaributesting:karibu-testing-v10:0.4.1"
+    testCompile "com.github.kaributesting:karibu-testing-v10:x.y.z"
 }
 ```
+
+> Note: obtain the newest version from the release name, and the tag name as well: [https://github.com/mvysny/karibu-testing/releases](https://github.com/mvysny/karibu-testing/releases)
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 

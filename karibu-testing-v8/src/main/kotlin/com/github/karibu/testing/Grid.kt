@@ -11,7 +11,7 @@ import kotlin.streams.toList
 /**
  * Returns the item on given row. Fails if the row index is invalid.
  * @param rowIndex the row, 0..size - 1
- * @return the item at given row, not null.
+ * @return the item at given row.
  */
 fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
     @Suppress("UNCHECKED_CAST")
@@ -20,11 +20,27 @@ fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
 }
 
 /**
+ * Returns all items in given data provider.
+ * @return the list of items.
+ */
+fun <T : Any> DataProvider<T, *>._findAll(): List<T> {
+    @Suppress("UNCHECKED_CAST")
+    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(0, Int.MAX_VALUE, null, null, null))
+    return fetched.toList()
+}
+
+/**
  * Returns the item on given row. Fails if the row index is invalid.
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
 fun <T : Any> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex)
+
+/**
+ * Returns all items in given data provider.
+ * @return the list of items.
+ */
+fun <T : Any> Grid<T>._findAll(): List<T> = dataProvider._findAll()
 
 /**
  * Returns the number of items in this data provider.

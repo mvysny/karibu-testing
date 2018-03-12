@@ -18,6 +18,11 @@ class GridTest : DynaTest({
         expect("name 5") { ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name }
     }
 
+    test("_findAll") {
+        val list = (0 until 20).map { TestPerson("name $it", it) }
+        expect(list) { ListDataProvider<TestPerson>(list)._findAll() }
+    }
+
     test("_dump") {
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         val grid = Grid<TestPerson>(TestPerson::class.java)

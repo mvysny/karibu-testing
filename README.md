@@ -7,10 +7,11 @@ testing instructions to: we bypass the browser and the JavaScript-Server bridge,
 
 This approach has the following advantages:
 
-* *Speed*. Server-side tests are typically 100x faster than Selenium and run in ~60 milliseconds.
+* *Speed*. Server-side tests are typically 100x faster than Selenium and run in 5-60 milliseconds,
+  depending on the complexity of the test.
 * *Reliable*. We don't need arbitrary sleeps since we're server-side and we can hook into data fetching.
-* Run headless since there's no browser.
-* Can be run after every commit since they're fast.
+* The tests run headless since there's no browser.
+* The tests can be run after every commit by your CI since they run fast: imagine running 600 UI tests in 7 seconds.
 * You don't even need to start the web server itself since we're bypassing the http parsing altogether!
 
 A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the browserless testing technique.

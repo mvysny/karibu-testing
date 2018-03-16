@@ -10,6 +10,7 @@ This approach has the following advantages:
 * *Fast*: Browserless tests are typically 100x faster than Selenium-based tests and run in 5-60 milliseconds,
   depending on their complexity.
 * *Reliable*: We don't need arbitrary sleeps since we're server-side and we can await until the request is fully processed.
+  We don't use Selenium drivers which are known to fail randomly.
 * *Headless*: The tests run headless since there's no browser.
 
 With this technique you can run 600 UI tests in 7 seconds, as opposing to 1-2 hours with Selenium-based approach.

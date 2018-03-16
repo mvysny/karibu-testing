@@ -16,7 +16,8 @@ This approach has the following advantages:
 With this technique you can run 600 UI tests in 7 seconds, as opposing to 1-2 hours with Selenium-based approach.
 Because of the speed, you can let the UI tests run after every commit by your continuous integration server.
 
-Since we're bypassing the browser and talking to Vaadin server API directly, you don't even need to start the servlet container!
+Since we're bypassing the browser and talking to Vaadin server API directly, you don't even need to start the servlet container -
+you can just add the server jars onto testing classpath and call Vaadin server API which will in turn invoke your server logic.
 
 A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the browserless testing technique.
 

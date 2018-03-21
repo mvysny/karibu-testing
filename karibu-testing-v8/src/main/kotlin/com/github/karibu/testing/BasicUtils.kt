@@ -4,6 +4,7 @@ import com.vaadin.data.HasValue
 import com.vaadin.server.AbstractClientConnector
 import com.vaadin.ui.Button
 import java.util.*
+import kotlin.test.expect
 
 /**
  * Allows us to fire any Vaadin event on any Vaadin component.
@@ -38,3 +39,8 @@ fun Button._click() {
     }
     click()
 }
+
+/**
+ * Expects that [actual] list of objects matches [expected] list of objects. Fails otherwise.
+ */
+fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)

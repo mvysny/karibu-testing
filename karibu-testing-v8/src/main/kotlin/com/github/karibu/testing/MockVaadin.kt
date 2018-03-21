@@ -13,13 +13,16 @@ object MockVaadin {
     private val strongRefUI = ThreadLocal<UI>()
     /**
      * Creates new mock session and UI for a test. Just call this in your @Before
+     * @param uiFactory provides instances of your app's UI. By default returns [MockUI]
+     * @param servlet the servlet to set to [VaadinServletService]; defaults to [VaadinServlet].
      */
-    fun setup(uiFactory: ()->UI = { MockUI() }) {
+    fun setup(uiFactory: ()->UI = { MockUI() }, servlet: VaadinServlet = VaadinServlet()) {
         val config = DefaultDeploymentConfiguration(MockVaadin::class.java, Properties())
-        val service = object : VaadinServletService(VaadinServlet(), config) {
+        val service = object : VaadinServletService(servlet, config) {
             override fun isAtmosphereAvailable() = false
         }
         service.init()
+        VaadinService.setCurrent(service)
         val session = object : VaadinSession(service) {
             private val lock = ReentrantLock()
             init {

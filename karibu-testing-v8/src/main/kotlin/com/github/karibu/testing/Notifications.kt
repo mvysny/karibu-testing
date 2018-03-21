@@ -11,9 +11,9 @@ fun getNotifications(): List<Notification> = UI.getCurrent().extensions.filterIs
 /**
  * Expects that given list of notifications is displayed. Also clears the notifications.
  */
-fun expectNotifications(vararg descriptions: String) {
+fun expectNotifications(vararg descriptions: Pair<String, String?>) {
     val notifications: List<Notification> = getNotifications()
-    expectList(*descriptions) { notifications.map { it.description } }
+    expectList(*descriptions) { notifications.map { it.caption to it.description } }
     clearNotifications()
 }
 

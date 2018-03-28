@@ -30,7 +30,13 @@ object MockVaadin {
      * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing.
      */
     fun setup(routes: Set<Class<out Component>> = setOf(), uiFactory: ()->UI = { MockedUI() }) {
-        val service = object : VaadinServletService(null, DefaultDeploymentConfiguration(MockVaadin::class.java, Properties(), { _, _ -> })) {
+        // init servlet
+        val servlet = VaadinServlet()
+        val ctx = MockContext()
+        servlet.init(MockServletConfig(ctx))
+
+        // init VaadinService
+        val service = object : VaadinServletService(servlet, DefaultDeploymentConfiguration(MockVaadin::class.java, Properties(), { _, _ -> })) {
             private val registry = object : RouteRegistry() {
                 init {
                     setNavigationTargets(routes)
@@ -46,6 +52,8 @@ object MockVaadin {
         }
         service.init()
         VaadinService.setCurrent(service)
+
+        // init Vaadin Session
         val session = object : VaadinSession(service) {
             private val lock = ReentrantLock().apply { lock() }
             override fun getLockInstance(): Lock = lock
@@ -54,7 +62,7 @@ object MockVaadin {
         strongRefSession.set(session)
         session.setAttribute(VaadinUriResolverFactory::class.java, MockResolverFactory)
 
-        val ctx = MockContext()
+        // init Vaadin Request
         val request = VaadinServletRequest(MockRequest(ctx), service)
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)

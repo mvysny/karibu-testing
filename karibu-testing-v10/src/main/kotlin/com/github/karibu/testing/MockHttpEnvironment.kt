@@ -99,9 +99,7 @@ class MockContext : ServletContext {
 
     override fun getRealPath(path: String): String = File("src/main/webapp/frontend/$path").absolutePath
 
-    override fun getInitParameter(name: String?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getInitParameter(name: String): String? = null
 
     override fun getMinorVersion(): Int = 0
 
@@ -149,12 +147,12 @@ class MockContext : ServletContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getAttribute(name: String?): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    private val attributes = mutableMapOf<String, Any>()
 
-    override fun setAttribute(name: String?, `object`: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getAttribute(name: String): Any? = attributes[name]
+
+    override fun setAttribute(name: String, `object`: Any?) {
+        if (`object` == null) attributes.remove(name) else attributes[name] = `object`
     }
 
     override fun getServletRegistration(servletName: String?): ServletRegistration {
@@ -189,13 +187,9 @@ class MockContext : ServletContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getResourcePaths(path: String?): MutableSet<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getResourcePaths(path: String?): MutableSet<String> = mutableSetOf()
 
-    override fun getInitParameterNames(): Enumeration<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getInitParameterNames(): Enumeration<String> = Collections.emptyEnumeration()
 
     override fun getServerInfo(): String = "Mock"
 
@@ -462,4 +456,14 @@ class MockRequest(ctx: ServletContext) : HttpServletRequest {
     override fun getRemoteHost(): String = "127.0.0.1"
 
     override fun isSecure(): Boolean = false
+}
+
+class MockServletConfig(val context: ServletContext) : ServletConfig {
+    override fun getInitParameter(name: String): String? = null
+
+    override fun getInitParameterNames(): Enumeration<String> = Collections.emptyEnumeration()
+
+    override fun getServletName(): String = "Vaadin Servlet"
+
+    override fun getServletContext(): ServletContext = context
 }

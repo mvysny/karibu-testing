@@ -3,9 +3,6 @@ package com.github.karibu.testing
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
-import com.vaadin.flow.component.dialog.GeneratedVaadinDialog
-import com.vaadin.flow.dom.PropertyChangeEvent
-import com.vaadin.flow.dom.PropertyChangeListener
 import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.ExecutionContext

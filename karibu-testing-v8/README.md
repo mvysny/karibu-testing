@@ -325,15 +325,16 @@ class AddressPanel : FormLayout() {
 }
 ```
 
-The class seems to be lacking any sort of indicator whether it's primary or not. Luckily, we can fix that with the help of extension properties:
+The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
 
 ```kotlin
 val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } .value
 ```
 
-Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter in
-the components. The `SearchSpec<T>` has one extension point: the `predicates` which allow you to add any additional conditions on the
-components considered by the function. We can indeed add our own predicate that takes advantage of the `isPrimary` property:
+Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter
+the components. The `SearchSpec<T>` has one extension point: the `predicates` property which allow you to add any additional conditions on the
+components considered by the function. We can indeed add our own predicate that takes advantage of the `isPrimary` property.
+The primary address lookup code will look like this:
 
 ```kotlin
 _get<AddressPanel> { predicates.add(Predicate { address -> address.isPrimary }) }

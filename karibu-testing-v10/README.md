@@ -321,3 +321,70 @@ contents of the Grid.
   fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
+
+## Adding support for custom search criteria
+
+Suppose you have a dynamic form which allows you to add multiple addresses, one of those being primary. You'll have the following `AddressPanel` class:
+
+```kotlin
+class AddressPanel : FormLayout() {
+    init {
+        checkBox("Primary Address")
+        textField("Street")
+    }
+}
+```
+
+The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
+
+```kotlin
+val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } .value
+```
+
+Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter
+the components. The `SearchSpec<T>` has one extension point: the `predicates` property which allow you to add any additional conditions on the
+components considered by the function. We can indeed add our own predicate that takes advantage of the `isPrimary` property.
+The primary address lookup code will look like this:
+
+```kotlin
+_get<AddressPanel> { predicates.add(Predicate { address -> address.isPrimary }) }
+```
+
+This code has two disadvantages:
+
+* It is ugly and hard to read
+* When no such addresses are found, a cryptic error message is printed: `No visible AddressPanel in MockUI[] matching AddressPanel and com.github.karibu.testing.LocatorTest$1$6$1$1@32eebfca: []`
+
+We can do better. We can extract the above code to a property; since we need access to `predicates` we need the property to be an extension
+property of `SearchSpec<T>`. We also need to provide a proper `toString()` to produce clear error messages.
+
+```kotlin
+var SearchSpec<AddressPanel>.isPrimary: Boolean
+    @Deprecated("", level = DeprecationLevel.ERROR)
+    get() = throw UnsupportedOperationException()
+    set(value) {
+        predicates.add(object : Predicate<AddressPanel> {
+            override fun test(t: AddressPanel) = t.isPrimary == value
+            override fun toString() = "isPrimary==$value"
+        })
+    }
+```
+
+Now we can simply look up the primary address as follows:
+
+```kotlin
+test("check that the form has primary address") {
+    UI.getCurrent().content = AddressPanel()
+    _get<AddressPanel> { isPrimary = true }
+}
+```
+
+The error message of a failed test is now clear:
+
+```
+java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching AddressPanel and isPrimary==true: []. Component tree:
+└── MockUI[]
+    └── AddressPanel[]
+        ├── CheckBox[caption='Primary Address', value='false']
+        └── TextField[caption='Street', value='']
+```

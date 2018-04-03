@@ -51,7 +51,7 @@ fun Iterable<String?>.filterNotBlank(): List<String> = filterNotNull().filter { 
 
 private val Component.styleNames: Set<String> get() = styleName.split(' ').filterNotBlank().toSet()
 private fun Component.hasStyleName(style: String): Boolean {
-    if (style.contains(' ')) return style.split(' ').filterNotBlank().all { hasStyleName(style) }
+    if (style.contains(' ')) return style.split(' ').filterNotBlank().all { hasStyleName(it) }
     return styleNames.contains(style)
 }
 

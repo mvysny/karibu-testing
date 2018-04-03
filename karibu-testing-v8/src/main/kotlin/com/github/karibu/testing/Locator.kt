@@ -1,11 +1,10 @@
 package com.github.karibu.testing
 
-import com.vaadin.data.HasValue
-import com.vaadin.ui.Button
 import com.vaadin.ui.Component
 import com.vaadin.ui.HasComponents
 import com.vaadin.ui.UI
 import java.util.*
+import java.util.function.Predicate
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
@@ -14,7 +13,8 @@ import java.util.*
  * @property caption the required [Component.caption]; if null, no particular caption is matched.
  * @property styles if not null, the component must match all of these styles. Space-separated.
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
- * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored.
+ * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
+ * If adding a predicate, remember to provide a proper `toString()` so that you'll get an informative error message on lookup failure.
  */
 class SearchSpec<T : Component>(
     val clazz: Class<T>,
@@ -22,7 +22,7 @@ class SearchSpec<T : Component>(
     var caption: String? = null,
     var styles: String? = null,
     var count: IntRange = 0..Int.MAX_VALUE,
-    var predicates: List<(Component) -> Boolean> = listOf()
+    var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
     override fun toString(): String {
@@ -35,13 +35,14 @@ class SearchSpec<T : Component>(
         return list.joinToString(" and ")
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun toPredicate(): (Component) -> Boolean {
         val p = mutableListOf<(Component)->Boolean>()
         p.add({ component -> clazz.isInstance(component)} )
         if (id != null) p.add({ component -> component.id == id })
         if (caption != null) p.add({ component -> component.caption == caption })
         if (!styles.isNullOrBlank()) p.add({ component -> component.hasStyleName(styles!!) })
-        p.addAll(predicates)
+        p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }
 }

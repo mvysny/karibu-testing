@@ -5,6 +5,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
+import java.util.function.Predicate
 import java.util.stream.Collectors
 
 /**
@@ -14,7 +15,7 @@ import java.util.stream.Collectors
  * @property caption the required [Component.caption]; if null, no particular caption is matched.
  * @property text the [com.vaadin.flow.dom.Element.getText]
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
- * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored.
+ * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  */
 class SearchSpec<T : Component>(
     val clazz: Class<T>,
@@ -22,7 +23,7 @@ class SearchSpec<T : Component>(
     var caption: String? = null,
     var text: String? = null,
     var count: IntRange = 0..Int.MAX_VALUE,
-    var predicates: List<(Component) -> Boolean> = listOf()
+    var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
     override fun toString(): String {
@@ -35,13 +36,14 @@ class SearchSpec<T : Component>(
         return list.joinToString(" and ")
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun toPredicate(): (Component) -> Boolean {
         val p = mutableListOf<(Component)->Boolean>()
         p.add({ component -> clazz.isInstance(component)} )
         if (id != null) p.add({ component -> component.id_ == id })
         if (caption != null) p.add({ component -> component.caption == caption })
         if (text != null) p.add { component -> component.element.text == text }
-        p.addAll(predicates)
+        p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }
 }

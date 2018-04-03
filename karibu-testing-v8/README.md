@@ -1,3 +1,5 @@
+[![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
+
 # Getting started: Vaadin 8
 
 To start, just add the following lines into your Gradle `build.gradle` file:
@@ -11,7 +13,7 @@ dependencies {
 }
 ```
 
-> Note: obtain the newest version from the release name, and the tag name as well: [https://github.com/mvysny/karibu-testing/releases](https://github.com/mvysny/karibu-testing/releases)
+> Note: obtain the newest version from the tag name above
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 

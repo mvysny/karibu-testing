@@ -347,7 +347,10 @@ components considered by the function. We can indeed add our own predicate that 
 The primary address lookup code will look like this:
 
 ```kotlin
-_get<AddressPanel> { predicates.add(Predicate { address -> address.isPrimary }) }
+test("check that the form has primary address") {
+    UI.getCurrent().content = AddressPanel()
+    _get<AddressPanel> { predicates.add(Predicate { address -> address.isPrimary }) }
+}
 ```
 
 This code has two disadvantages:

@@ -263,9 +263,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getServerName(): String = "127.0.0.1"
 
-    override fun getLocalAddr(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getLocalAddr(): String = "127.0.0.1"
 
     override fun <T : HttpUpgradeHandler?> upgrade(handlerClass: Class<T>?): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -367,9 +365,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getLocale(): Locale {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getLocale(): Locale = Locale.ENGLISH
 
     override fun getMethod(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -381,9 +377,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getRemoteAddr(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getRemoteAddr(): String = "127.0.0.1"
 
     override fun getHeaders(name: String?): Enumeration<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -417,9 +411,9 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getHeader(headerName: String?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    val headers = mutableMapOf<String, String>()
+
+    override fun getHeader(headerName: String): String? = headers[headerName]
 
     override fun getContextPath(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -433,16 +427,19 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getAttribute(name: String?): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private val attributes = mutableMapOf<String, Any>()
+
+    override fun getAttribute(name: String): Any? = attributes[name]
+
+    override fun setAttribute(name: String, value: Any?) {
+        attributes.setOrRemove(name, value)
     }
 
-    override fun setAttribute(name: String?, value: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    private val parameters = mutableMapOf<String, String>()
 
-    override fun getParameter(parameter: String?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getParameter(parameter: String): String? = parameters.get(parameter)
+    fun setParameter(parameter: String, value: String?) {
+        parameters.setOrRemove(parameter, value)
     }
 
     override fun getRemotePort(): Int = 8080
@@ -462,4 +459,8 @@ open class MockServletConfig(val context: ServletContext) : ServletConfig {
     override fun getServletName(): String = "Vaadin Servlet"
 
     override fun getServletContext(): ServletContext = context
+}
+
+internal fun <K, V> MutableMap<K, V>.setOrRemove(key: K, value: V?) {
+    if (value == null) remove(key) else set(key, value)
 }

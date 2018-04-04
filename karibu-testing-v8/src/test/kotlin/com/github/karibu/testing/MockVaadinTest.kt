@@ -1,6 +1,7 @@
 package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
+import com.vaadin.server.Page
 import com.vaadin.server.VaadinService
 import com.vaadin.server.VaadinSession
 import com.vaadin.ui.UI
@@ -34,5 +35,9 @@ class MockVaadinTest : DynaTest({
     test("wrapped session works") {
         VaadinSession.getCurrent().session.setAttribute("foo", "bar")
         expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+    }
+
+    test("Browser should be mocked as well") {
+        expect("127.0.0.1") { Page.getCurrent().webBrowser.address }
     }
 })

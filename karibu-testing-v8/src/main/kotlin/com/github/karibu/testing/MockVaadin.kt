@@ -2,12 +2,13 @@ package com.github.karibu.testing
 
 import com.github.karibu.mockhttp.MockContext
 import com.github.karibu.mockhttp.MockHttpSession
+import com.github.karibu.mockhttp.MockRequest
 import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.server.*
+import com.vaadin.shared.Version
 import com.vaadin.ui.UI
-import java.net.URI
+import com.vaadin.util.CurrentInstance
 import java.util.*
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 object MockVaadin {
@@ -42,26 +43,24 @@ object MockVaadin {
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
 
+        // request
+        val httpRequest = MockRequest(httpSession)
+        val request = VaadinServletRequest(httpRequest, service)
+        httpRequest.setParameter("v-loc", "http://localhost:8080")
+        CurrentInstance.set(VaadinRequest::class.java, request)
+
         // UI
         val ui = uiFactory()
         strongRefUI.set(ui)
         UI.setCurrent(ui)
         ui.session = session
-        Page::class.java.getDeclaredField("location").apply {
-            isAccessible = true
-            set(ui.page, URI("http://localhost:8080"))
-        }
-        try {
+        ui.page.webBrowser.updateRequestDetails(request)
+        ui.doInit(request, 1, "1")
+        if (Version.getMinorVersion() >= 2) {
             UI::class.java.getDeclaredField("uiRootPath").apply {
                 isAccessible = true
                 set(ui, "")
             }
-        } catch (e: NoSuchFieldException) {
-            // Vaadin 8.1 and older doesn't have this field.
-        }
-        UI::class.java.getDeclaredMethod("init", VaadinRequest::class.java).apply {
-            isAccessible = true
-            invoke(ui, null)
         }
     }
 }

@@ -7,6 +7,7 @@ import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.ExecutionContext
@@ -32,27 +33,31 @@ object MockVaadin {
      */
     fun setup(routes: Set<Class<out Component>> = setOf(), uiFactory: ()->UI = { MockedUI() }) {
         // init servlet
-        val servlet = VaadinServlet()
+        val servlet = object : VaadinServlet() {
+            override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+                val service = object : VaadinServletService(this, deploymentConfiguration) {
+                    private val registry = object : RouteRegistry() {
+                        init {
+                            setNavigationTargets(routes)
+                        }
+                    }
+                    override fun isAtmosphereAvailable(): Boolean = false
+                    override fun getRouteRegistry(): RouteRegistry = registry
+                    override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
+                }
+                service.init()
+                return service
+            }
+        }
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
-        val httpSession = MockHttpSession.create(ctx)
+        VaadinService.setCurrent(servlet.service!!)
 
         // init VaadinService
-        val service = object : VaadinServletService(servlet, DefaultDeploymentConfiguration(MockVaadin::class.java, Properties(), { _, _ -> })) {
-            private val registry = object : RouteRegistry() {
-                init {
-                    setNavigationTargets(routes)
-                }
-            }
-            override fun isAtmosphereAvailable(): Boolean = false
-            override fun getRouteRegistry(): RouteRegistry = registry
-            override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
-        }
-        service.init()
-        VaadinService.setCurrent(service)
+        val httpSession = MockHttpSession.create(ctx)
 
         // init Vaadin Session
-        val session = object : VaadinSession(service) {
+        val session = object : VaadinSession(servlet.service) {
             private val lock = ReentrantLock().apply { lock() }
             override fun getLockInstance(): Lock = lock
         }
@@ -61,7 +66,7 @@ object MockVaadin {
         session.setAttribute(VaadinUriResolverFactory::class.java, MockResolverFactory)
 
         // init Vaadin Request
-        val request = VaadinServletRequest(MockRequest(httpSession), service)
+        val request = VaadinServletRequest(MockRequest(httpSession), servlet.service)
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 

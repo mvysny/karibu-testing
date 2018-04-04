@@ -1,6 +1,5 @@
 package com.github.karibu.mockhttp
 
-import java.util.Collections
 import java.util.Enumeration
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -56,20 +55,14 @@ open class MockHttpSession(
         return attributes[name]
     }
 
-    override fun getValue(name: String): Any? {
-        if (!valid.get()) throw IllegalStateException()
-        return attributes[name]
-    }
+    override fun getValue(name: String): Any? = getAttribute(name)
 
     override fun getAttributeNames(): Enumeration<String> {
         if (!valid.get()) throw IllegalStateException()
         return attributes.keys()
     }
 
-    override fun getValueNames(): Array<String> {
-        if (!valid.get()) throw IllegalStateException()
-        return Collections.list(attributes.keys()).toTypedArray()
-    }
+    override fun getValueNames(): Array<String> = attributeNames.toList().toTypedArray()
 
     override fun setAttribute(name: String, value: Any?) {
         if (!valid.get()) throw IllegalStateException()
@@ -77,8 +70,7 @@ open class MockHttpSession(
     }
 
     override fun putValue(name: String, value: Any?) {
-        if (!valid.get()) throw IllegalStateException()
-        attributes.putOrRemove(name, value)
+        setAttribute(name, value)
     }
 
     override fun removeAttribute(name: String) {
@@ -87,20 +79,12 @@ open class MockHttpSession(
     }
 
     override fun removeValue(name: String) {
-        if (!valid.get()) throw IllegalStateException()
-        attributes.remove(name)
+        removeAttribute(name)
     }
 
     fun copyAttributes(httpSession: HttpSession): MockHttpSession {
-        val e = httpSession.attributeNames
-        var k: String?
-        while (e.hasMoreElements()) {
-            k = e.nextElement()
-            if (k == null) continue
-
-            val o = httpSession.getAttribute(k) ?: continue
-
-            attributes[k] = o
+        httpSession.attributeNames.toList().forEach {
+            attributes[it] = httpSession.getAttribute(it)
         }
         return this
     }

@@ -1,7 +1,11 @@
 package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
+import com.vaadin.navigator.Navigator
+import com.vaadin.navigator.PushStateNavigation
+import com.vaadin.navigator.View
 import com.vaadin.server.Page
+import com.vaadin.server.VaadinRequest
 import com.vaadin.server.VaadinService
 import com.vaadin.server.VaadinSession
 import com.vaadin.ui.UI
@@ -40,4 +44,18 @@ class MockVaadinTest : DynaTest({
     test("Browser should be mocked as well") {
         expect("127.0.0.1") { Page.getCurrent().webBrowser.address }
     }
+
+    test("UI with push state and navigator won't fail") {
+        MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
+    }
 })
+
+@PushStateNavigation
+class MyUIWithNavigator : UI() {
+    override fun init(request: VaadinRequest) {
+        navigator = Navigator(this, this)
+        navigator.addView("", DummyView())
+    }
+}
+
+class DummyView : VerticalLayout(), View

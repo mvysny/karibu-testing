@@ -20,20 +20,27 @@ object MockVaadin {
      * @param uiFactory called once from this method, to provide instance of your app's UI. By default it returns [MockUI].
      * A basic Vaadin environment is prepared before calling this factory, in order to be safe to instantiate your UI.
      * To instantiate your UI just call your UI constructor, for example `YourUI()`
-     * @param servlet the servlet to set to [VaadinServletService]; defaults to [VaadinServlet].
      */
-    fun setup(uiFactory: ()->UI = { MockUI() }, servlet: VaadinServlet = VaadinServlet()) {
+    fun setup(uiFactory: ()->UI = { MockUI() }) {
         // prepare mocking servlet environment
         val servletContext = MockContext()
+        val servlet = object : VaadinServlet() {
+            override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+                val service = object : VaadinServletService(this, deploymentConfiguration) {
+                    override fun isAtmosphereAvailable() = false
+                }
+                service.init()
+                return service
+            }
+        }
         servlet.init(MockServletConfig(servletContext))
         val httpSession = MockHttpSession.create(servletContext)
 
         // mock Vaadin environment: Service
-        val config = DefaultDeploymentConfiguration(MockVaadin::class.java, Properties())
-        val service = object : VaadinServletService(servlet, config) {
-            override fun isAtmosphereAvailable() = false
+        val service = VaadinServlet::class.java.getDeclaredMethod("getService").run {
+            isAccessible = true
+            invoke(servlet) as VaadinServletService
         }
-        service.init()
         VaadinService.setCurrent(service)
 
         // Session
@@ -55,13 +62,13 @@ object MockVaadin {
         UI.setCurrent(ui)
         ui.session = session
         ui.page.webBrowser.updateRequestDetails(request)
-        ui.doInit(request, 1, "1")
         if (Version.getMinorVersion() >= 2) {
             UI::class.java.getDeclaredField("uiRootPath").apply {
                 isAccessible = true
                 set(ui, "")
             }
         }
+        ui.doInit(request, 1, "1")
     }
 }
 

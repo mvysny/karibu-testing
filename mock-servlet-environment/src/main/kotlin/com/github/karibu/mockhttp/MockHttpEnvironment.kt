@@ -18,7 +18,10 @@ open class MockContext : ServletContext {
 
     override fun getEffectiveMajorVersion(): Int = 3
 
-    override fun getResource(path: String): URL = File(getRealPath(path)).toURI().toURL()
+    override fun getResource(path: String): URL? {
+        val realPath = getRealPath(path) ?: return null
+        return File(realPath).toURI().toURL()
+    }
 
     override fun addListener(className: String?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -64,7 +67,7 @@ open class MockContext : ServletContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getResourceAsStream(path: String): InputStream = getResource(path).openStream()
+    override fun getResourceAsStream(path: String): InputStream? = getResource(path)?.openStream()
 
     override fun getNamedDispatcher(name: String?): RequestDispatcher {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -92,7 +95,10 @@ open class MockContext : ServletContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getRealPath(path: String): String = File("src/main/webapp/frontend/$path").absolutePath
+    override fun getRealPath(path: String): String? = listOf("src/main/webapp/frontend/$path", "src/main/webapp/$path").asSequence()
+        .map { File(it).absolutePath }
+        .filter { File(it).exists() }
+        .firstOrNull()
 
     override fun getInitParameter(name: String): String? = null
 
@@ -146,8 +152,8 @@ open class MockContext : ServletContext {
 
     override fun getAttribute(name: String): Any? = attributes[name]
 
-    override fun setAttribute(name: String, `object`: Any?) {
-        if (`object` == null) attributes.remove(name) else attributes[name] = `object`
+    override fun setAttribute(name: String, value: Any?) {
+        attributes.putOrRemove(name, value)
     }
 
     override fun getServletRegistration(servletName: String?): ServletRegistration {

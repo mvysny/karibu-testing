@@ -25,6 +25,5 @@ class ReviewsList : PolymerTemplate<TemplateModel>() {
     @Id("header")
     internal lateinit var header: H1
 
-    interface ReviewsModel : TemplateModel {
-    }
+    interface ReviewsModel : TemplateModel
 }

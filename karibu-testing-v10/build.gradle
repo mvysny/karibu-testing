@@ -17,6 +17,8 @@ dependencyManagement {
 
 dependencies {
     compile "com.vaadin:vaadin-core:$vaadin10_version"
+    // fixes incompatibility of vaadin-dialog with vaadin beta5. Remove this dep on upgrade to vaadin beta6 and above.
+    compile "com.vaadin:vaadin-dialog-flow:1.0.0.beta3"
     compile(project(":mock-servlet-environment"))
 
     testCompile("com.github.mvysny.dynatest:dynatest:${dynatest_version}")

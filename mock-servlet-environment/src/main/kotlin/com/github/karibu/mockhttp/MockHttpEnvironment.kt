@@ -432,14 +432,14 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getAttribute(name: String): Any? = attributes[name]
 
     override fun setAttribute(name: String, value: Any?) {
-        attributes.setOrRemove(name, value)
+        attributes.putOrRemove(name, value)
     }
 
     private val parameters = mutableMapOf<String, String>()
 
     override fun getParameter(parameter: String): String? = parameters.get(parameter)
     fun setParameter(parameter: String, value: String?) {
-        parameters.setOrRemove(parameter, value)
+        parameters.putOrRemove(parameter, value)
     }
 
     override fun getRemotePort(): Int = 8080
@@ -461,6 +461,6 @@ open class MockServletConfig(val context: ServletContext) : ServletConfig {
     override fun getServletContext(): ServletContext = context
 }
 
-internal fun <K, V> MutableMap<K, V>.setOrRemove(key: K, value: V?) {
+internal fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
     if (value == null) remove(key) else set(key, value)
 }

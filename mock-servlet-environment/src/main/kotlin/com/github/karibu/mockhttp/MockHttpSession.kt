@@ -71,14 +71,14 @@ open class MockHttpSession(
         return Collections.list(attributes.keys()).toTypedArray()
     }
 
-    override fun setAttribute(name: String, value: Any) {
+    override fun setAttribute(name: String, value: Any?) {
         if (!valid.get()) throw IllegalStateException()
-        attributes[name] = value
+        attributes.putOrRemove(name, value)
     }
 
-    override fun putValue(name: String, value: Any) {
+    override fun putValue(name: String, value: Any?) {
         if (!valid.get()) throw IllegalStateException()
-        attributes[name] = value
+        attributes.putOrRemove(name, value)
     }
 
     override fun removeAttribute(name: String) {

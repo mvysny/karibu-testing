@@ -2,7 +2,6 @@ package com.github.karibu.mockhttp
 
 import com.github.mvysny.dynatest.DynaTest
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpSession
 import kotlin.test.expect
 
 /**

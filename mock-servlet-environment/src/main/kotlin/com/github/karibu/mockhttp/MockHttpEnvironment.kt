@@ -1,10 +1,8 @@
-package com.github.karibu.testing
+package com.github.karibu.mockhttp
 
-import org.atmosphere.util.FakeHttpSession
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
 import java.lang.Exception
 import java.net.URL
@@ -14,7 +12,7 @@ import javax.servlet.*
 import javax.servlet.descriptor.JspConfigDescriptor
 import javax.servlet.http.*
 
-class MockContext : ServletContext {
+open class MockContext : ServletContext {
     override fun getServlet(name: String?): Servlet? = null
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
@@ -203,9 +201,7 @@ class MockContext : ServletContext {
     }
 }
 
-class MockRequest(ctx: ServletContext) : HttpServletRequest {
-
-    private val session = FakeHttpSession("1", ctx, System.currentTimeMillis(), 30)
+open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getInputStream(): ServletInputStream {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -458,7 +454,7 @@ class MockRequest(ctx: ServletContext) : HttpServletRequest {
     override fun isSecure(): Boolean = false
 }
 
-class MockServletConfig(val context: ServletContext) : ServletConfig {
+open class MockServletConfig(val context: ServletContext) : ServletConfig {
     override fun getInitParameter(name: String): String? = null
 
     override fun getInitParameterNames(): Enumeration<String> = Collections.emptyEnumeration()

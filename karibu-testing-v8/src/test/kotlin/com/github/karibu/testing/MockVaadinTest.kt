@@ -30,4 +30,9 @@ class MockVaadinTest : DynaTest({
         expect(2) { attachCalled.get() }
         expect(true) { vl.isAttached }
     }
+
+    test("wrapped session works") {
+        VaadinSession.getCurrent().session.setAttribute("foo", "bar")
+        expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+    }
 })

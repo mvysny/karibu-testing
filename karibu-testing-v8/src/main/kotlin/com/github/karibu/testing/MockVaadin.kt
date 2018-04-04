@@ -1,5 +1,8 @@
 package com.github.karibu.testing
 
+import com.github.karibu.mockhttp.MockContext
+import com.github.karibu.mockhttp.MockHttpSession
+import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.server.*
 import com.vaadin.ui.UI
 import java.net.URI
@@ -19,21 +22,27 @@ object MockVaadin {
      * @param servlet the servlet to set to [VaadinServletService]; defaults to [VaadinServlet].
      */
     fun setup(uiFactory: ()->UI = { MockUI() }, servlet: VaadinServlet = VaadinServlet()) {
+        // prepare mocking servlet environment
+        val servletContext = MockContext()
+        servlet.init(MockServletConfig(servletContext))
+        val httpSession = MockHttpSession.create(servletContext)
+
+        // mock Vaadin environment: Service
         val config = DefaultDeploymentConfiguration(MockVaadin::class.java, Properties())
         val service = object : VaadinServletService(servlet, config) {
             override fun isAtmosphereAvailable() = false
         }
         service.init()
         VaadinService.setCurrent(service)
-        val session = object : VaadinSession(service) {
-            private val lock = ReentrantLock()
-            init {
-                lock.lock()
-            }
-            override fun getLockInstance(): Lock = lock
-        }
+
+        // Session
+        val session = VaadinSession(service)
+        httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
+        session.refreshTransients(WrappedHttpSession(httpSession), service)
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
+
+        // UI
         val ui = uiFactory()
         strongRefUI.set(ui)
         UI.setCurrent(ui)

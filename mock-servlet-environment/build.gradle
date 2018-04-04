@@ -3,14 +3,9 @@ apply plugin: 'kotlin'
 apply plugin: "com.jfrog.bintray"
 
 dependencies {
-    compile "com.vaadin:vaadin-server:$vaadin8_version"
-    compile(project(":mock-servlet-environment"))
-
-    testCompile("com.github.mvysny.dynatest:dynatest:${dynatest_version}")
-    compile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testCompile('org.slf4j:slf4j-simple:1.7.25')
-
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile('org.slf4j:slf4j-api:1.7.25')
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -22,12 +17,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId 'karibu-testing-v8'
+            artifactId 'mock-servlet-environment'
             version project.version
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'Support for browserless Vaadin testing using the Kotlin language')
-                root.appendNode('name', 'Karibu Testing v8')
+                root.appendNode('description', 'Mock classes for http session, servlet, context and others')
+                root.appendNode('name', 'Mock Servlet Environment')
                 root.appendNode('url', 'https://github.com/mvysny/karibu-testing')
             }
             from components.java

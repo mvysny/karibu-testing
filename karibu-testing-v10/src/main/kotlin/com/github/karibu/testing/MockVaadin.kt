@@ -1,5 +1,9 @@
 package com.github.karibu.testing
 
+import com.github.karibu.mockhttp.MockContext
+import com.github.karibu.mockhttp.MockHttpSession
+import com.github.karibu.mockhttp.MockRequest
+import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
@@ -31,6 +35,7 @@ object MockVaadin {
         val servlet = VaadinServlet()
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
+        val httpSession = MockHttpSession.create(ctx)
 
         // init VaadinService
         val service = object : VaadinServletService(servlet, DefaultDeploymentConfiguration(MockVaadin::class.java, Properties(), { _, _ -> })) {
@@ -39,12 +44,8 @@ object MockVaadin {
                     setNavigationTargets(routes)
                 }
             }
-            override fun isAtmosphereAvailable(): Boolean {
-                // returning true here would access our null servlet, and we don't want that :)
-                return false
-            }
+            override fun isAtmosphereAvailable(): Boolean = false
             override fun getRouteRegistry(): RouteRegistry = registry
-
             override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
         }
         service.init()
@@ -60,7 +61,7 @@ object MockVaadin {
         session.setAttribute(VaadinUriResolverFactory::class.java, MockResolverFactory)
 
         // init Vaadin Request
-        val request = VaadinServletRequest(MockRequest(ctx), service)
+        val request = VaadinServletRequest(MockRequest(httpSession), service)
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 

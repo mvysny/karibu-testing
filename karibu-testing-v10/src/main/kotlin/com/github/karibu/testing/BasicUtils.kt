@@ -101,13 +101,17 @@ val Component._text: String? get() = when (this) {
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only or if no button (or too many buttons) matched.
  */
 fun Button._click() {
+    checkEditableByUser()
+    // click()  // can't call this since this calls JS method on the browser... but we're server-testing and there is no browser and this call would do nothing.
+    _fireEvent(HasClickListeners.ClickEvent(this, false))
+}
+
+private fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     check(isEnabled) { "The ${toPrettyString()} is not enabled" }
     if (this is HasValue<*, *>) {
         check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
-    // click()  // can't call this since this calls JS method on the browser... but we're server-testing and there is no browser and this call would do nothing.
-    _fireEvent(HasClickListeners.ClickEvent(this, false))
 }
 
 private fun Component.isEffectivelyVisible(): Boolean = isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
@@ -141,3 +145,15 @@ val Component.isEnabled: Boolean get() {
     }
     return true
 }
+
+/**
+ * Sets the value of given component, but only if it is actually possible to do so by the user.
+ * If the component is read-only or disabled, an exception is thrown.
+ * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
+ */
+var <V> HasValue<*, V>._value: V?
+    get() = value
+    set(v) {
+        (this as Component).checkEditableByUser()
+        value = v
+    }

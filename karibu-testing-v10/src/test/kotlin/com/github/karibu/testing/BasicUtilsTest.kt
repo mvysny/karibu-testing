@@ -3,6 +3,7 @@ package com.github.karibu.testing
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
@@ -41,6 +42,37 @@ class BasicUtilsTest : DynaTest({
             expectThrows(IllegalStateException::class, "The Button[DISABLED] is not enabled") {
                 expectClickCount(Button().apply { isEnabled = false }, 0) { _click() }
             }
+        }
+    }
+
+    group("HasValue.setValue()") {
+        test("enabled check box") {
+            expect(true) { Checkbox().apply { value = true } .value }
+            expect(true) { Checkbox().apply { _value = true } .value }
+        }
+
+        test("disabled check box") {
+            // Vaadin ignores the enabled flag and updates the value happily.
+            expect(true) { Checkbox().apply { isEnabled = false; value = true } .value }
+            // However, calling _value will fail
+            val cb = Checkbox().apply { isEnabled = false }
+            expectThrows(IllegalStateException::class) {
+                cb._value = true
+            }
+            expect(false) { cb.value }
+        }
+
+        test("read-only check box") {
+            var cb = Checkbox().apply { isReadOnly = true }
+            // surprisingly this works too
+            cb.value = true
+            expect(true) { cb.value }
+
+            cb = Checkbox().apply { isReadOnly = true }
+            expectThrows(IllegalStateException::class) {
+                cb._value = true
+            }
+            expect(false) { cb.value }
         }
     }
 })

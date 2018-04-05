@@ -2,9 +2,12 @@ package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
+import com.github.vok.karibudsl.flow.button
+import com.github.vok.karibudsl.flow.checkBox
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
 
@@ -43,6 +46,17 @@ class BasicUtilsTest : DynaTest({
                 expectClickCount(Button().apply { isEnabled = false }, 0) { _click() }
             }
         }
+
+        test("button with parent disabled") {
+            val layout = MyLayout().apply { isEnabled = false }
+            expect(false) { layout.isEffectivelyEnabled() }
+            // click() does nothing without an actual Browser, bummer
+            expectClickCount(layout.button(), 0) { click() }
+            // however _click() will properly fail
+            expectThrows(IllegalStateException::class, "The Button[] is nested in a disabled component") {
+                expectClickCount(layout.button(), 0) { _click() }
+            }
+        }
     }
 
     group("HasValue.setValue()") {
@@ -56,6 +70,19 @@ class BasicUtilsTest : DynaTest({
             expect(true) { Checkbox().apply { isEnabled = false; value = true } .value }
             // However, calling _value will fail
             val cb = Checkbox().apply { isEnabled = false }
+            expectThrows(IllegalStateException::class) {
+                cb._value = true
+            }
+            expect(false) { cb.value }
+        }
+
+        test("check box with parent disabled") {
+            val layout = MyLayout().apply { isEnabled = false }
+            expect(false) { layout.isEffectivelyEnabled() }
+            // Vaadin ignores the enabled flag and updates the value happily.
+            expect(true) { layout.checkBox().apply { isEnabled = false; value = true } .value }
+            // However, calling _value will fail
+            val cb = layout.checkBox() { isEnabled = false }
             expectThrows(IllegalStateException::class) {
                 cb._value = true
             }
@@ -79,3 +106,7 @@ class BasicUtilsTest : DynaTest({
 
 @Route("testing")
 class TestingView : Div()
+
+class MyLayout : VerticalLayout() {
+    var isEnabled: Boolean = false
+}

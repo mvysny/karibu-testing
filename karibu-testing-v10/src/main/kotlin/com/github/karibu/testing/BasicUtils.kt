@@ -109,6 +109,7 @@ fun Button._click() {
 private fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     check(isEnabled) { "The ${toPrettyString()} is not enabled" }
+    check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }
     if (this is HasValue<*, *>) {
         check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
@@ -132,6 +133,8 @@ val Node.textRecursively: String get() = when (this) {
 
 val Method.isPublic: Boolean get() = Modifier.isPublic(modifiers)
 val Method.isStatic: Boolean get() = Modifier.isStatic(modifiers)
+
+internal fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
 
 val Component.isEnabled: Boolean get() {
     // @todo remove when https://github.com/vaadin/flow/issues/3816 is implemented

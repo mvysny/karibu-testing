@@ -95,7 +95,7 @@ open class MockContext : ServletContext {
     }
 
     override fun getRealPath(path: String): String? = listOf("src/main/webapp/frontend/$path", "src/main/webapp/$path").asSequence()
-        .map { File(it).absolutePath }
+        .map { File(moduleDir, it).absolutePath }
         .filter { File(it).exists() }
         .firstOrNull()
 
@@ -201,4 +201,12 @@ open class MockContext : ServletContext {
         @JvmStatic
         private val log = LoggerFactory.getLogger(MockContext::class.java)
     }
+}
+
+internal val moduleDir: File get() {
+    var dir = File("").absoluteFile
+    if (dir.absolutePath.contains("/.idea/modules")) {
+        dir = File(dir.absolutePath.replace("/.idea/modules", ""))
+    }
+    return dir
 }

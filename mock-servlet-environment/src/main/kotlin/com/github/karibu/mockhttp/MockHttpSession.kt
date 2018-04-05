@@ -1,3 +1,5 @@
+@file:Suppress("OverridingDeprecatedMember", "DEPRECATION")
+
 package com.github.karibu.mockhttp
 
 import java.util.Enumeration

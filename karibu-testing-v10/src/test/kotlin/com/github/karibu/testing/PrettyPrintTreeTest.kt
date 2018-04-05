@@ -1,6 +1,7 @@
 package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.vok.karibudsl.flow.text
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid

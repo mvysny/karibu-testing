@@ -14,6 +14,8 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 
 fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
 inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
@@ -99,11 +101,10 @@ val Component._text: String? get() = when (this) {
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only or if no button (or too many buttons) matched.
  */
 fun Button._click() {
-    if (!isEffectivelyVisible()) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden")
-    }
-    if (this is HasValue<*, *> && this.isReadOnly) {
-        throw IllegalArgumentException("The button ${toPrettyString()} is read-only")
+    check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
+    check(isEnabled) { "The ${toPrettyString()} is not enabled" }
+    if (this is HasValue<*, *>) {
+        check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
     // click()  // can't call this since this calls JS method on the browser... but we're server-testing and there is no browser and this call would do nothing.
     _fireEvent(HasClickListeners.ClickEvent(this, false))
@@ -123,4 +124,20 @@ val Element.textRecursively2: String get() {
 val Node.textRecursively: String get() = when (this) {
     is TextNode -> this.text()
     else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
+}
+
+val Method.isPublic: Boolean get() = Modifier.isPublic(modifiers)
+val Method.isStatic: Boolean get() = Modifier.isStatic(modifiers)
+
+val Component.isEnabled: Boolean get() {
+    // @todo remove when https://github.com/vaadin/flow/issues/3816 is implemented
+    try {
+        val method = javaClass.getDeclaredMethod("isEnabled")
+        if (method.isPublic && !method.isStatic) {
+            return method.invoke(this) as Boolean
+        }
+    } catch (ex: NoSuchMethodException) {
+        // yes, ugly. But this method is going to go away so this will work for now.
+    }
+    return true
 }

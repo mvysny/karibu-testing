@@ -31,17 +31,11 @@ fun Button._click() {
 }
 
 private fun Component.checkEditableByUser() {
-    if (!isEffectivelyVisible()) {
-        throw IllegalStateException("The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden")
-    }
-    if (!isEnabled) {
-        throw IllegalStateException("The ${toPrettyString()} is not enabled")
-    }
-    if (!isEffectivelyEnabled()) {
-        throw IllegalStateException("The ${toPrettyString()} is nested in a disabled component")
-    }
-    if (this is HasValue<*> && this.isReadOnly) {
-        throw IllegalStateException("The ${toPrettyString()} is read-only")
+    check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
+    check(isEnabled) { "The ${toPrettyString()} is not enabled" }
+    check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }
+    if (this is HasValue<*>) {
+        check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
 }
 

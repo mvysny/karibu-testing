@@ -67,6 +67,9 @@ fun Component.toPrettyString(): String {
     if (this is HasValue<*, *> && this.isReadOnly) {
         list.add("RO")
     }
+    if (!isEnabled) {
+        list.add("DISABLED")
+    }
     if (element.style.names.toList().isNotEmpty()) {
         list.add(element.style.names.toList().joinToString(" ") { "$it:${element.style[it]}" })
     }

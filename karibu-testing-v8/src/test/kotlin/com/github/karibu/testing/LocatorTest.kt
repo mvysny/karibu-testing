@@ -2,6 +2,10 @@ package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
+import com.github.vok.karibudsl.button
+import com.github.vok.karibudsl.label
+import com.github.vok.karibudsl.textField
+import com.github.vok.karibudsl.verticalLayout
 import com.vaadin.ui.*
 import kotlin.test.expect
 

@@ -23,7 +23,7 @@ val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
 
 /**
  * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, an exception is thrown.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only or if no button (or too many buttons) matched.
+ * @throws IllegalStateException if the button was not visible or not enabled.
  */
 fun Button._click() {
     checkEditableByUser()
@@ -32,16 +32,16 @@ fun Button._click() {
 
 private fun Component.checkEditableByUser() {
     if (!isEffectivelyVisible()) {
-        throw IllegalArgumentException("The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden")
+        throw IllegalStateException("The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden")
     }
     if (!isEnabled) {
-        throw IllegalArgumentException("The ${toPrettyString()} is not enabled")
+        throw IllegalStateException("The ${toPrettyString()} is not enabled")
     }
     if (!isEffectivelyEnabled()) {
-        throw IllegalArgumentException("The ${toPrettyString()} is nested in a disabled component")
+        throw IllegalStateException("The ${toPrettyString()} is nested in a disabled component")
     }
     if (this is HasValue<*> && this.isReadOnly) {
-        throw IllegalArgumentException("The ${toPrettyString()} is read-only")
+        throw IllegalStateException("The ${toPrettyString()} is read-only")
     }
 }
 
@@ -61,6 +61,7 @@ fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.to
 /**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
+ * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 var <V> HasValue<V>._value: V?
     get() = value

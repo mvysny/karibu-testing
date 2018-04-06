@@ -299,6 +299,15 @@ Vaadin Button contains the `click()` method, however that method is not well fit
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
 all the above points, prior running the click listeners.
 
+### Changing values
+
+The `HasValue.setValue()` function succeeds even if the component in question is disabled or read-only. However, when we
+want to simulate user input and we want to change the value of, say, a `ComboBox`, we expect the ComboBox to be enabled,
+read-write, visible; in other words, fully prepared to receive user input.
+
+It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
+all the above items prior setting the new value.
+
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and

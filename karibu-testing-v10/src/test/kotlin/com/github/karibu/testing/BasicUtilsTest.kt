@@ -80,9 +80,9 @@ class BasicUtilsTest : DynaTest({
             val layout = MyLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
             // Vaadin ignores the enabled flag and updates the value happily.
-            expect(true) { layout.checkBox().apply { isEnabled = false; value = true } .value }
+            expect(true) { layout.checkBox { isEnabled = false; value = true } .value }
             // However, calling _value will fail
-            val cb = layout.checkBox() { isEnabled = false }
+            val cb = layout.checkBox { isEnabled = false }
             expectThrows(IllegalStateException::class) {
                 cb._value = true
             }

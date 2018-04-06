@@ -130,6 +130,9 @@ Then, we can call `Button.click()`
 to simulate a click on the button itself. The `click()` method will execute all listeners and will block until
 all listeners are done; we can check that the click listener was run and it had created the label.
 
+> Note: as you'll learn later on, neither `Button.click()` nor `setValue()` will check for whether the component is enabled or not.
+Therefore it's important to use `_click()` and `_value` instead.
+
 Obtaining the `TextField` in this simple project is easy - it's the first child of the layout so we can call `getComponent(0) as TextField` to obtain the text field.
 However, typical Vaadin apps has much more complex structure with lots of nested layouts.
 We need some kind of a lookup function which will find the appropriate component for us.
@@ -155,7 +158,7 @@ class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
     test("simple UI test") {
         // simulate a text entry as if entered by the user
-        _get<TextField> { caption = "Type your name here:" }.value = "Baron Vladimir Harkonnen"
+        _get<TextField> { caption = "Type your name here:" }._value = "Baron Vladimir Harkonnen"
 
         // simulate a button click as if clicked by the user
         _get<Button> { caption = "Click Me" }._click()
@@ -258,14 +261,14 @@ class AddNewPersonForm : VerticalLayout {
 
 test("add new person happy flow") {
     val form = AddNewPersonForm()
-    form._get<TextField> { caption = "Name:" } .value = "John Doe"
+    form._get<TextField> { caption = "Name:" } ._value = "John Doe"
     form._get<Button> { caption = "Create" } ._click()
 }
 ```
 
 Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular tab of a tab sheet:
 ```kotlin
-_get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } .value = "45"
+_get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } ._value = "45"
 ```
 
 Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
@@ -339,7 +342,7 @@ class AddressPanel : FormLayout() {
 The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
 
 ```kotlin
-val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } .value
+val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } ._value
 ```
 
 Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter

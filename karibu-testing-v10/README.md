@@ -127,6 +127,9 @@ The `click()` method will execute all listeners and will block until
 all listeners are done; we can check that the click listener was run and it had changed the value
 of the template, by examining the value of `ExampleTemplate`.
 
+> Note: as you'll learn later on, neither `Button.click()` nor `setValue()` will check for whether the component is enabled or not.
+Therefore it's important to use `_click()` and `_value` instead.
+
 Obtaining the `Button` in this simple project is easy - it's the first child of the `MainView`
 so we can simply call `children.findFirst().get() as Button` to obtain the button.
 However, typical Vaadin apps has much more complex structure with lots of nested layouts.
@@ -269,14 +272,14 @@ class AddNewPersonForm : VerticalLayout {
 
 test("add new person happy flow") {
     val form = AddNewPersonForm()
-    form._get<TextField> { caption = "Name:" } .value = "John Doe"
+    form._get<TextField> { caption = "Name:" } ._value = "John Doe"
     form._get<Button> { caption = "Create" } ._click()
 }
 ```
 
 Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular layout:
 ```kotlin
-_get<FlexLayout> { id = "form" } ._get<TextField> { caption = "Age" } .value = "45"
+_get<FlexLayout> { id = "form" } ._get<TextField> { caption = "Age" } ._value = "45"
 ```
 
 Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
@@ -310,6 +313,15 @@ checks the following points prior running the click listeners:
 * If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the user can't really
   interact with the button. In this case, the `_click()` method will fail as well.
 
+### Changing values
+
+The `HasValue.setValue()` function succeeds even if the component in question is disabled or read-only. However, when we
+want to simulate user input and we want to change the value of, say, a `Combobox`, we expect the Combobox to be enabled,
+read-write, visible; in other words, fully prepared to receive user input.
+
+It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
+all the above items prior setting the new value.
+
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
@@ -340,7 +352,7 @@ class AddressPanel : FormLayout() {
 The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
 
 ```kotlin
-val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } .value
+val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } ._value
 ```
 
 Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter

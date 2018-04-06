@@ -57,6 +57,15 @@ class BasicUtilsTest : DynaTest({
                 expectClickCount(layout.button(), 0) { _click() }
             }
         }
+
+        test("invisible button") {
+            // click() does nothing without an actual Browser, bummer
+            expectClickCount(Button().apply { isVisible = false }, 0) { click() }
+            // however _click() will properly fail
+            expectThrows(IllegalStateException::class, "The Button[INVIS] is not effectively visible") {
+                expectClickCount(Button().apply { isVisible = false }, 0) { _click() }
+            }
+        }
     }
 
     group("HasValue.setValue()") {
@@ -70,7 +79,17 @@ class BasicUtilsTest : DynaTest({
             expect(true) { Checkbox().apply { isEnabled = false; value = true } .value }
             // However, calling _value will fail
             val cb = Checkbox().apply { isEnabled = false }
-            expectThrows(IllegalStateException::class) {
+            expectThrows(IllegalStateException::class, "The Checkbox[DISABLED, value='false'] is not enabled") {
+                cb._value = true
+            }
+            expect(false) { cb.value }
+        }
+
+        test("invisible check box") {
+            expect(true) { Checkbox().apply { isVisible = false; value = true } .value }
+            // However, calling _value will fail
+            val cb = Checkbox().apply { isVisible = false }
+            expectThrows(IllegalStateException::class, "The Checkbox[INVIS, value='false'] is not effectively visible") {
                 cb._value = true
             }
             expect(false) { cb.value }
@@ -80,10 +99,10 @@ class BasicUtilsTest : DynaTest({
             val layout = MyLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
             // Vaadin ignores the enabled flag and updates the value happily.
-            expect(true) { layout.checkBox { isEnabled = false; value = true } .value }
+            expect(true) { layout.checkBox { value = true } .value }
             // However, calling _value will fail
-            val cb = layout.checkBox { isEnabled = false }
-            expectThrows(IllegalStateException::class) {
+            val cb = layout.checkBox()
+            expectThrows(IllegalStateException::class, "The Checkbox[value='false'] is nested in a disabled component") {
                 cb._value = true
             }
             expect(false) { cb.value }
@@ -96,7 +115,7 @@ class BasicUtilsTest : DynaTest({
             expect(true) { cb.value }
 
             cb = Checkbox().apply { isReadOnly = true }
-            expectThrows(IllegalStateException::class) {
+            expectThrows(IllegalStateException::class, "The Checkbox[RO, value='false'] is read-only") {
                 cb._value = true
             }
             expect(false) { cb.value }

@@ -48,7 +48,7 @@ class BasicUtilsTest : DynaTest({
         }
 
         test("button with parent disabled") {
-            val layout = MyLayout().apply { isEnabled = false }
+            val layout = VerticalLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
             // click() does nothing without an actual Browser, bummer
             expectClickCount(layout.button(), 0) { click() }
@@ -96,7 +96,7 @@ class BasicUtilsTest : DynaTest({
         }
 
         test("check box with parent disabled") {
-            val layout = MyLayout().apply { isEnabled = false }
+            val layout = VerticalLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
             // Vaadin ignores the enabled flag and updates the value happily.
             expect(true) { layout.checkBox { value = true } .value }
@@ -125,7 +125,3 @@ class BasicUtilsTest : DynaTest({
 
 @Route("testing")
 class TestingView : Div()
-
-class MyLayout : VerticalLayout() {
-    var isEnabled: Boolean = false
-}

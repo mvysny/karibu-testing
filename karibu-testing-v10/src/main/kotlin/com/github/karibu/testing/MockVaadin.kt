@@ -61,6 +61,7 @@ object MockVaadin {
             private val lock = ReentrantLock().apply { lock() }
             override fun getLockInstance(): Lock = lock
         }
+        session.configuration = servlet.service.deploymentConfiguration
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
         session.setAttribute(VaadinUriResolverFactory::class.java, MockResolverFactory)

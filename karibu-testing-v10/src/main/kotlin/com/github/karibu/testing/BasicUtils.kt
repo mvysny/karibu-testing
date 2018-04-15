@@ -131,22 +131,11 @@ val Node.textRecursively: String get() = when (this) {
     else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
 }
 
-val Method.isPublic: Boolean get() = Modifier.isPublic(modifiers)
-val Method.isStatic: Boolean get() = Modifier.isStatic(modifiers)
-
 internal fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
 
-val Component.isEnabled: Boolean get() {
-    // @todo remove when https://github.com/vaadin/flow/issues/3816 is implemented
-    try {
-        val method = javaClass.getDeclaredMethod("isEnabled")
-        if (method.isPublic && !method.isStatic) {
-            return method.invoke(this) as Boolean
-        }
-    } catch (ex: NoSuchMethodException) {
-        // yes, ugly. But this method is going to go away so this will work for now.
-    }
-    return true
+val Component.isEnabled: Boolean get() = when (this) {
+    is HasEnabled -> isEnabled
+    else -> true
 }
 
 /**

@@ -11,12 +11,23 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.VaadinService
+import com.vaadin.flow.server.VaadinSession
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
 
     beforeEach { MockVaadin.setup(autoDiscoverViews("com.github")) }
+
+    test("smoke test that everything is mocked") {
+        expect(true) { UI.getCurrent() != null }
+        expect(true) { VaadinSession.getCurrent() != null }
+        expect(true) { VaadinService.getCurrent() != null }
+        expect(true) { VaadinSession.getCurrent().configuration != null }
+        expect(true) { VaadinSession.getCurrent().service != null }
+        expect(true) { VaadinSession.getCurrent().browser != null }
+    }
 
     test("verifyAttachCalled") {
         val attachCalled = AtomicInteger()

@@ -2,6 +2,7 @@ package com.github.karibu.testing
 
 import com.vaadin.data.HasValue
 import com.vaadin.server.AbstractClientConnector
+import com.vaadin.shared.communication.ClientRpc
 import com.vaadin.ui.Button
 import com.vaadin.ui.Component
 import java.util.*
@@ -63,3 +64,12 @@ var <V> HasValue<V>._value: V?
         (this as Component).checkEditableByUser()
         value = v
     }
+
+fun <T : ClientRpc> AbstractClientConnector.overrideRpcProxy(rpcInterface: Class<T>, instance: T) {
+    val rpcProxyMap: MutableMap<Class<*>, ClientRpc> = AbstractClientConnector::class.java.getDeclaredField("rpcProxyMap").run {
+        isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        get(this@overrideRpcProxy) as MutableMap<Class<*>, ClientRpc>
+    }
+    rpcProxyMap[rpcInterface] = instance
+}

@@ -6,9 +6,9 @@ import com.github.karibu.mockhttp.MockRequest
 import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.server.*
 import com.vaadin.shared.Version
+import com.vaadin.shared.ui.ui.PageClientRpc
 import com.vaadin.ui.UI
 import com.vaadin.util.CurrentInstance
-import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
 object MockVaadin {
@@ -57,18 +57,34 @@ object MockVaadin {
         CurrentInstance.set(VaadinRequest::class.java, request)
 
         // UI
+        createUI(uiFactory)
+    }
+
+    private fun createUI(uiFactory: ()->UI) {
         val ui = uiFactory()
+        ui.session = checkNotNull(VaadinSession.getCurrent())
+        val request = checkNotNull(CurrentInstance.get(VaadinRequest::class.java))
         strongRefUI.set(ui)
         UI.setCurrent(ui)
-        ui.session = session
         ui.page.webBrowser.updateRequestDetails(request)
         if (Version.getMinorVersion() >= 2) {
+            // uiRootPath field is only present for Vaadin 8.2.x and higher.
             UI::class.java.getDeclaredField("uiRootPath").apply {
                 isAccessible = true
                 set(ui, "")
             }
         }
         ui.doInit(request, 1, "1")
+
+        // catch Page.getCurrent().reload() requests
+        ui.overrideRpcProxy(PageClientRpc::class.java, object : PageClientRpc {
+            override fun reload() {
+                createUI(uiFactory)
+            }
+
+            override fun initializeMobileHtml5DndPolyfill() {
+            }
+        })
     }
 }
 

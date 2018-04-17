@@ -48,6 +48,15 @@ class MockVaadinTest : DynaTest({
     test("UI with push state and navigator won't fail") {
         MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
     }
+
+    test("Page reload should re-create the UI") {
+        val ui = UI.getCurrent()
+        val session = VaadinSession.getCurrent()
+        Page.getCurrent().reload()
+        // a new UI must be created; but the Session must stay the same.
+        expect(false) { UI.getCurrent() === ui }
+        expect(true) { VaadinSession.getCurrent() === session }
+    }
 })
 
 @PushStateNavigation

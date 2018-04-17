@@ -44,7 +44,22 @@ object MockVaadin {
         VaadinService.setCurrent(service)
 
         // Session
-        val session = VaadinSession(service)
+        createSession(httpSession, uiFactory)
+    }
+
+    private fun createSession(httpSession: MockHttpSession, uiFactory: () -> UI) {
+        val service = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
+        val session = object : VaadinSession(service) {
+            override fun close() {
+                super.close()
+                closeCurrentUI()
+                VaadinSession.setCurrent(null)
+                strongRefSession.set(null)
+                httpSession.destroy()
+                createSession(httpSession, uiFactory)
+            }
+        }
+
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         VaadinSession.setCurrent(session)
@@ -58,6 +73,14 @@ object MockVaadin {
 
         // UI
         createUI(uiFactory)
+    }
+
+    private fun closeCurrentUI() {
+        val ui: UI = UI.getCurrent() ?: return
+        ui.close()
+        ui.detach()
+        UI.setCurrent(null)
+        strongRefUI.set(null)
     }
 
     private fun createUI(uiFactory: ()->UI) {
@@ -79,6 +102,7 @@ object MockVaadin {
         // catch Page.getCurrent().reload() requests
         ui.overrideRpcProxy(PageClientRpc::class.java, object : PageClientRpc {
             override fun reload() {
+                closeCurrentUI()
                 createUI(uiFactory)
             }
 

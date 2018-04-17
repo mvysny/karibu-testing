@@ -51,11 +51,34 @@ class MockVaadinTest : DynaTest({
 
     test("Page reload should re-create the UI") {
         val ui = UI.getCurrent()
+        var detachCalled = false
+        ui.addDetachListener { detachCalled = true }
         val session = VaadinSession.getCurrent()
         Page.getCurrent().reload()
         // a new UI must be created; but the Session must stay the same.
+        expect(true) { UI.getCurrent() != null }
         expect(false) { UI.getCurrent() === ui }
         expect(true) { VaadinSession.getCurrent() === session }
+        // the old UI must be detached properly
+        expect(true) { detachCalled }
+    }
+
+    test("VaadinSession.close() must re-create the entire session and the UI") {
+        val ui = UI.getCurrent()
+        var detachCalled = false
+        ui.addDetachListener { detachCalled = true }
+        val session = VaadinSession.getCurrent()
+        session.setAttribute("foo", "bar")
+        session.close()
+
+        // a new UI+Session must be created
+        expect(true) { UI.getCurrent() != null }
+        expect(true) { VaadinSession.getCurrent() != null }
+        expect(false) { UI.getCurrent() === ui }
+        expect(false) { VaadinSession.getCurrent() === session }
+        // the old UI must be detached properly
+        expect(true) { detachCalled }
+        expect(null) { VaadinSession.getCurrent().getAttribute("foo") }
     }
 })
 

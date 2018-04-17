@@ -17,7 +17,6 @@ dependencyManagement {
 
 dependencies {
     compile "com.vaadin:vaadin-core:$vaadin10_version"
-    compile "com.vaadin:flow-server:1.0.0.beta7"  // because of HasEnabled; remove this line when vaadin-core is v-bumped
     compile(project(":mock-servlet-environment"))
 
     testCompile("com.github.mvysny.dynatest:dynatest:${dynatest_version}")

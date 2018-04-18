@@ -1,6 +1,9 @@
 package com.github.karibu.testing
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.expectThrows
+import com.github.vok.karibudsl.autoDiscoverViews
+import com.github.vok.karibudsl.autoViewProvider
 import com.vaadin.navigator.Navigator
 import com.vaadin.navigator.PushStateNavigation
 import com.vaadin.navigator.View
@@ -87,6 +90,14 @@ class MockVaadinTest : DynaTest({
         // the new session must not inherit attributes from the old one
         expect(null) { VaadinSession.getCurrent().getAttribute("foo") }
     }
+
+    test("if autoViewProvider is used with a Navigator, display a helpful message instead of standard Vaadin one") {
+        autoDiscoverViews("non.existing.package")   // should remove all views
+
+        expectThrows(RuntimeException::class, "UI failed to initialize. If you're using autoViewProvider, make sure that views are auto-discovered via autoDiscoverViews()") {
+            MockVaadin.setup({ MyUIWithAutoViewProvider() })
+        }
+    }
 })
 
 @PushStateNavigation
@@ -98,3 +109,11 @@ class MyUIWithNavigator : UI() {
 }
 
 class DummyView : VerticalLayout(), View
+
+@PushStateNavigation
+class MyUIWithAutoViewProvider : UI() {
+    override fun init(request: VaadinRequest) {
+        navigator = Navigator(this, this)
+        navigator.addProvider(autoViewProvider)
+    }
+}

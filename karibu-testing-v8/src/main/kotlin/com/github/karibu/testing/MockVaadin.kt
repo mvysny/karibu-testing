@@ -97,7 +97,15 @@ object MockVaadin {
                 set(ui, "")
             }
         }
-        ui.doInit(request, 1, "1")
+        try {
+            ui.doInit(request, 1, "1")
+        } catch (e: Exception) {
+            if (ui.navigator != null) {
+                throw RuntimeException("UI failed to initialize. If you're using autoViewProvider, make sure that views are auto-discovered via autoDiscoverViews()", e)
+            } else {
+                throw e
+            }
+        }
 
         // catch Page.getCurrent().reload() requests
         ui.overrideRpcProxy(PageClientRpc::class.java, object : PageClientRpc {

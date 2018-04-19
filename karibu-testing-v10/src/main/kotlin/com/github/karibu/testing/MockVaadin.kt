@@ -5,8 +5,10 @@ import com.github.karibu.mockhttp.MockHttpSession
 import com.github.karibu.mockhttp.MockRequest
 import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
@@ -15,7 +17,6 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.startup.RouteRegistry
 import com.vaadin.flow.shared.VaadinUriResolver
-import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
@@ -53,13 +54,29 @@ object MockVaadin {
         servlet.init(MockServletConfig(ctx))
         VaadinService.setCurrent(servlet.service!!)
 
-        // init VaadinService
+        // init Vaadin Session
+        createSession(ctx, servlet, uiFactory)
+    }
+
+    private fun closeCurrentUI() {
+        val ui: UI = UI.getCurrent() ?: return
+        ui.close()
+        ui._fireEvent(DetachEvent(ui))
+        UI.setCurrent(null)
+        strongRefUI.set(null)
+    }
+
+    private fun createSession(ctx: MockContext, servlet: VaadinServlet, uiFactory: ()->UI) {
         val httpSession = MockHttpSession.create(ctx)
 
-        // init Vaadin Session
         val session = object : VaadinSession(servlet.service) {
             private val lock = ReentrantLock().apply { lock() }
             override fun getLockInstance(): Lock = lock
+            override fun close() {
+                super.close()
+                closeCurrentUI()
+                createSession(ctx, servlet, uiFactory)
+            }
         }
         session.configuration = servlet.service.deploymentConfiguration
         VaadinSession.setCurrent(session)
@@ -71,7 +88,23 @@ object MockVaadin {
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 
+        // craete UI
+        createUI(uiFactory, session, request)
+    }
+
+    private fun createUI(uiFactory: () -> UI, session: VaadinSession, request: VaadinServletRequest) {
         val ui = uiFactory()
+        // hook into Page.reload() and recreate the UI
+        UI::class.java.getDeclaredField("page").apply {
+            isAccessible = true
+            set(ui, object : Page(ui) {
+                override fun reload() {
+                    super.reload()
+                    closeCurrentUI()
+                    createUI(uiFactory, session, request)
+                }
+            })
+        }
         ui.internals.session = session
         UI.setCurrent(ui)
         ui.doInit(request, -1)

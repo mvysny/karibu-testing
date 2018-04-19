@@ -76,6 +76,45 @@ class MockVaadinTest : DynaTest({
         └── Text[text='Welcome!']
 """.trim()) { UI.getCurrent().toPrettyTree().trim() }
     }
+
+    test("Page reload should re-create the UI") {
+        val ui = UI.getCurrent()
+        var detachCalled = false
+        ui.addDetachListener { detachCalled = true }
+        UI.getCurrent().page.reload()
+        // a new UI must be created; but the Session must stay the same.
+        expect(true) { UI.getCurrent() != null }
+        expect(false) { UI.getCurrent() === ui }
+        // the old UI must be detached properly
+        expect(true) { detachCalled }
+    }
+
+    test("Page reload should preserve session") {
+        val session = VaadinSession.getCurrent()
+        session.setAttribute("foo", "bar")
+        UI.getCurrent().page.reload()
+        expect(true) { VaadinSession.getCurrent() === session }
+        expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
+    }
+
+    test("VaadinSession.close() must re-create the entire session and the UI") {
+        val ui = UI.getCurrent()
+        var detachCalled = false
+        ui.addDetachListener { detachCalled = true }
+        val session = VaadinSession.getCurrent()
+        session.setAttribute("foo", "bar")
+        session.close()
+
+        // a new UI+Session must be created
+        expect(true) { UI.getCurrent() != null }
+        expect(true) { VaadinSession.getCurrent() != null }
+        expect(false) { UI.getCurrent() === ui }
+        expect(false) { VaadinSession.getCurrent() === session }
+        // the old UI must be detached properly
+        expect(true) { detachCalled }
+        // the new session must not inherit attributes from the old one
+        expect(null) { VaadinSession.getCurrent().getAttribute("foo") }
+    }
 })
 
 @Route("helloworld")

@@ -27,21 +27,20 @@ object MockVaadin {
     private val strongRefReq = ThreadLocal<VaadinRequest>()
 
     /**
-     * Mocks Vaadin for the current test method.
-     * @param routes all classes annotated with [com.vaadin.flow.router.Route]; use [autoDiscoverViews] to auto-discover all such classes.
+     * Mocks Vaadin for the current test method:
+     * ```
+     * MockVaadin.setup(Routes().autoDiscoverViews("com.myapp"))
+     * ```
+     * @param routes all classes annotated with [com.vaadin.flow.router.Route]; use [Routes.autoDiscoverViews] to auto-discover all such classes.
      * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
      * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing.
      */
-    fun setup(routes: Set<Class<out Component>> = setOf(), uiFactory: ()->UI = { MockedUI() }) {
+    fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
                 val service = object : VaadinServletService(this, deploymentConfiguration) {
-                    private val registry = object : RouteRegistry() {
-                        init {
-                            setNavigationTargets(routes)
-                        }
-                    }
+                    private val registry = routes.createRegistry()
                     override fun isAtmosphereAvailable(): Boolean = false
                     override fun getRouteRegistry(): RouteRegistry = registry
                     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"

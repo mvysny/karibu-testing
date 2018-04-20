@@ -5,7 +5,9 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
+import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.startup.RouteRegistry
 import org.atmosphere.util.annotation.AnnotationDetector
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
@@ -20,27 +22,49 @@ inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStr
 inline fun <reified T: Serializable> T.serializeDeserialize() = serializeToBytes().deserialize<T>()
 
 /**
- * Auto-discovers views and register them to [autoViewProvider]. Can be called multiple times.
- * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
+ * A configuration object of all routes and error routes in the application. Use [autoDiscoverViews] to discover views; use [addErrorRoutes]
+ * to manually add [HasErrorParameter]s.
  */
-fun autoDiscoverViews(packageName: String? = null): Set<Class<out Component>> {
-    val entities = mutableListOf<Class<*>>()
-    val detector = AnnotationDetector(object : AnnotationDetector.TypeReporter {
-        override fun reportTypeAnnotation(annotation: Class<out Annotation>?, className: String?) {
-            entities.add(Class.forName(className))
-        }
+class Routes: Serializable {
+    val routes = mutableSetOf<Class<out Component>>()
+    val errorRoutes = mutableSetOf<Class<out HasErrorParameter<*>>>()
 
-        override fun annotations(): Array<out Class<out Annotation>> = arrayOf(Route::class.java)
-    })
-    if (packageName == null) {
-        detector.detect()
-    } else {
-        detector.detect(packageName)
+    fun addErrorRoutes(vararg routes: Class<out HasErrorParameter<*>>): Routes = apply {
+        errorRoutes.addAll(routes.toSet())
     }
 
-    println("Auto-discovered views: ${entities.joinToString { it.simpleName }}")
-    @Suppress("UNCHECKED_CAST")
-    return entities.map { it as Class<out Component> }.toSet()
+    /**
+     * Creates a Vaadin 10 registry from this configuration object.
+     */
+    fun createRegistry() : RouteRegistry = object : RouteRegistry() {
+        init {
+            setNavigationTargets(routes)
+            setErrorNavigationTargets(errorRoutes.map { it.asSubclass(Component::class.java) } .toMutableSet())
+        }
+    }
+
+    /**
+     * Auto-discovers all `@Route`-annotated views and returns them.
+     *
+     * *WARNING*: it currently can not detect error views (components which implement the `HasErrorParameter` interface) - those need to be added manually.
+     * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
+     */
+    fun autoDiscoverViews(packageName: String? = null): Routes = apply {
+        val detector = AnnotationDetector(object : AnnotationDetector.TypeReporter {
+            override fun reportTypeAnnotation(annotation: Class<out Annotation>?, className: String?) {
+                routes.add(Class.forName(className).asSubclass(Component::class.java))
+            }
+
+            override fun annotations(): Array<out Class<out Annotation>> = arrayOf(Route::class.java)
+        })
+        if (packageName == null) {
+            detector.detect()
+        } else {
+            detector.detect(packageName)
+        }
+
+        println("Auto-discovered views: ${routes.joinToString { it.simpleName }}")
+    }
 }
 
 /**

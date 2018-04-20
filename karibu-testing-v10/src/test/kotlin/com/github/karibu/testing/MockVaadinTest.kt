@@ -18,7 +18,7 @@ import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
 
-    beforeEach { MockVaadin.setup(autoDiscoverViews("com.github")) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
 
     test("smoke test that everything is mocked") {
         expect(true) { UI.getCurrent() != null }

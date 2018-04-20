@@ -16,12 +16,12 @@ class BasicUtilsTest : DynaTest({
     val allViews = setOf(TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java)
 
     test("AutoViewDiscovery") {
-        expect(allViews) { autoDiscoverViews("com.github") }
+        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
     }
 
     test("calling autoDiscoverViews() multiple times won't fail") {
-        expect(allViews) { autoDiscoverViews("com.github") }
-        expect(allViews) { autoDiscoverViews("com.github") }
+        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
     }
 
     group("button click") {

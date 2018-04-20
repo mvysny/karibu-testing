@@ -7,7 +7,7 @@ import kotlin.test.expect
 import kotlin.streams.*
 
 class PolymerTemplateTest : DynaTest({
-    beforeEach { MockVaadin.setup(autoDiscoverViews("com.github")) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
 
     test("simple instantiation fills in @Id-annotated components") {
         val list = ReviewsList()

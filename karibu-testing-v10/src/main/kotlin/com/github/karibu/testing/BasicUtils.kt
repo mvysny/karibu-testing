@@ -14,8 +14,6 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
-import java.lang.reflect.Method
-import java.lang.reflect.Modifier
 
 fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
 inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
@@ -67,12 +65,19 @@ var Component.label: String
     }
 
 /**
- * The Component's caption: [text] for [Button], [label] for fields such as [TextField].
+ * The Component's caption: [Button.text] for [Button], [label] for fields such as [TextField].
  */
-val Component.caption: String get() = when(this) {
-    is Button -> text
-    else -> label
-}
+var Component.caption: String
+    get() = when (this) {
+        is Button -> text
+        else -> label
+    }
+    set(value) {
+        when (this) {
+            is Button -> text = value
+            else -> label = value
+        }
+    }
 /**
  * Workaround for https://github.com/vaadin/flow/issues/664
  */
@@ -90,6 +95,9 @@ val Component._isVisible: Boolean get() = when (this) {
     else -> isVisible
 }
 
+/**
+ * Returns direct text contents (it doesn't peek into the child elements).
+ */
 val Component._text: String? get() = when (this) {
     is HasText -> text
     is Text -> text   // workaround for https://github.com/vaadin/flow/issues/3606

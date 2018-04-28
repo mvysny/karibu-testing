@@ -98,7 +98,7 @@ to provide the auto-detected set of `@Route`s to the function:
 
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
 })
 ```
 
@@ -154,7 +154,7 @@ With this arsenal at hand, we can rewrite the test:
 
 ```kotlin
 class MainViewTest: DynaTest({
-    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
 
     test("test greeting") {
         // simulate a button click as if clicked by the user
@@ -191,7 +191,7 @@ A typical app will consist of multiple views. You can test the views of such app
   also the component may lazy-initialize itself by the means of the `onAttach()` listener which only gets fired when the component is attached to a UI.
   Therefore, this approach should only be used for reusable components which do not depend on a particular UI and do not
   lazy-init themselves.
-* Properly set up your UI by calling `MockVaadin.setup(autoDiscoverViews("your.app.package"))`. The `autoDiscoverViews()` function will
+* Properly set up your UI by calling `MockVaadin.setup(Routes().autoDiscoverViews("your.app.package"))`. The `autoDiscoverViews()` function will
   automatically discover all of your `@Route`-annotated views; `MockVaadin` will then properly populate the internal Vaadin Flow `RouteRegistry`.
   Because of that, you can simply call the navigation from your tests to perform the navigation to the view, for example
   `UI.getCurrent().navigateTo("books")`.
@@ -203,7 +203,7 @@ to call this function before all tests:
 
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup(autoDiscoverViews("com.vaadin.flow.demo")) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
     test("simple test") {
         // navigate to the "Categories" list route.
         UI.getCurrent().navigateTo("categories")

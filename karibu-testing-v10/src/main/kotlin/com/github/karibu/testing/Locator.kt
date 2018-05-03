@@ -97,10 +97,11 @@ fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Uni
     spec.block()
     val result = find(spec.toPredicate())
     if (result.size !in spec.count) {
+        val loc: String = UI.getCurrent().internals.activeViewLocation.pathWithQueryParameters
         val message = when {
-            result.isEmpty() -> "No visible ${clazz.simpleName}"
-            result.size < spec.count.first -> "Too few (${result.size}) visible ${clazz.simpleName}s"
-            else -> "Too many visible ${clazz.simpleName}s (${result.size})"
+            result.isEmpty() -> "/$loc: No visible ${clazz.simpleName}"
+            result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"
+            else -> "/$loc: Too many visible ${clazz.simpleName}s (${result.size})"
         }
         throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
     }

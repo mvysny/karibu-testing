@@ -14,17 +14,19 @@ import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.ExecutionContext
 import com.vaadin.flow.internal.StateTree
+import com.vaadin.flow.router.Location
+import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.startup.RouteRegistry
-import com.vaadin.flow.shared.VaadinUriResolver
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
-    private val strongRefSession = ThreadLocal<VaadinSession>()
-    private val strongRefUI = ThreadLocal<UI>()
-    private val strongRefReq = ThreadLocal<VaadinRequest>()
+    private var strongRefSession: VaadinSession? = null
+    private var strongRefUI: UI? = null
+    private var strongRefReq: VaadinRequest? = null
+    private var lastNavigation: Location? = null
 
     /**
      * Mocks Vaadin for the current test method:
@@ -55,17 +57,15 @@ object MockVaadin {
 
         // init Vaadin Session
         createSession(ctx, servlet, uiFactory)
-
-        // navigate to the initial page
-        UI.getCurrent().navigate("")
     }
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
+        lastNavigation = ui.internals.activeViewLocation
         ui.close()
         ui._fireEvent(DetachEvent(ui))
         UI.setCurrent(null)
-        strongRefUI.set(null)
+        strongRefUI = null
     }
 
     private fun createSession(ctx: MockContext, servlet: VaadinServlet, uiFactory: ()->UI) {
@@ -82,14 +82,14 @@ object MockVaadin {
         }
         session.configuration = servlet.service.deploymentConfiguration
         VaadinSession.setCurrent(session)
-        strongRefSession.set(session)
+        strongRefSession = session
 
         // init Vaadin Request
         val request = VaadinServletRequest(MockRequest(httpSession), servlet.service)
-        strongRefReq.set(request)
+        strongRefReq = request
         CurrentInstance.set(VaadinRequest::class.java, request)
 
-        // craete UI
+        // create UI
         createUI(uiFactory, session, request)
     }
 
@@ -109,7 +109,14 @@ object MockVaadin {
         ui.internals.session = session
         UI.setCurrent(ui)
         ui.doInit(request, -1)
-        strongRefUI.set(ui)
+        strongRefUI = ui
+
+        // navigate to the initial page
+        if (lastNavigation != null) {
+            UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation!!, NavigationTrigger.PROGRAMMATIC)
+        } else {
+            UI.getCurrent().navigate("")
+        }
     }
 }
 

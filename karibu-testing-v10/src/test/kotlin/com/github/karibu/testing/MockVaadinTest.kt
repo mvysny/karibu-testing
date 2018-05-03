@@ -97,6 +97,18 @@ class MockVaadinTest : DynaTest({
         expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
     }
 
+    test("Page reload should automatically navigate to the current URL") {
+        _get<WelcomeView>()
+        UI.getCurrent().page.reload()
+        _get<WelcomeView>()
+        UI.getCurrent().navigate("helloworld")
+        _expectNone<WelcomeView>()
+        _get<HelloWorldView>()
+        UI.getCurrent().page.reload()
+        _expectNone<WelcomeView>()
+        _get<HelloWorldView>()
+    }
+
     test("VaadinSession.close() must re-create the entire session and the UI") {
         val ui = UI.getCurrent()
         var detachCalled = false

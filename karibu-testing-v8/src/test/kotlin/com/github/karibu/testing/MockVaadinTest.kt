@@ -72,6 +72,18 @@ class MockVaadinTest : DynaTest({
         expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
     }
 
+    test("Page reload should automatically navigate to the current URL") {
+        _get<DummyView>()
+        UI.getCurrent().page.reload()
+        _get<DummyView>()
+        UI.getCurrent().navigator.navigateTo("2")
+        _expectNone<DummyView>()
+        _get<DummyView2>()
+        UI.getCurrent().page.reload()
+        _expectNone<DummyView>()
+        _get<DummyView2>()
+    }
+
     test("VaadinSession.close() must re-create the entire session and the UI") {
         val ui = UI.getCurrent()
         var detachCalled = false
@@ -105,10 +117,12 @@ class MyUIWithNavigator : UI() {
     override fun init(request: VaadinRequest) {
         navigator = Navigator(this, this)
         navigator.addView("", DummyView())
+        navigator.addView("2", DummyView2())
     }
 }
 
 class DummyView : VerticalLayout(), View
+class DummyView2 : VerticalLayout(), View
 
 @PushStateNavigation
 class MyUIWithAutoViewProvider : UI() {

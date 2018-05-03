@@ -4,16 +4,16 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.vok.karibudsl.flow.button
 import com.github.vok.karibudsl.flow.checkBox
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
-import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
 
 class BasicUtilsTest : DynaTest({
 
-    val allViews = setOf(TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java)
+    val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java)
 
     test("AutoViewDiscovery") {
         expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
@@ -53,7 +53,7 @@ class BasicUtilsTest : DynaTest({
             // click() does nothing without an actual Browser, bummer
             expectClickCount(layout.button(), 0) { click() }
             // however _click() will properly fail
-            expectThrows(IllegalStateException::class, "The Button[] is nested in a disabled component") {
+            expectThrows(IllegalStateException::class, "The Button[DISABLED] is nested in a disabled component") {
                 expectClickCount(layout.button(), 0) { _click() }
             }
         }
@@ -102,7 +102,7 @@ class BasicUtilsTest : DynaTest({
             expect(true) { layout.checkBox { value = true } .value }
             // However, calling _value will fail
             val cb = layout.checkBox()
-            expectThrows(IllegalStateException::class, "The Checkbox[value='false'] is nested in a disabled component") {
+            expectThrows(IllegalStateException::class, "The Checkbox[DISABLED, value='false'] is nested in a disabled component") {
                 cb._value = true
             }
             expect(false) { cb.value }
@@ -124,4 +124,4 @@ class BasicUtilsTest : DynaTest({
 })
 
 @Route("testing")
-class TestingView : Div()
+class TestingView : VerticalLayout()

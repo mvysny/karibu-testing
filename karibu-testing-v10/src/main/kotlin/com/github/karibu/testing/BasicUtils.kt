@@ -135,14 +135,19 @@ val Component._text: String? get() = when (this) {
 fun Button._click() {
     checkEditableByUser()
     // click()  // can't call this since this calls JS method on the browser... but we're server-testing and there is no browser and this call would do nothing.
-    _fireEvent(HasClickListeners.ClickEvent(this, false))
+    _fireEvent(ClickEvent<Button>(this))
 }
 
 private fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
-    check(isEnabled) { "The ${toPrettyString()} is not enabled" }
+    val parentNullOrEnabled = !parent.isPresent || parent.get().isEffectivelyEnabled()
+    if (parentNullOrEnabled) {
+        check(isEnabled) { "The ${toPrettyString()} is not enabled" }
+    }
     check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }
     if (this is HasValue<*, *>) {
+        @Suppress("UNCHECKED_CAST")
+        val hasValue = this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>
         check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
 }
@@ -175,7 +180,7 @@ val Component.isEnabled: Boolean get() = when (this) {
  * If the component is read-only or disabled, an exception is thrown.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-var <V> HasValue<*, V>._value: V?
+var <V, E: HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
     get() = value
     set(v) {
         (this as Component).checkEditableByUser()

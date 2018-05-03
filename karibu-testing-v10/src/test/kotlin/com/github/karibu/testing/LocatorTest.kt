@@ -77,7 +77,7 @@ class LocatorTest : DynaTest({
         layout = UI.getCurrent().verticalLayout {
             val name = textField("Type your name here:")
             button("Click Me") {
-                onLeftClick {
+                addClickListener {
                     println("Thanks ${name.value}, it works!")
                     layout.text("Thanks ${name.value}, it works!")
                 }

@@ -56,6 +56,7 @@ fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
  * * The [Component.label] and text
  * * The [HasValue.getValue]
  */
+@Suppress("UNCHECKED_CAST")
 fun Component.toPrettyString(): String {
     val list = ArrayList<String>()
     if (id.isPresent) {
@@ -64,7 +65,7 @@ fun Component.toPrettyString(): String {
     if (!_isVisible) {
         list.add("INVIS")
     }
-    if (this is HasValue<*, *> && this.isReadOnly) {
+    if (this is HasValue<*, *> && (this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>).isReadOnly) {
         list.add("RO")
     }
     if (!isEnabled) {
@@ -80,7 +81,7 @@ fun Component.toPrettyString(): String {
         list.add("text='$_text'")
     }
     if (this is HasValue<*, *>) {
-        list.add("value='${this.value}'")
+        list.add("value='${(this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>).value}'")
     }
     if (this is Grid.Column<*> && this.header2.isNotBlank()) {
         list.add("header='${this.header2}'")

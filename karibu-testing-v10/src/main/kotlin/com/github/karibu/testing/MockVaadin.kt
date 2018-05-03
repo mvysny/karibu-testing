@@ -55,6 +55,9 @@ object MockVaadin {
 
         // init Vaadin Session
         createSession(ctx, servlet, uiFactory)
+
+        // navigate to the initial page
+        UI.getCurrent().navigate("")
     }
 
     private fun closeCurrentUI() {
@@ -80,7 +83,6 @@ object MockVaadin {
         session.configuration = servlet.service.deploymentConfiguration
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
-        session.setAttribute(VaadinUriResolverFactory::class.java, MockResolverFactory)
 
         // init Vaadin Request
         val request = VaadinServletRequest(MockRequest(httpSession), servlet.service)
@@ -131,13 +133,4 @@ class MockedUI : UI() {
             }
         }
     }
-}
-
-object MockResolverFactory : VaadinUriResolverFactory {
-    override fun getUriResolver(request: VaadinRequest): VaadinUriResolver = MockUriResolver
-}
-
-object MockUriResolver : VaadinUriResolver() {
-    override fun getFrontendRootUrl(): String = ""
-    override fun getContextRootUrl(): String = ""
 }

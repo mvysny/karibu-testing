@@ -13,8 +13,9 @@ import java.util.concurrent.locks.ReentrantLock
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
-    private val strongRefSession = ThreadLocal<VaadinSession>()
-    private val strongRefUI = ThreadLocal<UI>()
+    private var strongRefSession: VaadinSession? = null
+    private var strongRefUI: UI? = null
+    private var lastLocation: String? = null
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
      * @param uiFactory called once from this method, to provide instance of your app's UI. By default it returns [MockUI].
@@ -54,7 +55,7 @@ object MockVaadin {
                 super.close()
                 closeCurrentUI()
                 VaadinSession.setCurrent(null)
-                strongRefSession.set(null)
+                strongRefSession = null
                 httpSession.destroy()
                 createSession(httpSession, uiFactory)
             }
@@ -63,7 +64,7 @@ object MockVaadin {
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         VaadinSession.setCurrent(session)
-        strongRefSession.set(session)
+        strongRefSession = session
 
         // request
         val httpRequest = MockRequest(httpSession)
@@ -77,17 +78,18 @@ object MockVaadin {
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
+        lastLocation = Page.getCurrent().location.path.trim('/')
         ui.close()
         ui.detach()
         UI.setCurrent(null)
-        strongRefUI.set(null)
+        strongRefUI = null
     }
 
     private fun createUI(uiFactory: ()->UI) {
         val ui = uiFactory()
         ui.session = checkNotNull(VaadinSession.getCurrent())
         val request = checkNotNull(CurrentInstance.get(VaadinRequest::class.java))
-        strongRefUI.set(ui)
+        strongRefUI = ui
         UI.setCurrent(ui)
         ui.page.webBrowser.updateRequestDetails(request)
         if (Version.getMinorVersion() >= 2) {
@@ -117,6 +119,11 @@ object MockVaadin {
             override fun initializeMobileHtml5DndPolyfill() {
             }
         })
+
+        if (!lastLocation.isNullOrBlank()) {
+            UI.getCurrent().navigator.navigateTo(lastLocation)
+            lastLocation = null
+        }
     }
 }
 

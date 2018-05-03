@@ -114,6 +114,7 @@ object MockVaadin {
         // navigate to the initial page
         if (lastNavigation != null) {
             UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation!!, NavigationTrigger.PROGRAMMATIC)
+            lastNavigation = null
         } else {
             UI.getCurrent().navigate("")
         }

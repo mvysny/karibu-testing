@@ -73,6 +73,7 @@ class MockVaadinTest : DynaTest({
     }
 
     test("Page reload should automatically navigate to the current URL") {
+        MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
         _get<DummyView>()
         UI.getCurrent().page.reload()
         _get<DummyView>()

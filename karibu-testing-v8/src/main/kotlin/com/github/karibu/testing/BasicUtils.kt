@@ -3,8 +3,7 @@ package com.github.karibu.testing
 import com.vaadin.data.HasValue
 import com.vaadin.server.AbstractClientConnector
 import com.vaadin.shared.communication.ClientRpc
-import com.vaadin.ui.Button
-import com.vaadin.ui.Component
+import com.vaadin.ui.*
 import java.util.*
 import kotlin.test.expect
 
@@ -73,3 +72,12 @@ fun <T : ClientRpc> AbstractClientConnector.overrideRpcProxy(rpcInterface: Class
     }
     rpcProxyMap[rpcInterface] = instance
 }
+
+val Component.placeholder: String?
+    get() = when (this) {
+        is AbstractTextField -> placeholder
+        is ComboBox<*> -> (this as ComboBox<*>).placeholder
+        is DateField -> placeholder
+        is DateTimeField -> placeholder
+        else -> null
+    }

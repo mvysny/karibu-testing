@@ -88,4 +88,23 @@ class LocatorTest : DynaTest({
         expect("Thanks Baron Vladimir Harkonnen, it works!") { (layout.last() as Label).value }
         expect(3) { layout.componentCount }
     }
+
+    group("matcher") {
+        fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+        test("caption") {
+            expect(true) { Button("click me").matches { caption = "click me" } }
+            expect(true) { TextField("name:").matches { caption = "name:" } }
+            expect(true) { Button("click me").matches { } }
+            expect(true) { TextField("name:").matches { } }
+            expect(false) { Button("click me").matches { caption = "Click Me" } }
+            expect(false) { TextField("name:").matches { caption = "Name"} }
+        }
+        test("placeholder") {
+            expect(true) { TextField("name").apply { placeholder = "the name" } .matches { placeholder = "the name" } }
+            expect(true) { PasswordField("password").apply { placeholder = "at least 6 characters" }.matches { placeholder = "at least 6 characters" } }
+            expect(true) { ComboBox<String>().apply { placeholder = "foo" }.matches { placeholder = "foo" } }
+            expect(false) { TextField("name").apply { placeholder = "the name" } .matches { placeholder = "name" } }
+            expect(false) { PasswordField("password").apply { placeholder = "at least 6 characters" }.matches { placeholder = "password" } }
+        }
+    }
 })

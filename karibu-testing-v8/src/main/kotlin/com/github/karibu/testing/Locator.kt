@@ -12,6 +12,7 @@ import java.util.function.Predicate
  * @property clazz the class of the component we are searching for.
  * @property id the required [Component.getId]; if null, no particular id is matched.
  * @property caption the required [Component.caption]; if null, no particular caption is matched.
+ * @property placeholder the required [Component.placeholder]; if null, no particular placeholder is matched.
  * @property styles if not null, the component must match all of these styles. Space-separated.
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
@@ -21,6 +22,7 @@ class SearchSpec<T : Component>(
     val clazz: Class<T>,
     var id: String? = null,
     var caption: String? = null,
+    var placeholder: String? = null,
     var styles: String? = null,
     var count: IntRange = 0..Int.MAX_VALUE,
     var predicates: MutableList<Predicate<T>> = mutableListOf()
@@ -30,6 +32,7 @@ class SearchSpec<T : Component>(
         val list = mutableListOf<String>(if (clazz.simpleName.isBlank()) clazz.name else clazz.simpleName)
         if (id != null) list.add("id='$id'")
         if (caption != null) list.add("caption='$caption'")
+        if (placeholder != null) list.add("placeholder='$placeholder'")
         if (!styles.isNullOrBlank()) list.add("styles='$styles'")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
@@ -42,6 +45,7 @@ class SearchSpec<T : Component>(
         p.add({ component -> clazz.isInstance(component)} )
         if (id != null) p.add({ component -> component.id == id })
         if (caption != null) p.add({ component -> component.caption == caption })
+        if (placeholder != null) p.add({ component -> component.placeholder == placeholder })
         if (!styles.isNullOrBlank()) p.add({ component -> component.hasStyleName(styles!!) })
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()

@@ -9,6 +9,10 @@ import java.util.function.Predicate
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
+ *
+ * You can add more properties, simply by creating a write-only property which will register a new [predicate] on write. See
+ * [Adding support for custom search criteria](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v8#adding-support-for-custom-search-criteria)
+ * for more details.
  * @property clazz the class of the component we are searching for.
  * @property id the required [Component.getId]; if null, no particular id is matched.
  * @property caption the required [Component.caption]; if null, no particular caption is matched.

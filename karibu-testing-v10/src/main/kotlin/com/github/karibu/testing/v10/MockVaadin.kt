@@ -35,7 +35,8 @@ object MockVaadin {
      * ```
      * @param routes all classes annotated with [com.vaadin.flow.router.Route]; use [Routes.autoDiscoverViews] to auto-discover all such classes.
      * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
-     * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing.
+     * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
+     * [MockedUI.beforeClientResponse] for details.
      */
     fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() }) {
         // init servlet

@@ -2,6 +2,11 @@ package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.html.Input
+import com.vaadin.flow.component.textfield.PasswordField
+import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
@@ -185,4 +190,16 @@ var <V, E: HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
     set(v) {
         (this as Component).checkEditableByUser()
         value = v
+    }
+
+// modify when this is fixed: https://github.com/vaadin/flow/issues/4068
+val Component.placeholder: String?
+    get() = when (this) {
+        is TextField -> placeholder
+        is TextArea -> placeholder
+        is PasswordField -> placeholder
+        is ComboBox<*> -> (this as ComboBox<*>).placeholder
+        is DatePicker -> placeholder
+        is Input -> placeholder.orElse(null)
+        else -> null
     }

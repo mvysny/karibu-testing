@@ -3,7 +3,7 @@ package com.github.karibu.testing.v10
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.grid.Grid
-import java.util.ArrayList
+import java.util.*
 import kotlin.streams.toList
 
 /**
@@ -57,7 +57,7 @@ fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
  */
 @Suppress("UNCHECKED_CAST")
 fun Component.toPrettyString(): String {
-    val list = ArrayList<String>()
+    val list = LinkedList<String>()
     if (id.isPresent) {
         list.add("#${id.get()}")
     }
@@ -84,6 +84,9 @@ fun Component.toPrettyString(): String {
     }
     if (this is Grid.Column<*> && this.header2.isNotBlank()) {
         list.add("header='${this.header2}'")
+    }
+    if (!placeholder.isNullOrBlank()) {
+        list.add("placeholder='$placeholder'")
     }
     var name = javaClass.simpleName
     if (name.isEmpty()) {

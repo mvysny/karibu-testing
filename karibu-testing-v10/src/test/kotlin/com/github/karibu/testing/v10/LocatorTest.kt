@@ -3,10 +3,13 @@ package com.github.karibu.testing.v10
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.vok.karibudsl.flow.*
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.streams.asSequence
 import kotlin.test.expect
@@ -89,5 +92,24 @@ class LocatorTest : DynaTest({
         expect("Thanks Baron Vladimir Harkonnen, it works!") { _get<Text>().text }
         expect("Thanks Baron Vladimir Harkonnen, it works!") { (layout.children.asSequence().last() as Text).text }
         expect(3) { layout.componentCount }
+    }
+
+    group("matcher") {
+        fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+        test("caption") {
+            expect(true) { Button("click me").matches { caption = "click me" } }
+            expect(true) { TextField("name:").matches { caption = "name:" } }
+            expect(true) { Button("click me").matches { } }
+            expect(true) { TextField("name:").matches { } }
+            expect(false) { Button("click me").matches { caption = "Click Me" } }
+            expect(false) { TextField("name:").matches { caption = "Name"} }
+        }
+        test("placeholder") {
+            expect(true) { TextField("name", "the name").matches { placeholder = "the name" } }
+            expect(true) { PasswordField("password", "at least 6 characters").matches { placeholder = "at least 6 characters" } }
+            expect(true) { ComboBox<String>().apply { placeholder = "foo" }.matches { placeholder = "foo" } }
+            expect(false) { TextField("name", "the name").matches { placeholder = "name" } }
+            expect(false) { PasswordField("password", "at least 6 characters").matches { placeholder = "password" } }
+        }
     }
 })

@@ -148,7 +148,7 @@ private fun Component.checkEditableByUser() {
     if (this is HasValue<*, *>) {
         @Suppress("UNCHECKED_CAST")
         val hasValue = this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>
-        check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
+        check(!hasValue.isReadOnly) { "The ${toPrettyString()} is read-only" }
     }
 }
 

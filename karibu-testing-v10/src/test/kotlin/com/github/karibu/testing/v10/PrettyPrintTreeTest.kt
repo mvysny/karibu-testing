@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.vok.karibudsl.flow.text

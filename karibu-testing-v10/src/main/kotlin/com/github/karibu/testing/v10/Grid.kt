@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.grid.AbstractColumn
 import com.vaadin.flow.component.grid.Grid
@@ -6,11 +6,8 @@ import com.vaadin.flow.data.provider.DataGenerator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.Query
 import com.vaadin.flow.dom.Element
-import com.vaadin.flow.dom.ElementUtil
 import elemental.json.Json
-import elemental.json.JsonObject
 import elemental.json.JsonValue
-import org.jsoup.nodes.Document
 import kotlin.streams.toList
 
 /**

@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.github.karibu.mockhttp.MockContext
 import com.github.karibu.mockhttp.MockHttpSession

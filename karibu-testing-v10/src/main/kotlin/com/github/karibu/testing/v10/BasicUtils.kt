@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.button.Button

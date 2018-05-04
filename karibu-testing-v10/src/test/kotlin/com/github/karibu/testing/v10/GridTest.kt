@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.github.mvysny.dynatest.DynaTest
 import com.vaadin.flow.component.Text
@@ -8,14 +8,24 @@ import kotlin.test.expect
 
 class GridTest : DynaTest({
 
-    beforeEach { MockVaadin.setup()  }
+    beforeEach { MockVaadin.setup() }
 
     test("_size") {
-        expect(20) { ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._size() }
+        expect(20) { ListDataProvider<TestPerson>((0 until 20).map {
+            TestPerson(
+                "name $it",
+                it
+            )
+        })._size() }
     }
 
     test("_get") {
-        expect("name 5") { ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name }
+        expect("name 5") { ListDataProvider<TestPerson>((0 until 20).map {
+            TestPerson(
+                "name $it",
+                it
+            )
+        })._get(5).name }
     }
 
     test("_findAll") {
@@ -24,7 +34,12 @@ class GridTest : DynaTest({
     }
 
     test("_dump") {
-        val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        val dp = ListDataProvider<TestPerson>((0 until 7).map {
+            TestPerson(
+                "name $it",
+                it
+            )
+        })
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.dataProvider = dp
         expect("--[Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
@@ -34,7 +49,12 @@ class GridTest : DynaTest({
 
     test("expectRow()") {
         val grid = Grid<TestPerson>(TestPerson::class.java)
-        grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map {
+            TestPerson(
+                "name $it",
+                it
+            )
+        })
         grid.expectRows(7)
         grid.expectRow(0, "name 0", "0")
     }

@@ -1,7 +1,6 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.Component
-import com.vaadin.flow.component.HasText
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.grid.Grid
 import java.util.ArrayList

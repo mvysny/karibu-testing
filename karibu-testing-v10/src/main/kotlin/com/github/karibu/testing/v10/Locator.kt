@@ -1,4 +1,4 @@
-package com.github.karibu.testing
+package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -77,7 +77,8 @@ fun <T: Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.()->Unit
  * @return the only matching component, never null.
  * @throws IllegalArgumentException if no component matched, or if more than one component matches.
  */
-inline fun <reified T: Component> _get(noinline block: SearchSpec<T>.()->Unit = {}): T = _get(T::class.java, block)
+inline fun <reified T: Component> _get(noinline block: SearchSpec<T>.()->Unit = {}): T =
+    _get(T::class.java, block)
 
 /**
  * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
@@ -119,7 +120,8 @@ inline fun <reified T: Component> Component._find(noinline block: SearchSpec<T>.
  * @param block the search specification
  * @return the list of matching components, may be empty.
  */
-inline fun <reified T: Component> _find(noinline block: SearchSpec<T>.()->Unit = {}): List<T> = _find(T::class.java, block)
+inline fun <reified T: Component> _find(noinline block: SearchSpec<T>.()->Unit = {}): List<T> =
+    _find(T::class.java, block)
 
 /**
  * Finds a list of VISIBLE components of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
@@ -182,7 +184,8 @@ fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.(
  * Expects that there are no VISIBLE components in the current UI of given type which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
  * @throws IllegalArgumentException if one or more components matched.
  */
-inline fun <reified T: Component> _expectNone(noinline block: SearchSpec<T>.()->Unit = {}): Unit = _expectNone(T::class.java, block)
+inline fun <reified T: Component> _expectNone(noinline block: SearchSpec<T>.()->Unit = {}): Unit =
+    _expectNone(T::class.java, block)
 
 /**
  * Expects that there are no VISIBLE components in the current UI of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.

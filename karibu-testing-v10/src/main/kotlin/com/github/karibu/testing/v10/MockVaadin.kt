@@ -126,14 +126,8 @@ object MockVaadin {
  */
 class MockedUI : UI() {
     override fun beforeClientResponse(component: Component, execution: SerializableConsumer<ExecutionContext>): StateTree.ExecutionRegistration {
-        if (component is Dialog && component.isOpened) {
-            component.addOpenedChangeListener {
-                // not currently fired by Flow.
-                if (!component.isOpened) {
-                    component.element.removeFromParent()  // cleanup closed dialogs from the UI
-                }
-            }
-        }
+        // run this execution immediately, otherwise the dialog is not really opened. This is because the dialog does not open immediately,
+        // instead it slates itself to be opened via this method.
         execution.accept(ExecutionContext(this, false))
         return object : StateTree.ExecutionRegistration {
             override fun remove() {

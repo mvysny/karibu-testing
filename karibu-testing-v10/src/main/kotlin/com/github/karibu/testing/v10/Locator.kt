@@ -7,6 +7,7 @@ import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Collectors
+import kotlin.streams.toList
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
@@ -146,9 +147,15 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     return descendants.filter { predicate(it) }
 }
 
-fun cleanupDialogs() {
-    // @todo mavi remove when Flow will properly fire Dialog close listeners. See MockedUI for more details
-    UI.getCurrent().children.collect(Collectors.toList()).forEach {
+/**
+ * Flow Server does not close the dialog when close() is called; instead it tells client-side dialog to close,
+ * which then fires event back to the server that the dialog was closed, and removes itself from the DOM.
+ * Since there's no browser with browserless testing, we need to cleanup closed dialogs manually, hence this method.
+ *
+ * Also see [MockedUI] for more details
+ */
+internal fun cleanupDialogs() {
+    UI.getCurrent().children.forEach {
         if (it is Dialog && !it.isOpened) it.element.removeFromParent()
     }
 }

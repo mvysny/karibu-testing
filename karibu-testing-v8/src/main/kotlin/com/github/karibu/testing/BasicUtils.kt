@@ -76,7 +76,7 @@ fun <T : ClientRpc> AbstractClientConnector.overrideRpcProxy(rpcInterface: Class
 val Component.placeholder: String?
     get() = when (this) {
         is AbstractTextField -> placeholder
-        is ComboBox<*> -> (this as ComboBox<*>).placeholder
+        is ComboBox<*> -> this.placeholder  // https://youtrack.jetbrains.com/issue/KT-24275
         is DateField -> placeholder
         is DateTimeField -> placeholder
         else -> null

@@ -198,7 +198,7 @@ val Component.placeholder: String?
         is TextField -> placeholder
         is TextArea -> placeholder
         is PasswordField -> placeholder
-        is ComboBox<*> -> (this as ComboBox<*>).placeholder
+        is ComboBox<*> -> this.placeholder  // https://youtrack.jetbrains.com/issue/KT-24275
         is DatePicker -> placeholder
         is Input -> placeholder.orElse(null)
         else -> null

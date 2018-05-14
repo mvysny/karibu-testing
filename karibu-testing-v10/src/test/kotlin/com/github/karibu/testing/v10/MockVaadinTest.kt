@@ -18,7 +18,14 @@ import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
 
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
+    beforeEach {
+        MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
+        expect("""
+└── MockedUI[]
+    └── WelcomeView[]
+        └── Text[text='Welcome!']
+""".trim()) { UI.getCurrent().toPrettyTree().trim() }
+    }
 
     test("smoke test that everything is mocked") {
         expect(true) { UI.getCurrent() != null }
@@ -139,6 +146,7 @@ class HelloWorldView : VerticalLayout() {
 @Route("")
 class WelcomeView : VerticalLayout() {
     init {
+        width = null
         text("Welcome!")
     }
 }

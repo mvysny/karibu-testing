@@ -1,10 +1,11 @@
 package com.github.karibu.testing.v10
 
-import com.vaadin.flow.component.grid.AbstractColumn
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.data.provider.DataGenerator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.Query
+import com.vaadin.flow.data.renderer.Renderer
+import com.vaadin.flow.data.renderer.TemplateRenderer
 import com.vaadin.flow.dom.Element
 import elemental.json.Json
 import elemental.json.JsonValue
@@ -103,19 +104,25 @@ private val <T> Grid.Column<T>.internalId2: String get() = javaClass.getDeclared
     invoke(this@internalId2) as String
 }
 
+val Renderer<*>.template: String get() {
+    val template = Renderer::class.java.getDeclaredField("template").run {
+        isAccessible = true
+        get(this@template) as String?
+    }
+    return template ?: ""
+}
+
 /**
  * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String). The result value is undefined if a component has been set as the header.
  */
 var <T> Grid.Column<T>.header2: String
     get() {
-        val e = AbstractColumn::class.java.getDeclaredField("headerTemplate").run {
+        val e: Renderer<*>? = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer").run {
             isAccessible = true
-            get(this@header2) as? Element
+            get(this@header2) as Renderer<*>?
         }
-        // this would return "<vaadin-grid-sorter path='col5'>Foo</vaadin-grid-sorter>" for sortable columns
-//        return e?.getPropertyRaw("innerHTML")?.toString() ?: ""
-        // this doesn't work: e?.textRecursively  : https://github.com/vaadin/flow/issues/3668
-        return e?.textRecursively2 ?: ""
+
+        return e?.template ?: ""
     }
     set(value) {
         setHeader(value)

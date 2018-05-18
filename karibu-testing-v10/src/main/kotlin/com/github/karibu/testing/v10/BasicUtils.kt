@@ -12,6 +12,7 @@ import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.server.startup.RouteRegistry
 import org.atmosphere.util.annotation.AnnotationDetector
 import org.jsoup.nodes.Document
@@ -203,3 +204,10 @@ val Component.placeholder: String?
         is Input -> placeholder.orElse(null)
         else -> null
     }
+
+/**
+ * Navigates to where this router link points to.
+ */
+fun RouterLink.click() {
+    UI.getCurrent().navigate(href)
+}

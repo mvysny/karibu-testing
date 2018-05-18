@@ -4,7 +4,9 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.vok.karibudsl.flow.button
 import com.github.vok.karibudsl.flow.checkBox
+import com.github.vok.karibudsl.flow.routerLink
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -120,6 +122,17 @@ class BasicUtilsTest : DynaTest({
             }
             expect(false) { cb.value }
         }
+    }
+
+    test("RouterLink.click()") {
+        MockVaadin.setup(Routes().apply { routes.add(TestingView::class.java) })
+        UI.getCurrent().apply {
+            routerLink(text = "testing", viewType = TestingView::class) {
+                click()
+            }
+        }
+        // make sure that the navigation has been performed and there is the TestingView in the current UI
+        _get<TestingView>()
     }
 })
 

@@ -127,7 +127,7 @@ class BasicUtilsTest : DynaTest({
     test("RouterLink.click()") {
         MockVaadin.setup(Routes().apply { routes.add(TestingView::class.java) })
         UI.getCurrent().apply {
-            routerLink(text = "testing", viewType = TestingView::class) {
+            routerLink(null, "testing", TestingView::class) {
                 click()
             }
         }

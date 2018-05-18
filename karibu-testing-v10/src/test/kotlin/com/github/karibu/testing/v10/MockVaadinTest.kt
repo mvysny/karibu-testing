@@ -10,6 +10,8 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.router.BeforeEvent
+import com.vaadin.flow.router.HasUrlParameter
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
@@ -50,12 +52,22 @@ class MockVaadinTest : DynaTest({
         expect(true) { vl.isAttached }
     }
 
-    test("Navigation") {
+    test("navigation works in mocked env") {
         // no need: when UI is initialized in MockVaadin.setup(), automatic navigation to "" is performed.
 //        UI.getCurrent().navigate("")
         _get<Text> { text = "Welcome!" }
         UI.getCurrent().navigate("helloworld")
         _get<Button> { caption = "Hello, World!" }
+    }
+
+    test("navigation to parametrized view works in mocked env") {
+        UI.getCurrent().navigate("params/1")
+        _get<ParametrizedView>()
+    }
+
+    test("router-navigation to parametrized view works in mocked env") {
+        expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
+        expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
     }
 
     test("open dialog") {
@@ -135,6 +147,13 @@ class MockVaadinTest : DynaTest({
         expect(null) { VaadinSession.getCurrent().getAttribute("foo") }
     }
 })
+
+@Route("params")
+class ParametrizedView : VerticalLayout(), HasUrlParameter<Int> {
+    override fun setParameter(event: BeforeEvent, parameter: Int?) {
+        parameter!!
+    }
+}
 
 @Route("helloworld")
 class HelloWorldView : VerticalLayout() {

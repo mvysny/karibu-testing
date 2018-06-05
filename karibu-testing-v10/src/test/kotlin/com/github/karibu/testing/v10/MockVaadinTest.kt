@@ -10,9 +10,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.router.BeforeEvent
-import com.vaadin.flow.router.HasUrlParameter
-import com.vaadin.flow.router.Route
+import com.vaadin.flow.router.*
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.util.concurrent.atomic.AtomicInteger
@@ -65,9 +63,15 @@ class MockVaadinTest : DynaTest({
         _get<ParametrizedView>()
     }
 
-    test("router-navigation to parametrized view works in mocked env") {
+    test("navigation to view with parent route works in mocked env") {
+        UI.getCurrent().navigate("parent/child")
+        _get<ChildView>()
+    }
+
+    test("UI.getUrl() to view works in mocked env") {
         expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
         expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
+        expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
     }
 
     test("open dialog") {
@@ -169,3 +173,9 @@ class WelcomeView : VerticalLayout() {
         text("Welcome!")
     }
 }
+
+@Route("child", layout = ParentView::class)
+class ChildView : VerticalLayout()
+
+@RoutePrefix("parent")
+class ParentView: VerticalLayout(), RouterLayout

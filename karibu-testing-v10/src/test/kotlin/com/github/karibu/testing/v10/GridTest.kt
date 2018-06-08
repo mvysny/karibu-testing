@@ -33,8 +33,10 @@ class GridTest : DynaTest({
 
     test("_dump") {
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
-        val grid = Grid<TestPerson>(TestPerson::class.java)
-        grid.dataProvider = dp
+        val grid = UI.getCurrent().grid<TestPerson>(dp) {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+        }
         expect("--[Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
         expect("--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { grid._dump(0 until 5) }
         expect("--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n5: name 5, 5\n6: name 6, 6\n") {
@@ -45,8 +47,11 @@ class GridTest : DynaTest({
     }
 
     test("expectRow()") {
-        val grid = Grid<TestPerson>(TestPerson::class.java)
-        grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        val grid = UI.getCurrent().grid<TestPerson>(dp) {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+        }
         grid.expectRows(7)
         grid.expectRow(0, "name 0", "0")
     }

@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.2.50"
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.1"
 }
 
 repositories {

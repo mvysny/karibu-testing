@@ -6,8 +6,6 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate
-import java.util.stream.Collectors
-import kotlin.streams.toList
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.

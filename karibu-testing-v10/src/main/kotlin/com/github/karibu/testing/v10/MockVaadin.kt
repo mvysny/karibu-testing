@@ -7,7 +7,6 @@ import com.github.karibu.mockhttp.MockServletConfig
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.function.SerializableConsumer
@@ -37,17 +36,15 @@ object MockVaadin {
      * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
      * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
      * [MockedUI.beforeClientResponse] for details.
+     * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
+     * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
-    fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() }) {
+    fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() },
+              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-                val service = object : VaadinServletService(this, deploymentConfiguration) {
-                    private val registry = routes.createRegistry()
-                    override fun isAtmosphereAvailable(): Boolean = false
-                    override fun getRouteRegistry(): RouteRegistry = registry
-                    override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
-                }
+                val service = serviceFactory(this, deploymentConfiguration, routes.createRegistry())
                 service.init()
                 return service
             }
@@ -136,4 +133,10 @@ class MockedUI : UI() {
             }
         }
     }
+}
+
+class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration, private val registry: RouteRegistry) : VaadinServletService(servlet, deploymentConfiguration) {
+    override fun isAtmosphereAvailable(): Boolean = false
+    override fun getRouteRegistry(): RouteRegistry = registry
+    override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
 }

@@ -4,8 +4,6 @@ import com.github.karibu.mockhttp.MockContext
 import com.github.karibu.mockhttp.MockHttpSession
 import com.github.karibu.mockhttp.MockRequest
 import com.github.karibu.mockhttp.MockServletConfig
-import com.github.karibu.testing.v10.javasupport.ServiceFactory
-import com.github.karibu.testing.v10.javasupport.UIFactory
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
@@ -41,8 +39,10 @@ object MockVaadin {
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
-    fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() },
-              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
+    @JvmStatic @JvmOverloads fun setup(routes: Routes = Routes(),
+              uiFactory: () -> UI = { MockedUI() },
+              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService =
+                                               { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
@@ -62,22 +62,14 @@ object MockVaadin {
     /**
      * One more overloaded setup() for use in Java and Groovy
      */
-    @JvmStatic @JvmOverloads fun setup(routes: Routes = defaultRoutes(),
-                                       uiFactory: UIFactory = defaultUIFactory(),
-                                       serviceFactory: ServiceFactory = defaultServiceFactory()) {
-        setup(routes, uiFactory::provide, serviceFactory::provide)
-    }
-
-    /**
-     * One more overloaded setup() for use in Java and Groovy
-     */
     @JvmStatic fun setup(routes: Routes = defaultRoutes(),
-                         serviceFactory: ServiceFactory = defaultServiceFactory()) =
+                         serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
             setup(routes = routes, uiFactory = defaultUIFactory(), serviceFactory = serviceFactory)
 
     private fun defaultRoutes() = Routes()
-    private fun defaultServiceFactory() = ServiceFactory { servlet, dc, reg -> MockService(servlet, dc, reg) }
-    private fun defaultUIFactory() = UIFactory { MockedUI() }
+    private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration, reg: RouteRegistry ->
+        MockService(servlet, dc, reg) }
+    private fun defaultUIFactory() = { MockedUI() }
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return

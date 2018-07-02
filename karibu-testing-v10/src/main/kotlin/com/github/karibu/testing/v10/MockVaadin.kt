@@ -39,8 +39,10 @@ object MockVaadin {
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
-    fun setup(routes: Routes = Routes(), uiFactory: ()->UI = { MockedUI() },
-              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
+    @JvmStatic @JvmOverloads fun setup(routes: Routes = Routes(),
+              uiFactory: () -> UI = { MockedUI() },
+              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService =
+                                               { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
@@ -56,6 +58,18 @@ object MockVaadin {
         // init Vaadin Session
         createSession(ctx, servlet, uiFactory)
     }
+
+    /**
+     * One more overloaded setup() for use in Java and Groovy
+     */
+    @JvmStatic fun setup(routes: Routes = defaultRoutes(),
+                         serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
+            setup(routes = routes, uiFactory = defaultUIFactory(), serviceFactory = serviceFactory)
+
+    private fun defaultRoutes() = Routes()
+    private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration, reg: RouteRegistry ->
+        MockService(servlet, dc, reg) }
+    private fun defaultUIFactory() = { MockedUI() }
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
@@ -122,7 +136,8 @@ object MockVaadin {
 /**
  * We need to use a MockedUI, with [beforeClientResponse] overridden, otherwise opened dialogs will never appear in the UI.
  */
-class MockedUI : UI() {
+// opened to be extensible in user's library
+open class MockedUI : UI() {
     override fun beforeClientResponse(component: Component, execution: SerializableConsumer<ExecutionContext>): StateTree.ExecutionRegistration {
         // run this execution immediately, otherwise the dialog is not really opened. This is because the dialog does not open immediately,
         // instead it slates itself to be opened via this method.
@@ -135,7 +150,8 @@ class MockedUI : UI() {
     }
 }
 
-class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration, private val registry: RouteRegistry) : VaadinServletService(servlet, deploymentConfiguration) {
+// opened to be extensible in user's library
+open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration, private val registry: RouteRegistry) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getRouteRegistry(): RouteRegistry = registry
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"

@@ -405,3 +405,14 @@ java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching
         ├── CheckBox[caption='Primary Address', value='false']
         └── TextField[caption='Street', value='']
 ```
+
+## Using Karibu-Testing with Spring or Guice
+
+To have dependencies injected into your views as they are constructed, you need to register a custom `Instantiator` into Vaadin.
+The [Vaadin Spring Add-on](https://vaadin.com/directory/component/vaadin-spring) provides an implementation of the `Instantiator` which you can use.
+
+To use a custom `Instantiator`:
+ 
+1. Implement your own `VaadinServletService` (or extend pre-provided `MockService`) and override `VaadinServletService.loadInstantiators`,
+   to load a proper Instantiator
+2. Register your `VaadinServletService` in `MockVaadin.setup()`, the `serviceFactory` parameter.

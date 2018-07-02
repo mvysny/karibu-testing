@@ -39,7 +39,8 @@ object MockVaadin {
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
-    @JvmStatic @JvmOverloads fun setup(routes: Routes = Routes(),
+    @JvmStatic @JvmOverloads
+    fun setup(routes: Routes = Routes(),
               uiFactory: () -> UI = { MockedUI() },
               serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService =
                                                { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
@@ -62,14 +63,13 @@ object MockVaadin {
     /**
      * One more overloaded setup() for use in Java and Groovy
      */
-    @JvmStatic fun setup(routes: Routes = defaultRoutes(),
+    @JvmStatic
+    fun setup(routes: Routes = Routes(),
                          serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
-            setup(routes = routes, uiFactory = defaultUIFactory(), serviceFactory = serviceFactory)
+            setup(routes = routes, uiFactory = { MockedUI() }, serviceFactory = serviceFactory)
 
-    private fun defaultRoutes() = Routes()
     private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration, reg: RouteRegistry ->
         MockService(servlet, dc, reg) }
-    private fun defaultUIFactory() = { MockedUI() }
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return

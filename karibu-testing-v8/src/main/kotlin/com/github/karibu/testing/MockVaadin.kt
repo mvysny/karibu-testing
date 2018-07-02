@@ -22,6 +22,7 @@ object MockVaadin {
      * A basic Vaadin environment is prepared before calling this factory, in order to be safe to instantiate your UI.
      * To instantiate your UI just call your UI constructor, for example `YourUI()`
      */
+    @JvmStatic @JvmOverloads
     fun setup(uiFactory: ()->UI = { MockUI() }) {
         // prepare mocking servlet environment
         val servletContext = MockContext()
@@ -127,6 +128,9 @@ object MockVaadin {
     }
 }
 
+/**
+ * An empty mock UI.
+ */
 internal class MockUI : UI() {
     override fun init(request: VaadinRequest?) {
     }

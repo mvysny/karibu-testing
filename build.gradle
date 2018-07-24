@@ -1,7 +1,7 @@
 buildscript {
     ext.kotlin_version = '1.2.51'
     ext.vaadin8_version = '8.5.0.beta2'
-    ext.vaadin10_version = '10.0.1'
+    ext.vaadin10_version = '10.0.2'
     ext.dynatest_version = "0.8"
 
     ext.local = new Properties()

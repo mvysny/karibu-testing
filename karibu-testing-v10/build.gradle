@@ -19,7 +19,7 @@ dependencies {
 
     // to have class autodiscovery functionality
     compile "com.vaadin.external.atmosphere:atmosphere-runtime:2.4.24.vaadin1"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {

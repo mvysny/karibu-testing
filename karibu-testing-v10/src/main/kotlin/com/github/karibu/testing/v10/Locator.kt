@@ -3,9 +3,11 @@ package com.github.karibu.testing.v10
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate
+import kotlin.streams.toList
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
@@ -171,7 +173,17 @@ private class TreeIterator<out T>(root: T, private val children: (T) -> Iterator
     }
 }
 private fun Component.walk(): Iterable<Component> = Iterable {
-    TreeIterator(this, { component -> component.children.iterator() })
+    TreeIterator(this) { component -> component.getAllChildren() }
+}
+
+private fun Component.getAllChildren(): Iterator<Component> = when(this) {
+    is Grid<*> -> {
+        val columns = children.toList()
+        val headerComponents = this.headerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
+        val footerComponents = this.footerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
+        (columns + headerComponents + footerComponents).iterator()
+    }
+    else -> children.iterator()
 }
 
 /**

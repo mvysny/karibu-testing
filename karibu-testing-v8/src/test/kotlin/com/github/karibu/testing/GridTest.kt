@@ -3,6 +3,7 @@ package com.github.karibu.testing
 import com.github.mvysny.dynatest.DynaTest
 import com.vaadin.data.provider.ListDataProvider
 import com.vaadin.ui.Grid
+import com.vaadin.ui.TextField
 import kotlin.test.expect
 
 class GridTest : DynaTest({
@@ -39,6 +40,12 @@ class GridTest : DynaTest({
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         grid.expectRows(7)
         grid.expectRow(0, "name 0", "0")
+    }
+
+    test("lookup finds components in header") {
+        val grid = Grid<TestPerson>(TestPerson::class.java)
+        grid.getHeaderRow(0).getCell(TestPerson::age.name).component = TextField("Foo!")
+        expect("Foo!") { grid._get<TextField>().caption }
     }
 })
 

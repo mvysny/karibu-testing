@@ -6,6 +6,7 @@ import com.github.vok.karibudsl.flow.grid
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import kotlin.test.expect
@@ -72,6 +73,12 @@ class GridTest : DynaTest({
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         // unfortunately Vaadin 10 Renderer/Column code is so complex it's impossible to obtain the value of a NativeButtonRenderer
         grid.expectRow(0, "name 0", "null")
+    }
+
+    test("lookup finds components in header") {
+        val grid = Grid<TestPerson>(TestPerson::class.java)
+        grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
+        expect("Foo!") { grid._get<TextField>().caption }
     }
 })
 

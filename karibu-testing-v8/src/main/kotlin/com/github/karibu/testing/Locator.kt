@@ -162,7 +162,7 @@ private class TreeIterator<out T>(root: T, private val children: (T) -> Iterable
 }
 
 private fun Component.walk(): Iterable<Component> = Iterable {
-    TreeIterator(this, { component -> component as? HasComponents ?: listOf() })
+    TreeIterator(this) { component -> component as? HasComponents ?: listOf() }
 }
 
 /**

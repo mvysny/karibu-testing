@@ -1,14 +1,19 @@
 package com.github.karibu.testing.v10
 
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.data.provider.DataGenerator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.Query
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.renderer.TemplateRenderer
 import com.vaadin.flow.dom.Element
 import elemental.json.Json
 import elemental.json.JsonValue
+import kotlin.reflect.KProperty1
 import kotlin.streams.toList
 
 /**
@@ -164,3 +169,98 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
     }
 }
+
+
+
+/**
+ * Returns `com.vaadin.flow.component.grid.AbstractColumn`
+ */
+internal val HeaderRow.HeaderCell.column: Any
+    get() {
+        val getColumn = abstractCellClass.getDeclaredMethod("getColumn")
+        getColumn.isAccessible = true
+        return getColumn.invoke(this)
+    }
+
+private val abstractCellClass = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
+private val abstractColumnClass = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
+
+/**
+ * Returns `com.vaadin.flow.component.grid.AbstractColumn`
+ */
+private val FooterRow.FooterCell.column: Any
+    get() {
+        val getColumn = abstractCellClass.getDeclaredMethod("getColumn")
+        getColumn.isAccessible = true
+        return getColumn.invoke(this)
+    }
+
+/**
+ * Retrieves the cell for given [property]; it matches [Grid.Column.getKey] to [KProperty1.name].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
+    val cell = cells.firstOrNull { (it.column as Grid.Column<*>).key == property.name }
+    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+    return cell!!
+}
+
+private val Any.columnKey: String?
+    get() {
+        abstractColumnClass.cast(this)
+        val method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
+        method.isAccessible = true
+        val gridColumn = method.invoke(this) as Grid.Column<*>
+        return gridColumn.key
+    }
+
+/**
+ * Retrieves the cell for given [property]; it matches [Grid.Column.getKey] to [KProperty1.name].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell {
+    val cell = cells.firstOrNull { it.column.columnKey == property.name }
+    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+    return cell!!
+}
+
+val HeaderRow.HeaderCell.renderer: Renderer<*>?
+    get() {
+        val method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
+        method.isAccessible = true
+        val renderer = method.invoke(column)
+        return renderer as Renderer<*>?
+    }
+
+val FooterRow.FooterCell.renderer: Renderer<*>?
+    get() {
+        val method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
+        method.isAccessible = true
+        val renderer = method.invoke(column)
+        return renderer as Renderer<*>?
+    }
+
+var FooterRow.FooterCell.component: Component?
+    get() {
+        val cr = (renderer as? ComponentRenderer<*, *>) ?: return null
+        return cr.createComponent(null)
+    }
+    set(value) {
+        setComponent(value)
+    }
+
+private val gridSorterComponentRendererClass = Class.forName("com.vaadin.flow.component.grid.GridSorterComponentRenderer")
+
+var HeaderRow.HeaderCell.component: Component?
+    get() {
+        val r = renderer
+        if (!gridSorterComponentRendererClass.isInstance(r)) return null
+        val componentField = gridSorterComponentRendererClass.getDeclaredField("component")
+        componentField.isAccessible = true
+        return componentField.get(r) as Component
+    }
+    set(value) {
+        setComponent(value)
+    }

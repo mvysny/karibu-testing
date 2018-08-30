@@ -12,6 +12,7 @@ import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
+import kotlin.test.fail
 
 class BasicUtilsTest : DynaTest({
 
@@ -29,7 +30,7 @@ class BasicUtilsTest : DynaTest({
     group("button click") {
         fun expectClickCount(button: Button, clickCount: Int, block: Button.()->Unit) {
             var clicked = 0
-            button.addClickListener { if (++clicked > clickCount) kotlin.test.fail("Clicked more than $clickCount times") }
+            button.addClickListener { if (++clicked > clickCount) fail("Clicked more than $clickCount times") }
             button.block()
             expect(clickCount) { clicked }
         }

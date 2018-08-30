@@ -8,12 +8,13 @@ import com.vaadin.ui.Button
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.VerticalLayout
 import kotlin.test.expect
+import kotlin.test.fail
 
 class BasicUtilsTest : DynaTest({
     group("button click") {
         fun expectClickCount(button: Button, clickCount: Int, block: Button.()->Unit) {
             var clicked = 0
-            button.addClickListener { if (++clicked > clickCount) kotlin.test.fail("Clicked more than $clickCount times") }
+            button.addClickListener { if (++clicked > clickCount) fail("Clicked more than $clickCount times") }
             button.block()
             expect(clickCount) { clicked }
         }

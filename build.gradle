@@ -22,7 +22,7 @@ defaultTasks 'clean', 'build'
 
 allprojects {
     group 'com.github.kaributesting'
-    version '0.4.16-SNAPSHOT'
+    version '0.4.16'
 }
 
 subprojects {

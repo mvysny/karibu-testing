@@ -1,8 +1,10 @@
 package com.github.karibu.testing;
 
 import com.vaadin.data.HasValue;
+import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,6 +156,7 @@ public class LocatorJ {
 
     /**
      * Expects that there are no VISIBLE components in the current UI of given [clazz] which matches [spec]. The [UI.getCurrent] and all of its descendants are searched.
+     *
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
@@ -165,6 +168,7 @@ public class LocatorJ {
 
     /**
      * Expects that there are no VISIBLE components of given [clazz]. The [receiver] and all of its descendants are searched.
+     *
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz) {
@@ -173,6 +177,7 @@ public class LocatorJ {
 
     /**
      * Expects that there are no VISIBLE components of given [clazz] matching given [spec]. The [receiver] and all of its descendants are searched.
+     *
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {

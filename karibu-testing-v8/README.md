@@ -284,6 +284,7 @@ With browserless tests there is no servlet container and nobody will discover th
 Luckily Karibu-DSL provides means to discover those views, as a `autoDiscoverViews()` function. All you need to do in your tests is
 to call this function before all tests:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeGroup {
@@ -300,7 +301,31 @@ class MyUITest : DynaTest({
 })
 ```
 
-TODO java
+Java:
+```java
+import static com.github.karibu.testing.LocatorJ.*;
+import static com.github.vok.karibudsl.NavigatorKt.*;
+public class MyUITest {
+    @BeforeAll
+    public static void beforeAll() {
+        autoDiscoverViews("com.myproject")
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        MockVaadin.setup(MyUI::new);
+    }
+
+    @Test
+    public void simpleTest() {
+        navigateToView(CrudView.class);  // this will call Navigator.navigateTo("crud")
+
+        // now the view is ready and attached to your UI. We can test.
+        final Grid<Person> grid = _get(Grid.class);
+        // etc etc
+    }
+}
+```
 
 ## API
 
@@ -326,8 +351,9 @@ This set of functions operates on `UI.getCurrent()`. However, often it is handy 
 in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin
 component as an extension method. For example:
 
+Kotlin:
 ```kotlin
-class AddNewPersonForm : VerticalLayout {
+class AddNewPersonForm : VerticalLayout() {
     // nests fields, uses binder, etc etc
 }
 
@@ -338,9 +364,30 @@ test("add new person happy flow") {
 }
 ```
 
+Java:
+```java
+public class AddNewPersonForm extends VerticalLayout {
+    // nests fields, uses binder, etc etc
+}
+
+@Test
+public void addNewPersonHappyFlow() {
+    final AddNewPersonForm form = new AddNewPersonForm();
+    _setValue(_get(form, TextField.class, spec -> spec.withCaption("Name:")), "John Doe");
+    _click(_get(form, Button.class, spec -> spec.withCaption("Create")));
+}
+```
+
 Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular tab of a tab sheet:
+Kotlin:
 ```kotlin
 _get<TabSheet>().getTab[0].component._get<TextField> { caption = "Age" } ._value = "45"
+```
+Java:
+```java
+final TabSheet ts = _get(TabSheet.class);
+final Component first = ts.getTab(0).getComponent();
+_setValue(_get(first, TextField.class, spec -> spec.withCaption("Age")), "45");
 ```
 
 Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
@@ -372,7 +419,7 @@ Vaadin Button contains the `click()` method, however that method is not well fit
   should fail as well.
  
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
-all the above points, prior running the click listeners.
+all the above points, prior running the click listeners (in Java it's `_click(button)` since Java doesn't have extension methods).
 
 ### Changing values
 
@@ -381,24 +428,27 @@ want to simulate user input and we want to change the value of, say, a `ComboBox
 read-write, visible; in other words, fully prepared to receive user input.
 
 It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
-all the above items prior setting the new value.
+all the above items prior setting the new value. In Java it's `_setValue(hasValue, value)` since Java doesn't have extension methods.
 
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
 contents of the Grid.
 
-* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
-* You can check for the total amount of items shown in the grid, by calling `grid._size()`
+* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item. (in Java it's `GridKt.get(grid, 0);`).
+* You can check for the total amount of items shown in the grid, by calling `grid._size()` (or Java: `GridKt._size(grid);`).
 * You can click a button at a particular column (or any `ClickableRenderer` for that matter), by calling `grid._clickRenderer(0, "actions")`
+  (Java: `GridKt._clickRenderer(grid, 0, "actions");`).
 * You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
-  `List<String>`
+  `List<String>`. In Java it's `GridKt._getFormattedRow(grid, 5);`.
 * You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
-  fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
+  fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid. In Java it's `GridKt.expectRows(grid, 25);`.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
-  the function will fail with a proper grid dump.
+  the function will fail with a proper grid dump. In Java it's `GridKt.expectRow(new Grid<>(), 0, "John Doe", "25");`.
 
 ## Adding support for custom search criteria
+
+> *Note*: Java doesn't have extension methods and thus this feature is not supported in Java.
 
 Suppose you have a dynamic form which allows you to add multiple addresses, one of those being primary. You'll have the following `AddressPanel` class:
 

@@ -30,6 +30,7 @@ class GreetingLabel : Label() {
 
 We want to test the component so that a call to the `greet("world")` function will properly set the label's value:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     test("proper greeting") {
@@ -38,6 +39,18 @@ class MyUITest : DynaTest({
         expect("Hello, world") { label.value }
     }
 })
+```
+
+Java:
+```java
+public class MyUITest {
+    @Test
+    public void testProperGreeting() {
+        final GreetingLabel label = new GreetingLabel();
+        label.greet("world");
+        assertEquals("Hello, world", label.getValue());
+    }
+}
 ```
 
 Nothing special here - we have just instantiated the component as we would a regular Java object, and then we asserted that the value is updated properly.
@@ -100,18 +113,29 @@ environment needs to be prepared:
 Luckily, this is exactly what the `MockVaadin.setup()` function does. It will prepare everything for us and even initialize the `UI`; we just need
 to provide the `UI` instance to the function:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
 })
 ```
+Java:
+```java
+public class MyUITest {
+    @BeforeEach
+    public void beforeEach() {
+        MockVaadin.setup(MyUI::new);
+    }
+}
+```
 
-> **Tip:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
+> **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
 testing library you prefer.
 
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `VerticalLayout` (since our
 simple testing app uses `VerticalLayout` as the root component):
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
@@ -120,7 +144,21 @@ class MyUITest : DynaTest({
         expect(2) { layout.componentCount }
     }
 })
-``` 
+```
+Java:
+```java
+public class MyUITest {
+    @BeforeEach
+    public void beforeEach() {
+        MockVaadin.setup(MyUI::new);
+    }
+    @Test
+    public void simpleUITest() {
+        final VerticalLayout layout = (VerticalLayout) UI.getCurrent().getContent();
+        assertEquals(2, layout.getComponentCount());
+    }
+}
+```
 
 ### Simulating the user input
 
@@ -130,8 +168,11 @@ Then, we can call `Button.click()`
 to simulate a click on the button itself. The `click()` method will execute all listeners and will block until
 all listeners are done; we can check that the click listener was run and it had created the label.
 
-> Note: as you'll learn later on, neither `Button.click()` nor `setValue()` will check for whether the component is enabled or not.
-Therefore it's important to use `_click()` and `_value` instead.
+> Note: as you'll learn later on, neither `Button.click()` nor `HasValue.setValue()` will check for whether the component is enabled or not.
+Therefore it's important to use `button._click()` and `nameField._value` instead (for Java users, it's `_click(button)` and `_setValue(nameField, "John")`).
+
+> Note for Java users: don't forget to static-import all static methods from the `LocatorJ` class, in order to use them more easily:
+`import static com.github.karibu.testing.LocatorJ.*;`
 
 Obtaining the `TextField` in this simple project is easy - it's the first child of the layout so we can call `getComponent(0) as TextField` to obtain the text field.
 However, typical Vaadin apps has much more complex structure with lots of nested layouts.
@@ -142,17 +183,21 @@ We need some kind of a lookup function which will find the appropriate component
 The Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
-  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
+  if there is no such component, or if there are too many of matching components. For example: Kotlin: `_get<Button> { caption = "Click me" }`.
+  Java: `_get(Button.class, spec -> spec.withCaption("Click me"))`
 
 This particular function will search for all components nested within `UI.getCurrent()`. You can call the function in a different way, which will restrict the search to some particular layout
 which is handy when you're testing a standalone custom UI component outside of the `UI` class:
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
+  in Java: `_get(layout, Button.class, spec -> spec.withCaption("Click me"))`
 
 > **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
+  Java: `_get(Button.class, spec -> spec.withCaption("Click me"))` is a shorthand for `_get(UI.getCurrent(), Button.class, spec -> spec.withCaption("Click me"))`.
 
 With this arsenal at hand, we can rewrite the test:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
@@ -167,7 +212,29 @@ class MyUITest : DynaTest({
         expect("Thanks Baron Vladimir Harkonnen, it works!") { _get<Label>().value }
     }
 })
-``` 
+```
+Java:
+```java
+import static com.github.karibu.testing.LocatorJ.*;
+public class MyUITest {
+    @BeforeEach
+    public void beforeEach() {
+        MockVaadin.setup(MyUI::new);
+    }
+
+    @Test
+    public void simpleUITest() {
+        // simulate a text entry as if entered by the user
+        _setValue(_get(TextField.class, spec -> spec.withCaption("Type your name here:")), "Baron Vladimir Harkonnen");
+
+        // simulate a button click as if clicked by the user
+        _click(_get(Button.class, spec -> spec.withCaption("Click Me"));
+
+        // verify that there is a single Label and assert on its value
+        assertEquals("Thanks Baron Vladimir Harkonnen, it works!", _get(Label.class).getValue());
+    }
+}
+```
 
 > **Important note:** The lookup methods will only consider *visible* components - for example `_get<Button>()` will fail if the
   "Click me" button is invisible. This is because the intent of the test is to populate/access the components as if it was the user who
@@ -233,6 +300,8 @@ class MyUITest : DynaTest({
 })
 ```
 
+TODO java
+
 ## API
 
 ### Looking up components
@@ -240,11 +309,14 @@ class MyUITest : DynaTest({
 This library provides three methods for looking up components.
 
 * `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
-  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`
+  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`;
+  Java: `_get(Button.class, spec -> spec.withCaption("Click me"));`.
 * `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
-  an empty list if there is no such component. For example: `_find<VerticalLayout> { styles = "material" }`
+  an empty list if there is no such component. For example: `_find<VerticalLayout> { styles = "material" }`. Java:
+  `_find(Button.class, spec -> spec.withStyles("material"));`
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
-  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
+  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`. Java:
+  `_assertNone(Button.class, spec -> spec.withCaption("Delete"));`
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible

@@ -2,7 +2,6 @@ package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
@@ -140,24 +139,12 @@ fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): L
         UI.getCurrent()._find(clazz, block)
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
-    cleanupDialogs()
+    testingLifecycleHook.awaitBeforeLookup()
     val descendants = walk()
+    testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) throw AssertionError("An internal server error occurred; check log for the actual stack-trace. Error text: ${error.element.text}\n${UI.getCurrent().toPrettyTree()}")
     return descendants.filter { predicate(it) }
-}
-
-/**
- * Flow Server does not close the dialog when close() is called; instead it tells client-side dialog to close,
- * which then fires event back to the server that the dialog was closed, and removes itself from the DOM.
- * Since there's no browser with browserless testing, we need to cleanup closed dialogs manually, hence this method.
- *
- * Also see [MockedUI] for more details
- */
-internal fun cleanupDialogs() {
-    UI.getCurrent().children.forEach {
-        if (it is Dialog && !it.isOpened) it.element.removeFromParent()
-    }
 }
 
 private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }

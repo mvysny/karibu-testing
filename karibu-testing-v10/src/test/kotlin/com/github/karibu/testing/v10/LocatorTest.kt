@@ -17,12 +17,15 @@ import kotlin.test.expect
 class LocatorTest : DynaTest({
 
     beforeEach { MockVaadin.setup() }
+    beforeEach { testingLifecycleHook = MyLifecycleHook() }
+    afterEach { testingLifecycleHook = TestingLifecycleHook.noop }
 
     group("_get") {
         test("fails when no component match") {
             expectThrows(IllegalArgumentException::class) {
                 Button()._get(TextField::class.java)
             }
+            expectAfterLookupCalled()
         }
 
         test("fail when multiple component match") {
@@ -31,16 +34,19 @@ class LocatorTest : DynaTest({
                     verticalLayout { }
                 }._get(VerticalLayout::class.java)
             }
+            expectAfterLookupCalled()
         }
 
         test("ReturnsSelf") {
             val button = Button()
             expect(button) { button._get(Button::class.java) }
+            expectAfterLookupCalled()
         }
 
         test("ReturnsNested") {
             val button = Button()
             expect(button) { VerticalLayout(button)._get(Button::class.java) }
+            expectAfterLookupCalled()
         }
     }
 
@@ -48,12 +54,14 @@ class LocatorTest : DynaTest({
         test("findMatchingId") {
             val button = Button().apply { id_ = "foo" }
             expect(listOf(button)) { VerticalLayout(button, Button())._find<Button> { id = "foo" } }
+            expectAfterLookupCalled()
         }
     }
 
     group("_expectNone") {
         test("succeeds when no component match") {
             Button()._expectNone<TextField>()
+            expectAfterLookupCalled()
         }
 
         test("fail when multiple component match") {
@@ -61,17 +69,20 @@ class LocatorTest : DynaTest({
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }._expectNone<VerticalLayout>()
+                expectAfterLookupCalled()
             }
         }
 
         test("fails if self matches") {
             val button = Button()
             expectThrows(IllegalArgumentException::class) { button._expectNone<Button>() }
+            expectAfterLookupCalled()
         }
 
         test("fails if nested matches") {
             val button = Button()
             expectThrows(IllegalArgumentException::class) { VerticalLayout(button)._expectNone<Button>() }
+            expectAfterLookupCalled()
         }
     }
 
@@ -88,8 +99,11 @@ class LocatorTest : DynaTest({
         }
 
         _get<TextField> { caption = "Type your name here:" }.value = "Baron Vladimir Harkonnen"
+        expectAfterLookupCalled()
         _get<Button> { caption = "Click Me" }._click()
+        expectAfterLookupCalled()
         expect("Thanks Baron Vladimir Harkonnen, it works!") { _get<Text>().text }
+        expectAfterLookupCalled()
         expect("Thanks Baron Vladimir Harkonnen, it works!") { (layout.children.asSequence().last() as Text).text }
         expect(3) { layout.componentCount }
     }
@@ -113,3 +127,22 @@ class LocatorTest : DynaTest({
         }
     }
 })
+
+data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfterLookupCalled: Boolean = false) : TestingLifecycleHook {
+    override fun awaitBeforeLookup() {
+        check(!isBeforeLookupCalled) { "awaitBeforeLookup() has been already called" }
+        check(!isAfterLookupCalled) { "awaitAfterLookup() has been already called" }
+        isBeforeLookupCalled = true
+    }
+
+    override fun awaitAfterLookup() {
+        check(isBeforeLookupCalled) { "awaitBeforeLookup() has not yet been called" }
+        check(!isAfterLookupCalled) { "awaitAfterLookup() has been already called" }
+        isAfterLookupCalled = true
+    }
+}
+
+fun expectAfterLookupCalled() {
+    expect(MyLifecycleHook(true, true)) { testingLifecycleHook }
+    testingLifecycleHook = MyLifecycleHook()
+}

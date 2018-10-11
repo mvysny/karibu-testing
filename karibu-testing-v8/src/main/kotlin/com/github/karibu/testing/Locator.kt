@@ -146,7 +146,12 @@ fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): L
 
 internal fun Component.isEffectivelyVisible(): Boolean = isVisible && (parent == null || parent.isEffectivelyVisible())
 
-private fun Component.find(predicate: (Component)->Boolean): List<Component> = walk().filter { predicate(it) }
+private fun Component.find(predicate: (Component)->Boolean): List<Component> {
+    testingLifecycleHook.awaitBeforeLookup()
+    val result = walk().filter { predicate(it) }
+    testingLifecycleHook.awaitAfterLookup()
+    return result
+}
 
 private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }
 

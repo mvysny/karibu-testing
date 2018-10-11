@@ -4,7 +4,7 @@
 
 # Vaadin Browserless Testing
 
-Vaadin-on-Kotlin promotes a testing technique called *browserless testing*. With this approach, it's not the browser you issue
+[Vaadin-on-Kotlin](http://vaadinonkotlin.eu) promotes a testing technique called *browserless testing*. With this approach, it's not the browser you issue
 testing instructions to: we bypass the browser and the JavaScript-Server bridge, and talk directly to the server Vaadin component API.
 
 This approach has the following advantages:
@@ -23,12 +23,11 @@ you can just add the server jars onto testing classpath and call Vaadin server A
 
 A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the browserless testing technique.
 
-## The Testing library is Standalone
+## The Karibu-Testing library is Standalone and Fully Supports Java
 
-The browserless testing is an *approach* rather than a product, although it's backed by this support library.
-
-You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use this approach. You don't even need to write your app in Kotlin,
-since the library provides both Kotlin and Java API.
+Even though the Karibu-Testing is endorsed by [Vaadin-on-Kotlin](http://vaadinonkotlin.eu), the Karibu-Testing
+does not really depend on any other technology than Vaadin. You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use Karibu-Testing.
+You don't even need to write your app nor your tests in Kotlin, since the library provides both Kotlin and Java API.
 You can thus plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
 in Java or Kotlin, whichever suits you more.
 

@@ -416,3 +416,15 @@ To use a custom `Instantiator`:
 1. Implement your own `VaadinServletService` (or extend pre-provided `MockService`) and override `VaadinServletService.loadInstantiators`,
    to load a proper Instantiator
 2. Register your `VaadinServletService` in `MockVaadin.setup()`, the `serviceFactory` parameter.
+
+## Plugging into the testing lifecycle
+
+Sometimes you need to wait a bit before the UI is ready and settled. For example if you have a "Send" button
+which sends a chat message asynchronously, you need to wait after `_click()`-ing on the button before asserting
+on the state of the chat component. That's something you can do in that one particular test by hand.
+Hoever, imagine that your app uses async and push heavily; say that all of your data fetching code runs asynchronously.
+You would have to await for async to finish basically after every UI component lookup.
+
+We have added support to implement this kind of behavior. There is a global variable named `testingLifecycleHook`, which
+contains hooks which by default do nothing. You can simply provide your own custom implementation of `TestingLifecycleHook`
+interface which would await for async, and then set it to the `testingLifecycleHook` global variable.

@@ -30,12 +30,25 @@ class GreetingLabel : Div() {
 
 We want to test the component so that a call to the `greet("world")` function will properly set the label's text:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     test("proper greeting") {
         val label = GreetingLabel()
         label.greet("world")
         expect("Hello, world") { label.text }
+    }
+})
+```
+
+Java:
+```java
+public class MyUITest {
+    @Test
+    public void testProperGreeting() {
+        final GreetingLabel label = new GreetingLabel();
+        label.greet("world");
+        assertEquals("Hello, world", label.getText());
     }
 })
 ```
@@ -96,27 +109,53 @@ environment needs to be prepared:
 Luckily, this is exactly what the `MockVaadin.setup()` function does. It will prepare everything for us and even initialize the `UI`; we just need
 to provide the auto-detected set of `@Route`s to the function:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
 })
 ```
+Java:
+```java
+public class MyUITest {
+    @BeforeEach
+    public void setupVaadin() {
+        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+    }
+}
+```
 
-> **Tip:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
+> **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
 testing library you prefer.
 
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `MainView` (since our
 simple testing app uses `MainView` as the root route):
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup({ MyUI() }) }
+    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
     test("simple UI test") {
         val main = UI.getCurrent().children.findFirst().get() as MainView
         expect(2) { main.children.count() }
     }
 })
 ``` 
+
+Java:
+```java
+public class MyUITest {
+    @BeforeEach
+    public void setupVaadin() {
+        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+    }
+    @Test
+    public void simpleUITest() {
+        final MainView main = (MainView) UI.getCurrent().getChildren().findFirst().get();
+        assertEquals(2, main.getChildren().count());
+    }
+})
+```
 
 ### Simulating the user input
 
@@ -128,7 +167,7 @@ all listeners are done; we can check that the click listener was run and it had 
 of the template, by examining the value of `ExampleTemplate`.
 
 > Note: as you'll learn later on, neither `Button.click()` nor `setValue()` will check for whether the component is enabled or not.
-Therefore it's important to use `_click()` and `_value` instead.
+Therefore it's important to use `button._click()` and `textField._value = "foo"` instead (Java: `_click(button)` and `_setValue(textField, "foo")`).
 
 Obtaining the `Button` in this simple project is easy - it's the first child of the `MainView`
 so we can simply call `children.findFirst().get() as Button` to obtain the button.
@@ -140,18 +179,23 @@ We need some kind of a lookup function which will find the appropriate component
 The Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
-  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`
+  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`.
+  In Java you need to `import static com.github.karibu.testing.v10.LocatorJ.*;`; then you can call
+  `_get(Button.class, spec -> spec.withCaption("Click me"));`.
 
 This particular function will search for all components nested within `UI.getCurrent()`.
 You can call the function in a different way, which will restrict the search to some particular layout
 which is handy when you're testing a standalone custom UI component outside of the `UI` class:
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
+  In Java: `_get(component, Button.class, spec -> spec.withCaption("Click me"));`.
 
-> **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`.
+> **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`,
+  or for `_get(UI.getCurrent(), Button.class, spec -> spec.withCaption("Click me"));`
 
 With this arsenal at hand, we can rewrite the test:
 
+Kotlin:
 ```kotlin
 class MainViewTest: DynaTest({
     beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
@@ -165,6 +209,25 @@ class MainViewTest: DynaTest({
     }
 })
 ``` 
+
+Java:
+```java
+import static com.github.karibu.testing.v10.LocatorJ.*;
+public class MyUITest {
+    @BeforeEach
+    public void setupVaadin() {
+        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+    }
+    @Test
+    public void testGreeting() {
+        // simulate a button click as if clicked by the user
+        _click(_get(Button.class, spec -> spec.withCaption("Click me")));
+
+        // look up the Example Template and assert on its value
+        assertEquals("Clicked!", _get(ExampleTemplate.class).getValue());
+    }
+})
+```
 
 > **Important note:** The lookup methods will only consider *visible* components - for example `_get<Button>()` will fail if the
   "Click me" button is invisible. This is because the intent of the test is to populate/access the components as if it was the user who
@@ -201,6 +264,7 @@ nobody will discover the `@Route`s automatically. That's why Karibu-Testing libr
 the `autoDiscoverViews()` function. All you need to do in your tests is
 to call this function before all tests:
 
+Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
@@ -210,7 +274,29 @@ class MyUITest : DynaTest({
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         val grid = _get<Grid<*>>()
-        expect(1) { grid.dataProvider._size() }
+        expect(1) { grid._size() }
+        // etc etc
+    }
+})
+```
+
+Java:
+```java
+import static com.github.karibu.testing.v10.LocatorJ.*;
+import static com.github.karibu.testing.v10.GridKt.*;
+public class MyUITest {
+    @BeforeEach
+    public void setupVaadin() {
+        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+    }
+    @Test
+    public void testGreeting() {
+        // navigate to the "Categories" list route.
+        UI.getCurrent().navigateTo("categories");
+
+        // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
+        final Grid<Person> grid = _get(Grid.class);
+        assertEquals(1, _size(grid));
         // etc etc
     }
 })
@@ -251,11 +337,14 @@ test("create review") {
 This library provides three methods for looking up components.
 
 * `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
-  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`
+  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`.
+  Java: `_get(Button.class, spec -> spec.withCaption("Click me"));`
 * `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
-  an empty list if there is no such component. For example: `_find<VerticalLayout> { id = "form" }`
+  an empty list if there is no such component. For example: `_find<VerticalLayout> { id = "form" }`;
+  Java: `_find(VerticalLayout.class, spec -> spec.withId("form"));`
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
-  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`
+  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`; Java:
+  `_expectNone(Button.class, spec -> spec.withCaption("Delete"));`
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
@@ -265,8 +354,9 @@ This set of functions operates on `UI.getCurrent()`. However, often it is handy 
 in that component. There are `Component._get()`, `Component._find()` and `Component._expectNone()` counterparts, added to every Vaadin
 component as an extension method. For example:
 
+Kotlin:
 ```kotlin
-class AddNewPersonForm : VerticalLayout {
+class AddNewPersonForm : VerticalLayout() {
     // nests fields, uses binder, etc etc
 }
 
@@ -276,6 +366,24 @@ test("add new person happy flow") {
     form._get<Button> { caption = "Create" } ._click()
 }
 ```
+
+Of course this is not possible with Java since Java doesn't support extension methods. That's why
+there are `_get()` and others that take the receiver component as the first parameter:
+
+Java:
+```java
+public class AddNewPersonForm extends VerticalLayout {
+    // nests fields, uses binder, etc etc
+}
+
+@Test
+public void addNewPersonHappyFlow() {
+    final AddNewPersonForm form = new AddNewPersonForm();
+    _setValue(_get(form, TextField.class, spec -> spec.withCaption("Name:")), "John Doe");
+    _click(_get(form, Button.class, spec -> spec.withCaption("Create")));
+}
+```
+
 
 Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular layout:
 ```kotlin
@@ -304,7 +412,7 @@ java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching Text
 Vaadin Button contains the `click()` method, however that method actually invokes the browser-side click method which will then eventually
 fire server-side click listeners. However, with browserless testing there is no browser and nothing gets done.
 
-It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which moreover
+It is therefore important that we use the `button._click()` extension method provided by the Karibu Testing library, which moreover
 checks the following points prior running the click listeners:
 
 * When writing the test,
@@ -313,6 +421,8 @@ checks the following points prior running the click listeners:
 * If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the user can't really
   interact with the button. In this case, the `_click()` method will fail as well.
 
+With Java, you simply call `_click(button)`.
+
 ### Changing values
 
 The `HasValue.setValue()` function succeeds even if the component in question is disabled or read-only. However, when we
@@ -320,7 +430,7 @@ want to simulate user input and we want to change the value of, say, a `Combobox
 read-write, visible; in other words, fully prepared to receive user input.
 
 It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
-all the above items prior setting the new value.
+all the above items prior setting the new value. With Java: `_setValue(hasValue, "42");`
 
 ### Support for Grid
 
@@ -328,15 +438,19 @@ The Vaadin Grid is the most complex component in Vaadin, and therefore it requir
 contents of the Grid.
 
 * You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
-* You can check for the total amount of items shown in the grid, by calling `grid._size()`
+  Java: you need to `import static com.github.karibu.testing.v10.GridKt.*;`, then you can call `_get(grid, 0);`.
+* You can check for the total amount of items shown in the grid, by calling `grid._size()`. Java: `_size(grid);`
 * You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
-  `List<String>`
+  `List<String>`. In Java: `_getFormattedRow(grid, rowIndex)`
 * You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
   fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
+  In Java: `expectRows(grid, 25)`
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
 
 ## Adding support for custom search criteria
+
+> *Note*: this feature is unsupported for Java since Java lacks extension methods.
 
 Suppose you have a dynamic form which allows you to add multiple addresses, one of those being primary. You'll have the following `AddressPanel` class:
 

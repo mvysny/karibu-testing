@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
 import static com.github.karibu.testing.v10.LocatorJ.*;
+import static com.github.karibu.testing.v10.GridKt.*;
 
 /**
  * Not really a test, doesn't run any test methods. It just fails compilation if the LocatorJ API
@@ -15,9 +16,15 @@ import static com.github.karibu.testing.v10.LocatorJ.*;
  * @author mavi
  */
 public class LocatorJTest {
+
+    public static class MainView extends VerticalLayout {}
+
     public static class MyUI extends UI {}
     public LocatorJTest() {
         MockVaadin.setup(new Routes(), MyUI::new);
+        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+        final MainView main = (MainView) UI.getCurrent().getChildren().findFirst().get();
+        main.getChildren().count();
 
         _get(Label.class);
         _get(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
@@ -43,11 +50,11 @@ public class LocatorJTest {
         _setValue(_get(form, TextField.class, spec -> spec.withCaption("Name:")), "John Doe");
         _click(_get(form, Button.class, spec -> spec.withCaption("Create")));
 
-        GridKt._get(new Grid<>(), 0);
-        GridKt._size(new Grid<>());
-        GridKt._getFormattedRow(new Grid<>(), 5);
-        GridKt.expectRows(new Grid<>(), 0);
-        GridKt.expectRow(new Grid<>(), 0, "John Doe", "25");
+        _get(new Grid<>(), 0);
+        _size(new Grid<>());
+        _getFormattedRow(new Grid<>(), 5);
+        expectRows(new Grid<>(), 0);
+        expectRow(new Grid<>(), 0, "John Doe", "25");
     }
 
     public static class Person {}

@@ -27,8 +27,10 @@ A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everyt
 
 The browserless testing is an *approach* rather than a product, although it's backed by this support library.
 
-You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use this approach; you don't even need to write your app in Kotlin.
-You can just plug this library in into your Java+Vaadin-based project as a test dependency, and write only the test code in Kotlin.
+You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use this approach. You don't even need to write your app in Kotlin,
+since the library provides both Kotlin and Java API.
+You can thus plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
+in Java or Kotlin, whichever suits you more.
 
 ## Full Documentation
 

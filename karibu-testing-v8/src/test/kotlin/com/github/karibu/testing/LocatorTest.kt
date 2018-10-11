@@ -14,6 +14,12 @@ class LocatorTest : DynaTest({
     beforeEach { MockVaadin.setup() }
 
     group("_get") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(IllegalArgumentException::class) {
+                _get(Label::class.java)
+            }
+        }
+
         test("FailsOnNoComponents") {
             expectThrows(IllegalArgumentException::class) {
                 Button()._get(Label::class.java)

@@ -54,6 +54,15 @@ object MockVaadin {
         val session = object : VaadinSession(service) {
             override fun close() {
                 super.close()
+
+                // we need to simulate the actual browser + servlet container behavior.
+                // when the app closes the session (e.g. user wants to log out, so it's easiest to close the session and reload the page).
+                // Then the page is reloaded by the browser, and the servlet container will create a new, fresh session.
+
+                // that's exactly what we need to do here. We need to close the current UI and eradicate it,
+                // then we need to close the current session and eradicate it, and then we need to create a completely fresh
+                // new UI and Session.
+
                 closeCurrentUI()
                 VaadinSession.setCurrent(null)
                 strongRefSession = null

@@ -36,6 +36,8 @@ object MockVaadin {
      * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
      * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
      * [MockedUI.beforeClientResponse] for details.
+     * This factory must provide a new fresh instance of the UI, not yet attached to any session. If you're using Spring and getting UI
+     * from the injector, you must reconfigure Spring to use prototype scope, otherwise an old UI from the scope not yet closed will be provided.
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
@@ -84,18 +86,32 @@ object MockVaadin {
         val httpSession = MockHttpSession.create(ctx)
 
         val session = object : VaadinSession(servlet.service) {
+            /**
+             * We need to pretend that we have the UI lock during the duration of the test method, otherwise
+             * Vaadin would complain that there is no session lock.
+             * The easiest way is to simply always provide a locked lock :)
+             */
             private val lock = ReentrantLock().apply { lock() }
             override fun getLockInstance(): Lock = lock
             override fun close() {
                 super.close()
 
-                // we need to simulate the actual browser + servlet container behavior.
-                // when the app closes the session (e.g. user wants to log out, so it's easiest to close the session and reload the page).
-                // Then the page is reloaded by the browser, and the servlet container will create a new, fresh session.
+                // We need to simulate the actual browser + servlet container behavior here.
+                // Imagine that we want a test scenario where the user logs out, and we want to check that a login prompt appears.
 
-                // that's exactly what we need to do here. We need to close the current UI and eradicate it,
+                // To log out the user, the code typically closes the session and tells the browser to reload
+                // the page (Page.getCurrent().reload() or similar).
+                // Thus the page is reloaded by the browser, and since the session is gone, the servlet container
+                // will create a new, fresh session.
+
+                // That's exactly what we need to do here. We need to close the current UI and eradicate it,
                 // then we need to close the current session and eradicate it, and then we need to create a completely fresh
                 // new UI and Session.
+
+                // A problem appears when the uiFactory accidentally doesn't create a new, fresh instance of UI. Say that
+                // we call Spring injector to provide us an instance of the UI, but we accidentally scoped the UI to Session.
+                // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
+                // the previous UI instance which is still attached to the session. And it blows.
 
                 closeCurrentUI()
                 createSession(ctx, servlet, uiFactory)
@@ -116,6 +132,10 @@ object MockVaadin {
 
     private fun createUI(uiFactory: () -> UI, session: VaadinSession, request: VaadinServletRequest) {
         val ui = uiFactory()
+        require(ui.session == null) { "uiFactory produced UI $ui which is already attached to a Session, " +
+                "yet we expect the UI to be a fresh new instance, not yet attached to a Session. Perhaps you're " +
+                "using Spring which reuses a scoped instance of the UI?" }
+
         // hook into Page.reload() and recreate the UI
         UI::class.java.getDeclaredField("page").apply {
             isAccessible = true

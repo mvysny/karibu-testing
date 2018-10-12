@@ -18,11 +18,14 @@ object MockVaadin {
     private var lastLocation: String? = null
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
+     *
+     * The UI factory *must* provide a new, fresh instance of the UI, so that the
+     * tests start from a pre-known state. If you're using Spring and you're getting UI
+     * from the injector, you must reconfigure Spring to use prototype scope,
+     * otherwise an old UI from the UI scope or Session Scope will be provided.
      * @param uiFactory called once from this method, to provide instance of your app's UI. By default it returns [MockUI].
      * A basic Vaadin environment is prepared before calling this factory, in order to be safe to instantiate your UI.
-     * To instantiate your UI just call your UI constructor, for example `YourUI()`
-     * This factory must provide a new fresh instance of the UI, not yet attached to any session. If you're using Spring and getting UI
-     * from the injector, you must reconfigure Spring to use prototype scope, otherwise an old UI from the scope not yet closed will be provided.
+     * To instantiate your UI just call your UI constructor, for example `YourUI()`.
      */
     @JvmStatic @JvmOverloads
     fun setup(uiFactory: ()->UI = { MockUI() }) {
@@ -109,7 +112,8 @@ object MockVaadin {
     private fun createUI(uiFactory: ()->UI) {
         val ui = uiFactory()
         require(ui.session == null) { "uiFactory produced UI $ui which is already attached to a Session, " +
-                "yet we expect the UI to be a fresh new instance, not yet attached to a Session. Perhaps you're " +
+                "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the" +
+                " tests are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
                 "using Spring which reuses a scoped instance of the UI?" }
         ui.session = checkNotNull(VaadinSession.getCurrent())
         val request = checkNotNull(CurrentInstance.get(VaadinRequest::class.java))

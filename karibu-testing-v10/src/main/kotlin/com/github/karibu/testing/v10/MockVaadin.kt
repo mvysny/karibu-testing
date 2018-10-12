@@ -32,12 +32,15 @@ object MockVaadin {
      * ```
      * MockVaadin.setup(Routes().autoDiscoverViews("com.myapp"))
      * ```
+     *
+     * The UI factory *must* provide a new, fresh instance of the UI, so that the
+     * tests start from a pre-known state. If you're using Spring and you're getting UI
+     * from the injector, you must reconfigure Spring to use prototype scope,
+     * otherwise an old UI from the UI scope or Session Scope will be provided.
      * @param routes all classes annotated with [com.vaadin.flow.router.Route]; use [Routes.autoDiscoverViews] to auto-discover all such classes.
      * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
      * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
      * [MockedUI.beforeClientResponse] for details.
-     * This factory must provide a new fresh instance of the UI, not yet attached to any session. If you're using Spring and getting UI
-     * from the injector, you must reconfigure Spring to use prototype scope, otherwise an old UI from the scope not yet closed will be provided.
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      */
@@ -133,7 +136,8 @@ object MockVaadin {
     private fun createUI(uiFactory: () -> UI, session: VaadinSession, request: VaadinServletRequest) {
         val ui = uiFactory()
         require(ui.session == null) { "uiFactory produced UI $ui which is already attached to a Session, " +
-                "yet we expect the UI to be a fresh new instance, not yet attached to a Session. Perhaps you're " +
+                "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the tests" +
+                " are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
                 "using Spring which reuses a scoped instance of the UI?" }
 
         // hook into Page.reload() and recreate the UI

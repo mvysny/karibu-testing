@@ -13,6 +13,7 @@ import com.vaadin.server.VaadinService
 import com.vaadin.server.VaadinSession
 import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
+import java.lang.IllegalArgumentException
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.expect
 
@@ -109,6 +110,14 @@ class MockVaadinTest : DynaTest({
 
         expectThrows(RuntimeException::class, "UI failed to initialize. If you're using autoViewProvider, make sure that views are auto-discovered via autoDiscoverViews()") {
             MockVaadin.setup({ MyUIWithAutoViewProvider() })
+        }
+    }
+
+    test("Reusing UI fails with helpful message") {
+        val ui = MockUI()
+        MockVaadin.setup(uiFactory = { ui })
+        expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
+            MockVaadin.setup(uiFactory = { ui })
         }
     }
 })

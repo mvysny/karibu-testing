@@ -1,6 +1,7 @@
 package com.github.karibu.testing.v10
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.expectThrows
 import com.github.vok.karibudsl.flow.button
 import com.github.vok.karibudsl.flow.text
 import com.vaadin.flow.component.AttachEvent
@@ -13,6 +14,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
+import java.lang.IllegalArgumentException
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.expect
 
@@ -149,6 +151,15 @@ class MockVaadinTest : DynaTest({
         expect(true) { detachCalled }
         // the new session must not inherit attributes from the old one
         expect(null) { VaadinSession.getCurrent().getAttribute("foo") }
+    }
+
+
+    test("Reusing UI fails with helpful message") {
+        val ui = MockedUI()
+        MockVaadin.setup(uiFactory = { ui })
+        expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
+            MockVaadin.setup(uiFactory = { ui })
+        }
     }
 })
 

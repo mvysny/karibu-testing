@@ -86,10 +86,12 @@ class MyUI : UI() {
             val name = textField {
                 caption = "Type your name here:"
             }
-            button("Click Me", {
-                println("Thanks ${name.value}, it works!")
-                layout.label("Thanks ${name.value}, it works!")
-            })
+            button("Click Me") {
+                onLeftClick {
+                    println("Thanks ${name.value}, it works!")
+                    layout.label("Thanks ${name.value}, it works!")
+                }
+            }
         }
     }
 }

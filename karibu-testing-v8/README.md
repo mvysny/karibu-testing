@@ -6,7 +6,7 @@ To start, just add the following lines into your Gradle `build.gradle` file:
 
 ```groovy
 repositories {
-    maven { url "https://dl.bintray.com/mvysny/github" }
+    jcenter()
 }
 dependencies {
     testCompile "com.github.kaributesting:karibu-testing-v8:x.y.z"
@@ -14,6 +14,26 @@ dependencies {
 ```
 
 > Note: obtain the newest version from the tag name above
+
+Maven:
+```xml
+<project>
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>https://jcenter.bintray.com/</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>com.github.kaributesting</groupId>
+			<artifactId>karibu-testing-v8</artifactId>
+			<version>x.y.z</version>
+		</dependency>
+    </dependencies>
+</project>
+```
+
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 

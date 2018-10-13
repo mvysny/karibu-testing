@@ -42,7 +42,6 @@ subprojects {
 
     repositories {
         jcenter()
-        maven { url "https://dl.bintray.com/mvysny/github" }  // @todo remove this when karibu-dsl is on jcenter
     }
 
     test {

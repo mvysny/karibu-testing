@@ -1,7 +1,7 @@
 buildscript {
     ext.vaadin8_version = '8.5.2'
     ext.vaadin10_version = '11.0.1'
-    ext.dynatest_version = "0.9"
+    ext.dynatest_version = "0.10"
 
     ext.local = new Properties()
     if (project.rootProject.file('local.properties').exists()) {
@@ -14,15 +14,15 @@ plugins {
     id "com.jfrog.bintray" version "1.8.1"
 }
 
-repositories {
-    mavenCentral()
-}
-
 defaultTasks 'clean', 'build'
 
 allprojects {
     group 'com.github.kaributesting'
     version '0.4.18-SNAPSHOT'
+    repositories {
+        jcenter()
+        maven { url "https://dl.bintray.com/mvysny/github" }
+    }
 }
 
 subprojects {
@@ -38,10 +38,6 @@ subprojects {
         kotlinOptions {
             jvmTarget = "1.8"
         }
-    }
-
-    repositories {
-        jcenter()
     }
 
     test {

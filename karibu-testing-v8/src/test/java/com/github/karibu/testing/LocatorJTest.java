@@ -65,6 +65,8 @@ public class LocatorJTest {
         GridKt._getFormattedRow(new Grid<>(), 5);
         GridKt.expectRows(new Grid<>(), 0);
         GridKt.expectRow(new Grid<>(), 0, "John Doe", "25");
+
+        MockVaadin.tearDown();
     }
 
     public static class MyJavaView implements View {}

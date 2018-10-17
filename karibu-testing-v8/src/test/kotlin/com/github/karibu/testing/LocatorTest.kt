@@ -14,6 +14,7 @@ class LocatorTest : DynaTest({
     beforeEach { MockVaadin.setup() }
     beforeEach { testingLifecycleHook = MyLifecycleHook() }
     afterEach { testingLifecycleHook = TestingLifecycleHook.noop }
+    afterEach { MockVaadin.tearDown() }
 
     group("_get") {
         test("FailsOnNoComponents UI") {

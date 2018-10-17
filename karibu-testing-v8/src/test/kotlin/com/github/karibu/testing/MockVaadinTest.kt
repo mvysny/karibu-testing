@@ -19,11 +19,24 @@ import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
     beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
 
     test("Vaadin.getCurrent() returns non-null values") {
         expect(true) { VaadinSession.getCurrent() != null }
         expect(true) { VaadinService.getCurrent() != null }
         expect(true) { UI.getCurrent() != null }
+    }
+
+    test("setup() can be called multiple times in a row") {
+        MockVaadin.setup()
+        MockVaadin.setup()
+    }
+
+    test("setup() always provides new instances") {
+        MockVaadin.setup()
+        val ui = UI.getCurrent()!!
+        MockVaadin.setup()
+        expect(true) { UI.getCurrent()!! !== ui }
     }
 
     test("verifyAttachCalled") {

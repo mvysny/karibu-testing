@@ -9,6 +9,7 @@ import kotlin.test.expect
 class GridTest : DynaTest({
 
     beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
 
     test("_size") {
         expect(20) { ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._size() }

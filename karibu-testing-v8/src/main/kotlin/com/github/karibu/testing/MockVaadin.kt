@@ -54,6 +54,25 @@ object MockVaadin {
         createSession(httpSession, uiFactory)
     }
 
+    /**
+     * Cleans up and removes the Vaadin UI and Vaadin Session. You can call this function in `afterEach{}` block,
+     * to clean up after the test. This comes handy when you want to be extra-sure that the next test won't accidentally reuse old UI,
+     * should you forget to call [setup] properly.
+     *
+     * You don't have to call this function though; [setup] will overwrite any current UI/Session instances with a fresh ones.
+     */
+    @JvmStatic
+    fun tearDown() {
+        closeCurrentUI()
+        closeCurrentSession()
+        lastLocation = null
+    }
+
+    private fun closeCurrentSession() {
+        VaadinSession.setCurrent(null)
+        strongRefSession = null
+    }
+
     private fun createSession(httpSession: MockHttpSession, uiFactory: () -> UI) {
         val service = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
         val session = object : VaadinSession(service) {
@@ -78,8 +97,7 @@ object MockVaadin {
                 // the previous UI instance which is still attached to the session. And it blows.
 
                 closeCurrentUI()
-                VaadinSession.setCurrent(null)
-                strongRefSession = null
+                closeCurrentSession()
                 httpSession.destroy()
                 createSession(httpSession, uiFactory)
             }

@@ -6,6 +6,7 @@ import com.vaadin.ui.Notification
 
 class NotificationsTest : DynaTest({
     beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
 
     test("initially there are no notifications") {
         expectNotifications()

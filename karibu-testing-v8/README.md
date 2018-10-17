@@ -139,6 +139,7 @@ Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
+    afterEach { MockVaadin.tearDown() }
 })
 ```
 Java:
@@ -147,6 +148,10 @@ public class MyUITest {
     @BeforeEach
     public void beforeEach() {
         MockVaadin.setup(MyUI::new);
+    }
+    @AfterEach
+    public void afterEach() {
+        MockVaadin.tearDown();
     }
 }
 ```
@@ -161,6 +166,7 @@ Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup({ MyUI() }) }
+    afterEach { MockVaadin.tearDown() }
     test("simple UI test") {
         val layout = UI.getCurrent().content as VerticalLayout
         expect(2) { layout.componentCount }
@@ -173,6 +179,10 @@ public class MyUITest {
     @BeforeEach
     public void beforeEach() {
         MockVaadin.setup(MyUI::new);
+    }
+    @AfterEach
+    public void afterEach() {
+        MockVaadin.tearDown();
     }
     @Test
     public void simpleUITest() {

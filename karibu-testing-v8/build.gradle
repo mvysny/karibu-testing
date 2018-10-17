@@ -1,7 +1,3 @@
-apply plugin: 'maven-publish'
-apply plugin: 'kotlin'
-apply plugin: "com.jfrog.bintray"
-
 dependencies {
     compile "com.vaadin:vaadin-server:$vaadin8_version"
     compile(project(":mock-servlet-environment"))

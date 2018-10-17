@@ -58,6 +58,12 @@ class MockVaadinTest : DynaTest({
         expect(true) { UI.getCurrent() == null }
     }
 
+    test("tearDown() can be called multiple times") {
+        MockVaadin.tearDown()
+        MockVaadin.tearDown()
+        MockVaadin.tearDown()
+    }
+
     test("verifyAttachCalled") {
         val attachCalled = AtomicInteger()
         val vl = object : VerticalLayout() {

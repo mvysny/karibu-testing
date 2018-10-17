@@ -40,7 +40,7 @@ For the Getting Started documentation and for the full API documentation:
 
 ## Example Projects
 
-A list of very simple completely functional projects that employ Karibu Testing:
+A list of a very simple example projects that employ Karibu Testing:
 
 * Vaadin 8 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
 * Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)

@@ -9,6 +9,7 @@ import com.vaadin.shared.Version
 import com.vaadin.shared.ui.ui.PageClientRpc
 import com.vaadin.ui.UI
 import com.vaadin.util.CurrentInstance
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
 object MockVaadin {
@@ -107,6 +108,7 @@ object MockVaadin {
 
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
+        session.configuration = DefaultDeploymentConfiguration(service.servlet.javaClass, Properties())
         VaadinSession.setCurrent(session)
         strongRefSession = session
 

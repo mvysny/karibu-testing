@@ -39,6 +39,10 @@ class MockVaadinTest : DynaTest({
         expect(true) { VaadinSession.getCurrent().browser != null }
     }
 
+    test("configuration mocked as well") {
+        expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
+    }
+
     test("setup() can be called multiple times in a row") {
         MockVaadin.setup()
         MockVaadin.setup()

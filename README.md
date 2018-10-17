@@ -38,6 +38,15 @@ For the Getting Started documentation and for the full API documentation:
 * If you are using Vaadin 8, head to [Testing with Vaadin 8](karibu-testing-v8).
 * If you are using Vaadin 10, head to [Testing with Vaadin 10](karibu-testing-v10).
 
+## Example Projects
+
+A list of very simple completely functional projects that employ Karibu Testing:
+
+* Vaadin 8 + Kotlin + Gradle: [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
+* Vaadin 8 + Java + Maven: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
+* Vaadin 8 + Kotlin + Gradle: [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 10 + Java + Maven: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
+
 ## More Resources
 
 * The [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) which explains everything behind the browserless testing technique.

@@ -42,10 +42,10 @@ For the Getting Started documentation and for the full API documentation:
 
 A list of very simple completely functional projects that employ Karibu Testing:
 
-* Vaadin 8 + Kotlin + Gradle: [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
-* Vaadin 8 + Java + Maven: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
-* Vaadin 10 + Kotlin + Gradle: [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
-* Vaadin 10 + Java + Maven: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
+* Vaadin 8 + Kotlin + Gradle + DynaTest: [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
+* Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
+* Vaadin 10 + Kotlin + Gradle + DynaTest: [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 10 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
 
 ## More Resources
 

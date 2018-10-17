@@ -14,6 +14,7 @@ import kotlin.test.expect
 class GridTest : DynaTest({
 
     beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
 
     test("_size") {
         expect(20) {

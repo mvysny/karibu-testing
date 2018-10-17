@@ -10,6 +10,7 @@ import kotlin.test.expect
 
 class SearchSpecTest : DynaTest({
     beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
 
     test("clazz") {
         val spec = SearchSpec(Button::class.java)

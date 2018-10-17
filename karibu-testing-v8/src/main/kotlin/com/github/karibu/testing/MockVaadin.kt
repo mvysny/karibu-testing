@@ -65,6 +65,8 @@ object MockVaadin {
     fun tearDown() {
         closeCurrentUI()
         closeCurrentSession()
+        CurrentInstance.set(VaadinRequest::class.java, null)
+        VaadinService.setCurrent(null)
         lastLocation = null
     }
 

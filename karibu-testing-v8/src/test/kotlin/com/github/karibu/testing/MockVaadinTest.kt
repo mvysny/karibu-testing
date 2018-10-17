@@ -39,6 +39,13 @@ class MockVaadinTest : DynaTest({
         expect(true) { UI.getCurrent()!! !== ui }
     }
 
+    test("Vaadin.getCurrent() returns null after tearDown()") {
+        MockVaadin.tearDown()
+        expect(true) { VaadinSession.getCurrent() == null }
+        expect(true) { VaadinService.getCurrent() == null }
+        expect(true) { UI.getCurrent() == null }
+    }
+
     test("verifyAttachCalled") {
         val attachCalled = AtomicInteger()
         val vl = object : VerticalLayout() {

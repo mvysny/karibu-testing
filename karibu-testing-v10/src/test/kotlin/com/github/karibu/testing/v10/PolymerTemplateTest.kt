@@ -8,6 +8,7 @@ import kotlin.streams.*
 
 class PolymerTemplateTest : DynaTest({
     beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
+    afterEach { MockVaadin.tearDown() }
 
     test("simple instantiation fills in @Id-annotated components") {
         val list = ReviewsList()

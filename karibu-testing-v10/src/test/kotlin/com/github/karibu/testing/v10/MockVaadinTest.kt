@@ -28,6 +28,7 @@ class MockVaadinTest : DynaTest({
         └── Text[text='Welcome!']
 """.trim()) { UI.getCurrent().toPrettyTree().trim() }
     }
+    afterEach { MockVaadin.tearDown() }
 
     test("smoke test that everything is mocked") {
         expect(true) { UI.getCurrent() != null }
@@ -36,6 +37,25 @@ class MockVaadinTest : DynaTest({
         expect(true) { VaadinSession.getCurrent().configuration != null }
         expect(true) { VaadinSession.getCurrent().service != null }
         expect(true) { VaadinSession.getCurrent().browser != null }
+    }
+
+    test("setup() can be called multiple times in a row") {
+        MockVaadin.setup()
+        MockVaadin.setup()
+    }
+
+    test("setup() always provides new instances") {
+        MockVaadin.setup()
+        val ui = UI.getCurrent()!!
+        MockVaadin.setup()
+        expect(true) { UI.getCurrent()!! !== ui }
+    }
+
+    test("Vaadin.getCurrent() returns null after tearDown()") {
+        MockVaadin.tearDown()
+        expect(true) { VaadinSession.getCurrent() == null }
+        expect(true) { VaadinService.getCurrent() == null }
+        expect(true) { UI.getCurrent() == null }
     }
 
     test("verifyAttachCalled") {

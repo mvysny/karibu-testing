@@ -14,6 +14,9 @@ import com.vaadin.server.VaadinSession
 import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import java.lang.IllegalArgumentException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -158,14 +161,32 @@ class MockVaadinTest : DynaTest({
     }
 
     group("async") {
-        test("calling access() won't throw exception but the block won't be called immediately") {
-            UI.getCurrent().access { fail("Shouldn't be called now") }
-        }
+        group("from UI thread") {
+            test("calling access() won't throw exception but the block won't be called immediately") {
+                UI.getCurrent().access { fail("Shouldn't be called now") }
+            }
 
-        test("calling accessSynchronously() calls the block immediately") {
-            var called = false
-            UI.getCurrent().accessSynchronously { called = true }
-            expect(true) { called }
+            test("calling accessSynchronously() calls the block immediately") {
+                var called = false
+                UI.getCurrent().accessSynchronously { called = true }
+                expect(true) { called }
+            }
+        }
+        group("from bg thread") {
+            lateinit var executor: ExecutorService
+            beforeEach { executor = Executors.newCachedThreadPool() }
+            afterEach {
+                executor.shutdown()
+                executor.awaitTermination(4, TimeUnit.SECONDS)
+            }
+            fun runInBgSyncOnUI(block: UI.()->Unit) {
+                val ui = UI.getCurrent()
+                executor.submit { block(ui) }.get()
+            }
+
+            test("calling access() won't throw exception but the block won't be called immediately") {
+                runInBgSyncOnUI { access { fail("Shouldn't be called now") } }
+            }
         }
     }
 })

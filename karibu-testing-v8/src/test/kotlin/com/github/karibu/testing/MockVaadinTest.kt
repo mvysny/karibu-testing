@@ -15,6 +15,7 @@ import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import java.lang.IllegalArgumentException
 import kotlin.test.expect
+import kotlin.test.fail
 
 class MockVaadinTest : DynaTest({
     beforeEach { MockVaadin.setup() }
@@ -153,6 +154,18 @@ class MockVaadinTest : DynaTest({
 
         expectThrows(RuntimeException::class, "UI failed to initialize. If you're using autoViewProvider, make sure that views are auto-discovered via autoDiscoverViews()") {
             MockVaadin.setup({ MyUIWithAutoViewProvider() })
+        }
+    }
+
+    group("async") {
+        test("calling access() won't throw exception but the block won't be called immediately") {
+            UI.getCurrent().access { fail("Shouldn't be called now") }
+        }
+
+        test("calling accessSynchronously() calls the block immediately") {
+            var called = false
+            UI.getCurrent().accessSynchronously { called = true }
+            expect(true) { called }
         }
     }
 })

@@ -16,6 +16,7 @@ import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.lang.IllegalArgumentException
 import kotlin.test.expect
+import kotlin.test.fail
 
 class MockVaadinTest : DynaTest({
 
@@ -200,6 +201,18 @@ class MockVaadinTest : DynaTest({
         MockVaadin.setup(uiFactory = { ui })
         expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
             MockVaadin.setup(uiFactory = { ui })
+        }
+    }
+
+    group("async") {
+        test("calling access() won't throw exception but the block won't be called immediately") {
+            UI.getCurrent().access { fail("Shouldn't be called now") }
+        }
+
+        test("calling accessSynchronously() calls the block immediately") {
+            var called = false
+            UI.getCurrent().accessSynchronously { called = true }
+            expect(true) { called }
         }
     }
 })

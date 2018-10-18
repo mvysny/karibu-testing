@@ -16,6 +16,8 @@ import com.vaadin.flow.server.Command
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.lang.IllegalArgumentException
+import java.lang.RuntimeException
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -233,6 +235,13 @@ class MockVaadinTest : DynaTest({
                 expect(0) { calledCount }
                 MockVaadin.runUIQueue()
                 expect(4) { calledCount }
+            }
+
+            test("runUIQueue() propagates failures") {
+                UI.getCurrent().access { throw RuntimeException("simulated") }
+                expectThrows(ExecutionException::class, "simulated") {
+                    MockVaadin.runUIQueue()
+                }
             }
         }
         group("from bg thread") {

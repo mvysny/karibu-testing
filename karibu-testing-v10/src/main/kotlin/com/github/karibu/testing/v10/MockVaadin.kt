@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.startup.RouteRegistry
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
@@ -191,12 +192,30 @@ object MockVaadin {
 
     /**
      * Runs all tasks scheduled by [UI.access].
+     *
+     * Any exceptions thrown from Commands taken by [UI.access] will make this function fail. The exceptions will be wrapped in
+     * [ExecutionException].
      */
     fun runUIQueue() {
         VaadinSession.getCurrent()!!.apply {
-            unlock()  // this will process all Runnables registered via ui.access()
-            // lock the session back, so that the test can continue running as-if in the UI thread.
-            lock()
+            // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
+            // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
+            val errors = mutableListOf<Throwable>()
+            val oldErrorHandler = errorHandler
+            errorHandler = ErrorHandler { errors.add(it.throwable) }
+
+            try {
+                unlock()  // this will process all Runnables registered via ui.access()
+                // lock the session back, so that the test can continue running as-if in the UI thread.
+                lock()
+            } finally {
+                errorHandler = oldErrorHandler
+            }
+
+            if (!errors.isEmpty()) {
+                errors.drop(1).forEach { errors[0].addSuppressed(it) }
+                throw errors[0]
+            }
         }
     }
 }

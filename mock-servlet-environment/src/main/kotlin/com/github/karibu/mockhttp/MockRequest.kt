@@ -27,13 +27,10 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun setCharacterEncoding(env: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun setCharacterEncoding(env: String) {
     }
 
-    override fun getParameterValues(name: String?): Array<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getParameterValues(name: String): Array<String>? = null
 
     override fun isAsyncStarted(): Boolean = false
 
@@ -53,13 +50,9 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getServerPort(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getServerPort(): Int = MockHttpEnvironment.serverPort
 
-    override fun getRequestedSessionId(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getRequestedSessionId(): String = session.id
 
     override fun getServletPath(): String = ""
 
@@ -87,9 +80,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getLocalPort(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getLocalPort(): Int = MockHttpEnvironment.localPort
 
     override fun isRequestedSessionIdFromUrl(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -183,21 +174,15 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getRemoteAddr(): String = "127.0.0.1"
 
-    override fun getHeaders(name: String?): Enumeration<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getHeaders(name: String): Enumeration<String> = Collections.emptyEnumeration()
 
-    override fun getUserPrincipal(): Principal {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getUserPrincipal(): Principal? = MockHttpEnvironment.userPrincipal
 
     override fun getReader(): BufferedReader {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getLocales(): Enumeration<Locale> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getLocales(): Enumeration<Locale> = Collections.emptyEnumeration()
 
     override fun getAuthType(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -242,7 +227,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
         parameters.putOrRemove(parameter, value)
     }
 
-    override fun getRemotePort(): Int = 8080
+    override fun getRemotePort(): Int = MockHttpEnvironment.remotePort
 
     override fun getDateHeader(name: String?): Long = -1
 

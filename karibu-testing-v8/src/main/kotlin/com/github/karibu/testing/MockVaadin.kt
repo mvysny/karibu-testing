@@ -175,6 +175,17 @@ object MockVaadin {
             lastLocation = null
         }
     }
+
+    /**
+     * Runs all tasks scheduled by [UI.access].
+     */
+    fun runUIQueue() {
+        VaadinSession.getCurrent()!!.apply {
+            unlock()  // this will process all Runnables registered via ui.access()
+            // lock the session back, so that the test can continue running as-if in the UI thread.
+            lock()
+        }
+    }
 }
 
 /**

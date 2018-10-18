@@ -12,6 +12,7 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
+import com.vaadin.flow.server.Command
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.lang.IllegalArgumentException
@@ -213,10 +214,25 @@ class MockVaadinTest : DynaTest({
                 UI.getCurrent().access { fail("Shouldn't be called now") }
             }
 
-            test("calling accessSynchronously() calls the block immediately") {
+            test("calling accessSynchronously() calls the block immediately because the tests hold UI lock") {
                 var called = false
                 UI.getCurrent().accessSynchronously { called = true }
                 expect(true) { called }
+            }
+
+            test("runUIQueue() processes all access() calls") {
+                var calledCount = 0
+                UI.getCurrent().access(object : Command {
+                    override fun execute() {
+                        if (calledCount < 4) {
+                            calledCount++
+                            UI.getCurrent().access(this)
+                        }
+                    }
+                })
+                expect(0) { calledCount }
+                MockVaadin.runUIQueue()
+                expect(4) { calledCount }
             }
         }
         group("from bg thread") {
@@ -231,8 +247,25 @@ class MockVaadinTest : DynaTest({
                 executor.submit { block(ui) }.get()
             }
 
-            test("calling access() won't throw exception but the block won't be called immediately") {
+            test("calling access() won't throw exception but the block won't be called immediately because the tests hold UI lock") {
                 runInBgSyncOnUI { access { fail("Shouldn't be called now") } }
+            }
+
+            test("runUIQueue() processes all access() calls") {
+                var calledCount = 0
+                runInBgSyncOnUI {
+                    access(object : Command {
+                        override fun execute() {
+                            if (calledCount < 4) {
+                                calledCount++
+                                UI.getCurrent().access(this)
+                            }
+                        }
+                    })
+                }
+                expect(0) { calledCount }
+                MockVaadin.runUIQueue()
+                expect(4) { calledCount }
             }
         }
     }

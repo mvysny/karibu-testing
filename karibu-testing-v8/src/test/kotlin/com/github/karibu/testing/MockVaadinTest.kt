@@ -14,106 +14,119 @@ import com.vaadin.server.VaadinSession
 import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import java.lang.IllegalArgumentException
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    test("Vaadin.getCurrent() returns non-null values") {
-        expect(true) { VaadinSession.getCurrent() != null }
-        expect(true) { VaadinService.getCurrent() != null }
-        expect(true) { UI.getCurrent() != null }
-    }
+    group("setup/tearDown tests") {
+        test("Vaadin.getCurrent() returns non-null values") {
+            expect(true) { VaadinSession.getCurrent() != null }
+            expect(true) { VaadinService.getCurrent() != null }
+            expect(true) { UI.getCurrent() != null }
+        }
 
-    test("configuration mocked as well") {
-        expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
-    }
+        test("setup() can be called multiple times in a row") {
+            MockVaadin.setup()
+            MockVaadin.setup()
+        }
 
-    test("setup() can be called multiple times in a row") {
-        MockVaadin.setup()
-        MockVaadin.setup()
-    }
+        test("setup() always provides new instances") {
+            MockVaadin.setup()
+            val ui = UI.getCurrent()!!
+            MockVaadin.setup()
+            expect(true) { UI.getCurrent()!! !== ui }
+        }
 
-    test("setup() always provides new instances") {
-        MockVaadin.setup()
-        val ui = UI.getCurrent()!!
-        MockVaadin.setup()
-        expect(true) { UI.getCurrent()!! !== ui }
-    }
+        test("Vaadin.getCurrent() returns null after tearDown()") {
+            MockVaadin.tearDown()
+            expect(true) { VaadinSession.getCurrent() == null }
+            expect(true) { VaadinService.getCurrent() == null }
+            expect(true) { UI.getCurrent() == null }
+        }
 
-    test("Vaadin.getCurrent() returns null after tearDown()") {
-        MockVaadin.tearDown()
-        expect(true) { VaadinSession.getCurrent() == null }
-        expect(true) { VaadinService.getCurrent() == null }
-        expect(true) { UI.getCurrent() == null }
-    }
+        test("tearDown() can be called multiple times") {
+            MockVaadin.tearDown()
+            MockVaadin.tearDown()
+            MockVaadin.tearDown()
+        }
 
-    test("tearDown() can be called multiple times") {
-        MockVaadin.tearDown()
-        MockVaadin.tearDown()
-        MockVaadin.tearDown()
-    }
-
-    test("verifyAttachCalled") {
-        val attachCalled = AtomicInteger()
-        val vl = object : VerticalLayout() {
-            override fun attach() {
-                super.attach()
-                attachCalled.incrementAndGet()
+        test("Attempt to reuse UI fails with helpful message") {
+            val ui = MockUI()
+            MockVaadin.setup(uiFactory = { ui })
+            expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
+                MockVaadin.setup(uiFactory = { ui })
             }
         }
-        vl.addAttachListener { attachCalled.incrementAndGet() }
-        UI.getCurrent().content = vl
-        expect(2) { attachCalled.get() }
-        expect(true) { vl.isAttached }
     }
 
-    test("wrapped session works") {
-        VaadinSession.getCurrent().session.setAttribute("foo", "bar")
-        expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+    group("proper mocking") {
+        test("configuration mocked as well") {
+            expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
+        }
+
+        test("verifyAttachCalled") {
+            var attachCalled = 0
+            val vl = object : VerticalLayout() {
+                override fun attach() {
+                    super.attach()
+                    attachCalled++
+                }
+            }
+            vl.addAttachListener { attachCalled++ }
+            UI.getCurrent().content = vl
+            expect(2) { attachCalled }
+            expect(true) { vl.isAttached }
+        }
+
+        test("wrapped session works") {
+            VaadinSession.getCurrent().session.setAttribute("foo", "bar")
+            expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+        }
+
+        test("Browser should be mocked as well") {
+            expect("127.0.0.1") { Page.getCurrent().webBrowser.address }
+        }
+
+        test("UI with push state and navigator won't fail") {
+            MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
+        }
     }
 
-    test("Browser should be mocked as well") {
-        expect("127.0.0.1") { Page.getCurrent().webBrowser.address }
-    }
+    group("page reloading") {
+        test("Page reload should re-create the UI") {
+            val ui = UI.getCurrent()
+            var detachCalled = false
+            ui.addDetachListener { detachCalled = true }
+            Page.getCurrent().reload()
+            // a new UI must be created; but the Session must stay the same.
+            expect(true) { UI.getCurrent() != null }
+            expect(false) { UI.getCurrent() === ui }
+            // the old UI must be detached properly
+            expect(true) { detachCalled }
+        }
 
-    test("UI with push state and navigator won't fail") {
-        MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
-    }
+        test("Page reload should preserve session") {
+            val session = VaadinSession.getCurrent()
+            session.setAttribute("foo", "bar")
+            Page.getCurrent().reload()
+            expect(true) { VaadinSession.getCurrent() === session }
+            expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
+        }
 
-    test("Page reload should re-create the UI") {
-        val ui = UI.getCurrent()
-        var detachCalled = false
-        ui.addDetachListener { detachCalled = true }
-        Page.getCurrent().reload()
-        // a new UI must be created; but the Session must stay the same.
-        expect(true) { UI.getCurrent() != null }
-        expect(false) { UI.getCurrent() === ui }
-        // the old UI must be detached properly
-        expect(true) { detachCalled }
-    }
-
-    test("Page reload should preserve session") {
-        val session = VaadinSession.getCurrent()
-        session.setAttribute("foo", "bar")
-        Page.getCurrent().reload()
-        expect(true) { VaadinSession.getCurrent() === session }
-        expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
-    }
-
-    test("Page reload should automatically navigate to the current URL") {
-        MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
-        _get<DummyView>()
-        UI.getCurrent().page.reload()
-        _get<DummyView>()
-        UI.getCurrent().navigator.navigateTo("2")
-        _expectNone<DummyView>()
-        _get<DummyView2>()
-        UI.getCurrent().page.reload()
-        _expectNone<DummyView>()
-        _get<DummyView2>()
+        test("Page reload should automatically navigate to the current URL") {
+            MockVaadin.setup(uiFactory = { MyUIWithNavigator() })
+            _get<DummyView>()
+            UI.getCurrent().page.reload()
+            _get<DummyView>()
+            UI.getCurrent().navigator.navigateTo("2")
+            _expectNone<DummyView>()
+            _get<DummyView2>()
+            UI.getCurrent().page.reload()
+            _expectNone<DummyView>()
+            _get<DummyView2>()
+        }
     }
 
     test("VaadinSession.close() must re-create the entire session and the UI") {
@@ -140,14 +153,6 @@ class MockVaadinTest : DynaTest({
 
         expectThrows(RuntimeException::class, "UI failed to initialize. If you're using autoViewProvider, make sure that views are auto-discovered via autoDiscoverViews()") {
             MockVaadin.setup({ MyUIWithAutoViewProvider() })
-        }
-    }
-
-    test("Reusing UI fails with helpful message") {
-        val ui = MockUI()
-        MockVaadin.setup(uiFactory = { ui })
-        expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
-            MockVaadin.setup(uiFactory = { ui })
         }
     }
 })

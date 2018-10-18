@@ -15,7 +15,6 @@ import com.vaadin.flow.router.*
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.lang.IllegalArgumentException
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.expect
 
 class MockVaadinTest : DynaTest({
@@ -30,138 +29,150 @@ class MockVaadinTest : DynaTest({
     }
     afterEach { MockVaadin.tearDown() }
 
-    test("smoke test that everything is mocked") {
-        expect(true) { UI.getCurrent() != null }
-        expect(true) { VaadinSession.getCurrent() != null }
-        expect(true) { VaadinService.getCurrent() != null }
-        expect(true) { VaadinSession.getCurrent().configuration != null }
-        expect(true) { VaadinSession.getCurrent().service != null }
-        expect(true) { VaadinSession.getCurrent().browser != null }
-    }
 
-    test("configuration mocked as well") {
-        expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
-    }
-
-    test("setup() can be called multiple times in a row") {
-        MockVaadin.setup()
-        MockVaadin.setup()
-    }
-
-    test("setup() always provides new instances") {
-        MockVaadin.setup()
-        val ui = UI.getCurrent()!!
-        MockVaadin.setup()
-        expect(true) { UI.getCurrent()!! !== ui }
-    }
-
-    test("Vaadin.getCurrent() returns null after tearDown()") {
-        MockVaadin.tearDown()
-        expect(true) { VaadinSession.getCurrent() == null }
-        expect(true) { VaadinService.getCurrent() == null }
-        expect(true) { UI.getCurrent() == null }
-    }
-
-    test("tearDown() can be called multiple times") {
-        MockVaadin.tearDown()
-        MockVaadin.tearDown()
-        MockVaadin.tearDown()
-    }
-
-    test("verifyAttachCalled") {
-        val attachCalled = AtomicInteger()
-        val vl = object : VerticalLayout() {
-            override fun onAttach(attachEvent: AttachEvent?) {
-                super.onAttach(attachEvent)
-                attachCalled.incrementAndGet()
-            }
+    group("setup/teardown tests") {
+        test("smoke test that everything is mocked") {
+            expect(true) { UI.getCurrent() != null }
+            expect(true) { VaadinSession.getCurrent() != null }
+            expect(true) { VaadinService.getCurrent() != null }
+            expect(true) { VaadinSession.getCurrent().configuration != null }
+            expect(true) { VaadinSession.getCurrent().service != null }
+            expect(true) { VaadinSession.getCurrent().browser != null }
         }
-        vl.addAttachListener { attachCalled.incrementAndGet() }
-        UI.getCurrent().add(vl)
-        expect(2) { attachCalled.get() }
-        expect(true) { vl.isAttached }
+
+        test("setup() can be called multiple times in a row") {
+            MockVaadin.setup()
+            MockVaadin.setup()
+        }
+
+        test("setup() always provides new instances") {
+            MockVaadin.setup()
+            val ui = UI.getCurrent()!!
+            MockVaadin.setup()
+            expect(true) { UI.getCurrent()!! !== ui }
+        }
+
+        test("Vaadin.getCurrent() returns null after tearDown()") {
+            MockVaadin.tearDown()
+            expect(true) { VaadinSession.getCurrent() == null }
+            expect(true) { VaadinService.getCurrent() == null }
+            expect(true) { UI.getCurrent() == null }
+        }
+
+        test("tearDown() can be called multiple times") {
+            MockVaadin.tearDown()
+            MockVaadin.tearDown()
+            MockVaadin.tearDown()
+        }
     }
 
-    test("navigation works in mocked env") {
-        // no need: when UI is initialized in MockVaadin.setup(), automatic navigation to "" is performed.
+    group("proper mocking") {
+        test("configuration mocked as well") {
+            expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
+        }
+
+        test("verifyAttachCalled") {
+            var attachCalled = 0
+            val vl = object : VerticalLayout() {
+                override fun onAttach(attachEvent: AttachEvent?) {
+                    super.onAttach(attachEvent)
+                    attachCalled++
+                }
+            }
+            vl.addAttachListener { attachCalled++ }
+            UI.getCurrent().add(vl)
+            expect(2) { attachCalled }
+            expect(true) { vl.isAttached }
+        }
+
+        test("navigation works in mocked env") {
+            // no need: when UI is initialized in MockVaadin.setup(), automatic navigation to "" is performed.
 //        UI.getCurrent().navigate("")
-        _get<Text> { text = "Welcome!" }
-        UI.getCurrent().navigate("helloworld")
-        _get<Button> { caption = "Hello, World!" }
+            _get<Text> { text = "Welcome!" }
+            UI.getCurrent().navigate("helloworld")
+            _get<Button> { caption = "Hello, World!" }
+        }
+
+        test("navigation to parametrized view works in mocked env") {
+            UI.getCurrent().navigate("params/1")
+            _get<ParametrizedView>()
+        }
+
+        test("navigation to view with parent route works in mocked env") {
+            UI.getCurrent().navigate("parent/child")
+            _get<ChildView>()
+        }
+
+        test("UI.getUrl() to view works in mocked env") {
+            expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
+            expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
+            expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
+        }
     }
 
-    test("navigation to parametrized view works in mocked env") {
-        UI.getCurrent().navigate("params/1")
-        _get<ParametrizedView>()
-    }
+    group("dialogs") {
 
-    test("navigation to view with parent route works in mocked env") {
-        UI.getCurrent().navigate("parent/child")
-        _get<ChildView>()
-    }
+        test("open dialog") {
+            // there should be no dialogs in the UI
+            _expectNone<Dialog>()
+            _expectNone<Div> { text = "Dialog Text" }
+            val dialog = Dialog(Div().apply { text("Dialog Text") })
+            dialog.open()
+            _get<Dialog>()  // should be in the UI, along with its contents
+            _get<Div> { text = "Dialog Text" }
+            dialog.close()
+            // there should be no dialogs in the UI
+            _expectNone<Div> { text = "Dialog Text" }
+            _expectNone<Dialog>()
+        }
 
-    test("UI.getUrl() to view works in mocked env") {
-        expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
-        expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
-        expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
-    }
-
-    test("open dialog") {
-        // there should be no dialogs in the UI
-        _expectNone<Dialog>()
-        _expectNone<Div> { text = "Dialog Text" }
-        val dialog = Dialog(Div().apply { text("Dialog Text") })
-        dialog.open()
-        _get<Dialog>()  // should be in the UI, along with its contents
-        _get<Div> { text = "Dialog Text" }
-        dialog.close()
-        // there should be no dialogs in the UI
-        _expectNone<Div> { text = "Dialog Text" }
-        _expectNone<Dialog>()
-    }
-
-    test("the dialogs must be cleared up from the component tree on close") {
-        val dialog = Dialog(Div().apply { text("Dialog Text") })
-        dialog.open()
-        dialog.close()
-        cleanupDialogs()
-        expect("""
+        test("the dialogs must be cleared up from the component tree on close") {
+            val dialog = Dialog(Div().apply { text("Dialog Text") })
+            dialog.open()
+            dialog.close()
+            cleanupDialogs()
+            expect(
+                """
 └── MockedUI[]
     └── WelcomeView[]
         └── Text[text='Welcome!']
-""".trim()) { UI.getCurrent().toPrettyTree().trim() }
+""".trim()
+            ) { UI.getCurrent().toPrettyTree().trim() }
+        }
     }
 
-    test("Page reload should re-create the UI") {
-        val ui = UI.getCurrent()
-        var detachCalled = false
-        ui.addDetachListener { detachCalled = true }
-        UI.getCurrent().page.reload()
-        // a new UI must be created; but the Session must stay the same.
-        expect(true) { UI.getCurrent() != null }
-        expect(false) { UI.getCurrent() === ui }
-        // the old UI must be detached properly
-        expect(true) { detachCalled }
-    }
+    group("page reloading") {
+        test("Page reload should re-create the UI") {
+            val ui = UI.getCurrent()
+            var detachCalled = false
+            ui.addDetachListener { detachCalled = true }
+            UI.getCurrent().page.reload()
+            // a new UI must be created; but the Session must stay the same.
+            expect(true) { UI.getCurrent() != null }
+            expect(false) { UI.getCurrent() === ui }
+            // the old UI must be detached properly
+            expect(true) { detachCalled }
+        }
 
-    test("Page reload should preserve session") {
-        val session = VaadinSession.getCurrent()
-        session.setAttribute("foo", "bar")
-        UI.getCurrent().page.reload()
-        expect(true) { VaadinSession.getCurrent() === session }
-        expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
-    }
+        test("Page reload should preserve session") {
+            val session = VaadinSession.getCurrent()
+            session.setAttribute("foo", "bar")
+            UI.getCurrent().page.reload()
+            expect(true) { VaadinSession.getCurrent() === session }
+            expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
+        }
 
-    test("Page reload should automatically navigate to the current URL") {
-        _get<WelcomeView>()
-        UI.getCurrent().page.reload()
-        _get<WelcomeView>()
-        UI.getCurrent().navigate("helloworld")
-        _expectNone<WelcomeView>()
-        _get<HelloWorldView>()
-        UI.getCurrent().page.reload()
-        _expectNone<WelcomeView>()
-        _get<HelloWorldView>()
+        test("Page reload should automatically navigate to the current URL") {
+            _get<WelcomeView>()
+            UI.getCurrent().page.reload()
+            _get<WelcomeView>()
+            UI.getCurrent().navigate("helloworld")
+            _expectNone<WelcomeView>()
+            _get<HelloWorldView>()
+            UI.getCurrent().page.reload()
+            _expectNone<WelcomeView>()
+            _get<HelloWorldView>()
+        }
     }
 
     test("VaadinSession.close() must re-create the entire session and the UI") {

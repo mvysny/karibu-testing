@@ -95,12 +95,16 @@ object MockVaadin {
      */
     @JvmStatic
     fun tearDown() {
+        clearVaadinInstances()
+        lastNavigation = null
+    }
+
+    private fun clearVaadinInstances() {
         closeCurrentUI()
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
         strongRefReq = null
         VaadinService.setCurrent(null)
-        lastNavigation = null
     }
 
     private fun closeCurrentSession() {
@@ -139,8 +143,7 @@ object MockVaadin {
                 // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
                 // the previous UI instance which is still attached to the session. And it blows.
 
-                closeCurrentUI()
-                closeCurrentSession()
+                clearVaadinInstances()
                 httpSession.destroy()
                 createSession(ctx, servlet, uiFactory)
             }

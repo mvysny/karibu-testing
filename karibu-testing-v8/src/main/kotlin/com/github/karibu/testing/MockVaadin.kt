@@ -17,6 +17,7 @@ object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
     private var strongRefSession: VaadinSession? = null
     private var strongRefUI: UI? = null
+    private var strongRefRequest: VaadinRequest? = null
     private var lastLocation: String? = null
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
@@ -65,11 +66,16 @@ object MockVaadin {
      */
     @JvmStatic
     fun tearDown() {
+        clearVaadinObjects()
+        VaadinService.setCurrent(null)
+        lastLocation = null
+    }
+
+    private fun clearVaadinObjects() {
         closeCurrentUI()
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
-        VaadinService.setCurrent(null)
-        lastLocation = null
+        strongRefRequest = null
     }
 
     private fun closeCurrentSession() {
@@ -100,8 +106,7 @@ object MockVaadin {
                 // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
                 // the previous UI instance which is still attached to the session. And it blows.
 
-                closeCurrentUI()
-                closeCurrentSession()
+                clearVaadinObjects()
                 httpSession.destroy()
                 createSession(httpSession, uiFactory)
             }
@@ -115,9 +120,9 @@ object MockVaadin {
 
         // request
         val httpRequest = MockRequest(httpSession)
-        val request = VaadinServletRequest(httpRequest, service)
         httpRequest.setParameter("v-loc", "http://localhost:8080")
-        CurrentInstance.set(VaadinRequest::class.java, request)
+        strongRefRequest = VaadinServletRequest(httpRequest, service)
+        CurrentInstance.set(VaadinRequest::class.java, strongRefRequest)
 
         // UI
         createUI(uiFactory)

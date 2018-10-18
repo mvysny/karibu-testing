@@ -195,7 +195,15 @@ object MockVaadin {
             val errors = mutableListOf<Throwable>()
             val oldErrorHandler = UI.getCurrent().errorHandler
             if (oldErrorHandler == null || oldErrorHandler is DefaultErrorHandler || !propagateExceptionToHandler) {
-                UI.getCurrent().errorHandler = ErrorHandler { errors.add(it.throwable) }
+                UI.getCurrent().errorHandler = ErrorHandler {
+                    var t = it.throwable
+                    if (t !is ExecutionException) {
+                        // for some weird reason t may not be ExecutionException when it originates from a coroutine :confused:
+                        // the stacktrace would point someplace random. Wrap it in ExecutionException whose stacktrace will point to the test
+                        t = ExecutionException(t.message, t)
+                    }
+                    errors.add(t)
+                }
             }
 
             try {

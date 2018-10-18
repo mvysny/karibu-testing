@@ -180,16 +180,18 @@ object MockVaadin {
     /**
      * Runs all tasks scheduled by [UI.access].
      *
-     * Any exceptions thrown from Commands taken by [UI.access] will make this function fail. The exceptions will be wrapped in
-     * [ExecutionException].
+     * If [VaadinSession.errorHandler] is not set or [propagateExceptionToHandler] is false, any exceptions thrown from Commands taken by [UI.access] will make this function fail.
+     * The exceptions will be wrapped in [ExecutionException].
      */
-    fun runUIQueue() {
+    fun runUIQueue(propagateExceptionToHandler: Boolean = false) {
         VaadinSession.getCurrent()!!.apply {
             // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
             // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
             val errors = mutableListOf<Throwable>()
             val oldErrorHandler = UI.getCurrent().errorHandler
-            UI.getCurrent().errorHandler = ErrorHandler { errors.add(it.throwable) }
+            if (oldErrorHandler == null || oldErrorHandler is DefaultErrorHandler || !propagateExceptionToHandler) {
+                UI.getCurrent().errorHandler = ErrorHandler { errors.add(it.throwable) }
+            }
 
             try {
                 unlock()  // this will process all Runnables registered via ui.access()

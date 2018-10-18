@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.Command
+import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import java.lang.IllegalArgumentException
@@ -42,6 +43,7 @@ class MockVaadinTest : DynaTest({
             expect(true) { UI.getCurrent() != null }
             expect(true) { VaadinSession.getCurrent() != null }
             expect(true) { VaadinService.getCurrent() != null }
+            expect(true) { VaadinRequest.getCurrent() != null }
             expect(true) { VaadinSession.getCurrent().configuration != null }
             expect(true) { VaadinSession.getCurrent().service != null }
             expect(true) { VaadinSession.getCurrent().browser != null }
@@ -61,9 +63,10 @@ class MockVaadinTest : DynaTest({
 
         test("Vaadin.getCurrent() returns null after tearDown()") {
             MockVaadin.tearDown()
-            expect(true) { VaadinSession.getCurrent() == null }
-            expect(true) { VaadinService.getCurrent() == null }
-            expect(true) { UI.getCurrent() == null }
+            expect(null) { VaadinSession.getCurrent() }
+            expect(null) { VaadinService.getCurrent() }
+            expect(null) { VaadinRequest.getCurrent() }
+            expect(null) { UI.getCurrent() }
         }
 
         test("tearDown() can be called multiple times") {
@@ -243,6 +246,16 @@ class MockVaadinTest : DynaTest({
                     MockVaadin.runUIQueue()
                 }
             }
+
+            test("access() has properly mocked instances") {
+                UI.getCurrent().access {
+                    expect(true) { VaadinSession.getCurrent() != null }
+                    expect(true) { VaadinService.getCurrent() != null }
+                    expect(true) { VaadinRequest.getCurrent() != null }
+                    expect(true) { UI.getCurrent() != null }
+                }
+                MockVaadin.runUIQueue()
+            }
         }
         group("from bg thread") {
             lateinit var executor: ExecutorService
@@ -275,6 +288,18 @@ class MockVaadinTest : DynaTest({
                 expect(0) { calledCount }
                 MockVaadin.runUIQueue()
                 expect(4) { calledCount }
+            }
+
+            test("access() has properly mocked instances") {
+                runInBgSyncOnUI {
+                    access {
+                        expect(true) { VaadinSession.getCurrent() != null }
+                        expect(true) { VaadinService.getCurrent() != null }
+                        expect(true) { VaadinRequest.getCurrent() != null }
+                        expect(true) { UI.getCurrent() != null }
+                    }
+                }
+                MockVaadin.runUIQueue()
             }
         }
     }

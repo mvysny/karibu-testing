@@ -29,6 +29,7 @@ class MockVaadinTest : DynaTest({
         test("Vaadin.getCurrent() returns non-null values") {
             expect(true) { VaadinSession.getCurrent() != null }
             expect(true) { VaadinService.getCurrent() != null }
+            expect(true) { VaadinRequest.getCurrent() != null }
             expect(true) { UI.getCurrent() != null }
         }
 
@@ -48,6 +49,7 @@ class MockVaadinTest : DynaTest({
             MockVaadin.tearDown()
             expect(true) { VaadinSession.getCurrent() == null }
             expect(true) { VaadinService.getCurrent() == null }
+            expect(true) { VaadinRequest.getCurrent() == null }
             expect(true) { UI.getCurrent() == null }
         }
 
@@ -194,6 +196,16 @@ class MockVaadinTest : DynaTest({
                     MockVaadin.runUIQueue()
                 }
             }
+
+            test("access() has properly mocked instances") {
+                UI.getCurrent().access {
+                    expect(true) { VaadinSession.getCurrent() != null }
+                    expect(true) { VaadinService.getCurrent() != null }
+                    expect(true) { VaadinRequest.getCurrent() != null }
+                    expect(true) { UI.getCurrent() != null }
+                }
+                MockVaadin.runUIQueue()
+            }
         }
         group("from bg thread") {
             lateinit var executor: ExecutorService
@@ -226,6 +238,18 @@ class MockVaadinTest : DynaTest({
                 expect(0) { calledCount }
                 MockVaadin.runUIQueue()
                 expect(4) { calledCount }
+            }
+
+            test("access() has properly mocked instances") {
+                runInBgSyncOnUI {
+                    access {
+                        expect(true) { VaadinSession.getCurrent() != null }
+                        expect(true) { VaadinService.getCurrent() != null }
+                        expect(true) { VaadinRequest.getCurrent() != null }
+                        expect(true) { UI.getCurrent() != null }
+                    }
+                }
+                MockVaadin.runUIQueue()
             }
         }
     }

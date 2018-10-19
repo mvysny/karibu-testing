@@ -561,3 +561,60 @@ You would have to await for async to finish basically after every UI component l
 We have added support to implement this kind of behavior. There is a global variable named `testingLifecycleHook`, which
 contains hooks which by default do nothing. You can simply provide your own custom implementation of `TestingLifecycleHook`
 interface which would await for async, and then set it to the `testingLifecycleHook` global variable.
+
+# Advanced Topics
+
+## Testing Asynchronous Application
+
+Some apps tend to use async heavily: by enabling Vaadin Push you can have the client notified about important stuff at any time.
+You can even employ async data fetching, so that the threads in the JVM are not laying dormant doing nothing but taking
+memory until the data is fetched.
+
+The thing is that Karibu Testing runs the test with the UI lock held. That simplifies
+testing very much, but that also prevents async updates by another thread, simply
+because the test is holding the lock!
+
+The solution is to briefly let loose of the UI lock in the testing thread,
+allowing `UI.access()` tasks posted from a background thread to be processed.
+Then the testing thread will re-obtain the lock and continue testing.
+
+### Async Example
+
+You can see this technique in use in the [vaadin-coroutines-demo](https://github.com/mvysny/vaadin-coroutines-demo)
+sample project. What the test does is that it simply runs the long-running
+background process when the `Buy Ticket` button is pressed. Then,
+the test checks that a dialog has popped up. Here is the source of the test method:
+
+```kotlin
+_get<Button> { caption = "Buy Ticket" } ._click()
+MockVaadin.runUIQueue()
+Thread.sleep(200)
+MockVaadin.runUIQueue()
+expect("There are 25 available tickets. Would you like to purchase one?") { _get<ConfirmDialog>().message }
+```
+
+The test clicks the button, sleeps for a 200 millis (the request only takes 50 ms and
+should be done by then), then calls `MockVaadin.runUIQueue()` which releases
+the UI lock, runs the tasks and reacquires the lock. Meanwhile, the data-fetching
+process which runs in the background fetches the data and posts a UI task
+that shows a confirmation dialog.
+
+### Running the UI Queue Automatically
+
+Now calling `MockVaadin.runUIQueue()` manually can be tedious, you can easily
+forget to do that which would result in mysterious test crashes. The easiest
+way is to take advantage of Karibu-Testing hooking mechanism, and simply invoke
+the `MockVaadin.runUIQueue()` before and after every component lookup:
+
+```kotlin
+object UIQueueRunnerHook : TestingLifecycleHook {
+    override fun awaitBeforeLookup() {
+        MockVaadin.runUIQueue()
+    }
+    override fun awaitAfterLookup() {
+        MockVaadin.runUIQueue()
+    }
+}
+
+beforeGroup { testingLifecycleHook = UIQueueRunnerHook }
+```

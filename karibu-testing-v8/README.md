@@ -603,8 +603,9 @@ tasks have been processed.
 
 ### Running the UI Queue Automatically
 
-Now calling `MockVaadin.runUIQueue()` manually can be tedious, you can easily
-forget to do that which would result in mysterious test crashes. The easiest
+Calling `MockVaadin.runUIQueue()` manually in every test can be tedious. It is
+easy to
+forget to call the method, which results in mysterious test crashes. The easiest
 way is to take advantage of Karibu-Testing hooking mechanism, and simply invoke
 the `MockVaadin.runUIQueue()` before and after every component lookup:
 

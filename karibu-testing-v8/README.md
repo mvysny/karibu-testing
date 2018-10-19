@@ -597,7 +597,9 @@ The test clicks the button, sleeps for a 200 millis (the request only takes 50 m
 should be done by then), then calls `MockVaadin.runUIQueue()` which releases
 the UI lock, runs the tasks and reacquires the lock. Meanwhile, the data-fetching
 process which runs in the background fetches the data and posts a UI task
-that shows a confirmation dialog.
+that shows a confirmation dialog. The dialog is then shown because
+`MockVaadin.runUIQueue()` runs all submitted tasks and blocks until all the
+tasks have been processed.
 
 ### Running the UI Queue Automatically
 

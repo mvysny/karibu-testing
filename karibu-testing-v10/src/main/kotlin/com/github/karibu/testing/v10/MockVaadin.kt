@@ -44,6 +44,7 @@ object MockVaadin {
      * [MockedUI.beforeClientResponse] for details.
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
+     * Please consult [MockService] on what methods you must override in your custom service.
      */
     @JvmStatic @JvmOverloads
     fun setup(routes: Routes = Routes(),
@@ -58,6 +59,25 @@ object MockVaadin {
                 return service
             }
         }
+        setup(uiFactory, servlet)
+    }
+
+    /**
+     * Use this method when you need to provide a completely custom servlet (e.g. `SpringServlet`). Do not forget to create a specialized service
+     * which works in mocked environment. See below for details on how to do this.
+     *
+     * The UI factory *must* provide a new, fresh instance of the UI, so that the
+     * tests start from a pre-known state. If you're using Spring and you're getting UI
+     * from the injector, you must reconfigure Spring to use prototype scope,
+     * otherwise an old UI from the UI scope or Session Scope will be provided.
+     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
+     * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
+     * [MockedUI.beforeClientResponse] for details.
+     * @param servlet allows you to provide your own implementation of [VaadinServlet]. You MUST override [VaadinServlet.createServletService]
+     * and construct a custom service which overrides important methods. Please consult [MockService] on what methods you must override in your custom service.
+     */
+    @JvmStatic
+    fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
         VaadinService.setCurrent(servlet.service!!)
@@ -250,7 +270,13 @@ open class MockedUI : UI() {
     }
 }
 
-// opened to be extensible in user's library
+/**
+ * A mocking service that performs three very important tasks:
+ * * Overrides [isAtmosphereAvailable] to tell Vaadin that we don't have Atmosphere (otherwise Vaadin will crash)
+ * * Auto-detects and provides routes (otherwise there won't be any and Vaadin will reply with 404)
+ * * Provides some dummy value as a root ID via [getMainDivId] (otherwise the mocked servlet env will crash).
+ * The class is intentionally opened, to be extensible in user's library.
+ */
 open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration, private val registry: RouteRegistry) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getRouteRegistry(): RouteRegistry = registry

@@ -49,6 +49,7 @@ public class LocatorJTest {
         navigateToView(MyJavaView.class);
         autoDiscoverViews("com.myproject");
 
+        @SuppressWarnings("unchecked")
         final Grid<Person> grid = _get(Grid.class);
 
         final AddNewPersonForm form = new AddNewPersonForm();

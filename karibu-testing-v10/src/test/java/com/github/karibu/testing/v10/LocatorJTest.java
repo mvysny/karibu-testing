@@ -44,6 +44,7 @@ public class LocatorJTest {
         _click(new Button());
         _setValue(new TextField(), "John");
 
+        @SuppressWarnings("unchecked")
         final Grid<Person> grid = _get(Grid.class);
 
         final AddNewPersonForm form = new AddNewPersonForm();

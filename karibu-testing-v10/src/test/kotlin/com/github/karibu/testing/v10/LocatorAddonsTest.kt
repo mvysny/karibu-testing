@@ -41,7 +41,7 @@ class LocatorAddonsTest : DynaTest({
         test("fails when text doesn't match") {
             UI.getCurrent().add(Span("bar"))
             expectThrows(IllegalArgumentException::class, message = "and textContains('foo')") {
-                _get<Button> { textContains("foo") }
+                _get<Span> { textContains("foo") }
             }
         }
         test("succeeds when text matches") {

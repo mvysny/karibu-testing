@@ -16,8 +16,6 @@ import com.vaadin.flow.server.Command
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -142,7 +140,7 @@ class MockVaadinTest : DynaTest({
             dialog.close()
             cleanupDialogs()
             expect(
-                """
+                    """
 └── MockedUI[]
     └── WelcomeView[]
         └── Text[text='Welcome!']
@@ -264,7 +262,7 @@ class MockVaadinTest : DynaTest({
                 executor.shutdown()
                 executor.awaitTermination(4, TimeUnit.SECONDS)
             }
-            fun runInBgSyncOnUI(block: UI.()->Unit) {
+            fun runInBgSyncOnUI(block: UI.() -> Unit) {
                 val ui = UI.getCurrent()
                 executor.submit { block(ui) }.get()
             }
@@ -303,6 +301,17 @@ class MockVaadinTest : DynaTest({
             }
         }
     }
+
+    group("init listener") {
+        beforeEach {
+            MockVaadin.tearDown()
+            clearInitFlags()
+            MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
+        }
+        test("init listeners called") {
+            expect(true) { serviceInitCalled }
+        }
+    }
 })
 
 @Route("params")
@@ -331,4 +340,4 @@ class WelcomeView : VerticalLayout() {
 class ChildView : VerticalLayout()
 
 @RoutePrefix("parent")
-class ParentView: VerticalLayout(), RouterLayout
+class ParentView : VerticalLayout(), RouterLayout

@@ -46,11 +46,12 @@ object MockVaadin {
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      * Please consult [MockService] on what methods you must override in your custom service.
      */
-    @JvmStatic @JvmOverloads
+    @JvmStatic
+    @JvmOverloads
     fun setup(routes: Routes = Routes(),
               uiFactory: () -> UI = { MockedUI() },
               serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService =
-                                               { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
+                      { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
@@ -91,11 +92,12 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(routes: Routes = Routes(),
-                         serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
+              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
             setup(routes = routes, uiFactory = { MockedUI() }, serviceFactory = serviceFactory)
 
     private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration, reg: RouteRegistry ->
-        MockService(servlet, dc, reg) }
+        MockService(servlet, dc, reg)
+    }
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
@@ -132,7 +134,7 @@ object MockVaadin {
         strongRefSession = null
     }
 
-    private fun createSession(ctx: MockContext, servlet: VaadinServlet, uiFactory: ()->UI) {
+    private fun createSession(ctx: MockContext, servlet: VaadinServlet, uiFactory: () -> UI) {
         val httpSession = MockHttpSession.create(ctx)
 
         val session = object : VaadinSession(servlet.service) {
@@ -142,6 +144,7 @@ object MockVaadin {
              * The easiest way is to simply always provide a locked lock :)
              */
             private val lock = ReentrantLock().apply { lock() }
+
             override fun getLockInstance(): Lock = lock
             override fun close() {
                 super.close()
@@ -183,10 +186,12 @@ object MockVaadin {
 
     private fun createUI(uiFactory: () -> UI, session: VaadinSession, request: VaadinServletRequest) {
         val ui = uiFactory()
-        require(ui.session == null) { "uiFactory produced UI $ui which is already attached to a Session, " +
-                "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the tests" +
-                " are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
-                "using Spring which reuses a scoped instance of the UI?" }
+        require(ui.session == null) {
+            "uiFactory produced UI $ui which is already attached to a Session, " +
+                    "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the tests" +
+                    " are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
+                    "using Spring which reuses a scoped instance of the UI?"
+        }
 
         // hook into Page.reload() and recreate the UI
         UI::class.java.getDeclaredField("page").apply {
@@ -201,8 +206,11 @@ object MockVaadin {
         }
         ui.internals.session = session
         UI.setCurrent(ui)
-        ui.doInit(request, -1)
+        ui.doInit(request, 1)
         strongRefUI = ui
+
+        session.addUI(ui)
+        session.service.fireUIInitListeners(ui)
 
         // navigate to the initial page
         if (lastNavigation != null) {

@@ -305,11 +305,12 @@ class MockVaadinTest : DynaTest({
     group("init listener") {
         beforeEach {
             MockVaadin.tearDown()
-            clearInitFlags()
+            TestInitListener.clearInitFlags()
             MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
         }
         test("init listeners called") {
-            expect(true) { serviceInitCalled }
+            expect(true) { TestInitListener.serviceInitCalled }
+            expect(true) { TestInitListener.uiInitCalled }
         }
     }
 })

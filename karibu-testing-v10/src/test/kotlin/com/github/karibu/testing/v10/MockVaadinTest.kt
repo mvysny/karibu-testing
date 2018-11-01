@@ -311,6 +311,7 @@ class MockVaadinTest : DynaTest({
         test("init listeners called") {
             expect(true) { TestInitListener.serviceInitCalled }
             expect(true) { TestInitListener.uiInitCalled }
+            expect(true) { TestInitListener.uiBeforeEnterCalled }
         }
     }
 })

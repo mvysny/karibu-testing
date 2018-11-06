@@ -58,7 +58,7 @@ open class MockContext : ServletContext {
         TODO("not implemented")
     }
 
-    override fun setSessionTrackingModes(sessionTrackingModes: MutableSet<SessionTrackingMode>?) {
+    override fun setSessionTrackingModes(sessionTrackingModes: MutableSet<SessionTrackingMode>) {
         TODO("not implemented")
     }
 
@@ -76,20 +76,18 @@ open class MockContext : ServletContext {
 
     override fun getServletNames(): Enumeration<String> = Collections.emptyEnumeration()
 
-    override fun getDefaultSessionTrackingModes(): MutableSet<SessionTrackingMode> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getDefaultSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
 
     override fun getMimeType(file: String?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun declareRoles(vararg roleNames: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun <T : Filter?> createFilter(clazz: Class<T>?): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getRealPath(path: String): String? = listOf("src/main/webapp/frontend/$path", "src/main/webapp/$path").asSequence()
@@ -104,7 +102,7 @@ open class MockContext : ServletContext {
     override fun getMinorVersion(): Int = 0
 
     override fun getJspConfigDescriptor(): JspConfigDescriptor {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun removeAttribute(name: String) {
@@ -112,39 +110,35 @@ open class MockContext : ServletContext {
     }
 
     override fun getServletContextName(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addFilter(filterName: String?, className: String?): FilterRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addFilter(filterName: String?, filter: Filter?): FilterRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addFilter(filterName: String?, filterClass: Class<out Filter>?): FilterRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    override fun getContextPath(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getContextPath(): String = ""
 
     override fun getSessionCookieConfig(): SessionCookieConfig {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    override fun getVirtualServerName(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getVirtualServerName(): String = "mock/localhost" // Tomcat returns "Catalina/localhost"
 
     override fun getContext(uripath: String?): ServletContext {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getRequestDispatcher(path: String?): RequestDispatcher {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     private val attributes = ConcurrentHashMap<String, Any>()
@@ -156,35 +150,31 @@ open class MockContext : ServletContext {
     }
 
     override fun getServletRegistration(servletName: String?): ServletRegistration {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun <T : EventListener?> createListener(clazz: Class<T>?): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addServlet(servletName: String?, className: String?): ServletRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addServlet(servletName: String?, servlet: Servlet?): ServletRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addServlet(servletName: String?, servletClass: Class<out Servlet>?): ServletRegistration.Dynamic {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    override fun getServlets(): Enumeration<Servlet> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getServlets(): Enumeration<Servlet> = Collections.emptyEnumeration()
 
-    override fun getEffectiveMinorVersion(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getEffectiveMinorVersion(): Int = 0
 
     override fun getServletRegistrations(): MutableMap<String, out ServletRegistration> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getResourcePaths(path: String?): MutableSet<String> = mutableSetOf()
@@ -193,9 +183,7 @@ open class MockContext : ServletContext {
 
     override fun getServerInfo(): String = "Mock"
 
-    override fun getEffectiveSessionTrackingModes(): MutableSet<SessionTrackingMode> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getEffectiveSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
 
     companion object {
         @JvmStatic

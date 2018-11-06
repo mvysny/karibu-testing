@@ -28,17 +28,17 @@ open class MockHttpSession(
     }
 
     override fun getCreationTime(): Long {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return creationTime
     }
 
     override fun getId(): String {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return sessionId
     }
 
     override fun getLastAccessedTime(): Long {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return 0
     }
 
@@ -53,21 +53,21 @@ open class MockHttpSession(
     override fun getSessionContext(): HttpSessionContext? = null
 
     override fun getAttribute(name: String): Any? {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return attributes[name]
     }
 
     override fun getValue(name: String): Any? = getAttribute(name)
 
     override fun getAttributeNames(): Enumeration<String> {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return attributes.keys()
     }
 
     override fun getValueNames(): Array<String> = attributeNames.toList().toTypedArray()
 
     override fun setAttribute(name: String, value: Any?) {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         attributes.putOrRemove(name, value)
     }
 
@@ -76,7 +76,7 @@ open class MockHttpSession(
     }
 
     override fun removeAttribute(name: String) {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         attributes.remove(name)
     }
 
@@ -92,13 +92,17 @@ open class MockHttpSession(
     }
 
     override fun invalidate() {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         valid.set(false)
     }
 
     override fun isNew(): Boolean {
-        if (!valid.get()) throw IllegalStateException()
+        checkValid()
         return false
+    }
+
+    private fun checkValid() {
+        if (!valid.get()) throw IllegalStateException()
     }
 
     companion object {

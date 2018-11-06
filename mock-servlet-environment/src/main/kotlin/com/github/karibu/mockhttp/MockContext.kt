@@ -179,7 +179,7 @@ open class MockContext : ServletContext {
 
     override fun getResourcePaths(path: String?): MutableSet<String> = mutableSetOf()
 
-    override fun getInitParameterNames(): Enumeration<String> = Collections.emptyEnumeration()
+    override fun getInitParameterNames(): Enumeration<String> = Collections.enumeration(initParameters.keys)
 
     override fun getServerInfo(): String = "Mock"
 

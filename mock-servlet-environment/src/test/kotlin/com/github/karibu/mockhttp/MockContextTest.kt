@@ -20,4 +20,12 @@ class MockContextTest : DynaTest({
         ctx.removeAttribute("foo")
         expect(null) { ctx.getAttribute("foo") }
     }
+
+    test("init parameters") {
+        expect(null) { ctx.getInitParameter("foo") }
+        expect(true) { ctx.setInitParameter("foo", "bar") }
+        expect("bar") { ctx.getInitParameter("foo") }
+        expect(false) { ctx.setInitParameter("foo", "baz") }
+        expect("bar") { ctx.getInitParameter("foo") }
+    }
 })

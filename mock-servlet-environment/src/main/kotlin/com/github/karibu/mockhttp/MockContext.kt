@@ -14,7 +14,7 @@ open class MockContext : ServletContext {
     override fun getServlet(name: String?): Servlet? = null
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getEffectiveMajorVersion(): Int = 3
@@ -25,15 +25,15 @@ open class MockContext : ServletContext {
     }
 
     override fun addListener(className: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun <T : EventListener?> addListener(t: T) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun addListener(listenerClass: Class<out EventListener>?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getClassLoader(): ClassLoader = Thread.currentThread().contextClassLoader
@@ -55,25 +55,23 @@ open class MockContext : ServletContext {
     }
 
     override fun getFilterRegistration(filterName: String?): FilterRegistration {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun setSessionTrackingModes(sessionTrackingModes: MutableSet<SessionTrackingMode>?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    override fun setInitParameter(name: String?, value: String?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun setInitParameter(name: String, value: String): Boolean = initParameters.putIfAbsent(name, value) == null
 
     override fun getResourceAsStream(path: String): InputStream? = getResource(path)?.openStream()
 
     override fun getNamedDispatcher(name: String?): RequestDispatcher {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getFilterRegistrations(): MutableMap<String, out FilterRegistration> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getServletNames(): Enumeration<String> = Collections.emptyEnumeration()
@@ -99,7 +97,9 @@ open class MockContext : ServletContext {
         .filter { File(it).exists() }
         .firstOrNull()
 
-    override fun getInitParameter(name: String): String? = null
+    val initParameters = mutableMapOf<String, String>()
+
+    override fun getInitParameter(name: String): String? = initParameters[name]
 
     override fun getMinorVersion(): Int = 0
 

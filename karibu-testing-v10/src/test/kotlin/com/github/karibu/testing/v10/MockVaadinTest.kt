@@ -12,10 +12,7 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
-import com.vaadin.flow.server.Command
-import com.vaadin.flow.server.VaadinRequest
-import com.vaadin.flow.server.VaadinService
-import com.vaadin.flow.server.VaadinSession
+import com.vaadin.flow.server.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -45,6 +42,7 @@ class MockVaadinTest : DynaTest({
             expect(true) { VaadinSession.getCurrent().configuration != null }
             expect(true) { VaadinSession.getCurrent().service != null }
             expect(true) { VaadinSession.getCurrent().browser != null }
+            expect(true) { VaadinResponse.getCurrent() != null }
         }
 
         test("setup() can be called multiple times in a row") {
@@ -65,6 +63,7 @@ class MockVaadinTest : DynaTest({
             expect(null) { VaadinService.getCurrent() }
             expect(null) { VaadinRequest.getCurrent() }
             expect(null) { UI.getCurrent() }
+            expect(null) { VaadinResponse.getCurrent() }
         }
 
         test("tearDown() can be called multiple times") {
@@ -251,6 +250,7 @@ class MockVaadinTest : DynaTest({
                     expect(true) { VaadinService.getCurrent() != null }
                     expect(true) { VaadinRequest.getCurrent() != null }
                     expect(true) { UI.getCurrent() != null }
+                    expect(true) { VaadinResponse.getCurrent() != null }
                 }
                 MockVaadin.runUIQueue()
             }
@@ -295,6 +295,7 @@ class MockVaadinTest : DynaTest({
                         expect(true) { VaadinService.getCurrent() != null }
                         expect(true) { VaadinRequest.getCurrent() != null }
                         expect(true) { UI.getCurrent() != null }
+                        expect(true) { VaadinResponse.getCurrent() != null }
                     }
                 }
                 MockVaadin.runUIQueue()

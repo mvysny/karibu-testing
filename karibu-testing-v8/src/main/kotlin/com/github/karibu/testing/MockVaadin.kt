@@ -1,9 +1,6 @@
 package com.github.karibu.testing
 
-import com.github.karibu.mockhttp.MockContext
-import com.github.karibu.mockhttp.MockHttpSession
-import com.github.karibu.mockhttp.MockRequest
-import com.github.karibu.mockhttp.MockServletConfig
+import com.github.karibu.mockhttp.*
 import com.vaadin.server.*
 import com.vaadin.shared.Version
 import com.vaadin.shared.ui.ui.PageClientRpc
@@ -18,6 +15,7 @@ object MockVaadin {
     private var strongRefSession: VaadinSession? = null
     private var strongRefUI: UI? = null
     private var strongRefRequest: VaadinRequest? = null
+    private var strongRefResponse: VaadinResponse? = null
     private var lastLocation: String? = null
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
@@ -75,7 +73,9 @@ object MockVaadin {
         closeCurrentUI()
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
+        CurrentInstance.set(VaadinResponse::class.java, null)
         strongRefRequest = null
+        strongRefResponse = null
     }
 
     private fun closeCurrentSession() {
@@ -123,6 +123,10 @@ object MockVaadin {
         httpRequest.setParameter("v-loc", "http://localhost:8080")
         strongRefRequest = VaadinServletRequest(httpRequest, service)
         CurrentInstance.set(VaadinRequest::class.java, strongRefRequest)
+
+        // response
+        strongRefResponse = VaadinServletResponse(MockResponse(httpSession), service)
+        CurrentInstance.set(VaadinResponse::class.java, strongRefResponse)
 
         // UI
         createUI(uiFactory)

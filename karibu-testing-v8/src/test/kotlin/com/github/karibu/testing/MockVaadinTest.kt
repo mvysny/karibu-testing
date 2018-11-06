@@ -7,10 +7,7 @@ import com.github.vok.karibudsl.autoViewProvider
 import com.vaadin.navigator.Navigator
 import com.vaadin.navigator.PushStateNavigation
 import com.vaadin.navigator.View
-import com.vaadin.server.Page
-import com.vaadin.server.VaadinRequest
-import com.vaadin.server.VaadinService
-import com.vaadin.server.VaadinSession
+import com.vaadin.server.*
 import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import java.lang.IllegalArgumentException
@@ -31,6 +28,7 @@ class MockVaadinTest : DynaTest({
             expect(true) { VaadinService.getCurrent() != null }
             expect(true) { VaadinRequest.getCurrent() != null }
             expect(true) { UI.getCurrent() != null }
+            expect(true) { VaadinResponse.getCurrent() != null }
         }
 
         test("setup() can be called multiple times in a row") {
@@ -47,10 +45,11 @@ class MockVaadinTest : DynaTest({
 
         test("Vaadin.getCurrent() returns null after tearDown()") {
             MockVaadin.tearDown()
-            expect(true) { VaadinSession.getCurrent() == null }
-            expect(true) { VaadinService.getCurrent() == null }
-            expect(true) { VaadinRequest.getCurrent() == null }
-            expect(true) { UI.getCurrent() == null }
+            expect(null) { VaadinSession.getCurrent() }
+            expect(null) { VaadinService.getCurrent() }
+            expect(null) { VaadinRequest.getCurrent() }
+            expect(null) { UI.getCurrent() }
+            expect(null) { VaadinResponse.getCurrent() }
         }
 
         test("tearDown() can be called multiple times") {

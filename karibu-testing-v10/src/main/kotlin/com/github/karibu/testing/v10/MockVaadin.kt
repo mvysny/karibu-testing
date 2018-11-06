@@ -1,9 +1,6 @@
 package com.github.karibu.testing.v10
 
-import com.github.karibu.mockhttp.MockContext
-import com.github.karibu.mockhttp.MockHttpSession
-import com.github.karibu.mockhttp.MockRequest
-import com.github.karibu.mockhttp.MockServletConfig
+import com.github.karibu.mockhttp.*
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
@@ -26,6 +23,7 @@ object MockVaadin {
     private var strongRefSession: VaadinSession? = null
     private var strongRefUI: UI? = null
     private var strongRefReq: VaadinRequest? = null
+    private var strongRefRes: VaadinResponse? = null
     private var lastNavigation: Location? = null
 
     /**
@@ -125,7 +123,9 @@ object MockVaadin {
         closeCurrentUI()
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
+        CurrentInstance.set(VaadinResponse::class.java, null)
         strongRefReq = null
+        strongRefRes = null
         VaadinService.setCurrent(null)
     }
 
@@ -179,6 +179,11 @@ object MockVaadin {
         val request = VaadinServletRequest(MockRequest(httpSession), servlet.service)
         strongRefReq = request
         CurrentInstance.set(VaadinRequest::class.java, request)
+
+        // init Vaadin Response
+        val response = VaadinServletResponse(MockResponse(httpSession), servlet.service)
+        strongRefRes = response
+        CurrentInstance.set(VaadinResponse::class.java, response)
 
         // create UI
         createUI(uiFactory, session, request)

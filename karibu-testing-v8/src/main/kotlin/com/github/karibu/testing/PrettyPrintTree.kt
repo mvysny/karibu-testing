@@ -7,7 +7,16 @@ import com.vaadin.ui.Label
 
 import java.util.ArrayList
 
+/**
+ * If true, [PrettyPrintTree] will use `\--` instead of `└──` which tend to render on some terminals as `???`.
+ */
+var prettyPrintUseAscii: Boolean = false
+
 class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTree>) {
+
+    private val pipe = if (!prettyPrintUseAscii) '│' else '|'
+    private val branchTail = if (!prettyPrintUseAscii) "└── " else "\\-- "
+    private val branch = if (!prettyPrintUseAscii) "├── " else "|-- "
 
     fun print(): String {
         val sb = StringBuilder()
@@ -16,13 +25,13 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
     }
 
     private fun print(sb: StringBuilder, prefix: String, isTail: Boolean) {
-        sb.append(prefix + (if (isTail) "└── " else "├── ") + name + "\n")
+        sb.append(prefix + (if (isTail) branchTail else branch) + name + "\n")
         for (i in 0 until children.size - 1) {
-            children[i].print(sb, prefix + if (isTail) "    " else "│   ", false)
+            children[i].print(sb, prefix + if (isTail) "    " else "$pipe   ", false)
         }
         if (children.size > 0) {
             children[children.size - 1]
-                    .print(sb, prefix + if (isTail) "    " else "│   ", true)
+                    .print(sb, prefix + if (isTail) "    " else "$pipe   ", true)
         }
     }
 

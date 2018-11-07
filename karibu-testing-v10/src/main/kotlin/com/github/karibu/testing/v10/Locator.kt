@@ -1,6 +1,7 @@
 package com.github.karibu.testing.v10
 
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.router.InternalServerError
@@ -20,6 +21,7 @@ import kotlin.streams.toList
  * @property placeholder the required [Component.placeholder]; if null, no particular placeholder is matched.
  * @property text the [com.vaadin.flow.dom.Element.getText]
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
+ * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  */
 class SearchSpec<T : Component>(
@@ -29,6 +31,7 @@ class SearchSpec<T : Component>(
     var placeholder: String? = null,
     var text: String? = null,
     var count: IntRange = 0..Int.MAX_VALUE,
+    var value: Any? = null,
     var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
@@ -38,6 +41,7 @@ class SearchSpec<T : Component>(
         if (caption != null) list.add("caption='$caption'")
         if (placeholder != null) list.add("placeholder='$placeholder'")
         if (text != null) list.add("text='$text'")
+        if (value != null) list.add("value=$value")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
         return list.joinToString(" and ")
@@ -51,6 +55,7 @@ class SearchSpec<T : Component>(
         if (caption != null) p.add({ component -> component.caption == caption })
         if (placeholder != null) p.add({ component -> component.placeholder == placeholder })
         if (text != null) p.add { component -> component.element.text == text }
+        if (value != null) p.add { component -> (component as? HasValue<*, *>)?.getValue() == value }
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }

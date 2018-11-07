@@ -92,7 +92,7 @@ var Component.label: String
     }
 
 /**
- * The Component's caption: [Button.text] for [Button], [label] for fields such as [TextField].
+ * The Component's caption: [Button.getText] for [Button], [label] for fields such as [TextField].
  */
 var Component.caption: String
     get() = when (this) {

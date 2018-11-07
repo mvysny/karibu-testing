@@ -3,6 +3,7 @@ package com.github.karibu.testing
 import com.vaadin.data.HasValue
 import com.vaadin.ui.Component
 import com.vaadin.ui.HasComponents
+import com.vaadin.ui.Label
 
 import java.util.ArrayList
 
@@ -64,8 +65,8 @@ fun Component.toPrettyString(): String {
     if (caption != null) {
         list.add("caption='$caption'")
     }
-    if (this is HasValue<*>) {
-        list.add("value='${this.value}'")
+    if (this is HasValue<*> || this is Label) {
+        list.add("value='$value'")
     }
     var name = javaClass.simpleName
     if (name.isEmpty()) {

@@ -105,6 +105,8 @@ class LocatorTest : DynaTest({
         expectAfterLookupCalled()
         expect("Thanks Baron Vladimir Harkonnen, it works!") { _get<Text>().text }
         expectAfterLookupCalled()
+        _get<TextField> { value = "Baron Vladimir Harkonnen" }  // test lookup by value
+        expectAfterLookupCalled()
         expect("Thanks Baron Vladimir Harkonnen, it works!") { (layout.children.asSequence().last() as Text).text }
         expect(3) { layout.componentCount }
     }
@@ -125,6 +127,10 @@ class LocatorTest : DynaTest({
             expect(true) { ComboBox<String>().apply { placeholder = "foo" }.matches { placeholder = "foo" } }
             expect(false) { TextField("name", "the name").matches { placeholder = "name" } }
             expect(false) { PasswordField("password", "at least 6 characters").matches { placeholder = "password" } }
+        }
+        test("value") {
+            expect(true) { TextField(null, "Mannerheim", "placeholder").matches { value = "Mannerheim" } }
+            expect(false) { TextField("Mannerheim").matches { value = "Mannerheim" } }
         }
     }
 

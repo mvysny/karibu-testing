@@ -53,6 +53,15 @@ private fun Component.isEffectivelyEnabled(): Boolean = when {
 fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)
 
 /**
+ * Returns [Label.value] or [HasValue.getValue]; returns `null` if the receiver is neither of those two things.
+ */
+val Component.value: Any? get()= when(this) {
+    is Label -> this.value
+    is HasValue<*> -> this.value
+    else -> null
+}
+
+/**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.

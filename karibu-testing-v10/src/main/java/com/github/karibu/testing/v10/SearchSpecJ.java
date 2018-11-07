@@ -2,6 +2,7 @@ package com.github.karibu.testing.v10;
 
 import com.vaadin.flow.component.Component;
 
+import com.vaadin.flow.component.HasValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +23,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.getId; if null, no particular id is matched.
+     * The required {@link Component#getId()}; if {@code null}, no particular id is matched.
      * @param id the id
      * @return this
      */
@@ -33,7 +34,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.caption; if null, no particular caption is matched.
+     * The required {@link BasicUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
      * @param caption
      * @return this
      */
@@ -44,8 +45,19 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.placeholder; if null, no particular placeholder is matched.
-     * @param placeholder
+     * The required {@link HasValue#getValue()}. If {@code null}, no particular value is matched.
+     * @param value the expected value
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withValue(@Nullable Object value) {
+        spec.setValue(value);
+        return this;
+    }
+
+    /**
+     * The required {@link BasicUtilsKt#getPlaceholder(Component)}; if {@code null}, no particular placeholder is matched.
+     * @param placeholder the placeholder
      * @return this
      */
     @NotNull
@@ -55,8 +67,8 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * if not null, the component's [com.vaadin.flow.dom.Element.getText] must match given text.
-     * @param text
+     * if not null, the component's {@link com.vaadin.flow.dom.Element#getText} must match given text.
+     * @param text the expected text
      * @return this
      */
     @NotNull
@@ -67,7 +79,7 @@ public class SearchSpecJ<T extends Component> {
 
     /**
      * expected count of matching components, defaults to `0..Int.MAX_VALUE`
-     * @param count
+     * @param count the expected count
      * @return this
      */
     @NotNull
@@ -79,9 +91,9 @@ public class SearchSpecJ<T extends Component> {
     /**
      * Adds an additional predicate which the component needs to match. Not null.
      * <p/>
-     * Please remember to provide a proper `toString()` for the predicate,
+     * Please remember to provide a proper {@link Object#toString()} for the predicate,
      * so that you'll get an informative error message on lookup failure.
-     * @param predicate
+     * @param predicate the matcher
      * @return this
      */
     @NotNull

@@ -1,7 +1,9 @@
 package com.github.karibu.testing;
 
+import com.vaadin.data.HasValue;
 import com.vaadin.ui.Component;
 
+import com.vaadin.ui.Label;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +24,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.getId; if null, no particular id is matched.
+     * The required Component.getId; if {@code null}, no particular id is matched.
      * @param id the id
      * @return this
      */
@@ -33,8 +35,8 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.caption; if null, no particular caption is matched.
-     * @param caption
+     * The required {@link Component#getCaption()}; if {@code null}, no particular caption is matched.
+     * @param caption the expected caption
      * @return this
      */
     @NotNull
@@ -44,8 +46,19 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required Component.placeholder; if null, no particular placeholder is matched.
-     * @param placeholder
+     * The required {@link BasicUtilsKt#getValue(Component)}. If {@code null}, no particular value is matched.
+     * @param value the expected value
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withValue(@Nullable Object value) {
+        spec.setValue(value);
+        return this;
+    }
+
+    /**
+     * The required {@link BasicUtilsKt#getPlaceholder(Component)}; if {@code null}, no particular placeholder is matched.
+     * @param placeholder the expected placeholder
      * @return this
      */
     @NotNull
@@ -56,7 +69,7 @@ public class SearchSpecJ<T extends Component> {
 
     /**
      * if not null, the component must match all of these styles. Space-separated.
-     * @param styles
+     * @param styles expected space-separated styles.
      * @return this
      */
     @NotNull
@@ -67,7 +80,7 @@ public class SearchSpecJ<T extends Component> {
 
     /**
      * expected count of matching components, defaults to `0..Int.MAX_VALUE`
-     * @param count
+     * @param count expected count
      * @return this
      */
     @NotNull
@@ -79,9 +92,9 @@ public class SearchSpecJ<T extends Component> {
     /**
      * Adds an additional predicate which the component needs to match. Not null.
      * <p/>
-     * Please remember to provide a proper `toString()` for the predicate,
+     * Please remember to provide a proper {@link Object#toString()} for the predicate,
      * so that you'll get an informative error message on lookup failure.
-     * @param predicate
+     * @param predicate the predicate
      * @return this
      */
     @NotNull

@@ -19,13 +19,13 @@ import static com.github.vok.karibudsl.NavigatorKt.*;
  * is hard to use from Java. This is an API test.
  * @author mavi
  */
-public class LocatorJTest {
+public class LocatorJApiTest {
     public static class MyUI extends UI {
         @Override
         protected void init(VaadinRequest request) {
         }
     }
-    public LocatorJTest() {
+    public LocatorJApiTest() {
         MockVaadin.setup(MyUI::new);
 
         _get(Label.class);

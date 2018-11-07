@@ -145,7 +145,7 @@ data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfte
     }
 }
 
-fun expectAfterLookupCalled() {
+private fun expectAfterLookupCalled() {
     expect(MyLifecycleHook(true, true)) { testingLifecycleHook }
     testingLifecycleHook = MyLifecycleHook()
 }

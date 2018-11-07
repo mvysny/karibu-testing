@@ -78,7 +78,7 @@ public class LocatorJ {
      */
     @NotNull
     public static <T extends Component> T _get(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
-        return LocatorKt._get(clazz, ss -> {
+        return LocatorKt._get(receiver, clazz, ss -> {
             spec.accept(new SearchSpecJ<>(ss));
             return Unit.INSTANCE;
         });
@@ -172,7 +172,7 @@ public class LocatorJ {
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz) {
-        LocatorKt._expectNone(clazz, ss -> Unit.INSTANCE);
+        LocatorKt._expectNone(receiver, clazz, ss -> Unit.INSTANCE);
     }
 
     /**
@@ -181,7 +181,7 @@ public class LocatorJ {
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
-        LocatorKt._expectNone(clazz, ss -> {
+        LocatorKt._expectNone(receiver, clazz, ss -> {
             spec.accept(new SearchSpecJ<>(ss));
             return Unit.INSTANCE;
         });

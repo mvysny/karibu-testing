@@ -49,6 +49,28 @@ A list of a very simple example projects that employ Karibu Testing:
 * Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
 * Vaadin 10 + Spring Boot + Java + Maven + JUnit 4: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
 
+## Integrating Karibu-Testing With Your App
+
+Absolute requirement in order for the Karibu-Testing library to work with your app is:
+
+* You must be able to "start" your app in the same JVM which runs the tests.
+
+Here are a few tips for typical apps:
+
+* For simple apps with just the UI and no database that's very easy: simply call `MockVaadin.setup { MyUI() }` before every test, and `MockVaadin.tearDown()` after every test. That will
+instantiate your UI along with all necessary Vaadin environment.
+* For more complex apps employing database access (for example [Vaadin-on-Kotlin](http://vaadinonkotlin.eu) apps) you need to bootstrap Vaadin-on-Kotlin. Luckily that's very easy,
+simply configure your database in `VaadinOnKotlin.dataSourceConfig` and then init vok: `VaadinOnKotlin.init()` before all tests. Or even better,
+since you typically do this in a `ServletContextListener` such as the `Bootstrap` class, simply call that: `Bootstrap().contextInitialized(null)`. Then, when the app is bootstrapped,
+you can proceed to setting up your UI by calling `MockVaadin.setup { MyUI() }` before every test, and `MockVaadin.tearDown()` after every test.
+* For more complex apps not using Vaadin-on-Kotlin, just use the same approach of simply calling all `ServletContextListener` which you have in your app, before all tests are executed.
+Then, when the app is bootstrapped,
+you can proceed to setting up your UI by calling `MockVaadin.setup { MyUI() }` before every test, and `MockVaadin.tearDown()` after every test.
+* For Spring-based apps it's best to use Spring testing capabilities to bootstrap your app with Spring Test. Then, after that's done, use Spring injector to obtain the instance of your UI:
+call `MockVaadin.setup { beanFactory!!.getBean(MainUI::class.java) }` before every test, and `MockVaadin.tearDown()` after every test. Please see the [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring) example project
+for more details.
+* For JavaEE-based apps you need to figure out how to launch your app in some kind of embedded JavaEE container in JUnit's JVM.
+
 ## More Resources
 
 * The [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) which explains everything behind the browserless testing technique.

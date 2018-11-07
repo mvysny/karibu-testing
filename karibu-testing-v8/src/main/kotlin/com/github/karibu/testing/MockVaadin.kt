@@ -134,9 +134,18 @@ object MockVaadin {
 
     private fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
-        lastLocation = Page.getCurrent().location.path.trim('/')
+        lastLocation = try {
+            Page.getCurrent().location.path.trim('/')
+        } catch (t: Exception) {
+            t.printStackTrace()
+            // incorrectly mocked Page tends to fail in Page.getLocation(). Just do nothing.
+            null
+        }
         ui.close()
-        ui.detach()
+        if (ui.isAttached) {
+            // incorrectly mocked UI can fail in mysterious ways in detach()
+            ui.detach()
+        }
         UI.setCurrent(null)
         strongRefUI = null
     }

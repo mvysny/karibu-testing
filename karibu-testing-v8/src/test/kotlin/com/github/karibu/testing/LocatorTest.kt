@@ -6,7 +6,10 @@ import com.github.vok.karibudsl.button
 import com.github.vok.karibudsl.label
 import com.github.vok.karibudsl.textField
 import com.github.vok.karibudsl.verticalLayout
+import com.vaadin.server.Page
 import com.vaadin.ui.*
+import com.vaadin.util.CurrentInstance
+import java.lang.NullPointerException
 import kotlin.test.expect
 
 class LocatorTest : DynaTest({
@@ -142,7 +145,18 @@ class LocatorTest : DynaTest({
         beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
         test("lookup functions should work in unmocked environment") {
             Button()._get(Button::class.java)
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(IllegalArgumentException::class, "/?: No visible TextField in Button[] matching TextField") {
+                Button()._get(TextField::class.java)
+            }
+        }
+        test("incorrectly mocked env") {
+            val ui = MockUI()
+            UI.setCurrent(ui)
+            expectThrows(NullPointerException::class) {
+                Page.getCurrent().location
+            }
+            // the Page has been mocked improperly, but _get should still fail with a proper error message.
+            expectThrows(IllegalArgumentException::class, "/?: No visible TextField in Button[] matching TextField") {
                 Button()._get(TextField::class.java)
             }
         }

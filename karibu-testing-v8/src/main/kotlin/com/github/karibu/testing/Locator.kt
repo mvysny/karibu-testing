@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.karibu.testing
 
 import com.vaadin.server.Page
@@ -117,7 +119,13 @@ fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> 
     spec.block()
     val result = find(spec.toPredicate())
     if (result.size !in spec.count) {
-        val loc: String = Page.getCurrent()?.location?.path?.trim('/') ?: "?"
+        val loc: String = try {
+            Page.getCurrent()?.location?.path?.trim('/') ?: "?"
+        } catch (t: Exception) {
+            // incorrectly mocked Page tends to fail with NPE in Page.getLocation(). Meh, just log the exception and return "?"
+            t.printStackTrace()
+            "?"
+        }
         val message = when {
             result.isEmpty() -> "/$loc: No visible ${clazz.simpleName}"
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"

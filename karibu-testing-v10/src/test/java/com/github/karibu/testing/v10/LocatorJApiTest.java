@@ -15,12 +15,12 @@ import static com.github.karibu.testing.v10.GridKt.*;
  * is hard to use from Java. This is an API test.
  * @author mavi
  */
-public class LocatorJTest {
+public class LocatorJApiTest {
 
     public static class MainView extends VerticalLayout {}
 
     public static class MyUI extends UI {}
-    public LocatorJTest() {
+    public LocatorJApiTest() {
         MockVaadin.setup(new Routes(), MyUI::new);
         MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
         final MainView main = (MainView) UI.getCurrent().getChildren().findFirst().get();

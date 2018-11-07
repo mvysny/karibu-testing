@@ -79,10 +79,7 @@ class Routes: Serializable {
  * @param event the event, not null.
  */
 fun Component._fireEvent(event: ComponentEvent<*>) {
-    // fireEvent() is protected, gotta make it public
-    val fireEvent = Component::class.java.getDeclaredMethod("fireEvent", ComponentEvent::class.java)
-    fireEvent.isAccessible = true
-    fireEvent.invoke(this, event)
+    ComponentUtil.fireEvent(this, event)
 }
 
 /**

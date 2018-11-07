@@ -113,7 +113,7 @@ fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> 
     spec.block()
     val result = find(spec.toPredicate())
     if (result.size !in spec.count) {
-        val loc: String = Page.getCurrent().location.path.trim('/')
+        val loc: String = Page.getCurrent()?.location?.path?.trim('/') ?: "?"
         val message = when {
             result.isEmpty() -> "/$loc: No visible ${clazz.simpleName}"
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"

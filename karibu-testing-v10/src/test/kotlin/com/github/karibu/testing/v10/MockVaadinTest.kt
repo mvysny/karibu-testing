@@ -11,6 +11,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import java.util.concurrent.ExecutionException

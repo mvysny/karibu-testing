@@ -9,7 +9,11 @@ interface TestingLifecycleHook {
      *
      * The default implementation calls [cleanupDialogs].
      */
-    fun awaitBeforeLookup() { cleanupDialogs() }
+    fun awaitBeforeLookup() {
+        if (UI.getCurrent() != null) {
+            cleanupDialogs()
+        }
+    }
 
     /**
      * Invoked after every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.

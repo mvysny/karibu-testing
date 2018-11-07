@@ -29,6 +29,7 @@ class MockVaadinTest : DynaTest({
             expect(true) { VaadinRequest.getCurrent() != null }
             expect(true) { UI.getCurrent() != null }
             expect(true) { VaadinResponse.getCurrent() != null }
+            expect(true) { Page.getCurrent() != null }
         }
 
         test("setup() can be called multiple times in a row") {
@@ -50,6 +51,7 @@ class MockVaadinTest : DynaTest({
             expect(null) { VaadinRequest.getCurrent() }
             expect(null) { UI.getCurrent() }
             expect(null) { VaadinResponse.getCurrent() }
+            expect(null) { Page.getCurrent() }
         }
 
         test("tearDown() can be called multiple times") {

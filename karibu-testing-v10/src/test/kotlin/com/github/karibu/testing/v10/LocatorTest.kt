@@ -127,6 +127,16 @@ class LocatorTest : DynaTest({
             expect(false) { PasswordField("password", "at least 6 characters").matches { placeholder = "password" } }
         }
     }
+
+    group("unmocked env") {
+        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
+        test("lookup functions should work in unmocked environment") {
+            Button()._get(Button::class.java)
+            expectThrows(IllegalArgumentException::class) {
+                Button()._get(TextField::class.java)
+            }
+        }
+    }
 })
 
 data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfterLookupCalled: Boolean = false) : TestingLifecycleHook {

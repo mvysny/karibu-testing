@@ -198,7 +198,7 @@ The Karibu-Testing library provides three functions for this purpose; for now we
 
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
   if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`.
-  In Java you need to `import static com.github.karibu.testing.v10.LocatorJ.*;`; then you can call
+  In Java you need to `import static com.github.mvysny.kaributesting.v10.LocatorJ.*;`; then you can call
   `_get(Button.class, spec -> spec.withCaption("Click me"));`.
 
 This particular function will search for all components nested within `UI.getCurrent()`.
@@ -230,7 +230,7 @@ class MainViewTest: DynaTest({
 
 Java:
 ```java
-import static com.github.karibu.testing.v10.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 public class MyUITest {
     @BeforeEach
     public void setupVaadin() {
@@ -300,8 +300,8 @@ class MyUITest : DynaTest({
 
 Java:
 ```java
-import static com.github.karibu.testing.v10.LocatorJ.*;
-import static com.github.karibu.testing.v10.GridKt.*;
+import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v10.GridKt.*;
 public class MyUITest {
     @BeforeEach
     public void setupVaadin() {
@@ -456,7 +456,7 @@ The Vaadin Grid is the most complex component in Vaadin, and therefore it requir
 contents of the Grid.
 
 * You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
-  Java: you need to `import static com.github.karibu.testing.v10.GridKt.*;`, then you can call `_get(grid, 0);`.
+  Java: you need to `import static com.github.mvysny.kaributesting.v10.GridKt.*;`, then you can call `_get(grid, 0);`.
 * You can check for the total amount of items shown in the grid, by calling `grid._size()`. Java: `_size(grid);`
 * You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
   `List<String>`. In Java: `_getFormattedRow(grid, rowIndex)`

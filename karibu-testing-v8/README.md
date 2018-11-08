@@ -204,7 +204,7 @@ all listeners are done; we can check that the click listener was run and it had 
 Therefore it's important to use `button._click()` and `nameField._value` instead (for Java users, it's `_click(button)` and `_setValue(nameField, "John")`).
 
 > Note for Java users: don't forget to static-import all static methods from the `LocatorJ` class, in order to use them more easily:
-`import static com.github.karibu.testing.LocatorJ.*;`
+`import static com.github.mvysny.kaributesting.v8.LocatorJ.*;`
 
 Obtaining the `TextField` in this simple project is easy - it's the first child of the layout so we can call `getComponent(0) as TextField` to obtain the text field.
 However, typical Vaadin apps has much more complex structure with lots of nested layouts.
@@ -247,7 +247,7 @@ class MyUITest : DynaTest({
 ```
 Java:
 ```java
-import static com.github.karibu.testing.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
 public class MyUITest {
     @BeforeEach
     public void beforeEach() {
@@ -335,7 +335,7 @@ class MyUITest : DynaTest({
 
 Java:
 ```java
-import static com.github.karibu.testing.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
 import static com.github.vok.karibudsl.NavigatorKt.*;
 public class MyUITest {
     @BeforeAll

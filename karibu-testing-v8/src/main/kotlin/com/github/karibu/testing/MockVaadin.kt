@@ -6,6 +6,7 @@ import com.vaadin.shared.Version
 import com.vaadin.shared.ui.ui.PageClientRpc
 import com.vaadin.ui.UI
 import com.vaadin.util.CurrentInstance
+import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
@@ -17,6 +18,7 @@ object MockVaadin {
     private var strongRefRequest: VaadinRequest? = null
     private var strongRefResponse: VaadinResponse? = null
     private var lastLocation: String? = null
+    val log = LoggerFactory.getLogger(MockVaadin::class.java)
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
      *
@@ -137,8 +139,8 @@ object MockVaadin {
         lastLocation = try {
             Page.getCurrent().location.path.trim('/')
         } catch (t: Exception) {
-            t.printStackTrace()
             // incorrectly mocked Page tends to fail in Page.getLocation(). Just do nothing.
+            log.warn("Failed to retrieve current location from Page, probably because of incorrectly mocked Vaadin classes", t)
             null
         }
         ui.close()

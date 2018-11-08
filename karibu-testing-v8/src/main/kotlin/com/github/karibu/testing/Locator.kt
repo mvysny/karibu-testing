@@ -123,7 +123,7 @@ fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> 
             Page.getCurrent()?.location?.path?.trim('/') ?: "?"
         } catch (t: Exception) {
             // incorrectly mocked Page tends to fail with NPE in Page.getLocation(). Meh, just log the exception and return "?"
-            t.printStackTrace()
+            MockVaadin.log.warn("Failed to retrieve current location from Page, probably because of incorrectly mocked Vaadin classes", t)
             "?"
         }
         val message = when {

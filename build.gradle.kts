@@ -50,22 +50,46 @@ subprojects {
             from(java.sourceSets["main"].allSource)
         }
 
+        val javadocJar = task("javadocJar", Jar::class) {
+            val javadoc = tasks.findByName("javadoc") as Javadoc
+            javadoc.isFailOnError = false
+            dependsOn(javadoc)
+            classifier = "javadoc"
+            from(javadoc.destinationDir)
+        }
+
         publishing {
             publications {
                 create("mavenJava", MavenPublication::class.java).apply {
                     groupId = project.group.toString()
                     this.artifactId = artifactId
                     version = project.version.toString()
-                    pom.withXml {
-                        val root = asNode()
-                        root.appendNode("description", "Karibu Testing, support for browserless Vaadin testing in Kotlin")
-                        root.appendNode("name", artifactId)
-                        root.appendNode("url", "https://github.com/mvysny/karibu-testing")
+                    pom.apply {
+                        description.set("Karibu Testing, support for browserless Vaadin testing in Kotlin")
+                        name.set(artifactId)
+                        url.set("https://github.com/mvysny/karibu-testing")
+                        licenses {
+                            license {
+                                name.set("The Apache Software License, Version 2.0")
+                                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                                distribution.set("repo")
+                            }
+                        }
+                        developers {
+                            developer {
+                                id.set("mavi")
+                                name.set("Martin Vysny")
+                                email.set("martin@vysny.me")
+                            }
+                        }
+                        scm {
+                            url.set("https://github.com/mvysny/karibu-testing")
+                        }
                     }
+
                     from(components.findByName("java")!!)
-                    artifact(sourceJar) {
-                        classifier = "sources"
-                    }
+                    artifact(sourceJar)
+                    artifact(javadocJar)
                 }
             }
         }

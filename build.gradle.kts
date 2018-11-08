@@ -14,8 +14,8 @@ plugins {
 defaultTasks("clean", "build")
 
 allprojects {
-    group = "com.github.kaributesting"
-    version = "0.5.8-SNAPSHOT"
+    group = "com.github.mvysny.kaributesting"
+    version = "1.0.0-SNAPSHOT"
     repositories {
         jcenter()
         maven { setUrl("https://dl.bintray.com/mvysny/github") }
@@ -99,7 +99,7 @@ subprojects {
             key = local.getProperty("bintray.key")
             pkg(closureOf<BintrayExtension.PackageConfig> {
                 repo = "github"
-                name = "com.github.kaributesting"
+                name = "com.github.mvysny.kaributesting"
                 setLicenses("Apache-2.0")
                 vcsUrl = "https://github.com/mvysny/karibu-testing"
                 publish = true

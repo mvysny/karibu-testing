@@ -15,7 +15,7 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.kaributesting"
-    version = "0.5.7-SNAPSHOT"
+    version = "0.5.7"
     repositories {
         jcenter()
         maven { setUrl("https://dl.bintray.com/mvysny/github") }

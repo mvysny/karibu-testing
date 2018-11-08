@@ -64,7 +64,7 @@ subprojects {
                     groupId = project.group.toString()
                     this.artifactId = artifactId
                     version = project.version.toString()
-                    pom.apply {
+                    pom {
                         description.set("Karibu Testing, support for browserless Vaadin testing in Kotlin")
                         name.set(artifactId)
                         url.set("https://github.com/mvysny/karibu-testing")

@@ -31,8 +31,9 @@ to your `pom.xml`:
 </project>
 ```
 
-
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
+
+> *Note:* Karibu-Testing pulls in the `vaadin-server.jar` as its dependency, but feel free to exclude it, in order to use whatever Vaadin version your project is using.
 
 ## Writing your first test
 

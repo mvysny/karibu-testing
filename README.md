@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/mvysny/karibu-testing.svg?branch=master)](https://travis-ci.org/mvysny/karibu-testing)
 [![Join the chat at https://gitter.im/vaadin/vaadin-on-kotlin](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/vaadin-on-kotlin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing)
 
 # Vaadin Browserless Testing
 
@@ -37,8 +38,8 @@ Karibu-Testing is published on Maven Central, so it's very easy to add as a Mave
 
 For the Getting Started documentation and for the full API documentation:
 
-* If you are using Vaadin 8, head to [Testing with Vaadin 8](karibu-testing-v8).
-* If you are using Vaadin 10, head to [Testing with Vaadin 10](karibu-testing-v10).
+* If you are using Vaadin 8, head to [Testing with Vaadin 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
+* If you are using Vaadin 10, head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 1x version (10, 11, etc).
 
 ## Example Projects
 

@@ -12,7 +12,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
-import static com.github.vok.karibudsl.NavigatorKt.*;
+import static com.github.mvysny.karibudsl.v8.NavigatorKt.*;
 
 /**
  * Not really a test, doesn't run any test methods. It just fails compilation if the LocatorJ API

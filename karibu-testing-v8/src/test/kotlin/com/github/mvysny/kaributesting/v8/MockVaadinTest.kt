@@ -2,8 +2,8 @@ package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.vok.karibudsl.autoDiscoverViews
-import com.github.vok.karibudsl.autoViewProvider
+import com.github.mvysny.karibudsl.v8.autoDiscoverViews
+import com.github.mvysny.karibudsl.v8.autoViewProvider
 import com.vaadin.navigator.Navigator
 import com.vaadin.navigator.PushStateNavigation
 import com.vaadin.navigator.View

@@ -2,9 +2,9 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.vok.karibudsl.flow.button
-import com.github.vok.karibudsl.flow.checkBox
-import com.github.vok.karibudsl.flow.routerLink
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.checkBox
+import com.github.mvysny.karibudsl.v10.routerLink
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button

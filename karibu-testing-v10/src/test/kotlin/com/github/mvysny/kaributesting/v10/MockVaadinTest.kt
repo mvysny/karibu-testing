@@ -2,8 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.vok.karibudsl.flow.button
-import com.github.vok.karibudsl.flow.text
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.text
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI

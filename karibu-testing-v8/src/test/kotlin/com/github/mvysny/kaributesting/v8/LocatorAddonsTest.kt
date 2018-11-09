@@ -2,8 +2,8 @@ package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.vok.karibudsl.button
-import com.github.vok.karibudsl.verticalLayout
+import com.github.mvysny.karibudsl.v8.button
+import com.github.mvysny.karibudsl.v8.verticalLayout
 import com.vaadin.ui.Button
 import com.vaadin.ui.UI
 import kotlin.test.expect

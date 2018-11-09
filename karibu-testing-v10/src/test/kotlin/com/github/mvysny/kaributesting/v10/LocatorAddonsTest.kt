@@ -2,9 +2,9 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.vok.karibudsl.flow.button
-import com.github.vok.karibudsl.flow.span
-import com.github.vok.karibudsl.flow.verticalLayout
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.span
+import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span

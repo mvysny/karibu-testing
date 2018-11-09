@@ -12,7 +12,7 @@ dependencies {
 
     testCompile("com.github.mvysny.dynatest:dynatest-engine:${ext["dynatest_version"]}")
     testCompile("org.slf4j:slf4j-simple:1.7.25")
-    testCompile("com.github.vok.karibudsl:karibu-dsl-v10:0.4.11")
+    testCompile("com.github.mvysny.karibudsl:karibu-dsl-v10:0.5.0")
 
     // to have class autodiscovery functionality
     compile("com.vaadin.external.atmosphere:atmosphere-runtime:2.4.24.vaadin1")

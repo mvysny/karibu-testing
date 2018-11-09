@@ -1,8 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaTest
-import com.github.vok.karibudsl.flow.addColumnFor
-import com.github.vok.karibudsl.flow.grid
+import com.github.mvysny.karibudsl.v10.addColumnFor
+import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid

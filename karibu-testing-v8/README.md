@@ -6,7 +6,8 @@ To start, just add the following lines into your Gradle `build.gradle` file:
 
 ```groovy
 repositories {
-    jcenter()
+    mavenCentral()
+    // jcenter()   // Karibu-Testing is published both on Maven Central and on JCenter
 }
 dependencies {
     testCompile "com.github.mvysny.kaributesting:karibu-testing-v8:x.y.z"
@@ -15,15 +16,11 @@ dependencies {
 
 > Note: obtain the newest version from the tag name above
 
-Maven:
+For Maven it's really easy: Karibu-Testing is published on Maven Central, so all you need to do is to add the dependency
+to your `pom.xml`:
+
 ```xml
 <project>
-	<repositories>
-		<repository>
-			<id>jcenter</id>
-			<url>https://jcenter.bintray.com/</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.mvysny.kaributesting</groupId>

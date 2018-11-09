@@ -31,6 +31,8 @@ You don't even need to write your app nor your tests in Kotlin, since the librar
 You can thus plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
 in Java or Kotlin, whichever suits you more.
 
+Karibu-Testing is published on Maven Central, so it's very easy to add as a Maven dependency.
+
 ## Full Documentation
 
 For the Getting Started documentation and for the full API documentation:

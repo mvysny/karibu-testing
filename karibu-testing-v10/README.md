@@ -9,7 +9,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    testCompile "com.github.kaributesting:karibu-testing-v10:x.y.z"
+    testCompile "com.github.mvysny.kaributesting:karibu-testing-v10:x.y.z"
 }
 ```
 
@@ -25,7 +25,7 @@ dependencies {
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.kaributesting</groupId>
+			<groupId>com.github.mvysny.kaributesting</groupId>
 			<artifactId>karibu-testing-v10</artifactId>
 			<version>x.y.z</version>
 		</dependency>

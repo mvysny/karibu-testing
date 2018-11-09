@@ -2,6 +2,7 @@ import com.jfrog.bintray.gradle.BintrayExtension
 import groovy.lang.Closure
 import org.gradle.api.tasks.GradleBuild
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
@@ -9,6 +10,7 @@ plugins {
     kotlin("jvm") version "1.3.0"
     id("com.jfrog.bintray") version "1.8.1"
     `maven-publish`
+    id("org.jetbrains.dokka") version "0.9.17"
 }
 
 defaultTasks("clean", "build")
@@ -31,6 +33,7 @@ subprojects {
         plugin("maven-publish")
         plugin("kotlin")
         plugin("com.jfrog.bintray")
+        plugin("org.jetbrains.dokka")
     }
 
     // creates a reusable function which configures proper deployment to Bintray
@@ -51,11 +54,12 @@ subprojects {
         }
 
         val javadocJar = task("javadocJar", Jar::class) {
-            val javadoc = tasks.findByName("javadoc") as Javadoc
-            javadoc.isFailOnError = false
+            val javadoc = tasks.findByName("dokka") as DokkaTask
+            javadoc.outputFormat = "javadoc"
+            javadoc.outputDirectory = "$buildDir/javadoc"
             dependsOn(javadoc)
             classifier = "javadoc"
-            from(javadoc.destinationDir)
+            from(javadoc.outputDirectory)
         }
 
         publishing {

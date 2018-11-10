@@ -27,7 +27,7 @@ allprojects {
 subprojects {
     ext["vaadin8_version"] = "8.6.0"
     ext["vaadin10_version"] = "11.0.1"
-    ext["dynatest_version"] = "0.11"
+    ext["dynatest_version"] = "0.12"
 
     apply {
         plugin("maven-publish")

@@ -20,7 +20,6 @@ allprojects {
     version = "1.0.1-SNAPSHOT"
     repositories {
         jcenter()
-        maven { setUrl("https://dl.bintray.com/mvysny/github") }
     }
 }
 

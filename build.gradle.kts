@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
 plugins {
-    kotlin("jvm") version "1.3.0"
+    kotlin("jvm") version "1.3.10"
     id("com.jfrog.bintray") version "1.8.1"
     `maven-publish`
     id("org.jetbrains.dokka") version "0.9.17"

@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.data.ValueProvider
@@ -55,7 +57,7 @@ fun DataProvider<*, *>._size(): Int =
 fun Grid<*>._size(): Int = dataProvider._size()
 
 /**
- * Performs a click on a [ClickableRenderer] in given [grid] cell.
+ * Performs a click on a [ClickableRenderer] in given [Grid] cell. Fails if [Grid.Column.getRenderer] is not a [ClickableRenderer].
  * @receiver the grid, not null.
  * @param rowIndex the row index, 0 or higher.
  * @param columnId the column ID.
@@ -69,7 +71,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String) {
 }
 
 /**
- * Returns the formatted value as a String. Does not use renderer to render the value - simply calls the value provider and presentation provider
+ * Returns the formatted value of a cell as a String. Does not use renderer to render the value - simply calls the value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
  * @param columnId the column ID.
@@ -82,18 +84,29 @@ fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
 }
 
 /**
- * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
- * and converts the result to string (even if the result is a [Component]).
- * @param rowIndex the row index, 0 or higher.
+ * Returns the formatted value of a cell as a String. Does not use [renderer][Grid.Column.getRenderer] to render the value
+ * - it only calls the [value provider][Grid.Column.getValueProvider] and [presentation provider][Grid.Column.presentationProvider]
+ * and converts the result to string (even if the result is a [com.vaadin.ui.Component]).
+ *
+ * Calls [getPresentationValue] and converts the result to string; `null`s are converted to the string "null".
+ * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
  */
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
+/**
+ * Returns the formatted value of a Grid row as a list of strings, one for every visible column. Calls [_getFormatted] to
+ * obtain the formatted cell value.
+ * @param rowIndex the row index, 0 or higher.
+ */
 fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = dataProvider._get(rowIndex)
     return columns.filterNot { it.isHidden } .map { it._getFormatted(rowObject) }
 }
 
+/**
+ * Returns the [Grid.Column]'s presentation provider. Never null, may be [ValueProvider.identity].
+ */
 @Suppress("UNCHECKED_CAST")
 val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
     get() =
@@ -102,6 +115,11 @@ val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
             get(this@presentationProvider) as ValueProvider<V, *>
         }
 
+/**
+ * Returns the formatted value as outputted by the value provider + presentation provider. Does not use [renderer][com.vaadin.ui.Grid.Column.getRenderer] to render the value
+ * - it only calls the [value provider][com.vaadin.ui.Grid.Column.getValueProvider] and [presentation provider][com.vaadin.ui.Grid.Column.presentationProvider].
+ * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
+ */
 fun <T: Any, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
 
 /**
@@ -127,14 +145,21 @@ fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     }
 }
 
+/**
+ * Expects that [Grid.getDataProvider] currently contains exactly expected [count] of items. Fails if not; [_dump]s
+ * first 10 rows of the Grid on failure.
+ */
 fun Grid<*>.expectRows(count: Int) {
     if (dataProvider._size() != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
     }
 }
 
-fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
-    val expected = row.toList()
+/**
+ * Expects that the row at [rowIndex] looks exactly as [expected].
+ */
+fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
+    val expected = expected.toList()
     val actual = _getFormattedRow(rowIndex)
     if (expected != actual) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")

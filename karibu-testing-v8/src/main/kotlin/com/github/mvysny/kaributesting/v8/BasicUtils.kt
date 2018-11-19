@@ -84,6 +84,10 @@ fun <T : ClientRpc> AbstractClientConnector.overrideRpcProxy(rpcInterface: Class
     rpcProxyMap[rpcInterface] = instance
 }
 
+/**
+ * Returns [AbstractTextField.getPlaceholder]/[ComboBox.getPlaceholder]/[DateField.getPlaceholder]/[DateTimeField.getPlaceholder] or null
+ * for other components.
+ */
 val Component.placeholder: String?
     get() = when (this) {
         is AbstractTextField -> placeholder

@@ -8,6 +8,7 @@ import com.vaadin.shared.MouseEventDetails
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.Grid
 import com.vaadin.ui.TextField
+import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.test.expect
 
@@ -89,6 +90,24 @@ class GridTest : DynaTest({
             grid._clickItem(5, mouseEventDetails = MouseEventDetails().apply { isCtrlKey = true })
             expect(true) { called }
         }
+    }
+
+    test("click renderer") {
+        var called = false
+        val grid = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name) {
+                setRenderer(ButtonRenderer<TestPerson> { e ->
+                    called = true
+                    expect("name 8") { e.item.name }
+                    expect("name") { e.column.id }
+                    expect(true) { e.mouseEventDetails.isCtrlKey }
+                })
+            }
+            addColumnFor(TestPerson::age)
+            setItems((0..10).map { TestPerson("name $it", it) })
+        }
+        grid._clickRenderer(8, "name", MouseEventDetails().apply { isCtrlKey = true })
+        expect(true) { called }
     }
 
     test("get component") {

@@ -64,12 +64,13 @@ fun Grid<*>._size(): Int = dataProvider._size()
  * @param rowIndex the row index, 0 or higher.
  * @param columnId the column ID.
  */
-fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String) {
+@JvmOverloads
+fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
     val column = getColumn(columnId)!!
     @Suppress("UNCHECKED_CAST")
     val renderer = column.renderer as ClickableRenderer<T, *>
     val item = dataProvider._get(rowIndex)
-    renderer._fireEvent(object : ClickableRenderer.RendererClickEvent<T>(this, item, column, MouseEventDetails()) {})
+    renderer._fireEvent(object : ClickableRenderer.RendererClickEvent<T>(this, item, column, mouseEventDetails) {})
 }
 
 /**

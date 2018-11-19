@@ -69,7 +69,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEvent
     val column = getColumnBy(columnId)
     @Suppress("UNCHECKED_CAST")
     val renderer = column.renderer as ClickableRenderer<T, *>
-    val item = dataProvider._get(rowIndex)
+    val item = _get(rowIndex)
     renderer._fireEvent(object : ClickableRenderer.RendererClickEvent<T>(this, item, column, mouseEventDetails) {})
 }
 

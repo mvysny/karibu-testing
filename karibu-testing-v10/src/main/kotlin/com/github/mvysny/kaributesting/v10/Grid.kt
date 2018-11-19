@@ -242,6 +242,9 @@ val FooterRow.FooterCell.renderer: Renderer<*>?
         return renderer as Renderer<*>?
     }
 
+/**
+ * Returns or sets the component in grid's footer cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
+ */
 var FooterRow.FooterCell.component: Component?
     get() {
         val cr = (renderer as? ComponentRenderer<*, *>) ?: return null
@@ -253,6 +256,9 @@ var FooterRow.FooterCell.component: Component?
 
 private val gridSorterComponentRendererClass = Class.forName("com.vaadin.flow.component.grid.GridSorterComponentRenderer")
 
+/**
+ * Returns or sets the component in grid's header cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
+ */
 var HeaderRow.HeaderCell.component: Component?
     get() {
         val r = renderer

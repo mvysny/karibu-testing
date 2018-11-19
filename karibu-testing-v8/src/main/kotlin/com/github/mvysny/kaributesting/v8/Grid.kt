@@ -173,8 +173,9 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
  * [Grid.addItemClickListener].
  * @param column click this column; defaults to the first visible column in the Grid.
  */
-fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ) {
-    _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), null, rowIndex))
+fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ,
+                           mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
+    _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), mouseEventDetails, rowIndex))
 }
 
 /**

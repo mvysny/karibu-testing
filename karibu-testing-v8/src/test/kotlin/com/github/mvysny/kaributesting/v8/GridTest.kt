@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.github.mvysny.karibudsl.v8.getColumnBy
 import com.vaadin.data.provider.ListDataProvider
+import com.vaadin.shared.MouseEventDetails
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.Grid
 import com.vaadin.ui.TextField
@@ -53,21 +54,41 @@ class GridTest : DynaTest({
         expect("Foo!") { grid._get<TextField>().caption }
     }
 
-    test("click item") {
-        val grid = Grid<TestPerson>().apply {
-            addColumnFor(TestPerson::name)
-            addColumnFor(TestPerson::age)
-            setItems((0..10).map { TestPerson("name $it", it) })
+    group("click item") {
+        test("item click listener is called") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            var called = false
+            grid.addItemClickListener { e ->
+                expect(grid.getColumnBy(TestPerson::name)) { e.column }
+                expect("name 5") { e.item.name }
+                expect(5) { e.rowIndex }
+                expect(false) { e.mouseEventDetails.isCtrlKey }
+                called = true
+            }
+            grid._clickItem(5)
+            expect(true) { called }
         }
-        var called = false
-        grid.addItemClickListener { e ->
-            expect(grid.getColumnBy(TestPerson::name)) { e.column }
-            expect("name 5") { e.item.name }
-            expect(5) { e.rowIndex }
-            called = true
+        test("mouse event details are properly passed to the listener") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            var called = false
+            grid.addItemClickListener { e ->
+                expect(grid.getColumnBy(TestPerson::name)) { e.column }
+                expect("name 5") { e.item.name }
+                expect(5) { e.rowIndex }
+                expect(true) { e.mouseEventDetails.isCtrlKey }
+                called = true
+            }
+            grid._clickItem(5, mouseEventDetails = MouseEventDetails().apply { isCtrlKey = true })
+            expect(true) { called }
         }
-        grid._clickItem(5)
-        expect(true) { called }
     }
 
     test("get component") {

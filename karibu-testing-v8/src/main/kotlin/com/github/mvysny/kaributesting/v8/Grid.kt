@@ -6,9 +6,11 @@ import com.vaadin.data.ValueProvider
 import com.vaadin.data.provider.DataProvider
 import com.vaadin.data.provider.Query
 import com.vaadin.shared.MouseEventDetails
+import com.vaadin.ui.Component
 import com.vaadin.ui.Grid
 import com.vaadin.ui.renderers.ClickableRenderer
 import kotlin.streams.toList
+import kotlin.test.fail
 
 /**
  * Returns the item on given row. Fails if the row index is invalid.
@@ -72,7 +74,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String) {
 
 /**
  * Returns the formatted value of a cell as a String. Does not use renderer to render the value - simply calls the value provider and presentation provider
- * and converts the result to string (even if the result is a [Component]).
+ * and converts the result to string (even if the result is a [com.vaadin.ui.Component]).
  * @param rowIndex the row index, 0 or higher.
  * @param columnId the column ID.
  */
@@ -120,7 +122,7 @@ val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
  * - it only calls the [value provider][com.vaadin.ui.Grid.Column.getValueProvider] and [presentation provider][com.vaadin.ui.Grid.Column.presentationProvider].
  * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
  */
-fun <T: Any, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
+fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
 
 /**
  * Dumps the first [maxRows] rows of the Grid, formatting the values using the [_getFormatted] function. The output example:
@@ -173,4 +175,30 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
  */
 fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ) {
     _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), null, rowIndex))
+}
+
+/**
+ * Retrieves the column for given [columnId].
+ * @throws IllegalArgumentException if no such column exists.
+ */
+@Suppress("UNCHECKED_CAST")
+fun <T, V> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, V> =
+        getColumn(columnId) as Grid.Column<T, V>?
+                ?: throw IllegalArgumentException("No column with ID $columnId; available column IDs: ${columns.map { it.id }.filterNotNull()}")
+
+/**
+ * Returns the component in given grid cell at [rowIndex]/[columnId]. Fails if there is something else in the cell (e.g. a String or other
+ * value).
+ *
+ * **WARNING**: This function doesn't return the button produced by [com.vaadin.ui.renderers.ButtonRenderer]! There must be an actual component
+ * produced by [Grid.Column.getValueProvider], possibly fed to [com.vaadin.ui.renderers.ComponentRenderer].
+ */
+fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
+    val item = _get(rowIndex)
+    val column = getColumnBy<T, Any?>(columnId)
+    val possibleComponent = column.getPresentationValue(item)
+    if (possibleComponent !is Component) {
+        fail("Expected Component at $rowIndex/$columnId but got $possibleComponent")
+    }
+    return possibleComponent
 }

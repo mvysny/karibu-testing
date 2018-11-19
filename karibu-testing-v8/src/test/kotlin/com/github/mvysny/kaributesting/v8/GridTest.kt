@@ -4,8 +4,10 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.github.mvysny.karibudsl.v8.getColumnBy
 import com.vaadin.data.provider.ListDataProvider
+import com.vaadin.ui.CheckBox
 import com.vaadin.ui.Grid
 import com.vaadin.ui.TextField
+import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.test.expect
 
 class GridTest : DynaTest({
@@ -66,6 +68,14 @@ class GridTest : DynaTest({
         }
         grid._clickItem(5)
         expect(true) { called }
+    }
+
+    test("get component") {
+        val grid = Grid<TestPerson>().apply {
+            addColumn({ it -> CheckBox(it.name) }, ComponentRenderer()).id = "foo"
+            setItems((0..10).map { TestPerson("name $it", it) })
+        }
+        expect("name 3") { (grid._getComponentAt(3, "foo") as CheckBox).caption }
     }
 })
 

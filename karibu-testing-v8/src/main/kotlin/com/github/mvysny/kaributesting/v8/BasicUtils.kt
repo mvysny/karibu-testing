@@ -1,3 +1,5 @@
+@file:Suppress("ObjectPropertyName")
+
 package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.data.HasValue
@@ -62,8 +64,8 @@ val Component.value: Any? get()= when(this) {
 }
 
 /**
- * Sets the value of given component, but only if it is actually possible to do so by the user.
- * If the component is read-only or disabled, an exception is thrown.
+ * Sets the value of given component, but only if it is actually possible to do so by the user, i.e. the component
+ * is enabled and is not read-only. If the component is read-only or disabled, an exception is thrown.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 var <V> HasValue<V>._value: V?

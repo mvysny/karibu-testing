@@ -15,7 +15,7 @@ import kotlin.streams.toList
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row.
  */
-fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
+fun <T> DataProvider<T, *>._get(rowIndex: Int): T {
     @Suppress("UNCHECKED_CAST")
     val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(rowIndex, 1, null, null, null))
     return fetched.toList().first()
@@ -25,7 +25,7 @@ fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
  * Returns all items in given data provider.
  * @return the list of items.
  */
-fun <T : Any> DataProvider<T, *>._findAll(): List<T> {
+fun <T> DataProvider<T, *>._findAll(): List<T> {
     @Suppress("UNCHECKED_CAST")
     val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(0, Int.MAX_VALUE, null, null, null))
     return fetched.toList()
@@ -36,13 +36,13 @@ fun <T : Any> DataProvider<T, *>._findAll(): List<T> {
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T : Any> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex)
+fun <T> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex)
 
 /**
  * Returns all items in given data provider.
  * @return the list of items.
  */
-fun <T : Any> Grid<T>._findAll(): List<T> = dataProvider._findAll()
+fun <T> Grid<T>._findAll(): List<T> = dataProvider._findAll()
 
 /**
  * Returns the number of items in this data provider.
@@ -164,4 +164,13 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
     if (expected != actual) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
     }
+}
+
+/**
+ * Fires the [com.vaadin.ui.Grid.ItemClick] event for given [rowIndex] which invokes all [com.vaadin.ui.components.grid.ItemClickListener]s registered via
+ * [Grid.addItemClickListener].
+ * @param column click this column; defaults to the first visible column in the Grid.
+ */
+fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ) {
+    _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), null, rowIndex))
 }

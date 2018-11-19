@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.karibudsl.v8.addColumnFor
+import com.github.mvysny.karibudsl.v8.getColumnBy
 import com.vaadin.data.provider.ListDataProvider
 import com.vaadin.ui.Grid
 import com.vaadin.ui.TextField
@@ -47,6 +49,23 @@ class GridTest : DynaTest({
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.getHeaderRow(0).getCell(TestPerson::age.name).component = TextField("Foo!")
         expect("Foo!") { grid._get<TextField>().caption }
+    }
+
+    test("click item") {
+        val grid = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            setItems((0..10).map { TestPerson("name $it", it) })
+        }
+        var called = false
+        grid.addItemClickListener { e ->
+            expect(grid.getColumnBy(TestPerson::name)) { e.column }
+            expect("name 5") { e.item.name }
+            expect(5) { e.rowIndex }
+            called = true
+        }
+        grid._clickItem(5)
+        expect(true) { called }
     }
 })
 

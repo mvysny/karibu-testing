@@ -8,7 +8,7 @@ import java.util.*
 
 plugins {
     kotlin("jvm") version "1.3.10"
-    id("com.jfrog.bintray") version "1.8.1"
+    id("com.jfrog.bintray") version "1.8.4"
     `maven-publish`
     id("org.jetbrains.dokka") version "0.9.17"
 }
@@ -25,7 +25,7 @@ allprojects {
 
 subprojects {
     ext["vaadin8_version"] = "8.6.1"
-    ext["vaadin10_version"] = "11.0.2"
+    ext["vaadin10_version"] = "11.0.3"
     ext["dynatest_version"] = "0.12"
 
     apply {
@@ -47,13 +47,13 @@ subprojects {
         val java: JavaPluginConvention = convention.getPluginByName("java")
 
         val sourceJar = task("sourceJar", Jar::class) {
-            dependsOn(tasks.findByName("classes"))
+            dependsOn(tasks["classes"])
             classifier = "sources"
-            from(java.sourceSets["main"].allSource)
+            from(sourceSets.main.get().allSource)
         }
 
         val javadocJar = task("javadocJar", Jar::class) {
-            val javadoc = tasks.findByName("dokka") as DokkaTask
+            val javadoc = tasks["dokka"] as DokkaTask
             javadoc.outputFormat = "javadoc"
             javadoc.outputDirectory = "$buildDir/javadoc"
             dependsOn(javadoc)
@@ -90,7 +90,7 @@ subprojects {
                         }
                     }
 
-                    from(components.findByName("java")!!)
+                    from(components["java"])
                     artifact(sourceJar)
                     artifact(javadocJar)
                 }

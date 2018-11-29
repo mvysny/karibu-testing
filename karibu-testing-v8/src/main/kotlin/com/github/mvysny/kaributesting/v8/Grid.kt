@@ -161,6 +161,7 @@ fun Grid<*>.expectRows(count: Int) {
 /**
  * Expects that the row at [rowIndex] looks exactly as [expected].
  */
+@Suppress("NAME_SHADOWING")
 fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
     val expected = expected.toList()
     val actual = _getFormattedRow(rowIndex)

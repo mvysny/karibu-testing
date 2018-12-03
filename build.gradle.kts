@@ -20,12 +20,15 @@ allprojects {
     version = "1.0.1-SNAPSHOT"
     repositories {
         jcenter()
+        // uncomment to enable Vaadin Pre-releases
+//        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
     }
 }
 
 subprojects {
     ext["vaadin8_version"] = "8.6.1"
     ext["vaadin10_version"] = "11.0.3"
+//    ext["vaadin10_version"] = "12.0.0.beta2"
     ext["dynatest_version"] = "0.13"
 
     apply {

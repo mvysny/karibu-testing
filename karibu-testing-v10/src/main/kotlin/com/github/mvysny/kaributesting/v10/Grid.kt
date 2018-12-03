@@ -90,17 +90,34 @@ fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-    val json = Json.createObject()
-    // the valueprovider is wrapped in TemplateRenderer which is wrapped in DataGenerator
-    (grid as Grid<T>).dataGenerator2.generateData(rowObject, json)
-    val value: JsonValue? = json.get(internalId2)
-    return value?.asString()
+
+    if (Grid::class.java.declaredMethods.any { it.name == "getDataGenerator" }) {
+        // Vaadin 11 or older
+        val json = Json.createObject()
+        // the valueprovider is wrapped in TemplateRenderer which is wrapped in DataGenerator
+        (grid as Grid<T>).dataGenerator2.generateData(rowObject, json)
+        val value: JsonValue? = json.get(internalId2)
+        return value?.asString()
+    }
+
+    // Vaadin 12
+    val valueProviders = renderer.valueProviders
+    val valueProvider = valueProviders[internalId2] ?: return null
+    // there is no value provider for NativeButtonRenderer, just return null
+    val value = valueProvider.apply(rowObject)
+    return "" + value
 }
 
 @Suppress("UNCHECKED_CAST")
 private val <T> Grid<T>.dataGenerator2: DataGenerator<T> get() = Grid::class.java.getDeclaredMethod("getDataGenerator").run {
     isAccessible = true
     invoke(this@dataGenerator2) as DataGenerator<T>
+}
+
+// use reflection until we start to compile KT against Vaadin 12
+@Suppress("UNCHECKED_CAST")
+private val <T> Grid.Column<T>.renderer: Renderer<T> get() = Grid.Column::class.java.getDeclaredMethod("getRenderer").run {
+    invoke(this@renderer) as Renderer<T>
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -1,5 +1,5 @@
 dependencies {
-    compile(enforcedPlatform("com.vaadin:vaadin-bom:${ext["vaadin10_version"]}"))
+    compile(platform("com.vaadin:vaadin-bom:${ext["vaadin10_version"]}"))
     compile("com.vaadin:vaadin-core:${ext["vaadin10_version"]}")
     compile(project(":mock-servlet-environment"))
 

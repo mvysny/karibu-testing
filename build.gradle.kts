@@ -20,8 +20,6 @@ allprojects {
     version = "1.0.1-SNAPSHOT"
     repositories {
         jcenter()
-        // uncomment to enable Vaadin Pre-releases
-//        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
     }
 }
 

@@ -17,7 +17,7 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "1.0.1-SNAPSHOT"
+    version = "1.0.1"
     repositories {
         jcenter()
     }

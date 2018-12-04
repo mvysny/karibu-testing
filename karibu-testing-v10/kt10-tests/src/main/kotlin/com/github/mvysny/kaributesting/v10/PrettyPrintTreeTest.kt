@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v10.text
 import com.vaadin.flow.component.Text
@@ -10,7 +11,7 @@ import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 
-class PrettyPrintTreeTest : DynaTest({
+internal fun DynaNodeGroup.prettyPrintTreeTest() {
     test("Simple dump") {
         val div = Div().apply {
             text("Foo")
@@ -29,4 +30,4 @@ class PrettyPrintTreeTest : DynaTest({
         expect("Grid[]") { Grid<Any>().toPrettyString() }
         expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it } .apply { header2 = "My Header" } }.toPrettyString() }
     }
-})
+}

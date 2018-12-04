@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
@@ -14,7 +15,7 @@ import com.vaadin.flow.component.textfield.TextField
 import kotlin.streams.asSequence
 import kotlin.test.expect
 
-class LocatorTest : DynaTest({
+internal fun DynaNodeGroup.locatorTest() {
 
     beforeEach { MockVaadin.setup() }
     beforeEach { testingLifecycleHook = MyLifecycleHook() }
@@ -143,7 +144,7 @@ class LocatorTest : DynaTest({
             }
         }
     }
-})
+}
 
 data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfterLookupCalled: Boolean = false) : TestingLifecycleHook {
     override fun awaitBeforeLookup() {

@@ -171,8 +171,15 @@ val Node.textRecursively: String get() = when (this) {
     else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
 }
 
-internal fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
+/**
+ * Computes that this component and all of its parents are enabled.
+ * @return false if this component or any of its parent is disabled.
+ */
+fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
 
+/**
+ * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.
+ */
 val Component.isEnabled: Boolean get() = when (this) {
     is HasEnabled -> isEnabled
     else -> true

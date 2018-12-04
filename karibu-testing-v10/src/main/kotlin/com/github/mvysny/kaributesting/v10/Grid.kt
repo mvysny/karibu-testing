@@ -90,7 +90,6 @@ fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-
     if (Grid::class.java.declaredMethods.any { it.name == "getDataGenerator" }) {
         // Vaadin 11 or older
         val json = Json.createObject()

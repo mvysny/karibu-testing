@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.Text
@@ -11,7 +11,7 @@ import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import kotlin.test.expect
 
-class GridTest : DynaTest({
+internal fun DynaNodeGroup.gridTestbatch() {
 
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
@@ -81,6 +81,6 @@ class GridTest : DynaTest({
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
         expect("Foo!") { grid._get<TextField>().caption }
     }
-})
+}
 
 data class TestPerson(val name: String, val age: Int)

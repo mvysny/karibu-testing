@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.verticalLayout
@@ -12,7 +13,7 @@ import kotlin.test.expect
 /**
  * A very simple quick test of the [LocatorJ] class.
  */
-class LocatorJTest : DynaTest({
+internal fun DynaNodeGroup.locatorJTest() {
 
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
@@ -78,4 +79,4 @@ class LocatorJTest : DynaTest({
             expectThrows(IllegalArgumentException::class) { LocatorJ._assertNone(VerticalLayout(Button()), Button::class.java) }
         }
     }
-})
+}

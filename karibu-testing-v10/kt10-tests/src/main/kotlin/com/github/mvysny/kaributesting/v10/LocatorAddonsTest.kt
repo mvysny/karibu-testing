@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
@@ -10,7 +11,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span
 import kotlin.test.expect
 
-class LocatorAddonsTest : DynaTest({
+internal fun DynaNodeGroup.locatorAddonsTestbatch() {
 
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
@@ -58,4 +59,4 @@ class LocatorAddonsTest : DynaTest({
             expect("foo bar") { _get<Span> { textContains("foo") }.text }
         }
     }
-})
+}

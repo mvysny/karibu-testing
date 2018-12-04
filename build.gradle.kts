@@ -28,7 +28,8 @@ allprojects {
 subprojects {
     ext["vaadin8_version"] = "8.6.1"
     ext["vaadin10_version"] = "11.0.3"
-//    ext["vaadin10_version"] = "12.0.0.beta2"
+    ext["vaadin11_version"] = "11.0.3"
+    ext["vaadin12_version"] = "12.0.0.beta2"
     ext["dynatest_version"] = "0.13"
 
     apply {

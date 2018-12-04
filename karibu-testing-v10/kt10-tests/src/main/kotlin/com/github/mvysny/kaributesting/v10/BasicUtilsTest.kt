@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.checkBox
@@ -14,7 +14,7 @@ import com.vaadin.flow.router.Route
 import kotlin.test.expect
 import kotlin.test.fail
 
-class BasicUtilsTest : DynaTest({
+internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
     val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java, ParametrizedView::class.java, ChildView::class.java)
 
@@ -135,7 +135,7 @@ class BasicUtilsTest : DynaTest({
         // make sure that the navigation has been performed and there is the TestingView in the current UI
         _get<TestingView>()
     }
-})
+}
 
 @Route("testing")
 class TestingView : VerticalLayout()

@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.test.expect
 import kotlin.test.fail
 
-class MockVaadinTest : DynaTest({
+internal fun DynaNodeGroup.mockVaadinTest() {
 
     beforeEach {
         MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
@@ -316,7 +317,7 @@ class MockVaadinTest : DynaTest({
             expect(true) { TestInitListener.uiBeforeEnterCalled }
         }
     }
-})
+}
 
 @Route("params")
 class ParametrizedView : VerticalLayout(), HasUrlParameter<Int> {

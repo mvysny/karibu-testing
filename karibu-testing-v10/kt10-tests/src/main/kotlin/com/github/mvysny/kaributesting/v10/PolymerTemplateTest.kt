@@ -1,12 +1,13 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectList
 import com.vaadin.flow.component.Component
 import kotlin.test.expect
 import kotlin.streams.*
 
-class PolymerTemplateTest : DynaTest({
+internal fun DynaNodeGroup.polymerTemplateTest() {
     beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
     afterEach { MockVaadin.tearDown() }
 
@@ -27,4 +28,4 @@ class PolymerTemplateTest : DynaTest({
         expectList() { list.children.toList() }
         expectList(list) { list._find<Component>() }
     }
-})
+}

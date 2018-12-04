@@ -1,6 +1,6 @@
 dependencies {
-    compile(platform("com.vaadin:vaadin-bom:${ext["vaadin10_version"]}"))
-    compile("com.vaadin:vaadin-core:${ext["vaadin10_version"]}")
+    compile(platform("com.vaadin:vaadin-bom:${ext["vaadin_platform_lts_version"]}"))
+    compile("com.vaadin:vaadin-core:${ext["vaadin_platform_lts_version"]}")
     compile(project(":karibu-testing-v10"))
 
     compile("com.github.mvysny.dynatest:dynatest-engine:${ext["dynatest_version"]}")

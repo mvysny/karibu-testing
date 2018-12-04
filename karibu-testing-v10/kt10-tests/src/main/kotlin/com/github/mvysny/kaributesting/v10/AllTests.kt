@@ -17,7 +17,7 @@ fun DynaNodeGroup.allTests() {
         locatorJTest()
     }
     group("locator") {
-        locatorJTest()
+        locatorTest()
     }
     group("mock vaadin") {
         mockVaadinTest()

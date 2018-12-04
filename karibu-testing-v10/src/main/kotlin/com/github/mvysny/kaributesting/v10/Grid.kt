@@ -150,7 +150,7 @@ var <T> Grid.Column<T>.header2: String
     }
 
 /**
- * Dumps the first [maxRows] rows of the Grid, formatting the values using the [_getFormatted] function. The output example:
+ * Dumps given range of [rows] of the Grid, formatting the values using the [_getFormatted] function. The output example:
  * ```
  * --[Name]--[Age]--[Occupation]--
  * 0: John, 25, Service Worker

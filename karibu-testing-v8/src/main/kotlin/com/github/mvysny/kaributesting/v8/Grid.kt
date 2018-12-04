@@ -66,7 +66,7 @@ fun Grid<*>._size(): Int = dataProvider._size()
  */
 @JvmOverloads
 fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
-    val column = getColumnBy(columnId)
+    val column = getColumnById(columnId)
     @Suppress("UNCHECKED_CAST")
     val renderer = column.renderer as ClickableRenderer<T, *>
     val item = _get(rowIndex)
@@ -185,9 +185,12 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.fi
  * @throws IllegalArgumentException if no such column exists.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> =
+fun <T> Grid<T>.getColumnById(columnId: String): Grid.Column<T, *> =
         getColumn(columnId) as Grid.Column<T, *>?
-                ?: throw IllegalArgumentException("No column with ID $columnId; available column IDs: ${columns.map { it.id }.filterNotNull()}")
+                ?: throw IllegalArgumentException("No column with ID $columnId; available column IDs: ${columns.mapNotNull { it.id }}")
+
+@Deprecated("replaced by getColumnById()", replaceWith = ReplaceWith("getColumnById(columnId)"))
+fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById(columnId)
 
 /**
  * Returns the component in given grid cell at [rowIndex]/[columnId]. Fails if there is something else in the cell (e.g. a String or other
@@ -198,7 +201,7 @@ fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> =
  */
 fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
     val item = _get(rowIndex)
-    val column = getColumnBy(columnId)
+    val column = getColumnById(columnId)
     val possibleComponent = column.getPresentationValue(item)
     if (possibleComponent !is Component) {
         fail("Expected Component at $rowIndex/$columnId but got $possibleComponent")

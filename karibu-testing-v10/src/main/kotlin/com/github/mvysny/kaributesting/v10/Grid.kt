@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
@@ -7,10 +9,9 @@ import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.data.provider.DataGenerator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.Query
+import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
-import com.vaadin.flow.data.renderer.TemplateRenderer
-import com.vaadin.flow.dom.Element
 import elemental.json.Json
 import elemental.json.JsonValue
 import kotlin.reflect.KProperty1
@@ -63,6 +64,28 @@ fun DataProvider<*, *>._size(): Int =
 fun Grid<*>._size(): Int = dataProvider._size()
 
 /**
+ * Gets a [Grid.Column] of this grid by its [columnKey].
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> =
+        requireNotNull(getColumnByKey(columnKey)) { "No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}" }
+
+/**
+ * Performs a click on a [ClickableRenderer] in given [Grid] cell. Fails if [Grid.Column.renderer] is not a [ClickableRenderer].
+ *
+ * WARNING: Only supported for Vaadin 12 and higher.
+ * @param rowIndex the row index, 0 or higher.
+ * @param columnKey the column key [Grid.Column.getKey]
+ */
+fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String) {
+    val column = _getColumnByKey(columnKey)
+    @Suppress("UNCHECKED_CAST")
+    val renderer = column.renderer as ClickableRenderer<T>
+    val item = _get(rowIndex)
+    renderer.onClick(item)
+}
+
+/**
  * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
@@ -113,10 +136,17 @@ private val <T> Grid<T>.dataGenerator2: DataGenerator<T> get() = Grid::class.jav
     invoke(this@dataGenerator2) as DataGenerator<T>
 }
 
-// use reflection until we start to compile KT against Vaadin 12
+/**
+ * Retrieves the renderer for given [Grid.Column].
+ */
 @Suppress("UNCHECKED_CAST")
-private val <T> Grid.Column<T>.renderer: Renderer<T> get() = Grid.Column::class.java.getDeclaredMethod("getRenderer").run {
-    invoke(this@renderer) as Renderer<T>
+val <T> Grid.Column<T>.renderer: Renderer<T> get() {
+    check(Grid.Column::class.java.declaredMethods.any { it.name == "getRenderer" }) {
+        "This functionality can only be used with Vaadin 12 or higher. It is not possible to retrieve Renderer from Grid.Column on Vaadin 11 and lower, because of missing getRenderer() function."
+    }
+    return Grid.Column::class.java.getDeclaredMethod("getRenderer").run {
+        invoke(this@renderer) as Renderer<T>
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -222,6 +252,10 @@ fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
     return cell
 }
 
+/**
+ * Retrieves column key from the `AbstractColumn` receiver. The problem here is that receiver can be `ColumnGroup` which doesn't have
+ * a key.
+ */
 private val Any.columnKey: String?
     get() {
         abstractColumnClass.cast(this)

@@ -1,6 +1,8 @@
 [![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
 
-# Getting started: Vaadin 10
+# Getting started: Vaadin platform
+
+> Supports: Vaadin 10, Vaadin 11, Vaadin 12
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

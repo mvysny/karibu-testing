@@ -32,6 +32,10 @@ class MockVaadinTest : DynaTest({
             expect(true) { Page.getCurrent() != null }
         }
 
+        test("current UI contains sane values") {
+            expect(true) { UI.getCurrent().locale != null }
+        }
+
         test("setup() can be called multiple times in a row") {
             MockVaadin.setup()
             MockVaadin.setup()

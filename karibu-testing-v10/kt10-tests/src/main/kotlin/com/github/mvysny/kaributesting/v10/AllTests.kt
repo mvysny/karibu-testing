@@ -7,6 +7,9 @@ fun DynaNodeGroup.allTests() {
     group("basic utils") {
         basicUtilsTestbatch()
     }
+    group("combo box") {
+        comboBoxTestbatch()
+    }
     group("grid") {
         gridTestbatch()
     }

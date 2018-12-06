@@ -35,3 +35,13 @@ fun <T> ComboBox<T>.getSuggestionItems(): List<T> {
     val stream = methodFetchFromProvider.invoke(dataCommunicator, 0, Int.MAX_VALUE) as Stream<T>
     return stream.toList()
 }
+
+/**
+ * Fetches captions of items currently displayed in the suggestion box.
+ *
+ * WARNING: Only works with Vaadin 12 or higher
+ */
+fun <T> ComboBox<T>.getSuggestions(): List<String> {
+    val items = getSuggestionItems()
+    return items.map { itemLabelGenerator.apply(it) }
+}

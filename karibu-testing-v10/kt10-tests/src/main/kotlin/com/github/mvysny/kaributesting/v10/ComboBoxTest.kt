@@ -26,6 +26,15 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 cb.setUserInput("a")
                 expectList("aaa") { cb.getSuggestionItems() }
             }
+
+            test("full-blown example") {
+                val cb = ComboBox<TestPerson>().apply {
+                    setItems((0..10).map { TestPerson("foo $it", it) })
+                    setItemLabelGenerator { it.name }
+                }
+                cb.setUserInput("foo 1")
+                expectList("foo 1", "foo 10") { cb.getSuggestions() }
+            }
         }
     } else {
         test("getSuggestionItems() fails with proper error message") {

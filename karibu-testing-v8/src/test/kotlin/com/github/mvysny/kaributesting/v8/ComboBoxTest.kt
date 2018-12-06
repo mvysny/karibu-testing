@@ -4,7 +4,6 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v8.comboBox
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.UI
-import java.util.*
 
 class ComboBoxTest : DynaTest({
     beforeEach { MockVaadin.setup() }

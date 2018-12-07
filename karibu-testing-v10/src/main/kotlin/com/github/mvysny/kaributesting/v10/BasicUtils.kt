@@ -64,6 +64,7 @@ class Routes: Serializable {
      * @param autoDetectErrorRoutes if false then [HasErrorParameter] error views are not auto-detected. This emulates
      * the old behavior of this method.
      */
+    @JvmOverloads
     fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
         val scan: ScanResult = ClassGraph().enableClassInfo()
                 .enableAnnotationInfo()

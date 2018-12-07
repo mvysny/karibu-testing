@@ -8,8 +8,7 @@ dependencies {
     testCompile("com.github.mvysny.karibudsl:karibu-dsl-v10:0.5.0")
 
     // to have class autodiscovery functionality
-    compile("com.vaadin.external.atmosphere:atmosphere-runtime:2.4.24.vaadin1")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("io.github.classgraph:classgraph:4.6.3")
 }
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit

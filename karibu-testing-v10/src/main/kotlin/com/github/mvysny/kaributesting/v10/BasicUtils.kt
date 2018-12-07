@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.*
@@ -14,6 +16,8 @@ import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.server.startup.RouteRegistry
+import io.github.classgraph.ClassGraph
+import io.github.classgraph.ScanResult
 import org.atmosphere.util.annotation.AnnotationDetector
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
@@ -28,13 +32,16 @@ inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStr
 inline fun <reified T: Serializable> T.serializeDeserialize() = serializeToBytes().deserialize<T>()
 
 /**
- * A configuration object of all routes and error routes in the application. Use [autoDiscoverViews] to discover views; use [addErrorRoutes]
- * to manually add [HasErrorParameter]s.
+ * A configuration object of all routes and error routes in the application. Use [autoDiscoverViews] to discover everything.
  */
 class Routes: Serializable {
     val routes = mutableSetOf<Class<out Component>>()
     val errorRoutes = mutableSetOf<Class<out HasErrorParameter<*>>>()
 
+    /**
+     * Manually register error routes. No longer needed since [autoDiscoverViews] can now detect error routes.
+     */
+    @Deprecated("No longer needed, error routes are now auto-detected with autoDiscoverViews()", ReplaceWith(""))
     fun addErrorRoutes(vararg routes: Class<out HasErrorParameter<*>>): Routes = apply {
         errorRoutes.addAll(routes.toSet())
     }
@@ -50,26 +57,30 @@ class Routes: Serializable {
     }
 
     /**
-     * Auto-discovers all `@Route`-annotated views and returns them.
-     *
-     * *WARNING*: it currently can not detect error views (components which implement the `HasErrorParameter` interface) - those need to be added manually.
+     * Auto-discovers everything, registers it into `this` and returns `this`.
+     * * [Route]-annotated views
+     * * [HasErrorParameter] error views
      * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
+     * @param autoDetectErrorRoutes if false then [HasErrorParameter] error views are not auto-detected. This emulates
+     * the old behavior of this method.
      */
-    fun autoDiscoverViews(packageName: String? = null): Routes = apply {
-        val detector = AnnotationDetector(object : AnnotationDetector.TypeReporter {
-            override fun reportTypeAnnotation(annotation: Class<out Annotation>?, className: String?) {
-                routes.add(Class.forName(className).asSubclass(Component::class.java))
+    fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
+        val scan: ScanResult = ClassGraph().enableClassInfo()
+                .enableAnnotationInfo()
+                .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName))).scan()
+        scan.use { scanResult ->
+            scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info ->
+                Class.forName(info.name).asSubclass(Component::class.java)
             }
-
-            override fun annotations(): Array<out Class<out Annotation>> = arrayOf(Route::class.java)
-        })
-        if (packageName == null) {
-            detector.detect()
-        } else {
-            detector.detect(packageName)
+            if (autoDetectErrorRoutes) {
+                scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info ->
+                    Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
+                }
+            }
         }
 
         println("Auto-discovered views: ${routes.joinToString { it.simpleName }}")
+        println("Auto-discovered error routes: ${errorRoutes.joinToString { it.simpleName }}")
     }
 }
 

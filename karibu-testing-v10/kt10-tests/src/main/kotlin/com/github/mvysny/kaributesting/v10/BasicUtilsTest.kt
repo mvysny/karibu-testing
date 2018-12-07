@@ -10,16 +10,23 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.router.BeforeEnterEvent
+import com.vaadin.flow.router.ErrorParameter
+import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
+import java.lang.Exception
+import java.lang.RuntimeException
 import kotlin.test.expect
 import kotlin.test.fail
 
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
     val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java, ParametrizedView::class.java, ChildView::class.java)
+    val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java)
 
     test("AutoViewDiscovery") {
         expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+        expect(allErrorRoutes) { Routes().autoDiscoverViews("com.github").errorRoutes }
     }
 
     test("calling autoDiscoverViews() multiple times won't fail") {
@@ -139,3 +146,8 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
 @Route("testing")
 class TestingView : VerticalLayout()
+
+class ErrorView : VerticalLayout(), HasErrorParameter<Exception> {
+    override fun setErrorParameter(event: BeforeEnterEvent, parameter: ErrorParameter<Exception>): Int =
+            throw RuntimeException(parameter.caughtException)
+}

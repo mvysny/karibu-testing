@@ -47,6 +47,18 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinResponse.getCurrent() != null }
         }
 
+        test("current UI contains sane values") {
+            expect(true) { UI.getCurrent().locale != null }
+            expect(true) { UI.getCurrent().element != null }
+            expect(true) { UI.getCurrent().session != null }
+            expect(true) { UI.getCurrent().loadingIndicatorConfiguration != null }
+            expect(true) { UI.getCurrent().pushConfiguration != null }
+            expect(true) { UI.getCurrent().reconnectDialogConfiguration != null }
+            expect(true) { UI.getCurrent().internals != null }
+            expect(true) { UI.getCurrent().page != null }
+            expect(true) { UI.getCurrent().router != null }
+        }
+
         test("setup() can be called multiple times in a row") {
             MockVaadin.setup()
             MockVaadin.setup()

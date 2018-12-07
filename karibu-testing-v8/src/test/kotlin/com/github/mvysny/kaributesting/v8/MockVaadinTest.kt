@@ -34,6 +34,16 @@ class MockVaadinTest : DynaTest({
 
         test("current UI contains sane values") {
             expect(true) { UI.getCurrent().locale != null }
+            expect(true) { UI.getCurrent().session != null }
+            expect(true) { UI.getCurrent().loadingIndicatorConfiguration != null }
+            expect(true) { UI.getCurrent().pushConfiguration != null }
+            expect(null) { UI.getCurrent().pushConnection }  // not using push
+            expect(true) { UI.getCurrent().reconnectDialogConfiguration != null }
+            expect(true) { UI.getCurrent().connectorTracker != null }
+            expect(true) { UI.getCurrent().tooltipConfiguration != null }
+            expect(true) { UI.getCurrent().notificationConfiguration != null }
+            expect(true) { UI.getCurrent().page != null }
+            expect(null) { UI.getCurrent().navigator }  // null by default
         }
 
         test("setup() can be called multiple times in a row") {

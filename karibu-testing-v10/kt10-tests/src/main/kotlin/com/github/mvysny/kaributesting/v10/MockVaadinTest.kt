@@ -129,6 +129,17 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
             expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
         }
+
+        // tests https://github.com/mvysny/karibu-testing/issues/11
+        test("beforeClientResponse invoked") {
+            var ran = false
+            UI.getCurrent().beforeClientResponse(UI.getCurrent()) {
+                expect(false, "the block was supposed to be run only once") { ran }
+                ran = true
+            }
+            _get<UI> {} // do the lookup which should trigger the beforeClientResponse run
+            expect(true) { ran }
+        }
     }
 
     group("dialogs") {

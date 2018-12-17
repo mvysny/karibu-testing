@@ -37,9 +37,7 @@ object MockVaadin {
      * from the injector, you must reconfigure Spring to use prototype scope,
      * otherwise an old UI from the UI scope or Session Scope will be provided.
      * @param routes all classes annotated with [com.vaadin.flow.router.Route]; use [Routes.autoDiscoverViews] to auto-discover all such classes.
-     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
-     * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
-     * [MockedUI.beforeClientResponse] for details.
+     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class.
      * @param serviceFactory allows you to provide your own implementation of [VaadinServletService] which allows you to e.g. override
      * [VaadinServletService.loadInstantiators] and provide your own way of instantiating Views, e.g. via Spring or Guice.
      * Please consult [MockService] on what methods you must override in your custom service.
@@ -69,9 +67,7 @@ object MockVaadin {
      * tests start from a pre-known state. If you're using Spring and you're getting UI
      * from the injector, you must reconfigure Spring to use prototype scope,
      * otherwise an old UI from the UI scope or Session Scope will be provided.
-     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class. If you decide to
-     * provide a different value, override [UI.beforeClientResponse] so that your dialogs are opened properly with this mocked testing - see
-     * [MockedUI.beforeClientResponse] for details.
+     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class.
      * @param servlet allows you to provide your own implementation of [VaadinServlet]. You MUST override [VaadinServlet.createServletService]
      * and construct a custom service which overrides important methods. Please consult [MockService] on what methods you must override in your custom service.
      */
@@ -267,21 +263,9 @@ object MockVaadin {
 }
 
 /**
- * We need to use a MockedUI, with [beforeClientResponse] overridden, otherwise opened dialogs will never appear in the UI.
+ * A simple no-op UI used by default by [MockVaadin.setup]. The class is open, in order to be extensible in user's library
  */
-// opened to be extensible in user's library
-open class MockedUI : UI() {
-    override fun beforeClientResponse(component: Component, execution: SerializableConsumer<ExecutionContext>): StateTree.ExecutionRegistration {
-        // run this execution immediately, otherwise the dialog is not really opened. This is because the dialog does not open immediately,
-        // instead it slates itself to be opened via this method.
-        execution.accept(ExecutionContext(this, false))
-        return object : StateTree.ExecutionRegistration {
-            override fun remove() {
-                // no-op, cannot be canceled since it already ran
-            }
-        }
-    }
-}
+open class MockedUI : UI()
 
 /**
  * A mocking service that performs three very important tasks:

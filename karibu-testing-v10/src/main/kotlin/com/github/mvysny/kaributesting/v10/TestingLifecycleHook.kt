@@ -7,10 +7,13 @@ interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      *
-     * The default implementation calls [cleanupDialogs].
+     * The default implementation does two things:
+     * * Calls all tasks submitted via [UI.beforeClientResponse]
+     * * Calls [cleanupDialogs]
      */
     fun awaitBeforeLookup() {
         if (UI.getCurrent() != null) {
+            UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
             cleanupDialogs()
         }
     }
@@ -42,6 +45,8 @@ var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.noop
  */
 fun cleanupDialogs() {
     UI.getCurrent().children.forEach {
-        if (it is Dialog && !it.isOpened) it.element.removeFromParent()
+        if (it is Dialog && !it.isOpened) {
+            it.element.removeFromParent()
+        }
     }
 }

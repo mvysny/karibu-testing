@@ -2,12 +2,15 @@ package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v8.autoDiscoverViews
-import com.github.mvysny.karibudsl.v8.autoViewProvider
+import com.github.mvysny.karibudsl.v8.*
 import com.vaadin.navigator.Navigator
 import com.vaadin.navigator.PushStateNavigation
 import com.vaadin.navigator.View
 import com.vaadin.server.*
+import com.vaadin.shared.JavaScriptExtensionState
+import com.vaadin.shared.ui.JavaScriptComponentState
+import com.vaadin.ui.AbstractJavaScriptComponent
+import com.vaadin.ui.HasComponents
 import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import java.lang.IllegalArgumentException
@@ -280,6 +283,35 @@ class MockVaadinTest : DynaTest({
             }
         }
     }
+
+    // test that Vaadin extensions work
+    group("extensions") {
+        test("attach to Button") {
+            UI.getCurrent().button {
+                MyExtension(this).text = "foo"
+                val e = extensions.filterIsInstance<MyExtension>().first()
+                expect("foo") { e.text }
+                e.remove()
+                expectList() { extensions.toList() }
+            }
+        }
+        test("attach to UI") {
+            MyExtension(UI.getCurrent()).text = "foo"
+            val e = UI.getCurrent().extensions.filterIsInstance<MyExtension>().first()
+            expect("foo") { e.text }
+            e.remove()
+            expectList() { UI.getCurrent().extensions.toList() }
+        }
+    }
+
+    group("javascript component") {
+        test("attach to UI") {
+            UI.getCurrent().myComponent {
+                text = "bar"
+                expect("bar") { text }
+            }
+        }
+    }
 })
 
 @PushStateNavigation
@@ -301,3 +333,34 @@ class MyUIWithAutoViewProvider : UI() {
         navigator.addProvider(autoViewProvider)
     }
 }
+
+class MyExtension(target: AbstractClientConnector) : AbstractJavaScriptExtension(target) {
+    class State : JavaScriptExtensionState() {
+        @JvmField var text: String = ""
+    }
+
+    override fun getState(): State = super.getState() as State
+    override fun getState(markAsDirty: Boolean): State = super.getState(markAsDirty) as State
+    var text: String
+        get() = getState(false).text
+        set(value) {
+            state.text = value
+        }
+}
+
+class MyComponent : AbstractJavaScriptComponent() {
+    class State : JavaScriptComponentState() {
+        @JvmField var text: String = ""
+    }
+
+    override fun getState(): State = super.getState() as State
+    override fun getState(markAsDirty: Boolean): State = super.getState(markAsDirty) as State
+    var text: String
+        get() = getState(false).text
+        set(value) {
+            state.text = value
+        }
+}
+
+@VaadinDsl
+fun (@VaadinDsl HasComponents).myComponent(block: (@VaadinDsl MyComponent).()->Unit = {}) = init(MyComponent(), block)

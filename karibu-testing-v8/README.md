@@ -373,7 +373,7 @@ This library provides three methods for looking up components.
   one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`. Java:
   `_assertNone(Button.class, spec -> spec.withCaption("Delete"));`
 * `_expectOne<type of component> { criteria }` will expect that there is
-  exactly ono **visible** component matching given criteria in the current UI; the function will fail if
+  exactly one **visible** component matching given criteria in the current UI; the function will fail if
   none, or more than one components are matching. For example: `_expectOne<Button> { caption = "Delete" }`. Java:
   `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`. Note: this is
   exactly the same as `_get()`, but it may communicate the intent of the test better if you're

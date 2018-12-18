@@ -363,6 +363,12 @@ This library provides three methods for looking up components.
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
   one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`; Java:
   `_expectNone(Button.class, spec -> spec.withCaption("Delete"));`
+* `_expectOne<type of component> { criteria }` will expect that there is
+  exactly one **visible** component matching given criteria in the current UI; the function will fail if
+  none, or more than one components are matching. For example: `_expectOne<Button> { caption = "Delete" }`. Java:
+  `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`. Note: this is
+  exactly the same as `_get()`, but it may communicate the intent of the test better if you're
+  only asserting that there is exactly one such component.
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible

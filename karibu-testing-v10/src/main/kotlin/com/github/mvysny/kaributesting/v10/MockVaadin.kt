@@ -223,12 +223,40 @@ object MockVaadin {
     }
 
     /**
+     * Since Karibu-Testing runs in the same JVM as the server and there is no browser, the boundaries between the client and
+     * the server become unclear. When looking into sources of any test method, it's really hard to tell where exactly the server request ends, and
+     * where another request starts.
+     *
+     * You can establish an explicit client boundary in your test, by explicitly calling this method. However, since that
+     * would be both laborous and error-prone, the default operation is that Karibu Testing pretends as if there was a client-server
+     * roundtrip before every component lookup
+     * via the [_get]/[_find]/[_expectNone]/[_expectOne] call. See [TestingLifecycleHook] for more details.
+     *
+     * Calls the following:
+     * * [runUIQueue]
+     * * [StateTree.runExecutionsBeforeClientResponse] which runs all blocks scheduled via [UI.beforeClientResponse]
+     * * [cleanupDialogs]
+     * @throws IllegalStateException if the environment is not mocked
+     */
+    fun clientRoundtrip() {
+        checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
+        runUIQueue()
+        UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
+        cleanupDialogs()
+    }
+
+    /**
      * Runs all tasks scheduled by [UI.access].
      *
      * If [VaadinSession.errorHandler] is not set or [propagateExceptionToHandler] is false, any exceptions thrown from Commands taken by [UI.access] will make this function fail.
      * The exceptions will be wrapped in [ExecutionException].
+     *
+     * Called automatically by [clientRoundtrip] which is by default called automatically from [TestingLifecycleHook]. You generally
+     * don't need to call this method unless you need to test your [ErrorHandler].
+     * @throws IllegalStateException if the environment is not mocked
      */
     fun runUIQueue(propagateExceptionToHandler: Boolean = false) {
+        checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
         VaadinSession.getCurrent()!!.apply {
             // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
             // otherwise the exceptions would simply be logged but unlock() wouldn't fail.

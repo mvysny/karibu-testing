@@ -15,7 +15,7 @@ class LocatorTest : DynaTest({
 
     beforeEach { MockVaadin.setup() }
     beforeEach { testingLifecycleHook = MyLifecycleHook() }
-    afterEach { testingLifecycleHook = TestingLifecycleHook.noop }
+    afterEach { testingLifecycleHook = TestingLifecycleHook.default }
     afterEach { MockVaadin.tearDown() }
 
     group("_get") {
@@ -176,7 +176,7 @@ class LocatorTest : DynaTest({
     }
 
     group("unmocked env") {
-        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
+        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.default }
         test("lookup functions should work in unmocked environment") {
             Button()._get(Button::class.java)
             expectThrows(AssertionError::class, "/?: No visible TextField in Button[] matching TextField") {

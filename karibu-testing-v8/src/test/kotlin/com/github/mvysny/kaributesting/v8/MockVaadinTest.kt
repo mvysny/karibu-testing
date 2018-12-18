@@ -190,7 +190,7 @@ class MockVaadinTest : DynaTest({
                 expect(true) { called }
             }
 
-            test("runUIQueue() processes all access() calls") {
+            test("clientRoundtrip() processes even calls scheduled in the access() itself") {
                 var calledCount = 0
                 UI.getCurrent().access(object : Runnable {
                     override fun run() {
@@ -201,14 +201,26 @@ class MockVaadinTest : DynaTest({
                     }
                 })
                 expect(0) { calledCount }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
                 expect(4) { calledCount }
             }
 
-            test("runUIQueue() propagates failures") {
+            test("_get() processes access()") {
+                var called = false
+                UI.getCurrent().access(object : Runnable {
+                    override fun run() {
+                        called = true
+                    }
+                })
+                expect(false) { called }
+                _get<UI>()
+                expect(true) { called }
+            }
+
+            test("clientRoundtrip() propagates failures") {
                 UI.getCurrent().access { throw java.lang.RuntimeException("simulated") }
                 expectThrows(ExecutionException::class, "simulated") {
-                    MockVaadin.runUIQueue()
+                    MockVaadin.clientRoundtrip()
                 }
             }
 
@@ -219,7 +231,7 @@ class MockVaadinTest : DynaTest({
                     expect(true) { VaadinRequest.getCurrent() != null }
                     expect(true) { UI.getCurrent() != null }
                 }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
             }
         }
         group("from bg thread") {
@@ -238,7 +250,7 @@ class MockVaadinTest : DynaTest({
                 runInBgSyncOnUI { access { fail("Shouldn't be called now") } }
             }
 
-            test("runUIQueue() processes all access() calls") {
+            test("clientRoundtrip() processes all access() calls") {
                 var calledCount = 0
                 runInBgSyncOnUI {
                     access(object : Runnable {
@@ -251,7 +263,7 @@ class MockVaadinTest : DynaTest({
                     })
                 }
                 expect(0) { calledCount }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
                 expect(4) { calledCount }
             }
 
@@ -264,7 +276,7 @@ class MockVaadinTest : DynaTest({
                         expect(true) { UI.getCurrent() != null }
                     }
                 }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
             }
         }
     }

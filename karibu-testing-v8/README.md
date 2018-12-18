@@ -577,6 +577,19 @@ We have added support to implement this kind of behavior. There is a global vari
 contains hooks which by default do nothing. You can simply provide your own custom implementation of `TestingLifecycleHook`
 interface which would await for async, and then set it to the `testingLifecycleHook` global variable.
 
+## Mocking Server Request End Properly
+
+Since Karibu-Testing runs in the same JVM as the server and there is no browser, the boundaries between the client and
+the server become unclear. When looking into sources of any test method, it's really hard to tell where exactly the server request ends, and
+where another request starts. However, it is very important to know the boundary, for example to understand when to run the `UI.access()` blocks.
+
+You can establish an explicit client boundary in your test, by explicitly calling `MockVaadin.clientRoundtrip()`. However, since that
+would be both laborous and error-prone, the default operation is that Karibu Testing pretends as if there was a client-server
+roundtrip before every component lookup
+via the `_get()`/`_find()`/`_expectNone()`/`_expectOne()` call. Therefore, `MockVaadin.clientRoundtrip()` is called from `TestingLifecycleHook.awaitBeforeLookup()` by default.
+
+You can change this behavior by providing your own `TestingLifecycleHook` implementation as described above.
+
 # Advanced Topics
 
 ## Testing Asynchronous Application

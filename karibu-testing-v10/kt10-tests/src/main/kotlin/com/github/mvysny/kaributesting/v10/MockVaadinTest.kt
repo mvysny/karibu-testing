@@ -247,7 +247,19 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 expect(true) { called }
             }
 
-            test("runUIQueue() processes all access() calls") {
+            test("_get() processes access()") {
+                var called = false
+                UI.getCurrent().access(object : Command {
+                    override fun execute() {
+                        called = true
+                    }
+                })
+                expect(false) { called }
+                _get<UI>()
+                expect(true) { called }
+            }
+
+            test("clientRoundtrip() processes all access() calls") {
                 var calledCount = 0
                 UI.getCurrent().access(object : Command {
                     override fun execute() {
@@ -258,14 +270,14 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                     }
                 })
                 expect(0) { calledCount }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
                 expect(4) { calledCount }
             }
 
-            test("runUIQueue() propagates failures") {
+            test("clientRoundtrip() propagates failures") {
                 UI.getCurrent().access { throw RuntimeException("simulated") }
                 expectThrows(ExecutionException::class, "simulated") {
-                    MockVaadin.runUIQueue()
+                    MockVaadin.clientRoundtrip()
                 }
             }
 
@@ -277,7 +289,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                     expect(true) { UI.getCurrent() != null }
                     expect(true) { VaadinResponse.getCurrent() != null }
                 }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
             }
         }
         group("from bg thread") {
@@ -296,7 +308,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 runInBgSyncOnUI { access { fail("Shouldn't be called now") } }
             }
 
-            test("runUIQueue() processes all access() calls") {
+            test("clientRoundtrip() processes all access() calls") {
                 var calledCount = 0
                 runInBgSyncOnUI {
                     access(object : Command {
@@ -309,7 +321,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                     })
                 }
                 expect(0) { calledCount }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
                 expect(4) { calledCount }
             }
 
@@ -323,7 +335,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                         expect(true) { VaadinResponse.getCurrent() != null }
                     }
                 }
-                MockVaadin.runUIQueue()
+                MockVaadin.clientRoundtrip()
             }
         }
     }

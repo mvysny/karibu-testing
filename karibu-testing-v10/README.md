@@ -367,7 +367,7 @@ This library provides three methods for looking up components.
   exactly one **visible** component matching given criteria in the current UI; the function will fail if
   none, or more than one components are matching. For example: `_expectOne<Button> { caption = "Delete" }`. Java:
   `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`. Note: this is
-  exactly the same as `_get()`, but it may communicate the intent of the test better if you're
+  exactly the same as `_get()`, but it may communicate the intent of the test better in the case when you're
   only asserting that there is exactly one such component.
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything

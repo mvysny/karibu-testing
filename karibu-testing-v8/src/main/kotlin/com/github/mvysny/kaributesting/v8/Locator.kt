@@ -133,6 +133,9 @@ fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> 
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"
             else -> "/$loc: Too many visible ${clazz.simpleName}s (${result.size})"
         }
+
+        // find() used to fail with IllegalArgumentException which makes sense for a general-purpose utility method. However,
+        // since find() is used in tests overwhelmingly, not finding the correct set of components is generally treated as an assertion error.
         fail("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
     }
     return result.filterIsInstance(clazz)

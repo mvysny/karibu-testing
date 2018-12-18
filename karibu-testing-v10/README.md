@@ -425,6 +425,17 @@ java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching Text
 	at org.test.MyUITest$1$2.invoke(MyUITest.kt:12)
 ```
 
+### Useful Tips
+
+* You should generally prefer `_get<Grid>()` over `_find<Grid>().get(0)`. If there are two or more Grids,
+  the former code will make the test fail with a clear explanation, while the latter will simply
+  select an arbitrary Grid, or fail with a non-informative `IndexOutOfBoundsException` if there is no such grid.
+  Using `_get()` will therefore make your code more robust. If you know there are two grids and you need
+  them both, then use `_find<Grid> { count = 2..2 }`
+* If you're only asserting that there is such a component (e.g. that a button named "Cancel" exists and is visible),
+  it's better to use `_expectOne()` (Java: `LocatorJ._assertOne()`) to express this intent explicitly, instead of
+  simply calling `_get()` without doing anything with the result component.
+
 ### Clicking Buttons
 
 Vaadin Button contains the `click()` method, however that method actually invokes the browser-side click method which will then eventually

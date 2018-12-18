@@ -8,11 +8,12 @@ import com.vaadin.ui.HasComponents
 import com.vaadin.ui.UI
 import java.util.*
 import java.util.function.Predicate
+import kotlin.test.fail
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
  *
- * You can add more properties, simply by creating a write-only property which will register a new [predicate] on write. See
+ * You can add more properties, simply by creating a write-only property which will register a new predicate into [predicates] on write. See
  * [Adding support for custom search criteria](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v8#adding-support-for-custom-search-criteria)
  * for more details.
  * @property clazz the class of the component we are searching for.
@@ -74,7 +75,7 @@ private fun Component.hasStyleName(style: String): Boolean {
  * Finds a VISIBLE component of given type which matches given [block]. This component and all of its descendants are searched.
  * @param block the search specification
  * @return the only matching component, never null.
- * @throws IllegalArgumentException if no component matched, or if more than one component matches.
+ * @throws AssertionError if no component matched, or if more than one component matches.
  */
 inline fun <reified T : Component> Component._get(noinline block: SearchSpec<T>.() -> Unit = {}): T = this._get(T::class.java, block)
 
@@ -83,7 +84,7 @@ inline fun <reified T : Component> Component._get(noinline block: SearchSpec<T>.
  * @param clazz the component must be of this class.
  * @param block the search specification
  * @return the only matching component, never null.
- * @throws IllegalArgumentException if no component matched, or if more than one component matches.
+ * @throws AssertionError if no component matched, or if more than one component matches.
  */
 fun <T : Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): T {
     val result = _find(clazz) {
@@ -97,7 +98,7 @@ fun <T : Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.() -> U
 /**
  * Finds a VISIBLE component in the current UI of given type which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
  * @return the only matching component, never null.
- * @throws IllegalArgumentException if no component matched, or if more than one component matches.
+ * @throws AssertionError if no component matched, or if more than one component matches.
  */
 inline fun <reified T : Component> _get(noinline block: SearchSpec<T>.() -> Unit = {}): T = _get(T::class.java, block)
 
@@ -106,13 +107,14 @@ inline fun <reified T : Component> _get(noinline block: SearchSpec<T>.() -> Unit
  * @param clazz the component must be of this class.
  * @param block the search specification
  * @return the only matching component, never null.
- * @throws IllegalArgumentException if no component matched, or if more than one component matches.
+ * @throws AssertionError if no component matched, or if more than one component matches.
  */
 fun <T : Component> _get(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): T = UI.getCurrent()._get(clazz, block)
 
 /**
  * Finds a list of VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
  * @return the list of matching components, may be empty.
+ * @throws AssertionError if the number of matched components isn't exactly as stated in [SearchSpec.count].
  */
 fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): List<T> {
     val spec = SearchSpec(clazz)
@@ -131,7 +133,7 @@ fun <T : Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.() -> 
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"
             else -> "/$loc: Too many visible ${clazz.simpleName}s (${result.size})"
         }
-        throw IllegalArgumentException("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
+        fail("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
     }
     return result.filterIsInstance(clazz)
 }
@@ -184,13 +186,13 @@ private fun Component.walk(): Iterable<Component> = Iterable {
 
 /**
  * Expects that there are no VISIBLE components of given type which matches [block]. This component and all of its descendants are searched.
- * @throws IllegalArgumentException if one or more components matched.
+ * @throws AssertionError if one or more components matched.
  */
 inline fun <reified T : Component> Component._expectNone(noinline block: SearchSpec<T>.() -> Unit = {}): Unit = this._expectNone(T::class.java, block)
 
 /**
  * Expects that there are no VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
- * @throws IllegalArgumentException if one or more components matched.
+ * @throws AssertionError if one or more components matched.
  */
 fun <T : Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): Unit {
     val result: List<T> = _find(clazz) {
@@ -203,12 +205,40 @@ fun <T : Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.
 
 /**
  * Expects that there are no VISIBLE components in the current UI of given type which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
- * @throws IllegalArgumentException if one or more components matched.
+ * @throws AssertionError if one or more components matched.
  */
 inline fun <reified T : Component> _expectNone(noinline block: SearchSpec<T>.() -> Unit = {}): Unit = _expectNone(T::class.java, block)
 
 /**
  * Expects that there are no VISIBLE components in the current UI of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
- * @throws IllegalArgumentException if one or more components matched.
+ * @throws AssertionError if one or more components matched.
  */
 fun <T : Component> _expectNone(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): Unit = UI.getCurrent()._expectNone(clazz, block)
+
+/**
+ * Expects that there is exactly one VISIBLE components of given type which matches [block]. This component and all of its descendants are searched.
+ * @throws AssertionError if none, or more than one components matched.
+ */
+inline fun <reified T : Component> Component._expectOne(noinline block: SearchSpec<T>.() -> Unit = {}): Unit = this._expectOne(T::class.java, block)
+
+/**
+ * Expects that there is exactly one VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
+ * @throws AssertionError if none, or more than one components matched.
+ */
+fun <T : Component> Component._expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}) {
+    // technically _expectNone is the same as _get, but the semantics differ - with _get() we're "just" doing a lookup (and asserting on
+    // the component later). _expectOne() explicitly declares in the test sources that we want to check that there is exactly one such component.
+    _get(clazz)
+}
+
+/**
+ * Expects that there is exactly one VISIBLE components in the current UI of given type which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * @throws AssertionError if none, or more than one components matched.
+ */
+inline fun <reified T : Component> _expectOne(noinline block: SearchSpec<T>.() -> Unit = {}): Unit = _expectOne(T::class.java, block)
+
+/**
+ * Expects that there is exactly one VISIBLE components in the current UI of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * @throws AssertionError if none, or more than one components matched.
+ */
+fun <T : Component> _expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): Unit = UI.getCurrent()._expectOne(clazz, block)

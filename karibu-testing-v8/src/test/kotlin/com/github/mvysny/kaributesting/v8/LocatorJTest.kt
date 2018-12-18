@@ -19,19 +19,19 @@ class LocatorJTest : DynaTest({
 
     group("_get") {
         test("FailsOnNoComponents UI") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(Label::class.java)
             }
         }
 
         test("FailsOnNoComponents") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(Button(), Label::class.java)
             }
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }, VerticalLayout::class.java)
@@ -63,7 +63,7 @@ class LocatorJTest : DynaTest({
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._assertNone(UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }, VerticalLayout::class.java)
@@ -71,11 +71,41 @@ class LocatorJTest : DynaTest({
         }
 
         test("selects self") {
-            expectThrows(IllegalArgumentException::class) { LocatorJ._assertNone(Button(), Button::class.java) }
+            expectThrows(AssertionError::class) { LocatorJ._assertNone(Button(), Button::class.java) }
         }
 
         test("ReturnsNested") {
-            expectThrows(IllegalArgumentException::class) { LocatorJ._assertNone(VerticalLayout(Button()), Button::class.java) }
+            expectThrows(AssertionError::class) { LocatorJ._assertNone(VerticalLayout(Button()), Button::class.java) }
+        }
+    }
+
+    group("_expectOne") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(Label::class.java)
+            }
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(Button(), Label::class.java)
+            }
+        }
+
+        test("fails when multiple components match") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }, VerticalLayout::class.java)
+            }
+        }
+
+        test("selects self") {
+            LocatorJ._assertOne(Button(), Button::class.java)
+        }
+
+        test("ReturnsNested") {
+            LocatorJ._assertOne(VerticalLayout(Button()), Button::class.java)
         }
     }
 })

@@ -16,7 +16,7 @@ class LocatorAddonsTest : DynaTest({
     group("captionContains") {
         test("fails when caption doesn't match") {
             UI.getCurrent().content = Button("bar")
-            expectThrows(IllegalArgumentException::class, message = "and captionContains('foo')") {
+            expectThrows(AssertionError::class, message = "and captionContains('foo')") {
                 _get<Button> { captionContains("foo") }
             }
         }

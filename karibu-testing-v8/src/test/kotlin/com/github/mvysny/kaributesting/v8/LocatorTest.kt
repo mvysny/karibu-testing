@@ -8,7 +8,6 @@ import com.github.mvysny.karibudsl.v8.textField
 import com.github.mvysny.karibudsl.v8.verticalLayout
 import com.vaadin.server.Page
 import com.vaadin.ui.*
-import com.vaadin.util.CurrentInstance
 import java.lang.NullPointerException
 import kotlin.test.expect
 
@@ -21,21 +20,21 @@ class LocatorTest : DynaTest({
 
     group("_get") {
         test("FailsOnNoComponents UI") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 _get(Label::class.java)
             }
             expectAfterLookupCalled()
         }
 
         test("FailsOnNoComponents") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 Button()._get(Label::class.java)
             }
             expectAfterLookupCalled()
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }._get(VerticalLayout::class.java)
@@ -56,6 +55,41 @@ class LocatorTest : DynaTest({
         }
     }
 
+    group("_expectOne") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) {
+                _expectOne(Label::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) {
+                Button()._expectOne(Label::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("fails when multiple components match") {
+            expectThrows(AssertionError::class) {
+                UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }._expectOne(VerticalLayout::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("selects self") {
+            Button()._expectOne(Button::class.java)
+            expectAfterLookupCalled()
+        }
+
+        test("ReturnsNested") {
+            VerticalLayout(Button())._expectOne(Button::class.java)
+            expectAfterLookupCalled()
+        }
+    }
+
     group("_find") {
         test("findMatchingId") {
             val button = Button().apply { id = "foo" }
@@ -71,7 +105,7 @@ class LocatorTest : DynaTest({
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }._expectNone(VerticalLayout::class.java)
@@ -80,12 +114,12 @@ class LocatorTest : DynaTest({
         }
 
         test("selects self") {
-            expectThrows(IllegalArgumentException::class) { Button()._expectNone(Button::class.java) }
+            expectThrows(AssertionError::class) { Button()._expectNone(Button::class.java) }
             expectAfterLookupCalled()
         }
 
         test("ReturnsNested") {
-            expectThrows(IllegalArgumentException::class) { VerticalLayout(Button())._expectNone(Button::class.java) }
+            expectThrows(AssertionError::class) { VerticalLayout(Button())._expectNone(Button::class.java) }
             expectAfterLookupCalled()
         }
     }
@@ -145,7 +179,7 @@ class LocatorTest : DynaTest({
         beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
         test("lookup functions should work in unmocked environment") {
             Button()._get(Button::class.java)
-            expectThrows(IllegalArgumentException::class, "/?: No visible TextField in Button[] matching TextField") {
+            expectThrows(AssertionError::class, "/?: No visible TextField in Button[] matching TextField") {
                 Button()._get(TextField::class.java)
             }
         }
@@ -156,7 +190,7 @@ class LocatorTest : DynaTest({
                 Page.getCurrent().location
             }
             // the Page has been mocked improperly, but _get should still fail with a proper error message.
-            expectThrows(IllegalArgumentException::class, "/?: No visible TextField in Button[] matching TextField") {
+            expectThrows(AssertionError::class, "/?: No visible TextField in Button[] matching TextField") {
                 Button()._get(TextField::class.java)
             }
         }

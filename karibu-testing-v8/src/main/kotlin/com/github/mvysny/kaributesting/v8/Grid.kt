@@ -108,7 +108,7 @@ fun <T: Any> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPrese
  * @param rowIndex the row index, 0 or higher.
  */
 fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
-    val rowObject: T = dataProvider._get(rowIndex)
+    val rowObject: T = _get(rowIndex)
     return columns.filterNot { it.isHidden } .map { it._getFormatted(rowObject) }
 }
 
@@ -151,7 +151,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
 fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
     visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]${getSortIndicator(it)}" }
-    val dsIndices: IntRange = 0 until dataProvider._size()
+    val dsIndices: IntRange = 0 until _size()
     val displayIndices = rows.intersect(dsIndices)
     for (i in displayIndices) {
         _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")

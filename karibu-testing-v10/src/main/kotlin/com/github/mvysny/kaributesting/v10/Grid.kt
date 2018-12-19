@@ -341,7 +341,7 @@ var HeaderRow.HeaderCell.component: Component?
 val KProperty1<*, *>.asc get() = QuerySortOrder(name, SortDirection.ASCENDING)
 val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
 /**
- * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions. Works also with Vaadin 11.
  */
 fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     // Vaadin 12 has public sort() method, but Vaadin 11 does not. We have to use reflection.
@@ -349,6 +349,9 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     method.invoke(this, sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) }, false)
 }
 
+/**
+ * Returns the current sort order for given Grid. Works also with Vaadin 11.
+ */
 @Suppress("UNCHECKED_CAST")
 val <T> Grid<T>.sortOrder: List<GridSortOrder<T>> get() {
     // Vaadin 11 doesn't have the public getSortOrder() function. Need to use reflection.

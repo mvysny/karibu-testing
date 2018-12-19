@@ -24,7 +24,7 @@ import kotlin.streams.toList
  */
 fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
     @Suppress("UNCHECKED_CAST")
-    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(rowIndex, 1, null, null, null))
+    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(rowIndex, 1, listOf(), null, null))
     return fetched.toList().first()
 }
 
@@ -34,7 +34,7 @@ fun <T : Any> DataProvider<T, *>._get(rowIndex: Int): T {
  */
 fun <T : Any> DataProvider<T, *>._findAll(): List<T> {
     @Suppress("UNCHECKED_CAST")
-    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(0, Int.MAX_VALUE, null, null, null))
+    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(0, Int.MAX_VALUE, listOf(), null, null))
     return fetched.toList()
 }
 

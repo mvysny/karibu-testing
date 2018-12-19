@@ -235,8 +235,6 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
     }
 }
 
-
-
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */

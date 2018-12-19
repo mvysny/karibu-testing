@@ -4,11 +4,13 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.github.mvysny.karibudsl.v8.getColumnBy
+import com.github.mvysny.karibudsl.v8.grid
 import com.vaadin.data.provider.ListDataProvider
 import com.vaadin.shared.MouseEventDetails
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.Grid
 import com.vaadin.ui.TextField
+import com.vaadin.ui.UI
 import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.test.expect
@@ -48,7 +50,13 @@ class GridTest : DynaTest({
     }
 
     test("_dump shows sorting indicator") {
-        fail("implement")
+        val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        val grid = UI.getCurrent().grid<TestPerson>(dataProvider = dp) {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            sort(TestPerson::name.asc, TestPerson::age.desc)
+        }
+        expect("--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
 
     test("expectRow()") {

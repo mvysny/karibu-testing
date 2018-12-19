@@ -55,7 +55,13 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     test("_dump shows sorting indicator") {
-        fail("implement")
+        val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        val grid = UI.getCurrent().grid<TestPerson>(dp) {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            sort(TestPerson::name.asc, TestPerson::age.desc)
+        }
+        expect("--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
 
     test("expectRow()") {

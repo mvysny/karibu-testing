@@ -189,6 +189,15 @@ var <T> Grid.Column<T>.header2: String
         setHeader(value)
     }
 
+private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
+    val so = sortOrder.firstOrNull { it.sorted == column }
+    return when {
+        so == null -> ""
+        so.direction == SortDirection.ASCENDING -> "v"
+        else -> "^"
+    }
+}
+
 /**
  * Dumps given range of [rows] of the Grid, formatting the values using the [_getFormatted] function. The output example:
  * ```
@@ -198,9 +207,9 @@ var <T> Grid.Column<T>.header2: String
  * --and 198 more
  * ```
  */
-fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = kotlin.text.buildString {
+fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
-    visibleColumns.map { "[${it.header2}]" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
+    visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
     val dsIndices: IntRange = 0 until dataProvider._size()
     val displayIndices = rows.intersect(dsIndices)
     for (i in displayIndices) {
@@ -213,7 +222,7 @@ fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = kotlin.text.buildSt
 }
 
 fun Grid<*>.expectRows(count: Int) {
-    if (dataProvider._size() != count) {
+    if (_size() != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
     }
 }

@@ -137,6 +137,15 @@ val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
  */
 fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
 
+private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
+    val so = sortOrder.firstOrNull { it.sorted == column }
+    return when {
+        so == null -> ""
+        so.direction == SortDirection.ASCENDING -> "v"
+        else -> "^"
+    }
+}
+
 /**
  * Dumps the first [maxRows] rows of the Grid, formatting the values using the [_getFormatted] function. The output example:
  * ```
@@ -148,7 +157,7 @@ fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presenta
  */
 fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
-    visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]" }
+    visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]${getSortIndicator(it)}" }
     val dsIndices: IntRange = 0 until dataProvider._size()
     val displayIndices = rows.intersect(dsIndices)
     for (i in displayIndices) {
@@ -165,7 +174,7 @@ fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
  * first 10 rows of the Grid on failure.
  */
 fun Grid<*>.expectRows(count: Int) {
-    if (dataProvider._size() != count) {
+    if (_size() != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
     }
 }

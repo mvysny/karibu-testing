@@ -61,7 +61,7 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int = size(Query(filter)
 /**
  * Returns the number of items in this data provider.
  */
-fun Grid<*>._size(): Int = dataProvider._size()
+fun Grid<*>._size(): Int = dataCommunicator.dataProviderSize
 
 /**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Fails if [Grid.Column.getRenderer] is not a [ClickableRenderer].

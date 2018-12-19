@@ -19,7 +19,7 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
     group("captionContains") {
         test("fails when caption doesn't match") {
             UI.getCurrent().add(Button("bar"))
-            expectThrows(IllegalArgumentException::class, message = "and captionContains('foo')") {
+            expectThrows(AssertionError::class, message = "and captionContains('foo')") {
                 _get<Button> { captionContains("foo") }
             }
         }
@@ -41,7 +41,7 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
     group("textContains") {
         test("fails when text doesn't match") {
             UI.getCurrent().add(Span("bar"))
-            expectThrows(IllegalArgumentException::class, message = "and textContains('foo')") {
+            expectThrows(AssertionError::class, message = "and textContains('foo')") {
                 _get<Span> { textContains("foo") }
             }
         }

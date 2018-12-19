@@ -229,9 +229,9 @@ inline fun <reified T : Component> Component._expectOne(noinline block: SearchSp
  * @throws AssertionError if none, or more than one components matched.
  */
 fun <T : Component> Component._expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}) {
-    // technically _expectNone is the same as _get, but the semantics differ - with _get() we're "just" doing a lookup (and asserting on
+    // technically _expectOne is the same as _get, but the semantics differ - with _get() we're "just" doing a lookup (and asserting on
     // the component later). _expectOne() explicitly declares in the test sources that we want to check that there is exactly one such component.
-    _get(clazz)
+    _get(clazz, block)
 }
 
 /**
@@ -245,3 +245,62 @@ inline fun <reified T : Component> _expectOne(noinline block: SearchSpec<T>.() -
  * @throws AssertionError if none, or more than one components matched.
  */
 fun <T : Component> _expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): Unit = UI.getCurrent()._expectOne(clazz, block)
+
+/**
+ * Expects that there are exactly [count] VISIBLE components matching [block]. This component and all of its descendants are searched. Examples:
+ * ```
+ * // check that there are 5 buttons in a button bar
+ * buttonBar._expect<Button>(5..5)
+ * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
+ * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
+ * ```
+ * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+ * @throws AssertionError if incorrect count of component matched.
+ */
+inline fun <reified T : Component> Component._expect(count: Int = 1, noinline block: SearchSpec<T>.() -> Unit = {}): Unit = this._expect(T::class.java, count, block)
+
+/**
+ * Expects that there are exactly [count] VISIBLE components of given [clazz] match [block]. This component and all of its descendants are searched. Examples:
+ * ```
+ * // check that there are 5 buttons in a button bar
+ * buttonBar._expect<Button>(5)
+ * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
+ * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
+ * ```
+ * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+ * @throws AssertionError if incorrect count of component matched.
+ */
+fun <T : Component> Component._expect(clazz: Class<T>, count: Int = 1, block: SearchSpec<T>.() -> Unit = {}) {
+    // technically _expect is the same as _find, but the semantics differ - with _find() we're "just" doing a lookup (and asserting on
+    // the components later). _expect() explicitly declares in the test sources that we want to check that there are exactly x components that match given spec.
+    _find(clazz) {
+        this.count = count..count
+        block()
+    }
+}
+
+/**
+ * Expects that there are exactly [count] VISIBLE components in the current UI match [block]. The [UI.getCurrent] and all of its descendants are searched. Examples:
+ * ```
+ * // check that there are 5 buttons in a button bar
+ * buttonBar._expect<Button>(5..5)
+ * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
+ * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
+ * ```
+ * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+ * @throws AssertionError if incorrect count of component matched.
+ */
+inline fun <reified T : Component> _expect(count: Int = 1, noinline block: SearchSpec<T>.() -> Unit = {}): Unit = _expect(T::class.java, count, block)
+
+/**
+ * Expects that there are exactly [count] VISIBLE components in the current UI with given [clazz] match [block]. The [UI.getCurrent] and all of its descendants are searched. Examples:
+ * ```
+ * // check that there are 5 buttons in a button bar
+ * buttonBar._expect<Button>(5..5)
+ * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
+ * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
+ * ```
+ * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+ * @throws AssertionError if incorrect count of component matched.
+ */
+fun <T : Component> _expect(clazz: Class<T>, count: Int = 1, block: SearchSpec<T>.() -> Unit = {}): Unit = UI.getCurrent()._expect(clazz, count, block)

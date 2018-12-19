@@ -78,14 +78,38 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * expected count of matching components, defaults to `0..Int.MAX_VALUE`
-     * @param count the expected count
+     * expected count of matching components, defaults to {@code 0..Int.MAX_VALUE}
+     * @param count expected count of matching components. Any count of component within this range is accepted.
      * @return this
      */
     @NotNull
     public SearchSpecJ<T> withCount(@NotNull IntRange count) {
         spec.setCount(count);
         return this;
+    }
+
+    /**
+     * Expected count of matching components, defaults to {@code 0..Int.MAX_VALUE}
+     * @param count expected count
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withCount(int count) {
+        return withCount(count, count);
+    }
+
+    /**
+     * Expected count of matching components, defaults to {@code 0..Int.MAX_VALUE}
+     * @param min minimum count, inclusive
+     * @param max maximum count, inclusive
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withCount(int min, int max) {
+        if (min > max) {
+            throw new IllegalArgumentException("Parameter min: invalid value " + min + ": must be less than or equal to max: " + max);
+        }
+        return withCount(new IntRange(min, max));
     }
 
     /**

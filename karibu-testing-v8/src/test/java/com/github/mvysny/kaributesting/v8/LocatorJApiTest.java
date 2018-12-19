@@ -40,8 +40,21 @@ public class LocatorJApiTest {
 
         _assertNone(Label.class);
         _assertNone(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _assertNone(Label.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
         _assertNone(new Button(), TextField.class);
         _assertNone(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo"));
+
+        _assertOne(Label.class);
+        _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
+        _assertOne(new Button(), TextField.class);
+        _assertOne(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo"));
+
+        _assert(Label.class, 2);
+        _assert(Label.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
+        _assert(Label.class, 4, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
+        _assert(new Button(), TextField.class, 6);
+        _assert(new VerticalLayout(), TextField.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
 
         _click(new Button());
         _setValue(new TextField(), "John");

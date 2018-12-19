@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.vaadin.flow.component.UI
@@ -20,19 +19,19 @@ internal fun DynaNodeGroup.locatorJTest() {
 
     group("_get") {
         test("FailsOnNoComponents UI") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(Label::class.java)
             }
         }
 
         test("FailsOnNoComponents") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(Button(), Label::class.java)
             }
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._get(UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }, VerticalLayout::class.java)
@@ -64,7 +63,7 @@ internal fun DynaNodeGroup.locatorJTest() {
         }
 
         test("fails when multiple components match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 LocatorJ._assertNone(UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }, VerticalLayout::class.java)
@@ -72,11 +71,83 @@ internal fun DynaNodeGroup.locatorJTest() {
         }
 
         test("selects self") {
-            expectThrows(IllegalArgumentException::class) { LocatorJ._assertNone(Button(), Button::class.java) }
+            expectThrows(AssertionError::class) { LocatorJ._assertNone(Button(), Button::class.java) }
         }
 
         test("ReturnsNested") {
-            expectThrows(IllegalArgumentException::class) { LocatorJ._assertNone(VerticalLayout(Button()), Button::class.java) }
+            expectThrows(AssertionError::class) { LocatorJ._assertNone(VerticalLayout(Button()), Button::class.java) }
+        }
+    }
+
+    group("_expectOne") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(Label::class.java)
+            }
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(Button(), Label::class.java)
+            }
+        }
+
+        test("fails when multiple components match") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assertOne(UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }, VerticalLayout::class.java)
+            }
+        }
+
+        test("selects self") {
+            LocatorJ._assertOne(Button(), Button::class.java)
+        }
+
+        test("ReturnsNested") {
+            LocatorJ._assertOne(VerticalLayout(Button()), Button::class.java)
+        }
+    }
+
+    group("_expect") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) { LocatorJ._assert(Label::class.java, 1) }
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) { LocatorJ._assert(Button(), Label::class.java, 1) }
+        }
+
+        test("matching 0 components works") {
+            LocatorJ._assert(Label::class.java, 0)
+            LocatorJ._assert(Button(), Label::class.java, 0)
+        }
+
+        test("fails when the count is wrong") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }, VerticalLayout::class.java, 1)
+            }
+        }
+
+        test("succeeds when the count is right") {
+            LocatorJ._assert(UI.getCurrent().verticalLayout {
+                verticalLayout { }
+            }, VerticalLayout::class.java, 2)
+        }
+
+        test("selects self") {
+            LocatorJ._assert(Button(), Button::class.java, 1)
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+            }
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+            }
         }
     }
 }

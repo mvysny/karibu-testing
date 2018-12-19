@@ -378,13 +378,20 @@ This library provides three methods for looking up components.
   `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`. Note: this is
   exactly the same as `_get()`, but it may communicate the intent of the test better in the case when you're
   only asserting that there is exactly one such component.
+* `_expect<type of component> { criteria }` is a generic version of the above methods which asserts
+  that all **visible** components match given criteria. For example, this checks that
+  there are five buttons in a button bar: `buttonBar._expect<Button>(5)`.
+  Note: this is exactly the same as `_find()`, but it may communicate the intent of the test better in the case when you're
+  only asserting on the state of the UI.
 
 > I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
   components - they will simply ignore invisible ones.
 
 This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
-in that component. There are `Component._get()`, `Component._find()`, `Component._expectNone()` and `Component._expectOne()` counterparts, added to every Vaadin
+in that component. There are `Component._get()`, `Component._find()`,
+`Component._expectNone()`, `Component._expectOne()` and `Component._expect()`
+counterparts, added to every Vaadin
 component as an extension method. For example:
 
 Kotlin:
@@ -586,7 +593,8 @@ where another request starts. However, it is very important to know the boundary
 You can establish an explicit client boundary in your test, by explicitly calling `MockVaadin.clientRoundtrip()`. However, since that
 would be both laborous and error-prone, the default operation is that Karibu Testing pretends as if there was a client-server
 roundtrip before every component lookup
-via the `_get()`/`_find()`/`_expectNone()`/`_expectOne()` call. Therefore, `MockVaadin.clientRoundtrip()` is called from `TestingLifecycleHook.awaitBeforeLookup()` by default.
+via the `_get()`/`_find()`/`_expectNone()`/`_expectOne()`/`_expect()` call.
+Therefore, `MockVaadin.clientRoundtrip()` is called from `TestingLifecycleHook.awaitBeforeLookup()` by default.
 
 You can change this behavior by providing your own `TestingLifecycleHook` implementation as described above.
 

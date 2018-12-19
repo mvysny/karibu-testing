@@ -239,4 +239,54 @@ public class LocatorJ {
             return Unit.INSTANCE;
         });
     }
+
+    /**
+     * Expects that there are exactly {@code count} VISIBLE components in the current UI match {@code block}. The {@link UI#getCurrent} and all of its descendants are searched.
+     * @param clazz the component must be of this class.
+     * @param count this count of components must match
+     * @throws AssertionError if incorrect count of component matched.
+     */
+    public static <T extends Component> void _assert(@NotNull Class<T> clazz, int count) {
+        LocatorKt._expect(clazz, count, spec -> Unit.INSTANCE);
+    }
+
+    /**
+     * Expects that there are exactly {@code count} VISIBLE components in the current UI of given class which matches spec. The {@link UI#getCurrent()} and all of its descendants are searched.
+     * @param clazz    the component must be of this class.
+     * @param count this count of components must match
+     * @param spec     allows you to add search criterion.
+     * @throws AssertionError if incorrect count of component matched.
+     */
+    public static <T extends Component> void _assert(@NotNull Class<T> clazz, int count, @NotNull Consumer<SearchSpecJ<T>> spec) {
+        LocatorKt._expect(clazz, count, ss -> {
+            spec.accept(new SearchSpecJ<>(ss));
+            return Unit.INSTANCE;
+        });
+    }
+
+    /**
+     * Expects that there are exactly {@code count} VISIBLE components of given class. Given component and all of its descendants are searched.
+     * @param receiver the parent layout to search in, not null.
+     * @param clazz    the component must be of this class.
+     * @param count this count of components must match
+     * @throws AssertionError if incorrect count of component matched.
+     */
+    public static <T extends Component> void _assert(@NotNull Component receiver, @NotNull Class<T> clazz, int count) {
+        LocatorKt._expect(receiver, clazz, count, ss -> Unit.INSTANCE);
+    }
+
+    /**
+     * Expects that there are exactly {@code count} VISIBLE components of given class matching given spec. Given component and all of its descendants are searched.
+     * @param receiver the parent layout to search in, not null.
+     * @param clazz    the component must be of this class.
+     * @param count this count of components must match
+     * @param spec     allows you to add search criterion.
+     * @throws AssertionError if incorrect count of component matched.
+     */
+    public static <T extends Component> void _assert(@NotNull Component receiver, @NotNull Class<T> clazz, int count, @NotNull Consumer<SearchSpecJ<T>> spec) {
+        LocatorKt._expect(receiver, clazz, count, ss -> {
+            spec.accept(new SearchSpecJ<>(ss));
+            return Unit.INSTANCE;
+        });
+    }
 }

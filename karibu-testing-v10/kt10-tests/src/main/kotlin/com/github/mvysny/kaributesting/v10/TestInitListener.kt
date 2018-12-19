@@ -3,6 +3,10 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.server.ServiceInitEvent
 import com.vaadin.flow.server.VaadinServiceInitListener
 
+/**
+ * This class is picked up automatically by Vaadin (since it's registered via META-INF/services). We then test elsewhere
+ * that MockVaadin-mocked env indeed picked up this init listener and executed it.
+ */
 class TestInitListener : VaadinServiceInitListener {
     override fun serviceInit(event: ServiceInitEvent) {
         serviceInitCalled = true

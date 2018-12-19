@@ -108,4 +108,46 @@ class LocatorJTest : DynaTest({
             LocatorJ._assertOne(VerticalLayout(Button()), Button::class.java)
         }
     }
+
+    group("_expect") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) { LocatorJ._assert(Label::class.java, 1) }
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) { LocatorJ._assert(Button(), Label::class.java, 1) }
+        }
+
+        test("matching 0 components works") {
+            LocatorJ._assert(Label::class.java, 0)
+            LocatorJ._assert(Button(), Label::class.java, 0)
+        }
+
+        test("fails when the count is wrong") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }, VerticalLayout::class.java, 1)
+            }
+        }
+
+        test("succeeds when the count is right") {
+            LocatorJ._assert(UI.getCurrent().verticalLayout {
+                verticalLayout { }
+            }, VerticalLayout::class.java, 2)
+        }
+
+        test("selects self") {
+            LocatorJ._assert(Button(), Button::class.java, 1)
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+            }
+            expectThrows(AssertionError::class) {
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+            }
+        }
+    }
 })

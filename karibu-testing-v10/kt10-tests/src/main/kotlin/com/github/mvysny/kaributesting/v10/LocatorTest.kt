@@ -8,6 +8,7 @@ import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
@@ -23,14 +24,14 @@ internal fun DynaNodeGroup.locatorTest() {
 
     group("_get") {
         test("fails when no component match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 Button()._get(TextField::class.java)
             }
             expectAfterLookupCalled()
         }
 
         test("fail when multiple component match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }._get(VerticalLayout::class.java)
@@ -66,7 +67,7 @@ internal fun DynaNodeGroup.locatorTest() {
         }
 
         test("fail when multiple component match") {
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
                 }._expectNone<VerticalLayout>()
@@ -76,13 +77,13 @@ internal fun DynaNodeGroup.locatorTest() {
 
         test("fails if self matches") {
             val button = Button()
-            expectThrows(IllegalArgumentException::class) { button._expectNone<Button>() }
+            expectThrows(AssertionError::class) { button._expectNone<Button>() }
             expectAfterLookupCalled()
         }
 
         test("fails if nested matches") {
             val button = Button()
-            expectThrows(IllegalArgumentException::class) { VerticalLayout(button)._expectNone<Button>() }
+            expectThrows(AssertionError::class) { VerticalLayout(button)._expectNone<Button>() }
             expectAfterLookupCalled()
         }
     }
@@ -138,8 +139,107 @@ internal fun DynaNodeGroup.locatorTest() {
         beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
         test("lookup functions should work in unmocked environment") {
             Button()._get(Button::class.java)
-            expectThrows(IllegalArgumentException::class) {
+            expectThrows(AssertionError::class) {
                 Button()._get(TextField::class.java)
+            }
+        }
+    }
+
+    group("_expectOne") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) {
+                _expectOne(Button::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) {
+                Button()._expectOne(Label::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("fails when multiple components match") {
+            expectThrows(AssertionError::class) {
+                UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }._expectOne(VerticalLayout::class.java)
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("selects self") {
+            Button()._expectOne(Button::class.java)
+            expectAfterLookupCalled()
+        }
+
+        test("returns nested") {
+            VerticalLayout(Button())._expectOne(Button::class.java)
+            expectAfterLookupCalled()
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                Button("foo")._expectOne<Button> { caption = "bar" }
+            }
+            expectAfterLookupCalled()
+            expectThrows(AssertionError::class) {
+                Button("foo")._expectOne(Button::class.java) { caption = "bar" }
+            }
+        }
+    }
+
+    group("_expect") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) { _expect<Label>() }
+            expectAfterLookupCalled()
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) { Button()._expect<Label>() }
+            expectAfterLookupCalled()
+        }
+
+        test("matching 0 components works") {
+            _expect<Label>(0)
+            expectAfterLookupCalled()
+            Button()._expect<Label>(0)
+        }
+
+        test("fails when the count is wrong") {
+            expectThrows(AssertionError::class) {
+                UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }._expect<VerticalLayout>()
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("succeeds when the count is right") {
+            UI.getCurrent().verticalLayout {
+                verticalLayout { }
+            }._expect<VerticalLayout>(2)
+            expectAfterLookupCalled()
+        }
+
+        test("selects self") {
+            Button()._expect<Button>(1)
+            expectAfterLookupCalled()
+        }
+
+        test("returns nested") {
+            VerticalLayout(Button())._expect<Button>(1)
+            expectAfterLookupCalled()
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                Button("foo")._expect<Button> { caption = "bar" }
+            }
+            expectAfterLookupCalled()
+            expectThrows(AssertionError::class) {
+                Button("foo")._expect(Button::class.java) { caption = "bar" }
             }
         }
     }

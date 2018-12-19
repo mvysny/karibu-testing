@@ -84,9 +84,73 @@ class LocatorTest : DynaTest({
             expectAfterLookupCalled()
         }
 
-        test("ReturnsNested") {
+        test("returns nested") {
             VerticalLayout(Button())._expectOne(Button::class.java)
             expectAfterLookupCalled()
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                Button("foo")._expectOne<Button> { caption = "bar" }
+            }
+            expectAfterLookupCalled()
+            expectThrows(AssertionError::class) {
+                Button("foo")._expectOne(Button::class.java) { caption = "bar" }
+            }
+        }
+    }
+
+    group("_expect") {
+        test("FailsOnNoComponents UI") {
+            expectThrows(AssertionError::class) { _expect<Label>() }
+            expectAfterLookupCalled()
+        }
+
+        test("FailsOnNoComponents") {
+            expectThrows(AssertionError::class) { Button()._expect<Label>() }
+            expectAfterLookupCalled()
+        }
+
+        test("matching 0 components works") {
+            _expect<Label>(0)
+            expectAfterLookupCalled()
+            Button()._expect<Label>(0)
+        }
+
+        test("fails when the count is wrong") {
+            expectThrows(AssertionError::class) {
+                UI.getCurrent().verticalLayout {
+                    verticalLayout { }
+                }._expect<VerticalLayout>()
+            }
+            expectAfterLookupCalled()
+        }
+
+        test("succeeds when the count is right") {
+            UI.getCurrent().verticalLayout {
+                verticalLayout { }
+            }._expect<VerticalLayout>(2)
+            expectAfterLookupCalled()
+        }
+
+        test("selects self") {
+            Button()._expect<Button>(1)
+            expectAfterLookupCalled()
+        }
+
+        test("returns nested") {
+            VerticalLayout(Button())._expect<Button>(1)
+            expectAfterLookupCalled()
+        }
+
+        test("spec") {
+            expectThrows(AssertionError::class) {
+                Button("foo")._expect<Button> { caption = "bar" }
+            }
+            expectAfterLookupCalled()
+            expectThrows(AssertionError::class) {
+                Button("foo")._expect(Button::class.java) { caption = "bar" }
+            }
         }
     }
 

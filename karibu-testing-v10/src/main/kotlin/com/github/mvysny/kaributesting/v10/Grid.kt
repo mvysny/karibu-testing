@@ -13,6 +13,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
 import elemental.json.Json
 import elemental.json.JsonValue
+import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
 
@@ -45,23 +46,23 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex, sortOrder.toDP(), getInMemorySorting())
-
-/**
- * Compute in-memory sorting for this grid, based on current [Grid.sortOrder] and comparators set in columns.
- */
-fun <T> Grid<T>.getInMemorySorting(): Comparator<T>? {
-    val comparators = sortOrder.map { it.sorted.getComparator(it.direction) }
-    return comparators.toComparator()
+fun <T> Grid<T>._get(rowIndex: Int): T {
+    require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
+    val fetched = _fetch(rowIndex, 1)
+    return fetched.firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
 }
 
-fun <T> List<GridSortOrder<T>>.toDP() = map { QuerySortOrder(it.sorted.key, it.direction) }
+fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> {
+    val m = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
+    @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(dataCommunicator, offset, limit) as Stream<T>
+    return fetched.toList()
+}
 
 /**
  * Returns all items in given data provider. Uses current Grid sorting.
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> = dataProvider._findAll(sortOrder.toDP(), getInMemorySorting())
+fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this data provider.
@@ -71,7 +72,10 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int = size(Query(filter)
 /**
  * Returns the number of items in this data provider.
  */
-fun Grid<*>._size(): Int = dataProvider._size()
+fun Grid<*>._size(): Int {
+    val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
+    return m.invoke(dataCommunicator) as Int
+}
 
 /**
  * Gets a [Grid.Column] of this grid by its [columnKey].
@@ -103,7 +107,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String) {
  */
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
-    val rowObject: T = dataProvider._get(rowIndex)
+    val rowObject: T = _get(rowIndex)
     val column: Grid.Column<T> = getColumnByKey(columnId) ?: throw IllegalArgumentException("There is no column $columnId. Available columns: ${columns.map { it.id }}")
     return column._getFormatted(rowObject)
 }
@@ -117,7 +121,7 @@ fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
 fun <T: Any> Grid.Column<T>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
 fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
-    val rowObject: T = dataProvider._get(rowIndex)
+    val rowObject: T = _get(rowIndex)
     return columns.filter { it.isVisible } .map { it._getFormatted(rowObject) }
 }
 
@@ -210,7 +214,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
 fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
-    val dsIndices: IntRange = 0 until dataProvider._size()
+    val dsIndices: IntRange = 0 until _size()
     val displayIndices = rows.intersect(dsIndices)
     for (i in displayIndices) {
         _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
@@ -357,24 +361,4 @@ val <T> Grid<T>.sortOrder: List<GridSortOrder<T>> get() {
     // Vaadin 11 doesn't have the public getSortOrder() function. Need to use reflection.
     val f = Grid::class.java.getDeclaredField("sortOrder").apply { isAccessible = true }
     return f.get(this) as List<GridSortOrder<T>>
-}
-
-/**
- * Creates a [Comparator] which compares items by all comparators in this list. If the list is empty, the comparator
- * will always treat all items as equal and will return `0`.
- */
-fun <T> List<Comparator<T>>.toComparator(): Comparator<T> = when {
-    isEmpty() -> Comparator { _, _ -> 0 }
-    size == 1 -> first()
-    else -> ComparatorList(this)
-}
-
-private class ComparatorList<T>(val comparators: List<Comparator<T>>) : Comparator<T> {
-    override fun compare(o1: T, o2: T): Int {
-        for (comparator in comparators) {
-            val result = comparator.compare(o1, o2)
-            if (result != 0) return result
-        }
-        return 0
-    }
 }

@@ -42,23 +42,16 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex, sortOrder.toDP(), getInMemorySorting())
-
-/**
- * Compute in-memory sorting for this grid, based on current [Grid.sortOrder] and comparators set in columns.
- */
-fun <T> Grid<T>.getInMemorySorting(): Comparator<T>? {
-    val comparators = sortOrder.map { it.sorted.getComparator(it.direction) }
-    return comparators.toComparator()
+fun <T> Grid<T>._get(rowIndex: Int): T {
+    val fetched = dataCommunicator.fetchItemsWithRange(rowIndex, 1)
+    return fetched.firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
 }
-
-fun <T> List<GridSortOrder<T>>.toDP(): List<QuerySortOrder> = map { QuerySortOrder(it.sorted.id, it.direction) }
 
 /**
  * Returns all items in given data provider. Uses current Grid sorting.
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> = dataProvider._findAll(sortOrder.toDP(), getInMemorySorting())
+fun <T> Grid<T>._findAll(): List<T> = dataCommunicator.fetchItemsWithRange(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this data provider.
@@ -238,24 +231,4 @@ val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
  */
 fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     setSortOrder(sortOrder.map { GridSortOrder(getColumnById(it.sorted), it.direction) })
-}
-
-/**
- * Creates a [Comparator] which compares items by all comparators in this list. If the list is empty, the comparator
- * will always treat all items as equal and will return `0`.
- */
-fun <T> List<Comparator<T>>.toComparator(): Comparator<T> = when {
-    isEmpty() -> Comparator { _, _ -> 0 }
-    size == 1 -> first()
-    else -> ComparatorList(this)
-}
-
-private class ComparatorList<T>(val comparators: List<Comparator<T>>) : Comparator<T> {
-    override fun compare(o1: T, o2: T): Int {
-        for (comparator in comparators) {
-            val result = comparator.compare(o1, o2)
-            if (result != 0) return result
-        }
-        return 0
-    }
 }

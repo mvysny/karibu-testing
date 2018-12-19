@@ -12,6 +12,7 @@ import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import java.lang.IllegalStateException
 import kotlin.test.expect
+import kotlin.test.fail
 
 internal fun DynaNodeGroup.gridTestbatch() {
 
@@ -27,6 +28,9 @@ internal fun DynaNodeGroup.gridTestbatch() {
     test("_get") {
         expect("name 5") {
             ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name
+        }
+        expectThrows(AssertionError::class, "Requested to get row 30 but the data provider only has 20 rows") {
+            ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(30)
         }
     }
 
@@ -48,6 +52,10 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 0 until 20
             )
         }
+    }
+
+    test("_dump shows sorting indicator") {
+        fail("implement")
     }
 
     test("expectRow()") {
@@ -106,6 +114,18 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 }.columns[0].renderer
             }
         }
+    }
+
+    test("sorting") {
+        val grid = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            setItems((0..10).map { TestPerson("name $it", it) })
+        }
+        grid.sort(TestPerson::age.desc)
+        expect((0..10).map { TestPerson("name $it", it) }.reversed()) { grid._findAll() }
+        expect(10) { grid._get(0).age }
+        expect(0) { grid._get(10).age }
     }
 }
 

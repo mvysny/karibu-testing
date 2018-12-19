@@ -3,55 +3,67 @@
 package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.data.ValueProvider
-import com.vaadin.data.provider.DataProvider
-import com.vaadin.data.provider.Query
+import com.vaadin.data.provider.*
 import com.vaadin.shared.MouseEventDetails
+import com.vaadin.shared.data.sort.SortDirection
 import com.vaadin.ui.Component
 import com.vaadin.ui.Grid
 import com.vaadin.ui.renderers.ClickableRenderer
+import kotlin.reflect.KProperty1
 import kotlin.streams.toList
 import kotlin.test.fail
 
 /**
- * Returns the item on given row. Fails if the row index is invalid.
+ * Returns the item on given row. Fails if the row index is invalid. The data provider is
+ * sorted according to given [sortOrders] (empty by default) and filtered according
+ * to given [filter] (null by default) first.
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row.
+ * @throws AssertionError if the row index is out of bounds.
  */
-fun <T> DataProvider<T, *>._get(rowIndex: Int): T {
-    @Suppress("UNCHECKED_CAST")
-    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(rowIndex, 1, listOf(), null, null))
-    return fetched.toList().first()
+fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
+    require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
+    val fetched = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
+    return fetched.toList().firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
 }
 
 /**
- * Returns all items in given data provider.
+ * Returns all items in given data provider, sorted according to given [sortOrders] (empty by default) and filtered according
+ * to given [filter] (null by default).
  * @return the list of items.
  */
-fun <T> DataProvider<T, *>._findAll(): List<T> {
-    @Suppress("UNCHECKED_CAST")
-    val fetched = (this as DataProvider<T, Any?>).fetch(Query<T, Any?>(0, Int.MAX_VALUE, listOf(), null, null))
+fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
+    val fetched = fetch(Query<T, F>(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
     return fetched.toList()
 }
 
 /**
- * Returns the item on given row. Fails if the row index is invalid.
+ * Returns the item on given row. Fails if the row index is invalid. Uses current Grid sorting.
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex)
+fun <T> Grid<T>._get(rowIndex: Int): T = dataProvider._get(rowIndex, sortOrder.toDP(), getInMemorySorting())
 
 /**
- * Returns all items in given data provider.
+ * Compute in-memory sorting for this grid, based on current [Grid.sortOrder] and comparators set in columns.
+ */
+fun <T> Grid<T>.getInMemorySorting(): Comparator<T>? {
+    val comparators = sortOrder.map { it.sorted.getComparator(it.direction) }
+    return comparators.toComparator()
+}
+
+fun <T> List<GridSortOrder<T>>.toDP(): List<QuerySortOrder> = map { QuerySortOrder(it.sorted.id, it.direction) }
+
+/**
+ * Returns all items in given data provider. Uses current Grid sorting.
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> = dataProvider._findAll()
+fun <T> Grid<T>._findAll(): List<T> = dataProvider._findAll(sortOrder.toDP(), getInMemorySorting())
 
 /**
  * Returns the number of items in this data provider.
  */
-@Suppress("UNCHECKED_CAST")
-fun DataProvider<*, *>._size(): Int =
-        (this as DataProvider<Any?, Any?>).size(Query(null))
+fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int = size(Query(filter))
 
 /**
  * Returns the number of items in this data provider.
@@ -136,7 +148,7 @@ fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presenta
  */
 fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
-    visibleColumns.map { "[${it.caption}]" } .joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
+    visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]" }
     val dsIndices: IntRange = 0 until dataProvider._size()
     val displayIndices = rows.intersect(dsIndices)
     for (i in displayIndices) {
@@ -207,4 +219,34 @@ fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
         fail("Expected Component at $rowIndex/$columnId but got $possibleComponent")
     }
     return possibleComponent
+}
+
+val KProperty1<*, *>.asc get() = QuerySortOrder(name, SortDirection.ASCENDING)
+val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
+
+/**
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+ */
+fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
+    setSortOrder(sortOrder.map { GridSortOrder(getColumnById(it.sorted), it.direction) })
+}
+
+/**
+ * Creates a [Comparator] which compares items by all comparators in this list. If the list is empty, the comparator
+ * will always treat all items as equal and will return `0`.
+ */
+fun <T> List<Comparator<T>>.toComparator(): Comparator<T> = when {
+    isEmpty() -> Comparator { _, _ -> 0 }
+    size == 1 -> first()
+    else -> ComparatorList(this)
+}
+
+private class ComparatorList<T>(val comparators: List<Comparator<T>>) : Comparator<T> {
+    override fun compare(o1: T, o2: T): Int {
+        for (comparator in comparators) {
+            val result = comparator.compare(o1, o2)
+            if (result != 0) return result
+        }
+        return 0
+    }
 }

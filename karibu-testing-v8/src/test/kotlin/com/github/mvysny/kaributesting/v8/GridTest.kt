@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.github.mvysny.karibudsl.v8.getColumnBy
 import com.vaadin.data.provider.ListDataProvider
@@ -11,6 +12,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.test.expect
+import kotlin.test.fail
 
 class GridTest : DynaTest({
 
@@ -23,6 +25,9 @@ class GridTest : DynaTest({
 
     test("_get") {
         expect("name 5") { ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name }
+        expectThrows(AssertionError::class, "Requested to get row 30 but the data provider only has 20 rows") {
+            ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(30)
+        }
     }
 
     test("_findAll") {
@@ -40,6 +45,10 @@ class GridTest : DynaTest({
         expect("--[The Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
         expect("--[The Name]-[Age]--\n0: NAME 0, 0\n1: NAME 1, 1\n2: NAME 2, 2\n3: NAME 3, 3\n4: NAME 4, 4\n--and 2 more\n") { grid._dump(0 until 5) }
         expect("--[The Name]-[Age]--\n0: NAME 0, 0\n1: NAME 1, 1\n2: NAME 2, 2\n3: NAME 3, 3\n4: NAME 4, 4\n5: NAME 5, 5\n6: NAME 6, 6\n") { grid._dump(0 until 20) }
+    }
+
+    test("_dump shows sorting indicator") {
+        fail("implement")
     }
 
     test("expectRow()") {
@@ -116,6 +125,18 @@ class GridTest : DynaTest({
             setItems((0..10).map { TestPerson("name $it", it) })
         }
         expect("name 3") { (grid._getComponentAt(3, "foo") as CheckBox).caption }
+    }
+
+    test("sorting") {
+        val grid = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            setItems((0..10).map { TestPerson("name $it", it) })
+        }
+        grid.sort(TestPerson::age.desc)
+        expect((0..10).map { TestPerson("name $it", it) }.reversed()) { grid._findAll() }
+        expect(10) { grid._get(0).age }
+        expect(0) { grid._get(10).age }
     }
 })
 

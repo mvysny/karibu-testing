@@ -16,13 +16,12 @@ This approach has the following advantages:
   We don't use Selenium drivers which are known to fail randomly.
 * *Headless*: The tests run headless since there's no browser.
 * *Simple*: the test runs in the same JVM as the server. You start the server in your `@BeforeClass` and
-  stop the server in your `@AfterClass`. There is no need to use the clunky setup of Maven's Integration plugin
+  stop the server in your `@AfterClass`. There is no need to use Maven's Integration plugin
   to start the server in the background (and then remember to kill it afterwards, otherwise all future CI tests
   will fail to start the server since it's already running).
 * *Robust*: the test runs in the same JVM as the server. If the
   server fails to start and throws an exception, the test method too will fail with the same exception.
-  No need to go hunting for exceptions in your server's log, located on your CI server which nobody
-  remembers how to access anymore.
+  No need to go hunting for exceptions in a log located somewhere on a CI server.
 
 With this technique you can run 600 UI tests in 7 seconds, as opposing to 1-2 hours with Selenium-based approach.
 Because of the speed, you can let the UI tests run after every commit by your continuous integration server.

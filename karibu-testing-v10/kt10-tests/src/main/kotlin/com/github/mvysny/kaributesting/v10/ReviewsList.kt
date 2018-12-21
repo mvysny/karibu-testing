@@ -11,7 +11,8 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.templatemodel.TemplateModel
 
 /**
- * Tests that the Browserless testing approach is able to instantiate a polymer template properly.
+ * Tests that the Browserless testing approach is able to instantiate a polymer template properly, from
+ * `src/main/webapp/frontend`.
  */
 @PageTitle("Review List")
 @Tag("reviews-list")
@@ -24,6 +25,11 @@ class ReviewsList : PolymerTemplate<TemplateModel>() {
     internal lateinit var addReview: Button
     @Id("header")
     internal lateinit var header: H1
-
-    interface ReviewsModel : TemplateModel
 }
+
+/**
+ * Test that the polymer template can be loaded from a classpath entry.
+ */
+@Tag("vaadin-button")
+@HtmlImport("frontend://bower_components/vaadin-button/src/vaadin-button.html")
+class MyButton : PolymerTemplate<TemplateModel>()

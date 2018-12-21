@@ -20,8 +20,30 @@ open class MockContext : ServletContext {
     override fun getEffectiveMajorVersion(): Int = 3
 
     override fun getResource(path: String): URL? {
-        val realPath = getRealPath(path) ?: return null
-        return File(realPath).toURI().toURL()
+        // for example @HtmlImport("frontend://reviews-list.html") will expect the resource to be present in the war file,
+        // which is typically located in $CWD/src/main/webapp/frontend, so let's search for that first
+        val realPath = getRealPath(path)
+        if (realPath != null) {
+            return File(realPath).toURI().toURL()
+        }
+
+        // nope, fall back to class loading.
+        //
+        // for example @HtmlImport("frontend://bower_components/vaadin-button/src/vaadin-button.html") will try to look up
+        // the following resources:
+        //
+        // 1. /frontend/bower_components/vaadin-button/src/vaadin-button.html
+        // 2. /webjars/vaadin-button/src/vaadin-button.html
+        //
+        // we need to match the latter one to a resource on classpath
+
+        if (path.startsWith("/")) {
+            val resource = Thread.currentThread().contextClassLoader.getResource("META-INF/resources$path")
+            if (resource != null) {
+                return resource
+            }
+        }
+        return null
     }
 
     override fun addListener(className: String?) {

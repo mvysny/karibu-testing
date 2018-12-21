@@ -28,4 +28,8 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
         expectList() { list.children.toList() }
         expectList(list) { list._find<Component>() }
     }
+
+    test("smoke-test class-loaded polymer template") {
+        MyButton()
+    }
 }

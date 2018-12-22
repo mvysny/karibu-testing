@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import kotlin.test.expect
 
 fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
 inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
@@ -226,4 +227,16 @@ val Component.placeholder: String?
  */
 fun RouterLink.click() {
     UI.getCurrent().navigate(href)
+}
+
+/**
+ * Expects that [actual] list of objects matches [expected] list of objects. Fails otherwise.
+ */
+fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)
+
+/**
+ * Removes the component from its parent. Does nothing if the component does not have a parent.
+ */
+fun Component.removeFromParent() {
+    (parent.orElse(null) as? HasComponents)?.remove(this)
 }

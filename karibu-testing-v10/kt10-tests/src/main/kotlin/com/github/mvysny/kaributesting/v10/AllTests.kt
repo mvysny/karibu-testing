@@ -34,6 +34,9 @@ fun DynaNodeGroup.allTests() {
     group("search spec") {
         searchSpecTest()
     }
+    group("notifications") {
+        notificationsTestBattery()
+    }
 }
 
 data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {

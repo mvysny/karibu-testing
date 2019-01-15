@@ -3,9 +3,9 @@
 [![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing-v8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing-v8)
 
-# Vaadin Browserless Testing
+# Karibu-Testing: The Vaadin Unit Testing
 
-The Unit Testing for Vaadin. Karibu-Testing removes the necessity to run
+The Unit Testing library for Vaadin. Karibu-Testing removes the necessity to run
 both the browser and the servlet container in order to test your Vaadin-based apps.
 
 1. *containerless testing*: You can test your Vaadin App without launching the servlet container -

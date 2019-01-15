@@ -5,10 +5,18 @@
 
 # Vaadin Browserless Testing
 
-[Vaadin-on-Kotlin](http://vaadinonkotlin.eu) promotes a testing technique called *browserless testing*. With this approach, it's not the browser you issue
-testing instructions to: we bypass the browser and the JavaScript-Server bridge, and talk directly to the server Vaadin component API.
+The Unit Testing for Vaadin. Karibu-Testing removes the necessity to run
+both the browser and the servlet container in order to test your Vaadin-based apps.
 
-This approach has the following advantages:
+1. *containerless testing*: You can test your Vaadin App without launching the servlet container -
+Karibu-Testing provides enough env around Vaadin Session and others, to run completely outside of servlet container.
+2. *browserless testing*: You look up components from
+server-side, bypassing browser and the JavaScript->Server bridge completely,
+and you talk directly to your server-side View classes, the server Vaadin components, etc.
+
+## Why?
+
+Advantages over the traditional testing with [Selenium](https://www.seleniumhq.org/)/[TestBench](https://vaadin.com/testbench):
 
 * *Fast*: Browserless tests are typically 100x faster than Selenium-based tests and run in 5-60 milliseconds,
   depending on their complexity.

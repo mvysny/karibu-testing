@@ -100,7 +100,7 @@ for more details.
 
 * The [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) which explains everything behind the browserless testing technique.
 * The [browserless web testing](https://mvysny.github.io/browserless-web-testing/) article describes this technique in more depth.
-* The [Testing the UI without a browser](https://vaadin.com/blog/testing-the-ui-without-a-browser) summarizes this technique.
+* The [Testing the UI without a browser](https://vaadin.com/blog/testing-the-ui-without-a-browser) blog post summarizes this technique.
 
 # License
 

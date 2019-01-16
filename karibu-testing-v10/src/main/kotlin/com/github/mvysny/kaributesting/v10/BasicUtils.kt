@@ -241,7 +241,6 @@ fun Component.removeFromParent() {
     (parent.orElse(null) as? HasComponents)?.remove(this)
 }
 
-
 /**
  * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
  * rules are matched against given component only (not against its children).

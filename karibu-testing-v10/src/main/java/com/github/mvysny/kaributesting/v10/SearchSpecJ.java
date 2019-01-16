@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10;
 import com.vaadin.flow.component.Component;
 
 import com.vaadin.flow.component.HasValue;
+import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,6 +114,28 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
+     * If not null, the component must match all of these classes. Space-separated.
+     * @param classes expected space-separated classes.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withClasses(@Nullable String classes) {
+        spec.setClasses(classes);
+        return this;
+    }
+
+    /**
+     * If not null, the component must NOT match any of these classes. Space-separated.
+     * @param classes space-separated classes, neither of which must be present on the component.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withoutClasses(@Nullable String classes) {
+        spec.setWithoutClasses(classes);
+        return this;
+    }
+
+    /**
      * Adds an additional predicate which the component needs to match. Not null.
      * <p/>
      * Please remember to provide a proper {@link Object#toString()} for the predicate,
@@ -129,5 +152,25 @@ public class SearchSpecJ<T extends Component> {
     @Override
     public String toString() {
         return spec.toString();
+    }
+
+    /**
+     * Returns a predicate which matches components based on this spec. All rules are matched, except the {@link #withCount(int)} rule. The
+     * rules are matched against given component only (not against its children).
+     */
+    @NotNull
+    public Predicate<Component> toPredicate() {
+        final Function1<Component, Boolean> predicate = spec.toPredicate();
+        return new Predicate<Component>() {
+            @Override
+            public boolean test(Component component) {
+                return predicate.invoke(component);
+            }
+
+            @Override
+            public String toString() {
+                return spec.toString();
+            }
+        };
     }
 }

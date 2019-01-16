@@ -132,7 +132,6 @@ internal fun DynaNodeGroup.locatorTest() {
     }
 
     group("matcher") {
-        fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
         test("id") {
             expect(true) { Button().matches { } }
             expect(false) { Button().matches { id = "a" } }

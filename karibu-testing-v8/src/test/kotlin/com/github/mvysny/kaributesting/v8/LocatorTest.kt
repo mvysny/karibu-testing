@@ -233,8 +233,7 @@ class LocatorTest : DynaTest({
         expect(3) { layout.componentCount }
     }
 
-    group("matcher") {
-        fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+    group("search spec") {
         test("id") {
             expect(true) { Button().matches { } }
             expect(false) { Button().matches { id = "a" } }

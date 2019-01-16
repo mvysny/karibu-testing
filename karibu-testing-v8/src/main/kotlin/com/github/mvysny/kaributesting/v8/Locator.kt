@@ -52,6 +52,10 @@ class SearchSpec<T : Component>(
         return list.joinToString(" and ")
     }
 
+    /**
+     * Returns a predicate which matches components based on this spec. All rules are matched, except the [count] rule. The
+     * rules are matched against given component only (not against its children).
+     */
     @Suppress("UNCHECKED_CAST")
     fun toPredicate(): (Component) -> Boolean {
         val p = mutableListOf<(Component) -> Boolean>()

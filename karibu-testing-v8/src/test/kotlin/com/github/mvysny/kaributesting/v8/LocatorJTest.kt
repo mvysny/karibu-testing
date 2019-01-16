@@ -3,10 +3,7 @@ package com.github.mvysny.kaributesting.v8
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.verticalLayout
-import com.vaadin.ui.Button
-import com.vaadin.ui.Label
-import com.vaadin.ui.UI
-import com.vaadin.ui.VerticalLayout
+import com.vaadin.ui.*
 import kotlin.test.expect
 
 /**
@@ -148,6 +145,59 @@ class LocatorJTest : DynaTest({
             expectThrows(AssertionError::class) {
                 LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
             }
+        }
+    }
+
+    group("search spec") {
+        fun Component.matches(spec: SearchSpecJ<Component>.()->Unit): Boolean = SearchSpecJ(SearchSpec(Component::class.java)).apply { spec() }.toPredicate().test(this)
+        test("id") {
+            expect(true) { Button().matches { } }
+            expect(false) { Button().matches { withId("a") } }
+            expect(true) { Button().apply { id = "a" } .matches { withId("a") } }
+            expect(true) { Button().apply { id = "a" } .matches { } }
+            expect(false) { Button().apply { id = "a b" } .matches { withId("a") } }
+            expect(false) { Button().apply { id = "a" } .matches { withId("a b") } }
+        }
+        test("caption") {
+            expect(true) { Button("click me").matches { withCaption("click me") } }
+            expect(true) { TextField("name:").matches { withCaption("name:") } }
+            expect(true) { Button("click me").matches { } }
+            expect(true) { TextField("name:").matches { } }
+            expect(false) { Button("click me").matches { withCaption("Click Me") } }
+            expect(false) { TextField("name:").matches { withCaption("Name") } }
+        }
+        test("placeholder") {
+            expect(true) { TextField("name").apply { placeholder = "the name" } .matches { withPlaceholder("the name") } }
+            expect(true) { PasswordField("password").apply { placeholder = "at least 6 characters" }.matches { withPlaceholder("at least 6 characters") } }
+            expect(true) { ComboBox<String>().apply { placeholder = "foo" }.matches { withPlaceholder("foo") } }
+            expect(false) { TextField("name").apply { placeholder = "the name" } .matches { withPlaceholder("name") } }
+            expect(false) { PasswordField("password").apply { placeholder = "at least 6 characters" }.matches { withPlaceholder("password") } }
+        }
+        test("value") {
+            expect(true) { TextField(null, "Mannerheim").matches { withValue("Mannerheim") } }
+            expect(false) { TextField("Mannerheim").matches { withValue("Mannerheim") } }
+            expect(true) { Label("Mannerheim").matches { withValue("Mannerheim") } }
+            expect(false) { Label().apply { caption = "Mannerheim" }.matches { withValue("Mannerheim") } }
+        }
+        test("styles") {
+            expect(true) { Button().apply { addStyleName("a b") } .matches { } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { withStyles("a") } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { withStyles("b") } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { withStyles("a b") } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withStyles("a c") } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withStyles("c") } }
+        }
+        test("withoutStyles") {
+            expect(true) { Button().apply { addStyleName("a b") } .matches { } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles("a") } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles("b") } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles("a b") } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles("a c") } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { withoutStyles("c") } }
+        }
+        test("predicates") {
+            expect(true) { Button().matches {}}
+            expect(false) { Button().matches { withPredicate { false } }}
         }
     }
 })

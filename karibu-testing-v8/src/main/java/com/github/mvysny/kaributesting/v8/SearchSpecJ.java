@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v8;
 
 import com.vaadin.ui.Component;
 
+import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,13 +67,24 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * if not null, the component must match all of these styles. Space-separated.
+     * If not null, the component must match all of these styles. Space-separated.
      * @param styles expected space-separated styles.
      * @return this
      */
     @NotNull
     public SearchSpecJ<T> withStyles(@Nullable String styles) {
         spec.setStyles(styles);
+        return this;
+    }
+
+    /**
+     * If not null, the component must NOT match any of these styles. Space-separated.
+     * @param styles expected space-separated styles, neither of which must be present on the component.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withoutStyles(@Nullable String styles) {
+        spec.setWithoutStyles(styles);
         return this;
     }
 
@@ -128,5 +140,25 @@ public class SearchSpecJ<T extends Component> {
     @Override
     public String toString() {
         return spec.toString();
+    }
+
+    /**
+     * Returns a predicate which matches components based on this spec. All rules are matched, except the {@link #withCount(int)} rule. The
+     * rules are matched against given component only (not against its children).
+     */
+    @NotNull
+    public Predicate<Component> toPredicate() {
+        final Function1<Component, Boolean> predicate = spec.toPredicate();
+        return new Predicate<Component>() {
+            @Override
+            public boolean test(Component component) {
+                return predicate.invoke(component);
+            }
+
+            @Override
+            public String toString() {
+                return spec.toString();
+            }
+        };
     }
 }

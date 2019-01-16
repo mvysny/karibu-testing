@@ -96,3 +96,9 @@ val Component.placeholder: String?
         is DateTimeField -> placeholder
         else -> null
     }
+
+/**
+ * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
+ * rules are matched against given component only (not against its children).
+ */
+fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)

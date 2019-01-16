@@ -45,7 +45,7 @@ public class LocatorJApiTest {
         _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
         _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
         _assertOne(new Button(), TextField.class);
-        _assertOne(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _assertOne(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo").withoutClasses("current"));
 
         _assert(Label.class, 2);
         _assert(Label.class, 3, spec -> spec.withCaption("Name:").withId("foo"));

@@ -227,6 +227,7 @@ class LocatorTest : DynaTest({
             expect(true) { Button().matches { } }
             expect(false) { Button().matches { id = "a" } }
             expect(true) { Button().apply { id = "a" } .matches { id = "a" } }
+            expect(true) { Button().apply { id = "a" } .matches { } }
             expect(false) { Button().apply { id = "a b" } .matches { id = "a" } }
             expect(false) { Button().apply { id = "a" } .matches { id = "a b" } }
         }

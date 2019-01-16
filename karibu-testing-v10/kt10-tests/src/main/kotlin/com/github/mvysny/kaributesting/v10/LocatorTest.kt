@@ -124,6 +124,7 @@ internal fun DynaNodeGroup.locatorTest() {
         test("id") {
             expect(true) { Button().matches { } }
             expect(false) { Button().matches { id = "a" } }
+            expect(true) { Button().apply { id_ = "a" } .matches { } }
             expect(true) { Button().apply { id_ = "a" } .matches { id = "a" } }
             expect(false) { Button().apply { id_ = "a b" } .matches { id = "a" } }
             expect(false) { Button().apply { id_ = "a" } .matches { id = "a b" } }

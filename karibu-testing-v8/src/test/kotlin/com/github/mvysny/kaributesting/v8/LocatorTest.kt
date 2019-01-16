@@ -164,7 +164,19 @@ class LocatorTest : DynaTest({
     group("_find") {
         test("findMatchingId") {
             val button = Button().apply { id = "foo" }
-            expect(listOf(button)) { VerticalLayout(button, Button())._find<Button> { id = "foo" } }
+            expectList(button) { VerticalLayout(button, Button())._find<Button> { id = "foo" } }
+            expectAfterLookupCalled()
+        }
+
+        test("doesn't return invisible") {
+            val button = Button().apply { isVisible = false }
+            expectList() { button._find(Button::class.java) }
+            expectAfterLookupCalled()
+        }
+
+        test("returns nested") {
+            val vl = VerticalLayout().apply { verticalLayout {} }
+            expect(2) { vl._find(VerticalLayout::class.java).size }
             expectAfterLookupCalled()
         }
     }

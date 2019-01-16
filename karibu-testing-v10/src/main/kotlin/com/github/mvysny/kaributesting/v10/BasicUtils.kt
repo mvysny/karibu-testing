@@ -168,7 +168,7 @@ private fun Component.checkEditableByUser() {
     }
 }
 
-private fun Component.isEffectivelyVisible(): Boolean = isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
+internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
 
 /**
  * This function actually works, as opposed to [Element.getTextRecursively].

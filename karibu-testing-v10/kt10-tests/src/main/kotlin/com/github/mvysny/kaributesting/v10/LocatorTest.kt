@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
+import java.util.function.Predicate
 import kotlin.streams.asSequence
 import kotlin.test.expect
 
@@ -48,6 +49,12 @@ internal fun DynaNodeGroup.locatorTest() {
         test("ReturnsNested") {
             val button = Button()
             expect(button) { VerticalLayout(button)._get(Button::class.java) }
+            expectAfterLookupCalled()
+        }
+
+        test("fails on invisible") {
+            val button = Button().apply { isVisible = false }
+            expectThrows(java.lang.AssertionError::class) { button._get(Button::class.java) }
             expectAfterLookupCalled()
         }
     }
@@ -114,6 +121,13 @@ internal fun DynaNodeGroup.locatorTest() {
 
     group("matcher") {
         fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+        test("id") {
+            expect(true) { Button().matches { } }
+            expect(false) { Button().matches { id = "a" } }
+            expect(true) { Button().apply { id_ = "a" } .matches { id = "a" } }
+            expect(false) { Button().apply { id_ = "a b" } .matches { id = "a" } }
+            expect(false) { Button().apply { id_ = "a" } .matches { id = "a b" } }
+        }
         test("caption") {
             expect(true) { Button("click me").matches { caption = "click me" } }
             expect(true) { TextField("name:").matches { caption = "name:" } }
@@ -132,6 +146,26 @@ internal fun DynaNodeGroup.locatorTest() {
         test("value") {
             expect(true) { TextField(null, "Mannerheim", "placeholder").matches { value = "Mannerheim" } }
             expect(false) { TextField("Mannerheim").matches { value = "Mannerheim" } }
+        }
+        test("styles") {
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { classes = "a" } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { classes = "b" } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { classes = "a b" } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { classes = "a c" } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { classes = "c" } }
+        }
+        test("withoutStyles") {
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "a" } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "b" } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "a b" } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "a c" } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "c" } }
+        }
+        test("predicates") {
+            expect(true) { Button().matches {}}
+            expect(false) { Button().matches { predicates.add(Predicate { false }) }}
         }
     }
 

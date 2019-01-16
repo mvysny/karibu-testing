@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid
@@ -24,6 +25,8 @@ import kotlin.streams.toList
  * @property text the [com.vaadin.flow.dom.Element.getText]
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
  * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
+ * @property classes if not null, the component must match all of these class names. Space-separated.
+ * @property withoutClasses if not null, the component must NOT match any of these class names. Space-separated.
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  */
 class SearchSpec<T : Component>(
@@ -34,6 +37,8 @@ class SearchSpec<T : Component>(
     var text: String? = null,
     var count: IntRange = 0..Int.MAX_VALUE,
     var value: Any? = null,
+    var classes: String? = null,
+    var withoutClasses: String? = null,
     var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
@@ -43,6 +48,8 @@ class SearchSpec<T : Component>(
         if (caption != null) list.add("caption='$caption'")
         if (placeholder != null) list.add("placeholder='$placeholder'")
         if (text != null) list.add("text='$text'")
+        if (!classes.isNullOrBlank()) list.add("classes='$classes'")
+        if (!withoutClasses.isNullOrBlank()) list.add("withoutClasses='$withoutClasses'")
         if (value != null) list.add("value=$value")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
@@ -52,15 +59,30 @@ class SearchSpec<T : Component>(
     @Suppress("UNCHECKED_CAST")
     fun toPredicate(): (Component) -> Boolean {
         val p = mutableListOf<(Component)->Boolean>()
-        p.add({ component -> clazz.isInstance(component)} )
-        if (id != null) p.add({ component -> component.id_ == id })
-        if (caption != null) p.add({ component -> component.caption == caption })
-        if (placeholder != null) p.add({ component -> component.placeholder == placeholder })
+        p.add { component -> clazz.isInstance(component)}
+        if (id != null) p.add { component -> component.id_ == id }
+        if (caption != null) p.add { component -> component.caption == caption }
+        if (placeholder != null) p.add { component -> component.placeholder == placeholder }
+        if (!classes.isNullOrBlank()) p.add { component -> component.hasAllClasses(classes!!) }
+        if (!withoutClasses.isNullOrBlank()) p.add { component -> component.doesntHaveAnyClasses(withoutClasses!!) }
         if (text != null) p.add { component -> component.element.text == text }
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.getValue() == value }
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }
+}
+
+fun Iterable<String?>.filterNotBlank(): List<String> = filterNotNull().filter { it.isNotBlank() }
+
+private fun Component.hasAllClasses(classes: String): Boolean {
+    if (classes.contains(' ')) return classes.split(' ').filterNotBlank().all { hasAllClasses(it) }
+    if (this !is HasStyle) return false
+    return classNames.contains(classes)
+}
+private fun Component.doesntHaveAnyClasses(classes: String): Boolean {
+    if (classes.contains(' ')) return classes.split(' ').filterNotBlank().all { !hasAllClasses(it) }
+    if (this !is HasStyle) return true
+    return !classNames.contains(classes)
 }
 
 /**
@@ -150,11 +172,11 @@ fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): L
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitBeforeLookup()
-    val descendants = walk()
+    val descendants = walk().toList()
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) throw AssertionError("An internal server error occurred; check log for the actual stack-trace. Error text: ${error.element.text}\n${UI.getCurrent().toPrettyTree()}")
-    return descendants.filter { predicate(it) }
+    return descendants.filter { it.isEffectivelyVisible() && predicate(it) }
 }
 
 private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }
@@ -193,7 +215,7 @@ inline fun <reified T: Component> Component._expectNone(noinline block: SearchSp
  * Expects that there are no VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
  * @throws IllegalArgumentException if one or more components matched.
  */
-fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): Unit {
+fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}) {
     val result: List<T> = _find(clazz) {
         count = 0..0
         block()

@@ -9,6 +9,7 @@ import com.github.mvysny.karibudsl.v8.verticalLayout
 import com.vaadin.server.Page
 import com.vaadin.ui.*
 import java.lang.NullPointerException
+import java.util.function.Predicate
 import kotlin.test.expect
 
 class LocatorTest : DynaTest({
@@ -51,6 +52,12 @@ class LocatorTest : DynaTest({
         test("ReturnsNested") {
             val button = Button()
             expect(button) { VerticalLayout(button)._get(Button::class.java) }
+            expectAfterLookupCalled()
+        }
+
+        test("fails on invisible") {
+            val button = Button().apply { isVisible = false }
+            expectThrows(java.lang.AssertionError::class) { button._get(Button::class.java) }
             expectAfterLookupCalled()
         }
     }
@@ -216,6 +223,13 @@ class LocatorTest : DynaTest({
 
     group("matcher") {
         fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+        test("id") {
+            expect(true) { Button().matches { } }
+            expect(false) { Button().matches { id = "a" } }
+            expect(true) { Button().apply { id = "a" } .matches { id = "a" } }
+            expect(false) { Button().apply { id = "a b" } .matches { id = "a" } }
+            expect(false) { Button().apply { id = "a" } .matches { id = "a b" } }
+        }
         test("caption") {
             expect(true) { Button("click me").matches { caption = "click me" } }
             expect(true) { TextField("name:").matches { caption = "name:" } }
@@ -236,6 +250,26 @@ class LocatorTest : DynaTest({
             expect(false) { TextField("Mannerheim").matches { value = "Mannerheim" } }
             expect(true) { Label("Mannerheim").matches { value = "Mannerheim" } }
             expect(false) { Label().apply { caption = "Mannerheim" }.matches { value = "Mannerheim" } }
+        }
+        test("styles") {
+            expect(true) { Button().apply { addStyleName("a b") } .matches { } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { styles = "a" } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { styles = "b" } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { styles = "a b" } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { styles = "a c" } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { styles = "c" } }
+        }
+        test("withoutStyles") {
+            expect(true) { Button().apply { addStyleName("a b") } .matches { } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles = "a" } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles = "b" } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles = "a b" } }
+            expect(false) { Button().apply { addStyleName("a b") } .matches { withoutStyles = "a c" } }
+            expect(true) { Button().apply { addStyleName("a b") } .matches { withoutStyles = "c" } }
+        }
+        test("predicates") {
+            expect(true) { Button().matches {}}
+            expect(false) { Button().matches { predicates.add(Predicate { false }) }}
         }
     }
 

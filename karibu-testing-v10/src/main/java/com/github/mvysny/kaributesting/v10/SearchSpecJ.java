@@ -161,6 +161,7 @@ public class SearchSpecJ<T extends Component> {
     @NotNull
     public Predicate<Component> toPredicate() {
         final Function1<Component, Boolean> predicate = spec.toPredicate();
+        final String toString = spec.toString();
         return new Predicate<Component>() {
             @Override
             public boolean test(Component component) {
@@ -169,7 +170,7 @@ public class SearchSpecJ<T extends Component> {
 
             @Override
             public String toString() {
-                return spec.toString();
+                return toString;
             }
         };
     }

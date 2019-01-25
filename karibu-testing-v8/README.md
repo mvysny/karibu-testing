@@ -26,6 +26,7 @@ to your `pom.xml`:
 			<groupId>com.github.mvysny.kaributesting</groupId>
 			<artifactId>karibu-testing-v8</artifactId>
 			<version>x.y.z</version>
+			<scope>test</scope>
 		</dependency>
     </dependencies>
 </project>

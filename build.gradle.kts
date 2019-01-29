@@ -26,7 +26,7 @@ allprojects {
 subprojects {
     ext["vaadin8_version"] = "8.6.4"
     ext["vaadin11_version"] = "11.0.4"
-    ext["vaadin12_version"] = "12.0.4"
+    ext["vaadin12_version"] = "12.0.5"
     ext["dynatest_version"] = "0.13"
     // here we should depend on latest Vaadin LTS version
     ext["vaadin_platform_lts_version"] = ext["vaadin11_version"]

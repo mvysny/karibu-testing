@@ -9,7 +9,7 @@ dependencies {
     testCompile("com.github.mvysny.karibudsl:karibu-dsl-v10:0.5.2")
 
     // to have class autodiscovery functionality
-    compile("io.github.classgraph:classgraph:4.6.3")
+    compile("io.github.classgraph:classgraph:4.6.23")
 }
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit

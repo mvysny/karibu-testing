@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
+import javax.servlet.ServletContext
+import javax.servlet.http.HttpSession
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -29,11 +31,12 @@ object MockVaadin {
      * @param uiFactory called once from this method, to provide instance of your app's UI. By default it returns [MockUI].
      * A basic Vaadin environment is prepared before calling this factory, in order to be safe to instantiate your UI.
      * To instantiate your UI just call your UI constructor, for example `YourUI()`.
+     * @param httpSession allow you to use custom http session. Useful for MPR where Vaadin 8 + Vaadin 10 share one session
+     * @param servletContext the servlet context to use
      */
     @JvmStatic @JvmOverloads
-    fun setup(uiFactory: ()->UI = { MockUI() }) {
+    fun setup(uiFactory: ()->UI = { MockUI() }, httpSession: MockHttpSession? = null, servletContext: ServletContext = MockContext()) {
         // prepare mocking servlet environment
-        val servletContext = MockContext()
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
                 val service = object : VaadinServletService(this, deploymentConfiguration) {
@@ -44,7 +47,7 @@ object MockVaadin {
             }
         }
         servlet.init(MockServletConfig(servletContext))
-        val httpSession = MockHttpSession.create(servletContext)
+        val httpSess = httpSession ?: MockHttpSession.create(servletContext)
 
         // mock Vaadin environment: Service
         val service = VaadinServlet::class.java.getDeclaredMethod("getService").run {
@@ -54,7 +57,7 @@ object MockVaadin {
         VaadinService.setCurrent(service)
 
         // Session
-        createSession(httpSession, uiFactory)
+        createSession(httpSess, uiFactory)
     }
 
     /**

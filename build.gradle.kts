@@ -1,6 +1,4 @@
 import com.jfrog.bintray.gradle.BintrayExtension
-import groovy.lang.Closure
-import org.gradle.api.tasks.GradleBuild
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile

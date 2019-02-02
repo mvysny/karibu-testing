@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.text
@@ -12,7 +11,6 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import java.util.concurrent.ExecutionException
@@ -51,6 +49,8 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { UI.getCurrent().locale != null }
             expect(true) { UI.getCurrent().element != null }
             expect(true) { UI.getCurrent().session != null }
+            expect(VaadinSession.getCurrent()) { UI.getCurrent().session }
+            expect(true) { UI.getCurrent().session.session != null }
             expect(true) { UI.getCurrent().loadingIndicatorConfiguration != null }
             expect(true) { UI.getCurrent().pushConfiguration != null }
             expect(true) { UI.getCurrent().reconnectDialogConfiguration != null }

@@ -140,6 +140,9 @@ object MockVaadin {
              * The easiest way is to simply always provide a locked lock :)
              */
             private val lock = ReentrantLock().apply { lock() }
+            init {
+                httpSession.setAttribute(servlet.service.serviceName + ".lock", lock)
+            }
 
             override fun getLockInstance(): Lock = lock
             override fun close() {
@@ -168,6 +171,7 @@ object MockVaadin {
             }
         }
         session.configuration = servlet.service.deploymentConfiguration
+        session.refreshTransients(WrappedHttpSession(httpSession), servlet.service)
         VaadinSession.setCurrent(session)
         strongRefSession = session
 

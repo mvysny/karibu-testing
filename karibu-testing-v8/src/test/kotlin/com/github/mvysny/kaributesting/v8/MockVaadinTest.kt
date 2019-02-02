@@ -38,6 +38,8 @@ class MockVaadinTest : DynaTest({
         test("current UI contains sane values") {
             expect(true) { UI.getCurrent().locale != null }
             expect(true) { UI.getCurrent().session != null }
+            expect(VaadinSession.getCurrent()) { UI.getCurrent().session }
+            expect(true) { UI.getCurrent().session.session != null }
             expect(true) { UI.getCurrent().loadingIndicatorConfiguration != null }
             expect(true) { UI.getCurrent().pushConfiguration != null }
             expect(null) { UI.getCurrent().pushConnection }  // not using push

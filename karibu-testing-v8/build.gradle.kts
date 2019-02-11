@@ -1,11 +1,11 @@
 dependencies {
-    compile("com.vaadin:vaadin-server:${ext["vaadin8_version"]}")
+    compile("com.vaadin:vaadin-server:${properties["vaadin8_version"]}")
     compile(project(":mock-servlet-environment"))
 
-    testCompile("com.github.mvysny.dynatest:dynatest-engine:${ext["dynatest_version"]}")
+    testCompile("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
     compile(kotlin("test"))
     testCompile("org.slf4j:slf4j-simple:1.7.25")
-    testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:0.5.2")
+    testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:0.5.3")
 }
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit

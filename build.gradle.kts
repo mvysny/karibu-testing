@@ -22,12 +22,8 @@ allprojects {
 }
 
 subprojects {
-    ext["vaadin8_version"] = "8.7.0"
-    ext["vaadin11_version"] = "11.0.4"
-    ext["vaadin12_version"] = "12.0.5"
-    ext["dynatest_version"] = "0.13"
-    // here we should depend on latest Vaadin LTS version
-    ext["vaadin_platform_lts_version"] = ext["vaadin11_version"]
+    // here we should depend on latest Vaadin LTS version (Vaadin 10, Vaadin 14, ...)
+    ext["vaadin_platform_lts_version"] = ext["vaadin12_version"]
 
     apply {
         plugin("maven-publish")

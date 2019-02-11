@@ -1,6 +1,9 @@
 dependencies {
     compile(platform("com.vaadin:vaadin-bom:${properties["vaadin_platform_lts_version"]}"))
     compile("com.vaadin:vaadin-core:${properties["vaadin_platform_lts_version"]}")
+    // accidentally missing deps:
+    compile("com.vaadin:vaadin-select-flow:1.0.0")
+
     compile(project(":mock-servlet-environment"))
 
     testCompile("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")

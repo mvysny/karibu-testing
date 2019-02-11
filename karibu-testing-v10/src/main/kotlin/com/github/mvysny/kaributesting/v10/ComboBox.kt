@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.function.SerializableConsumer
 import java.lang.reflect.Field
@@ -41,4 +42,21 @@ fun <T> ComboBox<T>.getSuggestionItems(): List<T> {
 fun <T> ComboBox<T>.getSuggestions(): List<String> {
     val items = getSuggestionItems()
     return items.map { itemLabelGenerator.apply(it) }
+}
+
+/**
+ * Fetches items currently displayed in the suggestion box.
+ */
+@Suppress("UNCHECKED_CAST")
+fun <T> Select<T>.getSuggestionItems(): List<T> = dataProvider._findAll()
+
+/**
+ * Fetches captions of items currently displayed in the suggestion box.
+ */
+fun <T> Select<T>.getSuggestions(): List<String> {
+    val items = getSuggestionItems()
+    return when (itemLabelGenerator) {
+        null -> items.map { it.toString() }
+        else -> items.map { itemLabelGenerator.apply(it) }
+    }
 }

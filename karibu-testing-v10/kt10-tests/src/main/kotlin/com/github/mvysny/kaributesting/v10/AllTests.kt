@@ -37,4 +37,7 @@ fun DynaNodeGroup.allTests() {
     group("notifications") {
         notificationsTestBattery()
     }
+    group("context menu") {
+        contextMenuTestbatch()
+    }
 }

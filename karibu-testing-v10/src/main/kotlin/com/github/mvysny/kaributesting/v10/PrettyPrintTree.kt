@@ -54,11 +54,6 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
                     result.children.add(ofVaadin(item))
                 }
             }
-            if (root is ContextMenu) {
-                for (item in root.items) {
-                    result.children.add(ofVaadin(item))
-                }
-            }
             return result
         }
     }

@@ -69,7 +69,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 item("foo")
             }
         }
-        expectThrows(AssertionError::class, "kvak") {
+        expectThrows(AssertionError::class, "No menu item with caption MenuItem[text='click me']") {
             cm._clickItemWithCaption("MenuItem[text='click me']")
         }
     }
@@ -112,7 +112,9 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 }
             }
         }
-        cm._clickItemWithCaption("click me")
+        expectThrows(AssertionError::class, "MenuItem[text='click me'] is not enabled because its parent item is not enabled:") {
+            cm._clickItemWithCaption("click me")
+        }
     }
 
     test("clicking menu with invisible parent throws exception") {
@@ -125,7 +127,9 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 }
             }
         }
-        cm._clickItemWithCaption("click me")
+        expectThrows(AssertionError::class, "MenuItem[text='click me'] is not visible because its parent item is not visible:") {
+            cm._clickItemWithCaption("click me")
+        }
     }
 
     test("clicking menu on invisible component throws exception") {
@@ -136,7 +140,9 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 item("click me", { e -> fail("shouldn't be called") })
             }
         }
-        cm._clickItemWithCaption("click me")
+        expectThrows(AssertionError::class, "Cannot click MenuItem[text='click me'] since it's attached to Div[INVIS] which is not effectively visible") {
+            cm._clickItemWithCaption("click me")
+        }
     }
 
     test("clicking menu on disabled component succeeds") {

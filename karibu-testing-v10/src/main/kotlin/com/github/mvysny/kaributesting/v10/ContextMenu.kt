@@ -35,7 +35,7 @@ private fun ContextMenu.getParentMap(): Map<MenuItem, Component> {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-private fun MenuItem._click() {
+fun MenuItem._click() {
     val parentMap = contextMenu.getParentMap()
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)

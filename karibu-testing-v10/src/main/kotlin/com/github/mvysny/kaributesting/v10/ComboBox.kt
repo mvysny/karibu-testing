@@ -4,9 +4,6 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.function.SerializableConsumer
-import java.lang.reflect.Field
-import java.util.stream.Stream
-import kotlin.streams.toList
 
 /**
  * Emulates an user inputting something into the combo box, filtering items.  You can use [getSuggestionItems]

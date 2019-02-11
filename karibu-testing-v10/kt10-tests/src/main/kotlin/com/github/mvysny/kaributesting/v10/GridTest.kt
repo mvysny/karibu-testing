@@ -98,28 +98,18 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Foo!") { grid._get<TextField>().caption }
     }
 
-    if (vaadinVersion >= 12) {
-        // _clickRenderer() works on Vaadin 12 only
-        test("click renderer") {
-            var called = false
-            val grid = Grid<TestPerson>().apply {
-                addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
-                    called = true
-                    expect("name 8") { person.name }
-                }).key = "name"
-                setItems((0..10).map { TestPerson("name $it", it) })
-            }
-            grid._clickRenderer(8, "name")
-            expect(true) { called }
+    // _clickRenderer() works on Vaadin 12 only
+    test("click renderer") {
+        var called = false
+        val grid = Grid<TestPerson>().apply {
+            addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
+                called = true
+                expect("name 8") { person.name }
+            }).key = "name"
+            setItems((0..10).map { TestPerson("name $it", it) })
         }
-    } else {
-        test("renderer retrieval fails with helpful error message") {
-            expectThrows(IllegalStateException::class, "This functionality can only be used with Vaadin 12 or higher") {
-                Grid<TestPerson>().apply {
-                    addColumnFor(TestPerson::name)
-                }.columns[0].renderer
-            }
-        }
+        grid._clickRenderer(8, "name")
+        expect(true) { called }
     }
 
     test("sorting") {

@@ -15,10 +15,10 @@ import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.router.RouterLink
-import com.vaadin.flow.server.startup.RouteRegistry
+import com.vaadin.flow.server.startup.ApplicationRouteRegistry
+import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ScanResult
-import org.atmosphere.util.annotation.AnnotationDetector
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import javax.servlet.ServletContext
 import kotlin.test.expect
 
 fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
@@ -48,13 +49,12 @@ class Routes: Serializable {
     }
 
     /**
-     * Creates a Vaadin 10 registry from this configuration object.
+     * Registers all routes to Vaadin 13 registry.
      */
-    fun createRegistry() : RouteRegistry = object : RouteRegistry() {
-        init {
-            setNavigationTargets(routes)
-            setErrorNavigationTargets(errorRoutes.map { it.asSubclass(Component::class.java) } .toMutableSet())
-        }
+    @Suppress("UNCHECKED_CAST")
+    fun register(sc: ServletContext) {
+        RouteRegistryInitializer().onStartup(routes.toSet(), sc)
+        ApplicationRouteRegistry.getInstance(sc).setErrorNavigationTargets(errorRoutes.map { it as Class<out Component> } .toSet())
     }
 
     /**
@@ -146,12 +146,11 @@ val Component._text: String? get() = when (this) {
 
 /**
  * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only or if no button (or too many buttons) matched.
+ * @throws IllegalArgumentException if the button was not visible, not enabled, read-only.
  */
 fun Button._click() {
     checkEditableByUser()
-    // click()  // can't call this since this calls JS method on the browser... but we're server-testing and there is no browser and this call would do nothing.
-    _fireEvent(ClickEvent<Button>(this))
+    click()  // this doesn't work on Vaadin 12 but it works properly with Vaadin 13
 }
 
 private fun Component.checkEditableByUser() {

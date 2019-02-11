@@ -43,14 +43,13 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
         }
 
         test("enabled button") {
-            // click() does nothing without an actual Browser, bummer
-            expectClickCount(Button(), 0) { click() }
+            expectClickCount(Button(), 1) { click() }
             expectClickCount(Button(), 1) { _click() }
         }
 
         test("disabled button") {
-            // click() does nothing without an actual Browser, bummer
-            expectClickCount(Button().apply { isEnabled = false }, 0) { click() }
+            // click() does not check for disabled state
+            expectClickCount(Button().apply { isEnabled = false }, 1) { click() }
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Button[DISABLED] is not enabled") {
                 expectClickCount(Button().apply { isEnabled = false }, 0) { _click() }
@@ -60,8 +59,8 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
         test("button with parent disabled") {
             val layout = VerticalLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
-            // click() does nothing without an actual Browser, bummer
-            expectClickCount(layout.button(), 0) { click() }
+            // click() does not check for parent disabled state
+            expectClickCount(layout.button(), 1) { click() }
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Button[DISABLED] is nested in a disabled component") {
                 expectClickCount(layout.button(), 0) { _click() }
@@ -69,8 +68,8 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
         }
 
         test("invisible button") {
-            // click() does nothing without an actual Browser, bummer
-            expectClickCount(Button().apply { isVisible = false }, 0) { click() }
+            // click() does not check for invisible state
+            expectClickCount(Button().apply { isVisible = false }, 1) { click() }
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Button[INVIS] is not effectively visible") {
                 expectClickCount(Button().apply { isVisible = false }, 0) { _click() }

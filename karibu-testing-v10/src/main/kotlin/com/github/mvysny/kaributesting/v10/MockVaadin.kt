@@ -1,19 +1,15 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
-import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.function.DeploymentConfiguration
-import com.vaadin.flow.function.SerializableConsumer
 import com.vaadin.flow.internal.CurrentInstance
-import com.vaadin.flow.internal.ExecutionContext
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
-import com.vaadin.flow.server.startup.RouteRegistry
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -46,12 +42,13 @@ object MockVaadin {
     @JvmOverloads
     fun setup(routes: Routes = Routes(),
               uiFactory: () -> UI = { MockedUI() },
-              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService =
-                      { servlet, dc, reg -> MockService(servlet, dc, reg) }) {
+              serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService =
+                      { servlet, dc -> MockService(servlet, dc) }) {
         // init servlet
         val servlet = object : VaadinServlet() {
             override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-                val service = serviceFactory(this, deploymentConfiguration, routes.createRegistry())
+                routes.register(servletContext)
+                val service = serviceFactory(this, deploymentConfiguration)
                 service.init()
                 return service
             }
@@ -73,6 +70,7 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
+        check(vaadinVersion >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using $vaadinVersion" }
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
         VaadinService.setCurrent(servlet.service!!)
@@ -86,11 +84,11 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(routes: Routes = Routes(),
-              serviceFactory: (VaadinServlet, DeploymentConfiguration, RouteRegistry) -> VaadinServletService = defaultServiceFactory()) =
+              serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService = defaultServiceFactory()) =
             setup(routes = routes, uiFactory = { MockedUI() }, serviceFactory = serviceFactory)
 
-    private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration, reg: RouteRegistry ->
-        MockService(servlet, dc, reg)
+    private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration ->
+        MockService(servlet, dc)
     }
 
     private fun closeCurrentUI() {
@@ -302,12 +300,10 @@ open class MockedUI : UI()
 /**
  * A mocking service that performs three very important tasks:
  * * Overrides [isAtmosphereAvailable] to tell Vaadin that we don't have Atmosphere (otherwise Vaadin will crash)
- * * Auto-detects and provides routes (otherwise there won't be any and Vaadin will reply with 404)
  * * Provides some dummy value as a root ID via [getMainDivId] (otherwise the mocked servlet env will crash).
  * The class is intentionally opened, to be extensible in user's library.
  */
-open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration, private val registry: RouteRegistry) : VaadinServletService(servlet, deploymentConfiguration) {
+open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
-    override fun getRouteRegistry(): RouteRegistry = registry
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
 }

@@ -15,15 +15,16 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "1.0.8-SNAPSHOT"
+    version = "1.1.0-SNAPSHOT"
     repositories {
         jcenter()
+        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases/") }
     }
 }
 
 subprojects {
     // here we should depend on latest Vaadin LTS version (Vaadin 10, Vaadin 14, ...)
-    ext["vaadin_platform_lts_version"] = ext["vaadin12_version"]
+    ext["vaadin_platform_lts_version"] = ext["vaadin13_version"]
 
     apply {
         plugin("maven-publish")

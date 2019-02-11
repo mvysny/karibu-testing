@@ -10,48 +10,29 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    if (vaadinVersion >= 12) {
-        group("getSuggestionItems()") {
-            test("by default shows all items") {
-                val cb = ComboBox<String>().apply {
-                    setItems(listOf("aaa", "bbb", "ccc"))
-                }
-                expectList("aaa", "bbb", "ccc") { cb.getSuggestionItems() }
+    group("getSuggestionItems()") {
+        test("by default shows all items") {
+            val cb = ComboBox<String>().apply {
+                setItems(listOf("aaa", "bbb", "ccc"))
             }
-
-            test("setting user input filters out stuff") {
-                val cb = ComboBox<String>().apply {
-                    setItems(listOf("aaa", "bbb", "ccc"))
-                }
-                cb.setUserInput("a")
-                expectList("aaa") { cb.getSuggestionItems() }
-            }
-
-            test("full-blown example") {
-                val cb = ComboBox<TestPerson>().apply {
-                    setItems((0..10).map { TestPerson("foo $it", it) })
-                    setItemLabelGenerator { it.name }
-                }
-                cb.setUserInput("foo 1")
-                expectList("foo 1", "foo 10") { cb.getSuggestions() }
-            }
+            expectList("aaa", "bbb", "ccc") { cb.getSuggestionItems() }
         }
-    } else {
-        test("getSuggestionItems() fails with proper error message") {
-            expectThrows(IllegalStateException::class, "This function only works with Vaadin 12 or higher") {
-                ComboBox<String>().apply {
-                    setItems(listOf("aaa", "bbb", "ccc"))
-                    getSuggestionItems()
-                }
+
+        test("setting user input filters out stuff") {
+            val cb = ComboBox<String>().apply {
+                setItems(listOf("aaa", "bbb", "ccc"))
             }
+            cb.setUserInput("a")
+            expectList("aaa") { cb.getSuggestionItems() }
         }
-        test("setUserInput() fails with proper error message") {
-            expectThrows(IllegalStateException::class, "This function only works with Vaadin 12 or higher") {
-                ComboBox<String>().apply {
-                    setItems(listOf("aaa", "bbb", "ccc"))
-                    setUserInput("a")
-                }
+
+        test("full-blown example") {
+            val cb = ComboBox<TestPerson>().apply {
+                setItems((0..10).map { TestPerson("foo $it", it) })
+                setItemLabelGenerator { it.name }
             }
+            cb.setUserInput("foo 1")
+            expectList("foo 1", "foo 10") { cb.getSuggestions() }
         }
     }
 }

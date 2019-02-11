@@ -30,10 +30,7 @@ fun <T> ComboBox<T>.getSuggestionItems(): List<T> {
     check(ComboBox::class.java.declaredFields.any { it.name == "dataCommunicator" }) { "This function only works with Vaadin 12 or higher" }
     val field = ComboBox::class.java.getDeclaredField("dataCommunicator").apply { isAccessible = true }
     val dataCommunicator = field.get(this) as DataCommunicator<T>
-
-    val methodFetchFromProvider = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
-    val stream = methodFetchFromProvider.invoke(dataCommunicator, 0, Int.MAX_VALUE) as Stream<T>
-    return stream.toList()
+    return dataCommunicator.fetch(0, Int.MAX_VALUE)
 }
 
 /**

@@ -52,9 +52,11 @@ fun <T> Grid<T>._get(rowIndex: Int): T {
     return fetched.firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
 }
 
-fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> {
+fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = dataCommunicator.fetch(offset, limit)
+
+fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     val m = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
-    @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(dataCommunicator, offset, limit) as Stream<T>
+    @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()
 }
 
@@ -127,16 +129,6 @@ fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-    if (Grid::class.java.declaredMethods.any { it.name == "getDataGenerator" }) {
-        // Vaadin 11 or older
-        val json = Json.createObject()
-        // the valueprovider is wrapped in TemplateRenderer which is wrapped in DataGenerator
-        (grid as Grid<T>).dataGenerator2.generateData(rowObject, json)
-        val value: JsonValue? = json.get(internalId2)
-        return value?.asString()
-    }
-
-    // Vaadin 12
     val valueProviders = renderer.valueProviders
     val valueProvider = valueProviders[internalId2] ?: return null
     // there is no value provider for NativeButtonRenderer, just return null
@@ -345,20 +337,8 @@ var HeaderRow.HeaderCell.component: Component?
 val KProperty1<*, *>.asc get() = QuerySortOrder(name, SortDirection.ASCENDING)
 val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
 /**
- * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions. Works also with Vaadin 11.
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
 fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
-    // Vaadin 12 has public sort() method, but Vaadin 11 does not. We have to use reflection.
-    val method = Grid::class.java.getDeclaredMethod("setSortOrder", List::class.java, Boolean::class.java).apply { isAccessible = true }
-    method.invoke(this, sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) }, false)
-}
-
-/**
- * Returns the current sort order for given Grid. Works also with Vaadin 11.
- */
-@Suppress("UNCHECKED_CAST")
-val <T> Grid<T>.sortOrder: List<GridSortOrder<T>> get() {
-    // Vaadin 11 doesn't have the public getSortOrder() function. Need to use reflection.
-    val f = Grid::class.java.getDeclaredField("sortOrder").apply { isAccessible = true }
-    return f.get(this) as List<GridSortOrder<T>>
+    sort(sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) })
 }

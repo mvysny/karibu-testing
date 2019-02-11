@@ -119,8 +119,8 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
-                isVisible = false
                 item("menu") {
+                    isVisible = false
                     item("click me", { e -> fail("shouldn't be called") })
                 }
             }

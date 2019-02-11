@@ -2,6 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
+import com.vaadin.flow.component.contextmenu.ContextMenu
+import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.grid.Grid
 import java.util.*
 import kotlin.streams.toList
@@ -46,6 +48,16 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
             val result = PrettyPrintTree(root.toPrettyString(), mutableListOf())
             for (child in root.children) {
                 result.children.add(ofVaadin(child))
+            }
+            if (root is MenuItem) {
+                for (item in root.subMenu.items) {
+                    result.children.add(ofVaadin(item))
+                }
+            }
+            if (root is ContextMenu) {
+                for (item in root.items) {
+                    result.children.add(ofVaadin(item))
+                }
             }
             return result
         }

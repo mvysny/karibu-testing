@@ -1,14 +1,15 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v10.div
+import com.github.mvysny.karibudsl.v10.grid
 import com.github.mvysny.karibudsl.v10.text
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
@@ -55,5 +56,23 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
     ├── MenuItem[DISABLED, text='menu']
     │   └── MenuItem[text='click me']
     └── MenuItem[text='save as']""".trim()) { cm.toPrettyTree().trim() }
+
+    }
+    test("grid menu dump") {
+        lateinit var cm: GridContextMenu<String>
+        UI.getCurrent().grid<String> {
+            cm = gridContextMenu {
+                item("menu") {
+                    isEnabled = false
+                    item("click me", { e -> fail("shouldn't be called") })
+                }
+                item("save as")
+            }
+        }
+        expect("""
+└── GridContextMenu[]
+    ├── GridMenuItem[DISABLED, text='menu']
+    │   └── GridMenuItem[text='click me']
+    └── GridMenuItem[text='save as']""".trim()) { cm.toPrettyTree().trim() }
     }
 }

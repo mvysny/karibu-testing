@@ -10,6 +10,9 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.contextmenu.HasMenuItems
 import com.vaadin.flow.component.contextmenu.MenuItem
+import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
 import java.lang.AssertionError
 import kotlin.test.expect
 import kotlin.test.fail
@@ -43,6 +46,32 @@ fun (@VaadinDsl MenuItem).item(component: Component, clickListener: ((ClickEvent
                                block: (@VaadinDsl MenuItem).()->Unit = {}): MenuItem =
         subMenu.item(component, clickListener, block)
 
+@VaadinDsl
+fun <T> (@VaadinDsl Grid<T>).gridContextMenu(block: GridContextMenu<T>.()->Unit = {}): GridContextMenu<T> {
+    val menu = GridContextMenu(this)
+    menu.block()
+    return menu
+}
+
+@VaadinDsl
+fun <T> (@VaadinDsl GridContextMenu<T>).item(text: String, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
+                                             block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
+        addItem(text, clickListener).apply { block() }
+
+@VaadinDsl
+fun <T> (@VaadinDsl GridMenuItem<T>).item(text: String, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
+                                          block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
+        subMenu.addItem(text, clickListener).apply { block() }
+
+@VaadinDsl
+fun <T> (@VaadinDsl GridContextMenu<T>).item(component: Component, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
+                                             block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
+        addItem(component, clickListener).apply { block() }
+
+@VaadinDsl
+fun <T> (@VaadinDsl GridMenuItem<T>).item(component: Component, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
+                                          block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
+        subMenu.addItem(component, clickListener).apply { block() }
 
 
 internal fun DynaNodeGroup.contextMenuTestbatch() {

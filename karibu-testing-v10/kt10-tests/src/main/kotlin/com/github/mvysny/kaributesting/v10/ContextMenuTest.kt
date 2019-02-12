@@ -2,11 +2,10 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.contextMenu
-import com.github.mvysny.karibudsl.v10.div
-import com.github.mvysny.karibudsl.v10.item
+import com.github.mvysny.karibudsl.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.ContextMenu
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -121,5 +120,19 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
         cm._clickItemWithCaption("click me")
         expect(1) { clicked }
+    }
+
+    group("grid context menu") {
+        test("simple click") {
+            var clicked: String? = null
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me", { e -> clicked = e.item.orElse(null) })
+                }
+            }
+            cm._clickItemWithCaption("click me", "foo")
+            expect("foo") { clicked }
+        }
     }
 }

@@ -10,8 +10,11 @@ import com.vaadin.flow.component.html.Input
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
+import com.vaadin.flow.dom.impl.BasicElementStateProvider
+import com.vaadin.flow.internal.nodefeature.ElementListenerMap
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.router.RouterLink
@@ -93,6 +96,10 @@ class Routes: Serializable {
  */
 fun Component._fireEvent(event: ComponentEvent<*>) {
     ComponentUtil.fireEvent(this, event)
+}
+
+fun Element._fireDomEvent(event: DomEvent) {
+    node.getFeature(ElementListenerMap::class.java).fireEvent(event)
 }
 
 /**

@@ -2,77 +2,13 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.VaadinDsl
+import com.github.mvysny.karibudsl.v10.contextMenu
 import com.github.mvysny.karibudsl.v10.div
-import com.vaadin.flow.component.ClickEvent
-import com.vaadin.flow.component.Component
+import com.github.mvysny.karibudsl.v10.item
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.ContextMenu
-import com.vaadin.flow.component.contextmenu.HasMenuItems
-import com.vaadin.flow.component.contextmenu.MenuItem
-import com.vaadin.flow.component.grid.Grid
-import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
-import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
-import java.lang.AssertionError
 import kotlin.test.expect
 import kotlin.test.fail
-
-// @todo mavi remove when karibu-dsl 0.6.0 is released
-
-@VaadinDsl
-fun (@VaadinDsl Component).contextMenu(block: ContextMenu.()->Unit = {}): ContextMenu {
-    val menu = ContextMenu(this)
-    menu.block()
-    return menu
-}
-
-@VaadinDsl
-fun (@VaadinDsl HasMenuItems).item(text: String, clickListener: ((ClickEvent<MenuItem>)->Unit)? = null,
-                                   block: (@VaadinDsl MenuItem).()->Unit = {}): MenuItem =
-        addItem(text, clickListener).apply { block() }
-
-@VaadinDsl
-fun (@VaadinDsl MenuItem).item(text: String, clickListener: ((ClickEvent<MenuItem>)->Unit)? = null,
-                               block: (@VaadinDsl MenuItem).()->Unit = {}): MenuItem =
-        subMenu.item(text, clickListener, block)
-
-@VaadinDsl
-fun (@VaadinDsl HasMenuItems).item(component: Component, clickListener: ((ClickEvent<MenuItem>)->Unit)? = null,
-                                   block: (@VaadinDsl MenuItem).()->Unit = {}): MenuItem =
-        addItem(component, clickListener).apply { block() }
-
-@VaadinDsl
-fun (@VaadinDsl MenuItem).item(component: Component, clickListener: ((ClickEvent<MenuItem>)->Unit)? = null,
-                               block: (@VaadinDsl MenuItem).()->Unit = {}): MenuItem =
-        subMenu.item(component, clickListener, block)
-
-@VaadinDsl
-fun <T> (@VaadinDsl Grid<T>).gridContextMenu(block: GridContextMenu<T>.()->Unit = {}): GridContextMenu<T> {
-    val menu = GridContextMenu(this)
-    menu.block()
-    return menu
-}
-
-@VaadinDsl
-fun <T> (@VaadinDsl GridContextMenu<T>).item(text: String, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
-                                             block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
-        addItem(text, clickListener).apply { block() }
-
-@VaadinDsl
-fun <T> (@VaadinDsl GridMenuItem<T>).item(text: String, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
-                                          block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
-        subMenu.addItem(text, clickListener).apply { block() }
-
-@VaadinDsl
-fun <T> (@VaadinDsl GridContextMenu<T>).item(component: Component, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
-                                             block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
-        addItem(component, clickListener).apply { block() }
-
-@VaadinDsl
-fun <T> (@VaadinDsl GridMenuItem<T>).item(component: Component, clickListener: ((GridContextMenu.GridContextMenuItemClickEvent<T>)->Unit)? = null,
-                                          block: (@VaadinDsl GridMenuItem<T>).()->Unit = {}): GridMenuItem<T> =
-        subMenu.addItem(component, clickListener).apply { block() }
-
 
 internal fun DynaNodeGroup.contextMenuTestbatch() {
     beforeEach { MockVaadin.setup() }

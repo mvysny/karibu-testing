@@ -21,7 +21,7 @@ import kotlin.test.fail
  */
 fun ContextMenu._clickItemWithCaption(caption: String) {
     val parentMap = getParentMap()
-    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in ${toPrettyTree()}")
+    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in ContextMenu:\n${toPrettyTree()}")
     (item as MenuItem)._click()
 }
 
@@ -32,7 +32,7 @@ fun ContextMenu._clickItemWithCaption(caption: String) {
  */
 fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
     val parentMap = getParentMap()
-    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in ${toPrettyTree()}")
+    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in GridContextMenu:\n${toPrettyTree()}")
     @Suppress("UNCHECKED_CAST")
     (item as GridMenuItem<T>)._click(gridItem)
 }

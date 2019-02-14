@@ -6,9 +6,11 @@ import com.vaadin.data.ValueProvider
 import com.vaadin.data.provider.*
 import com.vaadin.shared.MouseEventDetails
 import com.vaadin.shared.data.sort.SortDirection
+import com.vaadin.ui.Button
 import com.vaadin.ui.Component
 import com.vaadin.ui.Grid
 import com.vaadin.ui.renderers.ClickableRenderer
+import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
 import kotlin.test.fail
@@ -70,12 +72,26 @@ fun Grid<*>._size(): Int = dataCommunicator.dataProviderSize
  * @param columnId the column ID.
  */
 @JvmOverloads
-fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
+fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails(),
+                                     click: (Component)->Unit = { component ->
+                                         fail("${this.toPrettyString()} column $columnId: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
+                                     }) {
     val column = getColumnById(columnId)
-    @Suppress("UNCHECKED_CAST")
-    val renderer = column.renderer as ClickableRenderer<T, *>
-    val item = _get(rowIndex)
-    renderer._fireEvent(object : ClickableRenderer.RendererClickEvent<T>(this, item, column, mouseEventDetails) {})
+    val renderer = column.renderer
+    val item: T = _get(rowIndex)
+    if (renderer is ClickableRenderer<*, *>) {
+        @Suppress("UNCHECKED_CAST")
+        (renderer as ClickableRenderer<T, *>)._fireEvent(object : ClickableRenderer.RendererClickEvent<T>(this, item, column, mouseEventDetails) {})
+    } else if (renderer is ComponentRenderer) {
+        val component = column.valueProvider.apply(item) as Component
+        if (component is Button) {
+            component._click()
+        } else {
+            click(component)
+        }
+    } else {
+        fail("${this.toPrettyString()} column $columnId has renderer $renderer which is not supported by this method")
+    }
 }
 
 /**
@@ -201,7 +217,7 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.fi
 @Suppress("UNCHECKED_CAST")
 fun <T> Grid<T>.getColumnById(columnId: String): Grid.Column<T, *> =
         getColumn(columnId) as Grid.Column<T, *>?
-                ?: throw IllegalArgumentException("No column with ID $columnId; available column IDs: ${columns.mapNotNull { it.id }}")
+                ?: throw IllegalArgumentException("${this.toPrettyString()}: No column with ID $columnId; available column IDs: ${columns.mapNotNull { it.id }}")
 
 @Deprecated("replaced by getColumnById()", replaceWith = ReplaceWith("getColumnById(columnId)"))
 fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById(columnId)

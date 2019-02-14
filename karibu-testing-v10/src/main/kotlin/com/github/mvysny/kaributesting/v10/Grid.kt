@@ -84,7 +84,7 @@ fun Grid<*>._size(): Int {
  * @throws IllegalArgumentException if no such column exists.
  */
 fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> =
-        requireNotNull(getColumnByKey(columnKey)) { "No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}" }
+        requireNotNull(getColumnByKey(columnKey)) { "${this.toPrettyString()}: No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}" }
 
 /**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
@@ -104,6 +104,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
     val renderer = column.renderer
     val item: T = _get(rowIndex)
     if (renderer is ClickableRenderer<*>) {
+        @Suppress("UNCHECKED_CAST")
         (renderer as ClickableRenderer<T>).onClick(item)
     } else if (renderer is ComponentRenderer<*, *>) {
         val component = (renderer as ComponentRenderer<*, T>).createComponent(item)

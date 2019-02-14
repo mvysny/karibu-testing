@@ -5,12 +5,10 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.github.mvysny.karibudsl.v8.getColumnBy
 import com.github.mvysny.karibudsl.v8.grid
+import com.github.mvysny.karibudsl.v8.onLeftClick
 import com.vaadin.data.provider.ListDataProvider
 import com.vaadin.shared.MouseEventDetails
-import com.vaadin.ui.CheckBox
-import com.vaadin.ui.Grid
-import com.vaadin.ui.TextField
-import com.vaadin.ui.UI
+import com.vaadin.ui.*
 import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.test.expect
@@ -109,22 +107,41 @@ class GridTest : DynaTest({
         }
     }
 
-    test("click renderer") {
-        var called = false
-        val grid = Grid<TestPerson>().apply {
-            addColumnFor(TestPerson::name) {
-                setRenderer(ButtonRenderer<TestPerson> { e ->
-                    called = true
-                    expect("name 8") { e.item.name }
-                    expect("name") { e.column.id }
-                    expect(true) { e.mouseEventDetails.isCtrlKey }
-                })
+    group("click renderer") {
+        test("ClickableRenderer") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name) {
+                    setRenderer(ButtonRenderer<TestPerson> { e ->
+                        called = true
+                        expect("name 8") { e.item.name }
+                        expect("name") { e.column.id }
+                        expect(true) { e.mouseEventDetails.isCtrlKey }
+                    })
+                }
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
             }
-            addColumnFor(TestPerson::age)
-            setItems((0..10).map { TestPerson("name $it", it) })
+            grid._clickRenderer(8, "name", MouseEventDetails().apply { isCtrlKey = true })
+            expect(true) { called }
         }
-        grid._clickRenderer(8, "name", MouseEventDetails().apply { isCtrlKey = true })
-        expect(true) { called }
+        test("ComponentRenderer") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                val nameColumn = addColumn { p -> Button(p.name).apply {
+                    onLeftClick {
+                        called = true
+                        expect("name 8") { p.name }
+                    }
+                } }
+                nameColumn.id = "name"
+                nameColumn.setRenderer(ComponentRenderer())
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._clickRenderer(8, "name")
+            expect(true) { called }
+        }
     }
 
     test("get component") {

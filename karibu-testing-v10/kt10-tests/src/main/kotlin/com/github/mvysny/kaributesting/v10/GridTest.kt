@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.addColumnFor
+import com.github.mvysny.karibudsl.v10.component
 import com.github.mvysny.karibudsl.v10.grid
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.Text
@@ -13,9 +14,7 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
-import java.lang.IllegalStateException
 import kotlin.test.expect
-import kotlin.test.fail
 
 internal fun DynaNodeGroup.gridTestbatch() {
 
@@ -98,6 +97,20 @@ internal fun DynaNodeGroup.gridTestbatch() {
     test("lookup finds components in header") {
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
+        expect("Foo!") { grid._get<TextField>().caption }
+    }
+
+    test("lookup finds components in footer") {
+        val grid = Grid<TestPerson>(TestPerson::class.java)
+        grid.appendFooterRow().cells[0].setComponent(TextField("Foo!"))
+        expect("Foo!") { grid._get<TextField>().caption }
+    }
+
+    test("lookup skips empty slots in header") {
+        val grid = Grid<TestPerson>(TestPerson::class.java)
+        grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
+        grid.appendHeaderRow().cells[0].component = null
+        expect(null) { grid.appendHeaderRow().cells[0].component }
         expect("Foo!") { grid._get<TextField>().caption }
     }
 

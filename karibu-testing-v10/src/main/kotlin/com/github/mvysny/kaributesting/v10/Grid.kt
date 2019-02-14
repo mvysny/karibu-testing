@@ -332,7 +332,7 @@ var HeaderRow.HeaderCell.component: Component?
         if (!gridSorterComponentRendererClass.isInstance(r)) return null
         val componentField = gridSorterComponentRendererClass.getDeclaredField("component")
         componentField.isAccessible = true
-        return componentField.get(r) as Component
+        return componentField.get(r) as Component?
     }
     set(value) {
         setComponent(value)

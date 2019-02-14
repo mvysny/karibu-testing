@@ -4,11 +4,14 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.github.mvysny.karibudsl.v10.grid
+import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import java.lang.IllegalStateException
 import kotlin.test.expect
@@ -98,18 +101,33 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Foo!") { grid._get<TextField>().caption }
     }
 
-    // _clickRenderer() works on Vaadin 12 only
-    test("click renderer") {
-        var called = false
-        val grid = Grid<TestPerson>().apply {
-            addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
-                called = true
-                expect("name 8") { person.name }
-            }).key = "name"
-            setItems((0..10).map { TestPerson("name $it", it) })
+    group("click renderer") {
+        test("ClickableRenderer") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
+                    called = true
+                    expect("name 8") { person.name }
+                }).key = "name"
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._clickRenderer(8, "name")
+            expect(true) { called }
         }
-        grid._clickRenderer(8, "name")
-        expect(true) { called }
+        test("ComponentRenderer") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
+                    onLeftClick {
+                        called = true
+                        expect("name 8") { person.name }
+                    }
+                } }).key = "name"
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._clickRenderer(8, "name")
+            expect(true) { called }
+        }
     }
 
     test("sorting") {

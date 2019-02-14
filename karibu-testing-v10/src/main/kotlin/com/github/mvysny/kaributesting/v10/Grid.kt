@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
@@ -14,6 +15,7 @@ import com.vaadin.flow.data.renderer.Renderer
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
+import kotlin.test.fail
 
 /**
  * Returns the item on given row. Fails if the row index is invalid. The data provider is
@@ -85,18 +87,34 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> =
         requireNotNull(getColumnByKey(columnKey)) { "No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}" }
 
 /**
- * Performs a click on a [ClickableRenderer] in given [Grid] cell. Fails if [Grid.Column.renderer] is not a [ClickableRenderer].
- *
- * WARNING: Only supported for Vaadin 12 and higher.
+ * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
+ * * [ClickableRenderer]
+ * * [ComponentRenderer] which renders a [Button]
+ * * [ComponentRenderer] which renders something else than a [Button]; then you need to provide the [click] closure which can click on such a component.
  * @param rowIndex the row index, 0 or higher.
  * @param columnKey the column key [Grid.Column.getKey]
+ * @param click if [ComponentRenderer] doesn't produce a button, this is called, to click the component returned by the [ComponentRenderer]
+ * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
-fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String) {
+fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
+                                     click: (Component)->Unit = { component ->
+                                         fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
+                                     }) {
     val column = _getColumnByKey(columnKey)
-    @Suppress("UNCHECKED_CAST")
-    val renderer = column.renderer as ClickableRenderer<T>
-    val item = _get(rowIndex)
-    renderer.onClick(item)
+    val renderer = column.renderer
+    val item: T = _get(rowIndex)
+    if (renderer is ClickableRenderer<*>) {
+        (renderer as ClickableRenderer<T>).onClick(item)
+    } else if (renderer is ComponentRenderer<*, *>) {
+        val component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+        if (component is Button) {
+            component._click()
+        } else {
+            click(component)
+        }
+    } else {
+        fail("${this.toPrettyString()} column $columnKey has renderer $renderer which is not supported by this method")
+    }
 }
 
 /**

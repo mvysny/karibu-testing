@@ -11,8 +11,6 @@ import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
-import elemental.json.Json
-import elemental.json.JsonValue
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
@@ -140,19 +138,6 @@ fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
 private val <T> Grid<T>.dataGenerator2: DataGenerator<T> get() = Grid::class.java.getDeclaredMethod("getDataGenerator").run {
     isAccessible = true
     invoke(this@dataGenerator2) as DataGenerator<T>
-}
-
-/**
- * Retrieves the renderer for given [Grid.Column].
- */
-@Suppress("UNCHECKED_CAST")
-val <T> Grid.Column<T>.renderer: Renderer<T> get() {
-    check(Grid.Column::class.java.declaredMethods.any { it.name == "getRenderer" }) {
-        "This functionality can only be used with Vaadin 12 or higher. It is not possible to retrieve Renderer from Grid.Column on Vaadin 11 and lower, because of missing getRenderer() function."
-    }
-    return Grid.Column::class.java.getDeclaredMethod("getRenderer").run {
-        invoke(this@renderer) as Renderer<T>
-    }
 }
 
 @Suppress("UNCHECKED_CAST")

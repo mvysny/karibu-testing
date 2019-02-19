@@ -139,7 +139,7 @@ fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Uni
     spec.block()
     val result = find(spec.toPredicate())
     if (result.size !in spec.count) {
-        val loc: String = UI.getCurrent()?.internals?.activeViewLocation?.pathWithQueryParameters ?: "?"
+        val loc: String = currentPath ?: "?"
         val message = when {
             result.isEmpty() -> "/$loc: No visible ${clazz.simpleName}"
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"

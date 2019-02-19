@@ -39,4 +39,7 @@ fun DynaNodeGroup.allTests() {
     group("context menu") {
         contextMenuTestbatch()
     }
+    group("navigator test") {
+        navigatorTest()
+    }
 }

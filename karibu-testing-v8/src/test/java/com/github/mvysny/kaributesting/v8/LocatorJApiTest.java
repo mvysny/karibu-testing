@@ -83,7 +83,7 @@ public class LocatorJApiTest {
         MockVaadin.tearDown();
     }
 
-    public static class MyJavaView implements View {}
+    public static class MyJavaView extends Label implements View {}
 
     public static class Person {}
 

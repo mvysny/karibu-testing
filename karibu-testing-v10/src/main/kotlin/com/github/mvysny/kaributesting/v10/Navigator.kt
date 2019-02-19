@@ -18,9 +18,18 @@ val currentPath: String? get() {
  * Returns the current view
  */
 val currentView: Class<out Component>? get() {
-    val path = currentPath ?: return null
+    val path = (currentPath ?: return null).trim('/')
     val registry: RouteRegistry = UI.getCurrent().router.registry
-    return registry.getNavigationTarget(currentPath).orElse(null)
+    val segments = path.split('/')
+    for (prefix in segments.size downTo 1) {
+        val p = segments.subList(0, prefix).joinToString("/")
+        val s = segments.subList(prefix, segments.size)
+        val clazz = registry.getNavigationTarget(p, s).orElse(null)
+        if (clazz != null) {
+            return clazz
+        }
+    }
+    return null
 }
 
 /**

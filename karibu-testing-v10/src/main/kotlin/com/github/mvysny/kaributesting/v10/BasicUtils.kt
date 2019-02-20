@@ -16,7 +16,6 @@ import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.internal.nodefeature.ElementListenerMap
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
-import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
@@ -151,16 +150,6 @@ val Component._text: String? get() = when (this) {
 }
 
 /**
- * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [checkEditableByUser] for
- * more details.
- */
-fun Button._click() {
-    checkEditableByUser()
-    click()  // this doesn't work on Vaadin 12 but it works properly with Vaadin 13
-}
-
-/**
  * Checks that a component is actually editable by the user:
  * * The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
  *   For the purpose of testing individual components not attached to the [UI], a component may be considered visible even though it's not
@@ -236,24 +225,6 @@ val Component.placeholder: String?
         is Input -> placeholder.orElse(null)
         else -> null
     }
-
-/**
- * Navigates to where this router link points to.
- * @throws IllegalArgumentException if the link was not visible, not enabled. See [checkEditableByUser] for
- * more details.
- */
-fun RouterLink._click() {
-    checkEditableByUser()
-    click()
-}
-
-/**
- * Navigates to where this router link points to. The difference to [_click] is that this one doesn't check whether
- * the link is actually visible and enabled.
- */
-fun RouterLink.click() {
-    UI.getCurrent().navigate(href)
-}
 
 /**
  * Expects that [actual] list of objects matches [expected] list of objects. Fails otherwise.

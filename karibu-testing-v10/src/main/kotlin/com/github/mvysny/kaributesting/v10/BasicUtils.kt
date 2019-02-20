@@ -13,7 +13,6 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
-import com.vaadin.flow.dom.impl.BasicElementStateProvider
 import com.vaadin.flow.internal.nodefeature.ElementListenerMap
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
@@ -240,6 +239,17 @@ val Component.placeholder: String?
 
 /**
  * Navigates to where this router link points to.
+ * @throws IllegalArgumentException if the link was not visible, not enabled. See [checkEditableByUser] for
+ * more details.
+ */
+fun RouterLink._click() {
+    checkEditableByUser()
+    click()
+}
+
+/**
+ * Navigates to where this router link points to. The difference to [_click] is that this one doesn't check whether
+ * the link is actually visible and enabled.
  */
 fun RouterLink.click() {
     UI.getCurrent().navigate(href)

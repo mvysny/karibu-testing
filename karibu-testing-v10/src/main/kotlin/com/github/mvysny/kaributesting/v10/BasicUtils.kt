@@ -153,14 +153,24 @@ val Component._text: String? get() = when (this) {
 
 /**
  * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only.
+ * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [checkEditableByUser] for
+ * more details.
  */
 fun Button._click() {
     checkEditableByUser()
     click()  // this doesn't work on Vaadin 12 but it works properly with Vaadin 13
 }
 
-private fun Component.checkEditableByUser() {
+/**
+ * Checks that a component is actually editable by the user:
+ * * The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
+ *   For the purpose of testing individual components not attached to the [UI], a component may be considered visible even though it's not
+ *   currently nested in a [UI].
+ * * The component must be effectively enabled: it itself must be enabled, its parent must be enabled and all of its ascendants must be enabled.
+ * * If the component is [HasValue], it must not be [HasValue.isReadOnly].
+ * @throws IllegalArgumentException if any of the above doesn't hold.
+ */
+fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     val parentNullOrEnabled = !parent.isPresent || parent.get().isEffectivelyEnabled()
     if (parentNullOrEnabled) {

@@ -44,7 +44,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             cm = contextMenu {
                 item("menu") {
                     isEnabled = false
-                    item("click me", { e -> fail("shouldn't be called") })
+                    item("click me", { _ -> fail("shouldn't be called") })
                 }
                 item("save as")
             }
@@ -62,7 +62,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             cm = gridContextMenu {
                 item("menu") {
                     isEnabled = false
-                    item("click me", { e -> fail("shouldn't be called") })
+                    item("click me", { _ -> fail("shouldn't be called") })
                 }
                 item("save as")
             }

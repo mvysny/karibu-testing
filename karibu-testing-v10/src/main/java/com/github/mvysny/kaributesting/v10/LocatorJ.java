@@ -90,7 +90,7 @@ public class LocatorJ {
      * @throws IllegalStateException if the button was not visible or not enabled.
      */
     public static void _click(@NotNull Button receiver) {
-        BasicUtilsKt._click(receiver);
+        ButtonKt._click(receiver);
     }
 
     /**

@@ -130,17 +130,6 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             expect(false) { cb.value }
         }
     }
-
-    test("RouterLink.click()") {
-        MockVaadin.setup(Routes().apply { routes.add(TestingView::class.java) })
-        UI.getCurrent().apply {
-            routerLink(null, "testing", TestingView::class) {
-                _click()
-            }
-        }
-        // make sure that the navigation has been performed and there is the TestingView in the current UI
-        _get<TestingView>()
-    }
 }
 
 @Route("testing")

@@ -42,4 +42,7 @@ fun DynaNodeGroup.allTests() {
     group("navigator test") {
         navigatorTest()
     }
+    group("router link tests") {
+        routerLinkBatch()
+    }
 }

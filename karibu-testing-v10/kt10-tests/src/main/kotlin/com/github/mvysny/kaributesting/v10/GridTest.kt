@@ -10,6 +10,7 @@ import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -197,6 +198,25 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
             expect("name 0") { grid._getFormatted(0, "name") }
         }
+    }
+
+    test("_clickItem") {
+        var event: ItemClickEvent<TestPerson>? = null
+        val grid = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            setItems((0..10).map { TestPerson("name $it", it) })
+            addItemClickListener { e -> event = e }
+        }
+        grid._clickItem(2)
+        expect(true) { event != null }
+        expect("name 2") { event!!.item.name }
+        expect(true) { event!!.isFromClient }
+        expect(1) { event!!.button }
+        expect(false) { event!!.isAltKey }
+        expect(false) { event!!.isCtrlKey }
+        expect(false) { event!!.isMetaKey }
+        expect(false) { event!!.isShiftKey }
     }
 }
 

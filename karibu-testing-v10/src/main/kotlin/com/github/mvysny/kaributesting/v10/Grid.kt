@@ -4,10 +4,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.grid.FooterRow
-import com.vaadin.flow.component.grid.Grid
-import com.vaadin.flow.component.grid.GridSortOrder
-import com.vaadin.flow.component.grid.HeaderRow
+import com.vaadin.flow.component.grid.*
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -28,7 +25,8 @@ import kotlin.test.fail
 fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val fetched = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
-    return fetched.toList().firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
+    return fetched.toList().firstOrNull()
+            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
 }
 
 /**
@@ -49,7 +47,8 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
 fun <T> Grid<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val fetched = _fetch(rowIndex, 1)
-    return fetched.firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
+    return fetched.firstOrNull()
+            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
 }
 
 fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = dataCommunicator.fetch(offset, limit)
@@ -97,7 +96,7 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnBy
  * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
 fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
-                                     click: (Component)->Unit = { component ->
+                                     click: (Component) -> Unit = { component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
     val column = _getColumnByKey(columnKey)
@@ -125,7 +124,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
  * @param columnId the column ID.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
+fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
     val rowObject: T = _get(rowIndex)
     val column: Grid.Column<T> = _getColumnByKey(columnKey)
     return column._getFormatted(rowObject)
@@ -137,15 +136,15 @@ fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
  * @param rowIndex the row index, 0 or higher.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid.Column<T>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
+fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
-fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
+fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
-    return columns.filter { it.isVisible } .map { it._getFormatted(rowObject) }
+    return columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
+fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val valueProviders = renderer.valueProviders
     val valueProvider = valueProviders[internalId2] ?: return null
     // there is no value provider for NativeButtonRenderer, just return null
@@ -154,24 +153,27 @@ fun <T: Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
 }
 
 @Suppress("UNCHECKED_CAST")
-private val <T> Grid<T>.dataGenerator2: DataGenerator<T> get() = Grid::class.java.getDeclaredMethod("getDataGenerator").run {
-    isAccessible = true
-    invoke(this@dataGenerator2) as DataGenerator<T>
-}
+private val <T> Grid<T>.dataGenerator2: DataGenerator<T>
+    get() = Grid::class.java.getDeclaredMethod("getDataGenerator").run {
+        isAccessible = true
+        invoke(this@dataGenerator2) as DataGenerator<T>
+    }
 
 @Suppress("UNCHECKED_CAST")
-private val <T> Grid.Column<T>.internalId2: String get() = Grid.Column::class.java.getDeclaredMethod("getInternalId").run {
-    isAccessible = true
-    invoke(this@internalId2) as String
-}
-
-val Renderer<*>.template: String get() {
-    val template = Renderer::class.java.getDeclaredField("template").run {
+private val <T> Grid.Column<T>.internalId2: String
+    get() = Grid.Column::class.java.getDeclaredMethod("getInternalId").run {
         isAccessible = true
-        get(this@template) as String?
+        invoke(this@internalId2) as String
     }
-    return template ?: ""
-}
+
+val Renderer<*>.template: String
+    get() {
+        val template = Renderer::class.java.getDeclaredField("template").run {
+            isAccessible = true
+            get(this@template) as String?
+        }
+        return template ?: ""
+    }
 
 /**
  * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String). The result value is undefined if a component has been set as the header.
@@ -207,7 +209,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
  * --and 198 more
  * ```
  */
-fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
+fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
     val dsIndices: IntRange = 0 until _size()
@@ -345,4 +347,19 @@ val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
  */
 fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     sort(sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) })
+}
+
+/**
+ * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listenerss registered via
+ * [Grid.addItemClickListener].
+ * @param button the id of the pressed mouse button
+ * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
+ * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
+ * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
+ * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
+ */
+fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
+                           shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
+    val itemKey = dataCommunicator.keyMapper.key(_get(rowIndex))
+    _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
 }

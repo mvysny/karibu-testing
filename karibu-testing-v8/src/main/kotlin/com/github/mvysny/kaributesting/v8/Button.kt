@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.ui.Button

@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.UI
@@ -5,7 +7,7 @@ import com.vaadin.flow.router.RouterLink
 
 /**
  * Navigates to where this router link points to.
- * @throws IllegalArgumentException if the link was not visible, not enabled. See [checkEditableByUser] for
+ * @throws IllegalStateException if the link was not visible, not enabled. See [checkEditableByUser] for
  * more details.
  */
 fun RouterLink._click() {

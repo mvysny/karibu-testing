@@ -2,8 +2,10 @@
 
 package com.github.mvysny.kaributesting.v8
 
+import com.vaadin.annotations.Theme
 import com.vaadin.data.HasValue
 import com.vaadin.server.AbstractClientConnector
+import com.vaadin.server.VaadinRequest
 import com.vaadin.shared.communication.ClientRpc
 import com.vaadin.ui.*
 import java.util.*
@@ -102,3 +104,13 @@ val Component.placeholder: String?
  * rules are matched against given component only (not against its children).
  */
 fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+
+/**
+ * Returns the current Vaadin theme (the theme that the current UI uses).
+ */
+val currentTheme: String get() {
+    val ui = UI.getCurrent() ?: throw AssertionError("No current UI")
+    return ui.theme
+            ?: ui.javaClass.getAnnotation(Theme::class.java)?.value
+            ?: ui.session.service.getConfiguredTheme(VaadinRequest.getCurrent())
+}

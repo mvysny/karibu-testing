@@ -6,11 +6,15 @@ import com.github.mvysny.karibudsl.v8.button
 import com.github.mvysny.karibudsl.v8.checkBox
 import com.vaadin.ui.Button
 import com.vaadin.ui.CheckBox
+import com.vaadin.ui.UI
 import com.vaadin.ui.VerticalLayout
 import kotlin.test.expect
 import kotlin.test.fail
 
 class BasicUtilsTest : DynaTest({
+    beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
+
     group("HasValue.setValue()") {
         test("enabled check box") {
             expect(true) { CheckBox().apply { value = true } .value }
@@ -62,5 +66,14 @@ class BasicUtilsTest : DynaTest({
             }
             expect(false) { cb.value }
         }
+    }
+
+    test("current theme") {
+        expect("valo") { currentTheme }
+        MockVaadin.tearDown()
+        MockVaadin.setup({ MyThemeUI() })
+        expect("mytheme") { currentTheme }
+        UI.getCurrent().theme = "pink"
+        expect("pink") { currentTheme }
     }
 })

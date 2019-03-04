@@ -2,11 +2,14 @@ package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
+import com.vaadin.annotations.Theme
 import com.vaadin.navigator.Navigator
-import com.vaadin.server.ExternalResource
+import com.vaadin.server.*
 import com.vaadin.ui.Link
 import com.vaadin.ui.UI
+import java.io.File
 import java.lang.IllegalStateException
+import kotlin.test.expect
 
 class LinkTest : DynaTest({
     beforeEach {
@@ -37,4 +40,41 @@ class LinkTest : DynaTest({
             }
         }
     }
+
+    group("download resource") {
+        test("download theme") {
+            expect("test!") { ThemeResource("img/test.txt").download().toString(Charsets.UTF_8) }
+        }
+        test("custom theme") {
+            MockVaadin.tearDown()
+            MockVaadin.setup({ MyThemeUI() })
+            expect("mytheme-test") { ThemeResource("img/test.txt").download().toString(Charsets.UTF_8) }
+        }
+        test("download connector") {
+            val contents = FileResource(File("build.gradle.kts")).download().toString(Charsets.UTF_8)
+            expect(true, contents) { contents.contains("configureBintray") }
+            expect("link!") { ClassResource(LinkTest::class.java, "link.txt").download().toString(Charsets.UTF_8) }
+        }
+    }
+
+    group("download link") {
+        test("disabled link") {
+            expectThrows(IllegalStateException::class, "The Link[DISABLED, caption='foo'] is not enabled") {
+                Link("foo", ExternalResource("https://www.github.com")).apply {
+                    isEnabled = false
+                    _download()
+                }
+            }
+        }
+        test("class resource") {
+            val link = Link("foo", ClassResource(LinkTest::class.java, "link.txt"))
+            expect("link!") { link.download().toString(Charsets.UTF_8) }
+        }
+    }
 })
+
+@Theme("mytheme")
+class MyThemeUI : UI() {
+    override fun init(request: VaadinRequest) {
+    }
+}

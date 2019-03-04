@@ -9,7 +9,10 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 class ButtonTest : DynaTest({
-    group("button click") {
+    beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
+
+    group("click") {
         fun expectClickCount(button: Button, clickCount: Int, block: Button.()->Unit) {
             var clicked = 0
             button.addClickListener { if (++clicked > clickCount) fail("Clicked more than $clickCount times") }

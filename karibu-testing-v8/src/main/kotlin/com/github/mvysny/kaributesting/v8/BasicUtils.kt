@@ -1,4 +1,4 @@
-@file:Suppress("ObjectPropertyName")
+@file:Suppress("ObjectPropertyName", "FunctionName")
 
 package com.github.mvysny.kaributesting.v8
 
@@ -24,15 +24,15 @@ fun AbstractClientConnector._fireEvent(event: EventObject) {
 val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
 
 /**
- * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, an exception is thrown.
- * @throws IllegalStateException if the button was not visible or not enabled.
+ * Checks that a component is actually editable by the user:
+ * * The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
+ *   For the purpose of testing individual components not attached to the [UI], a component may be considered visible even though it's not
+ *   currently nested in a [UI].
+ * * The component must be effectively enabled: it itself must be enabled, its parent must be enabled and all of its ascendants must be enabled.
+ * * If the component is [HasValue], it must not be [HasValue.isReadOnly].
+ * @throws IllegalStateException if any of the above doesn't hold.
  */
-fun Button._click() {
-    checkEditableByUser()
-    click()
-}
-
-private fun Component.checkEditableByUser() {
+fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     check(isEnabled) { "The ${toPrettyString()} is not enabled" }
     check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }

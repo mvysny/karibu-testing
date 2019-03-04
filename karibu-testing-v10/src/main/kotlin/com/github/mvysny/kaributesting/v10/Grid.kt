@@ -99,6 +99,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
                                      click: (Component) -> Unit = { component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
+    checkEditableByUser()
     val column = _getColumnByKey(columnKey)
     val renderer = column.renderer
     val item: T = _get(rowIndex)
@@ -350,7 +351,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
 }
 
 /**
- * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listenerss registered via
+ * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listeners registered via
  * [Grid.addItemClickListener].
  * @param button the id of the pressed mouse button
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
@@ -360,6 +361,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  */
 fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
+    checkEditableByUser()
     val itemKey = dataCommunicator.keyMapper.key(_get(rowIndex))
     _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
 }

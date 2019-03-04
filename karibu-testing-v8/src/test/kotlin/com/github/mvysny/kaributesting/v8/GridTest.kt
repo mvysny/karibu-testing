@@ -11,6 +11,7 @@ import com.vaadin.shared.MouseEventDetails
 import com.vaadin.ui.*
 import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
+import java.lang.IllegalStateException
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -71,6 +72,18 @@ class GridTest : DynaTest({
     }
 
     group("click item") {
+        test("can't click disabled Grid") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+                isEnabled = false
+            }
+            grid.addItemClickListener { fail("Should not be called") }
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+                grid._clickItem(2)
+            }
+        }
         test("item click listener is called") {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
@@ -108,6 +121,19 @@ class GridTest : DynaTest({
     }
 
     group("click renderer") {
+        test("can't click disabled grid") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name) {
+                    setRenderer(ButtonRenderer<TestPerson> { e -> fail("shouldn't be called") })
+                }
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+                isEnabled = false
+            }
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+                grid._clickRenderer(8, "name")
+            }
+        }
         test("ClickableRenderer") {
             var called = false
             val grid = Grid<TestPerson>().apply {

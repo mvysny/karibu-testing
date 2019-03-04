@@ -76,6 +76,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEvent
                                      click: (Component)->Unit = { component ->
                                          fail("${this.toPrettyString()} column $columnId: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
+    checkEditableByUser()
     val column = getColumnById(columnId)
     val renderer = column.renderer
     val item: T = _get(rowIndex)
@@ -207,6 +208,7 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
  */
 fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ,
                            mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
+    checkEditableByUser()
     _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), mouseEventDetails, rowIndex))
 }
 

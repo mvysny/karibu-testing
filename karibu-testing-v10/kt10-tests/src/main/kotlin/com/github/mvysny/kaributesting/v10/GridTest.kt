@@ -15,7 +15,9 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import java.lang.IllegalStateException
 import kotlin.test.expect
+import kotlin.test.fail
 
 internal fun DynaNodeGroup.gridTestbatch() {
 
@@ -142,6 +144,16 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
+        test("fails on disabled grid") {
+            val grid = Grid<TestPerson>().apply {
+                addColumn(NativeButtonRenderer<TestPerson>("View") { fail("Shouldn't be called") }).key = "name"
+                setItems((0..10).map { TestPerson("name $it", it) })
+                isEnabled = false
+            }
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+                grid._clickRenderer(2, "name")
+            }
+        }
     }
 
     test("sorting") {
@@ -200,23 +212,37 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("_clickItem") {
-        var event: ItemClickEvent<TestPerson>? = null
-        val grid = Grid<TestPerson>().apply {
-            addColumnFor(TestPerson::name)
-            addColumnFor(TestPerson::age)
-            setItems((0..10).map { TestPerson("name $it", it) })
-            addItemClickListener { e -> event = e }
+    group("_clickItem") {
+        test("fails on disabled grid") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { fail("Shouldn't be called") }
+                isEnabled = false
+            }
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+                grid._clickItem(2)
+            }
         }
-        grid._clickItem(2)
-        expect(true) { event != null }
-        expect("name 2") { event!!.item.name }
-        expect(true) { event!!.isFromClient }
-        expect(1) { event!!.button }
-        expect(false) { event!!.isAltKey }
-        expect(false) { event!!.isCtrlKey }
-        expect(false) { event!!.isMetaKey }
-        expect(false) { event!!.isShiftKey }
+        test("simple") {
+            var event: ItemClickEvent<TestPerson>? = null
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+            }
+            grid._clickItem(2)
+            expect(true) { event != null }
+            expect("name 2") { event!!.item.name }
+            expect(true) { event!!.isFromClient }
+            expect(1) { event!!.button }
+            expect(false) { event!!.isAltKey }
+            expect(false) { event!!.isCtrlKey }
+            expect(false) { event!!.isMetaKey }
+            expect(false) { event!!.isShiftKey }
+        }
     }
 }
 

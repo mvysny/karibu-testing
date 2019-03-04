@@ -156,7 +156,7 @@ val Component._text: String? get() = when (this) {
  *   currently nested in a [UI].
  * * The component must be effectively enabled: it itself must be enabled, its parent must be enabled and all of its ascendants must be enabled.
  * * If the component is [HasValue], it must not be [HasValue.isReadOnly].
- * @throws IllegalArgumentException if any of the above doesn't hold.
+ * @throws IllegalStateException if any of the above doesn't hold.
  */
 fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }

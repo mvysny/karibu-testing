@@ -81,10 +81,10 @@ fun Grid<*>._size(): Int {
 
 /**
  * Gets a [Grid.Column] of this grid by its [columnKey].
- * @throws IllegalArgumentException if no such column exists.
+ * @throws AssertionError if no such column exists.
  */
-fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> =
-        requireNotNull(getColumnByKey(columnKey)) { "${this.toPrettyString()}: No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}" }
+fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnByKey(columnKey)
+        ?: throw AssertionError("${toPrettyString()}: No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}")
 
 /**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
@@ -125,9 +125,9 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
  * @param columnId the column ID.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
+fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
     val rowObject: T = _get(rowIndex)
-    val column: Grid.Column<T> = getColumnByKey(columnId) ?: throw IllegalArgumentException("There is no column $columnId. Available columns: ${columns.map { it.id }}")
+    val column: Grid.Column<T> = _getColumnByKey(columnKey)
     return column._getFormatted(rowObject)
 }
 

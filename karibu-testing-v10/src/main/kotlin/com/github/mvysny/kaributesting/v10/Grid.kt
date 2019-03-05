@@ -181,6 +181,7 @@ val Renderer<*>.template: String
  */
 var <T> Grid.Column<T>.header2: String
     get() {
+        // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
         val e: Renderer<*>? = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer").run {
             isAccessible = true
             get(this@header2) as Renderer<*>?

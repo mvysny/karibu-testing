@@ -189,6 +189,39 @@ class GridTest : DynaTest({
         expect(10) { grid._get(0).age }
         expect(0) { grid._get(10).age }
     }
+
+    group("_getFormatted()") {
+        // tests https://github.com/mvysny/karibu-testing/issues/18
+        test("non-existing column id") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            expectThrows(IllegalArgumentException::class, "No column with ID 'surname'; available column IDs: [name, age]") {
+                grid._getFormatted(0, "surname")
+            }
+        }
+
+        test("non-existing row") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+            }
+            expectThrows(AssertionError::class, "Requested to get row 0 but the data provider only has 0") {
+                grid._getFormatted(0, "name")
+            }
+        }
+
+        test("basic") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            expect("name 0") { grid._getFormatted(0, "name") }
+        }
+    }
 })
 
 data class TestPerson(val name: String, val age: Int)

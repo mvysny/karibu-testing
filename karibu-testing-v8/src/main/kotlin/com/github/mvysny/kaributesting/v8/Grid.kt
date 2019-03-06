@@ -104,7 +104,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEvent
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
     val rowObject: T = dataProvider._get(rowIndex)
-    val column: Grid.Column<T, *> = getColumn(columnId) ?: throw IllegalArgumentException("There is no column $columnId. Available columns: ${columns.map { it.id }}")
+    val column: Grid.Column<T, *> = getColumnById(columnId)
     return column._getFormatted(rowObject)
 }
 
@@ -219,7 +219,7 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.fi
 @Suppress("UNCHECKED_CAST")
 fun <T> Grid<T>.getColumnById(columnId: String): Grid.Column<T, *> =
         getColumn(columnId) as Grid.Column<T, *>?
-                ?: throw IllegalArgumentException("${this.toPrettyString()}: No column with ID $columnId; available column IDs: ${columns.mapNotNull { it.id }}")
+                ?: throw IllegalArgumentException("${this.toPrettyString()}: No column with ID '$columnId'; available column IDs: ${columns.mapNotNull { it.id }}")
 
 @Deprecated("replaced by getColumnById()", replaceWith = ReplaceWith("getColumnById(columnId)"))
 fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById(columnId)

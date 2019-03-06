@@ -68,7 +68,7 @@ class LinkTest : DynaTest({
         }
         test("class resource") {
             val link = Link("foo", ClassResource(LinkTest::class.java, "link.txt"))
-            expect("link!") { link.download().toString(Charsets.UTF_8) }
+            expect("link!") { link._download().toString(Charsets.UTF_8) }
         }
     }
 })

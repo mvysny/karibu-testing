@@ -15,7 +15,7 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "1.1.4-SNAPSHOT"
+    version = "1.1.4"
     repositories {
         jcenter()
         maven { setUrl("https://maven.vaadin.com/vaadin-prereleases/") }

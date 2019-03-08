@@ -8,7 +8,9 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
+import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
@@ -36,6 +38,10 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("TextArea[label='label', value='some text']") { TextArea("label").apply { value = "some text" } .toPrettyString() }
         expect("Grid[]") { Grid<Any>().toPrettyString() }
         expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it } .apply { header2 = "My Header" } }.toPrettyString() }
+        expect("Anchor[href='']") { Anchor().toPrettyString() }
+        expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
+        expect("Image[src='']") { Image().toPrettyString() }
+        expect("Image[src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
     }
 
     test("menu dump") {

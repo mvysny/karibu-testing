@@ -4,6 +4,8 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.html.Anchor
+import com.vaadin.flow.component.html.Image
 import java.util.*
 import kotlin.streams.toList
 
@@ -102,6 +104,12 @@ fun Component.toPrettyString(): String {
     }
     if (!placeholder.isNullOrBlank()) {
         list.add("placeholder='$placeholder'")
+    }
+    if (this is Anchor) {
+        list.add("href='$href'")
+    }
+    if (this is Image) {
+        list.add("src='$src'")
     }
     var name = javaClass.simpleName
     if (name.isEmpty()) {

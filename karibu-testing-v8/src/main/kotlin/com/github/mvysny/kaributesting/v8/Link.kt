@@ -2,7 +2,6 @@
 
 package com.github.mvysny.kaributesting.v8
 
-import com.vaadin.annotations.Theme
 import com.vaadin.server.*
 import com.vaadin.ui.Link
 import com.vaadin.ui.UI

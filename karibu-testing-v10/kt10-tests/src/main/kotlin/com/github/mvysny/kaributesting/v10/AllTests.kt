@@ -45,4 +45,7 @@ fun DynaNodeGroup.allTests() {
     group("router link tests") {
         routerLinkBatch()
     }
+    group("download test battery") {
+        downloadTestBattery()
+    }
 }

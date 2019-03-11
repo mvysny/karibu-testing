@@ -83,9 +83,12 @@ A list of a very simple example projects that employ Karibu Testing:
 
 Absolute requirement in order for the Karibu-Testing library to work with your app is:
 
-* You must be able to "start" your app in the same JVM which runs the tests.
+**You must be able to "start" your app in the same JVM which runs the tests.**
 
-Here are a few tips for typical apps:
+This is because Karibu-Testing uses Vaadin server-side API directly to assert the application state; it uses `UI.getCurrent()` to locate
+any components you test on. Your tests therefore need to have access to `UI.getCurrent()` populated by your app.
+
+Here are a few tips for typical apps on how to achieve that:
 
 * For simple apps with just the UI and no database that's very easy: simply call `MockVaadin.setup { MyUI() }` before every test, and `MockVaadin.tearDown()` after every test. That will
 instantiate your UI along with all necessary Vaadin environment.

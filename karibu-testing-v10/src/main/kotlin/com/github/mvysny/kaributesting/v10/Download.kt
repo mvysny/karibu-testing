@@ -4,7 +4,9 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Image
+import com.vaadin.flow.server.AbstractStreamResource
 import com.vaadin.flow.server.StreamResource
+import com.vaadin.flow.server.StreamResourceRegistry
 import com.vaadin.flow.server.VaadinSession
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -47,11 +49,16 @@ fun Image.download(): ByteArray {
  */
 fun downloadResource(uri: String): ByteArray {
     require(!uri.isBlank()) { "uri is blank" }
-    val s = checkNotNull(VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)) {
-        "No such StreamResource registered: $uri"
+    val s = VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)
+    expect(true, "No such StreamResource registered: '$uri'. Available resources: ${VaadinSession.getCurrent().resourceRegistry.resources.keys}") {
+        s != null
     }
     expect(true, "Only StreamResources are supported but got $s") { s is StreamResource }
     val bout = ByteArrayOutputStream()
     (s as StreamResource).writer.accept(bout, VaadinSession.getCurrent())
     return bout.toByteArray()
 }
+
+private val resField = StreamResourceRegistry::class.java.getDeclaredField("res").apply { isAccessible = true }
+@Suppress("UNCHECKED_CAST")
+val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource> get() = resField.get(this) as Map<URI, AbstractStreamResource>

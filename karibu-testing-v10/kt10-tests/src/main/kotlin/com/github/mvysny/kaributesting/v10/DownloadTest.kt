@@ -43,4 +43,20 @@ fun DynaNodeGroup.downloadTestBattery() {
             }
         }
     }
+
+    group("downloadResource") {
+        test("fails if there is no such resource") {
+            expectThrows(AssertionError::class, "No such StreamResource registered: 'foo'. Available resources: []") {
+                downloadResource("foo")
+            }
+        }
+        test("fails and lists resources if there is no such resource") {
+            val link = UI.getCurrent().anchor("")
+            val streamRes = StreamResource("foo.txt", InputStreamFactory { "yadda".byteInputStream() })
+            link.setHref(streamRes)
+            expectThrows(AssertionError::class, "No such StreamResource registered: 'foo'. Available resources: [VAADIN/dynamic/resource/1/") {
+                downloadResource("foo")
+            }
+        }
+    }
 }

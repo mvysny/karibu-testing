@@ -664,3 +664,19 @@ object UIQueueRunnerHook : TestingLifecycleHook {
 
 beforeGroup { testingLifecycleHook = UIQueueRunnerHook }
 ```
+
+## Cookies
+
+Testing cookies is simple. To insert mock cookies into the request, simply fill them into the `MockRequest`
+that backs up the `VaadinRequest` as follows:
+
+```kotlin
+currentRequest.mock.addCookie(Cookie("foo", "bar"))
+```
+
+To assert that your code has produced a cookie and written it into the response, simply use the `MockResponse`
+methods:
+
+```kotlin
+expect("bar") { currentResponse.mock.getCookie("foo").value }
+```

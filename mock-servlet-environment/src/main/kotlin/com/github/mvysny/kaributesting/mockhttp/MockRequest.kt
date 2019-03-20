@@ -140,6 +140,13 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     var cookiesInt: Array<Cookie>? = null
 
+    fun addCookie(cookie: Cookie) {
+        if (cookiesInt == null) {
+            cookiesInt = arrayOf()
+        }
+        cookiesInt = cookiesInt!! + cookie
+    }
+
     override fun getCookies(): Array<Cookie>? = cookiesInt
 
     override fun getLocale(): Locale = Locale.US

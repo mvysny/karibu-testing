@@ -2,6 +2,8 @@ package com.github.mvysny.kaributesting.mockhttp
 
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectList
+import com.github.mvysny.dynatest.expectThrows
+import javax.servlet.http.Cookie
 import kotlin.test.expect
 
 class MockResponseTest : DynaTest({
@@ -20,5 +22,14 @@ class MockResponseTest : DynaTest({
         expect("bar") { request.getHeader("foo") }
         expectList("foo") { request.headerNames.toList() }
         expectList("bar", "baz") { request.getHeaders("foo").toList() }
+    }
+
+    test("cookies") {
+        request.cookies += Cookie("foo", "bar")
+        expect("bar") { request.getCookie("foo").value }
+        expect(null) { request.findCookie("qqq") }
+        expectThrows(IllegalStateException::class, "no such cookie with name baz. Available cookies: foo=bar") {
+            request.getCookie("baz")
+        }
     }
 })

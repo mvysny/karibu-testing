@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.servlet.http.Cookie
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -312,6 +313,20 @@ class MockVaadinTest : DynaTest({
                 text = "bar"
                 expect("bar") { text }
             }
+        }
+    }
+
+    group("request") {
+        test("cookies") {
+            currentRequest.mock.addCookie(Cookie("foo", "bar"))
+            expectList("bar") { currentRequest.cookies!!.map { it.value } }
+        }
+    }
+
+    group("response") {
+        test("cookies") {
+            currentResponse.addCookie(Cookie("foo", "bar"))
+            expect("bar") { currentResponse.mock.getCookie("foo").value }
         }
     }
 })

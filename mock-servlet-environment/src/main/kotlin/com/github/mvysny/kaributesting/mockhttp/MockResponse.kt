@@ -27,6 +27,12 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
         cookies.add(cookie)
     }
 
+    fun getCookie(name: String): Cookie = checkNotNull(findCookie(name)) {
+        "no such cookie with name $name. Available cookies: ${cookies.joinToString { "${it.name}=${it.value}" }}"
+    }
+
+    fun findCookie(name: String): Cookie? = cookies.firstOrNull { it.name == name }
+
     override fun encodeRedirectUrl(url: String): String = encodeRedirectURL(url)
 
     override fun flushBuffer() {

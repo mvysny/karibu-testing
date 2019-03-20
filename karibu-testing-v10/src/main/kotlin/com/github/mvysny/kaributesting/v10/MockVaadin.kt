@@ -307,3 +307,22 @@ open class MockService(servlet: VaadinServlet, deploymentConfiguration: Deployme
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
 }
+
+val currentRequest: VaadinRequest get() = VaadinService.getCurrentRequest() ?: throw IllegalStateException("No current request")
+val currentResponse: VaadinResponse get() = VaadinService.getCurrentResponse() ?: throw IllegalStateException("No current response")
+
+/**
+ * Retrieves the mock request which backs up [VaadinRequest].
+ * ```
+ * currentRequest.mock.addCookie(Cookie("foo", "bar"))
+ * ```
+ */
+val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+
+/**
+ * Retrieves the mock request which backs up [VaadinResponse].
+ * ```
+ * currentResponse.mock.getCookie("foo").value
+ * ```
+ */
+val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse

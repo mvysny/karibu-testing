@@ -34,6 +34,8 @@ class MockVaadinTest : DynaTest({
             expect(true) { UI.getCurrent() != null }
             expect(true) { VaadinResponse.getCurrent() != null }
             expect(true) { Page.getCurrent() != null }
+            expect(true) { Page.getCurrent().webBrowser != null }
+            expect(true) { Page.getCurrent().webBrowser.locale != null }
         }
 
         test("current UI contains sane values") {

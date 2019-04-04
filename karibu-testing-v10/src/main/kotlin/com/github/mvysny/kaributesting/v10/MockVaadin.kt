@@ -176,6 +176,7 @@ object MockVaadin {
         // init Vaadin Request
         val request = VaadinServletRequest(MockRequest(httpSession), servlet.service)
         strongRefReq = request
+        session.browser.updateRequestDetails(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 
         // init Vaadin Response

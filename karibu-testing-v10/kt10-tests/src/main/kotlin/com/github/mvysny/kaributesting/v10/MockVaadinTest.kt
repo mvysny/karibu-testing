@@ -43,6 +43,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinSession.getCurrent().configuration != null }
             expect(true) { VaadinSession.getCurrent().service != null }
             expect(true) { VaadinSession.getCurrent().browser != null }
+            expect(true) { VaadinSession.getCurrent().browser.locale != null }
             expect(true) { VaadinResponse.getCurrent() != null }
         }
 

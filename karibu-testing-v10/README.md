@@ -8,7 +8,7 @@ Compatibility chart:
 | Karibu-Testing version | Supports |
 |------------------------|----------|
 | 1.0.x | Vaadin 10, Vaadin 11, Vaadin 12 |
-| 1.1.x | Vaadin 13 (not yet released, you need to add `vaadin-prereleases` Maven repo, see [#16](https://github.com/mvysny/karibu-testing/issues/16) for more details) |
+| 1.1.x | Vaadin 13 |
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

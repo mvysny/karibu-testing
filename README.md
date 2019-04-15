@@ -5,7 +5,7 @@
 
 # Karibu-Testing: The Vaadin Unit Testing
 
-The Unit Testing library for Vaadin. Karibu-Testing removes the necessity to run
+The Unit Testing library for [Vaadin](https://vaadin.com/). Karibu-Testing removes the necessity to run
 both the browser and the servlet container in order to test your Vaadin-based apps.
 
 1. *containerless testing*: You can test your Vaadin App without having to launch the servlet container.
@@ -15,7 +15,22 @@ to run completely outside of servlet container.
 server-side, bypassing browser and the JavaScript->Server bridge completely,
 and you talk directly to your server-side View classes, the server Vaadin components, etc.
 
-## Why?
+## Getting Started / Full Documentation
+
+For the Getting Started documentation and for the full API documentation:
+
+### Vaadin 8
+
+Head to [Testing with Vaadin 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
+
+### Vaadin 10+
+
+Head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 10+ version (10, 11, 12, 13 etc).
+
+> *Note:* Starting with version 1.0.0, Karibu-Testing changed the Java package and the Maven group ID in order to be allowed to be present in Maven Central. Be sure
+to change the `groupId` to `com.github.mvysny.kaributesting` in your projects.
+
+## Why Unit-testing?
 
 Advantages over the traditional testing with [Selenium](https://www.seleniumhq.org/)/[TestBench](https://vaadin.com/testbench):
 
@@ -49,21 +64,6 @@ You can thus plug this library in into your Java+Vaadin-based project as a test 
 in Java or Kotlin, whichever suits you more.
 
 Karibu-Testing is published on Maven Central, so it's very easy to add as a Maven dependency.
-
-## Getting Started / Full Documentation
-
-For the Getting Started documentation and for the full API documentation:
-
-### Vaadin 8
-
-Head to [Testing with Vaadin 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
-
-### Vaadin 10+
-
-Head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 10+ version (10, 11, 12, 13 etc).
-
-> *Note:* Starting with version 1.0.0, Karibu-Testing changed the Java package and the Maven group ID in order to be allowed to be present in Maven Central. Be sure
-to change the `groupId` to `com.github.mvysny.kaributesting` in your projects.
 
 ## Example Projects
 

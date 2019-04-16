@@ -35,11 +35,15 @@ inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStr
 inline fun <reified T: Serializable> T.serializeDeserialize() = serializeToBytes().deserialize<T>()
 
 /**
- * A configuration object of all routes and error routes in the application. Use [autoDiscoverViews] to discover everything.
+ * A configuration object of all routes and error routes in the application. Simply use [autoDiscoverViews] to discover everything.
+ *
+ * To speed up the tests, you can create one instance of this class only, then reuse that instance in every
+ * call to [MockVaadin.setup].
+ * @property routes a list of all route views in your application. Vaadin will ignore any routes not present here.
+ * @property errorRoutes a list of all route views in your application. Vaadin will ignore any routes not present here.
  */
-class Routes: Serializable {
-    val routes = mutableSetOf<Class<out Component>>()
-    val errorRoutes = mutableSetOf<Class<out HasErrorParameter<*>>>()
+data class Routes(val routes: MutableSet<Class<out Component>> = mutableSetOf(),
+                  val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf()): Serializable {
 
     /**
      * Manually register error routes. No longer needed since [autoDiscoverViews] can now detect error routes.
@@ -50,7 +54,7 @@ class Routes: Serializable {
     }
 
     /**
-     * Registers all routes to Vaadin 13 registry.
+     * Registers all routes to Vaadin 13 registry. Automatically called from [MockVaadin.setup].
      */
     @Suppress("UNCHECKED_CAST")
     fun register(sc: ServletContext) {
@@ -65,6 +69,7 @@ class Routes: Serializable {
      * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
      * @param autoDetectErrorRoutes if false then [HasErrorParameter] error views are not auto-detected. This emulates
      * the old behavior of this method.
+     * @return this
      */
     @JvmOverloads
     fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
@@ -82,9 +87,11 @@ class Routes: Serializable {
             }
         }
 
-        println("Auto-discovered views: ${routes.joinToString { it.simpleName }}")
-        println("Auto-discovered error routes: ${errorRoutes.joinToString { it.simpleName }}")
+        println("Auto-discovered views: $this")
     }
+
+    override fun toString(): String =
+            "Routes(routes=${routes.joinToString { it.simpleName }}, errorRoutes=${errorRoutes.joinToString { it.simpleName }})"
 }
 
 /**

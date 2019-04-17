@@ -137,15 +137,26 @@ to provide the auto-detected set of `@Route`s to the function:
 Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
+    // initialize routes only once, to avoid view auto-detection before every test and to speed up the tests
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    beforeEach { MockVaadin.setup(routes) }
 })
 ```
 Java:
 ```java
 public class MyUITest {
+    private static Routes routes;
+
+    @BeforeAll
+    public static void createRoutes() {
+        // initialize routes only once, to avoid view auto-detection before every test and to speed up the tests
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo");
+    }
+    
     @BeforeEach
     public void setupVaadin() {
-        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+        MockVaadin.setup(routes);
     }
 }
 ```
@@ -159,7 +170,9 @@ simple testing app uses `MainView` as the root route):
 Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    beforeEach { MockVaadin.setup(routes) }
     test("simple UI test") {
         val main = UI.getCurrent().children.findFirst().get() as MainView
         expect(2) { main.children.count() }
@@ -170,16 +183,24 @@ class MyUITest : DynaTest({
 Java:
 ```java
 public class MyUITest {
+    private static Routes routes;
+
+    @BeforeAll
+    public static void createRoutes() {
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo");
+    }
+
     @BeforeEach
     public void setupVaadin() {
-        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+        MockVaadin.setup(routes);
     }
+    
     @Test
     public void simpleUITest() {
         final MainView main = (MainView) UI.getCurrent().getChildren().findFirst().get();
         assertEquals(2, main.getChildren().count());
     }
-})
+}
 ```
 
 ### Simulating the user input
@@ -223,7 +244,9 @@ With this arsenal at hand, we can rewrite the test:
 Kotlin:
 ```kotlin
 class MainViewTest: DynaTest({
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    beforeEach { MockVaadin.setup(routes) }
 
     test("test greeting") {
         // simulate a button click as if clicked by the user
@@ -239,10 +262,18 @@ Java:
 ```java
 import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 public class MyUITest {
+    private static Routes routes;
+
+    @BeforeAll
+    public static void createRoutes() {
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo");
+    }
+
     @BeforeEach
     public void setupVaadin() {
-        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+        MockVaadin.setup(routes);
     }
+
     @Test
     public void testGreeting() {
         // simulate a button click as if clicked by the user
@@ -292,7 +323,9 @@ to call this function before all tests:
 Kotlin:
 ```kotlin
 class MyUITest : DynaTest({
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.vaadin.flow.demo")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    beforeEach { MockVaadin.setup(routes) }
     test("simple test") {
         // navigate to the "Categories" list route.
         UI.getCurrent().navigateTo("categories")
@@ -310,10 +343,18 @@ Java:
 import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 import static com.github.mvysny.kaributesting.v10.GridKt.*;
 public class MyUITest {
+    private static Routes routes;
+
+    @BeforeAll
+    public static void createRoutes() {
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo");
+    }
+
     @BeforeEach
     public void setupVaadin() {
-        MockVaadin.setup(new Routes().autoDiscoverViews("com.vaadin.flow.demo"));
+        MockVaadin.setup(routes);
     }
+
     @Test
     public void testGreeting() {
         // navigate to the "Categories" list route.

@@ -15,6 +15,8 @@ to run completely outside of servlet container.
 server-side, bypassing browser and the JavaScript->Server bridge completely,
 and you talk directly to your server-side View classes, the server Vaadin components, etc.
 
+> If you like the library, please star it. The more stars, the more popularity and more maintainenance the library will receive.
+
 ## Getting Started / Full Documentation
 
 For the Getting Started documentation and for the full API documentation:

@@ -113,7 +113,7 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
         is GridMenuItem<*> -> parent.checkMenuItemEnabled(originalItem, parentMap)
         is ContextMenu -> Unit
         is GridContextMenu<*> -> Unit
-        else -> fail("Unexpected parent ${parent.toPrettyString()}")
+        else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent ${parent.toPrettyString()}")
     }
 }
 

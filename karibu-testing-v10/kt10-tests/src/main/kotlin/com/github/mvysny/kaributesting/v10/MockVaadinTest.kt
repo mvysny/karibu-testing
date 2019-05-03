@@ -22,9 +22,10 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 internal fun DynaNodeGroup.mockVaadinTest() {
-
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
     beforeEach {
-        MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
+        MockVaadin.setup(routes)
         expect("""
 └── MockedUI[]
     └── WelcomeView[]

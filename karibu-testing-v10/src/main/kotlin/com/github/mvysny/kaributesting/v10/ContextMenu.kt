@@ -88,13 +88,14 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
     val parent = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
     when(parent) {
         is MenuItem -> parent.checkMenuItemVisible(originalItem, parentMap)
+        is GridMenuItem<*> -> parent.checkMenuItemVisible(originalItem, parentMap)
         is ContextMenu -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
             parent.target.isEffectivelyVisible()
         }
         is GridContextMenu<*> -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
             parent.target.isEffectivelyVisible()
         }
-        else -> fail("Unexpected parent ${parent.toPrettyString()}")
+        else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent: ${parent.toPrettyString()}")
     }
 }
 
@@ -109,6 +110,7 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
     val parent = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
     when(parent) {
         is MenuItem -> parent.checkMenuItemEnabled(originalItem, parentMap)
+        is GridMenuItem<*> -> parent.checkMenuItemEnabled(originalItem, parentMap)
         is ContextMenu -> Unit
         is GridContextMenu<*> -> Unit
         else -> fail("Unexpected parent ${parent.toPrettyString()}")

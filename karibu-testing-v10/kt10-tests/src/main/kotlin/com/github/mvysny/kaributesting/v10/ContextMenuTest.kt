@@ -134,5 +134,18 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithCaption("click me", "foo")
             expect("foo") { clicked }
         }
+        test("submenu click") {
+            var clicked: String? = null
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("submenu") {
+                        item("click me", { e -> clicked = e.item.orElse(null) })
+                    }
+                }
+            }
+            cm._clickItemWithCaption("click me", "foo")
+            expect("foo") { clicked }
+        }
     }
 }

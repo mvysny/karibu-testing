@@ -8,7 +8,9 @@ import kotlin.test.expect
 import kotlin.streams.*
 
 internal fun DynaNodeGroup.polymerTemplateTest() {
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
+    beforeEach { MockVaadin.setup(routes) }
     afterEach { MockVaadin.tearDown() }
 
     test("simple instantiation fills in @Id-annotated components") {

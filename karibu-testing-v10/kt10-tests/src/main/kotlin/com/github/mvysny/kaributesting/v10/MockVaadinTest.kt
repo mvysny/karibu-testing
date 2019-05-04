@@ -347,7 +347,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         beforeEach {
             MockVaadin.tearDown()
             TestInitListener.clearInitFlags()
-            MockVaadin.setup(Routes().autoDiscoverViews("com.github"))
+            MockVaadin.setup(routes)
         }
         test("init listeners called") {
             expect(true) { TestInitListener.serviceInitCalled }

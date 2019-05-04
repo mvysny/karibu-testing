@@ -6,8 +6,9 @@ import com.github.mvysny.karibudsl.v10.navigateToView
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.navigatorTest() {
-
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
+    beforeEach { MockVaadin.setup(routes) }
     afterEach { MockVaadin.tearDown() }
 
     test("navigation") {

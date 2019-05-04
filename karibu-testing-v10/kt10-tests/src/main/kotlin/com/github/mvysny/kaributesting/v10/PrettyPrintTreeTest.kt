@@ -17,7 +17,9 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 internal fun DynaNodeGroup.prettyPrintTreeTest() {
-    beforeEach { MockVaadin.setup(Routes().autoDiscoverViews("com.github")) }
+    lateinit var routes: Routes
+    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
+    beforeEach { MockVaadin.setup(routes) }
     afterEach { MockVaadin.tearDown() }
 
     test("Simple dump") {

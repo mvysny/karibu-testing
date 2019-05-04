@@ -128,7 +128,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
-                    item("click me", { e -> clicked = e.item.orElse(null) })
+                    item("click me", { e -> clicked = e })
                 }
             }
             cm._clickItemWithCaption("click me", "foo")
@@ -140,7 +140,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
                     item("submenu") {
-                        item("click me", { e -> clicked = e.item.orElse(null) })
+                        item("click me", { e -> clicked = e })
                     }
                 }
             }

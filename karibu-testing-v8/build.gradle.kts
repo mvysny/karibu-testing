@@ -5,7 +5,7 @@ dependencies {
     testCompile("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
     compile(kotlin("test"))
     testCompile("org.slf4j:slf4j-simple:1.7.25")
-    testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:0.6.0")
+    testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:${properties["karibudsl_version"]}")
 }
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit

@@ -204,8 +204,11 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
 /**
  * Fires the [com.vaadin.ui.Grid.ItemClick] event for given [rowIndex] which invokes all [com.vaadin.ui.components.grid.ItemClickListener]s registered via
  * [Grid.addItemClickListener].
- * @param column click this column; defaults to the first visible column in the Grid.
+ * @param column click this column; defaults to the first visible column in the Grid since it often doesn't really matter
+ * which column was clicked - only the row index matters.
+ * @param mouseEventDetails optionally mock mouse buttons and/or keyboard modifiers here.
  */
+@JvmOverloads
 fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ,
                            mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
     checkEditableByUser()

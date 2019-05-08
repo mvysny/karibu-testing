@@ -360,6 +360,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
  * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
  */
+@JvmOverloads
 fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()

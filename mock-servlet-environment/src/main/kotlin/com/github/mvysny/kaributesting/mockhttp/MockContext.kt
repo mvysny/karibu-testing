@@ -53,9 +53,12 @@ open class MockContext : ServletContext {
                 // to be able to resolve ThemeResource("../othertheme/img/foo.png") which work from the browser.
                 path = Paths.get(path).normalize().toString()
             }
-            val resource: URL? = Thread.currentThread().contextClassLoader.getResource(path.trimStart('/'))
-            if (resource != null) {
-                return resource
+            if (path.startsWith("/VAADIN/")) {
+                // reject to serve "/VAADIN/../" resources
+                val resource: URL? = Thread.currentThread().contextClassLoader.getResource(path.trimStart('/'))
+                if (resource != null) {
+                    return resource
+                }
             }
         }
         return null

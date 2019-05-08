@@ -68,6 +68,7 @@ public class LocatorJApiTest {
         _getFormattedRow(new Grid<>(), 5);
         expectRows(new Grid<>(), 0);
         expectRow(new Grid<>(), 0, "John Doe", "25");
+        _clickItem(new Grid<>(), 0);
     }
 
     public static class Person {}

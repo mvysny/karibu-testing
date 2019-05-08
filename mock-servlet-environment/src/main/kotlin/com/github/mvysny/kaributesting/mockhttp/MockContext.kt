@@ -5,6 +5,8 @@ import java.io.File
 import java.io.InputStream
 import java.lang.Exception
 import java.net.URL
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
@@ -38,7 +40,20 @@ open class MockContext : ServletContext {
         // we need to match the latter one to a resource on classpath
 
         if (path.startsWith("/")) {
-            val resource = Thread.currentThread().contextClassLoader.getResource("META-INF/resources$path")
+            val resource: URL? = Thread.currentThread().contextClassLoader.getResource("META-INF/resources$path")
+            if (resource != null) {
+                return resource
+            }
+        }
+
+        if (path.startsWith("/VAADIN/")) {
+            // Vaadin 8 exposed directory
+            var path = path
+            if (path.contains("..")) {
+                // to be able to resolve ThemeResource("../othertheme/img/foo.png") which work from the browser.
+                path = Paths.get(path).normalize().toString()
+            }
+            val resource: URL? = Thread.currentThread().contextClassLoader.getResource(path.trimStart('/'))
             if (resource != null) {
                 return resource
             }

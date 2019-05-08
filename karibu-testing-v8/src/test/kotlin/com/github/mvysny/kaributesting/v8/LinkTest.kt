@@ -58,6 +58,9 @@ class LinkTest : DynaTest({
         test("relative paths in theme resource") {
             expect("mytheme-test") { ThemeResource("../mytheme/img/test.txt").download().toString(Charsets.UTF_8) }
         }
+        test("relative paths in theme resource in jar file") {
+            ThemeResource("../../widgetsets/com.vaadin.DefaultWidgetSet/clear.cache.gif").download()
+        }
     }
 
     group("download link") {

@@ -6,6 +6,7 @@ dependencies {
     compile(kotlin("test"))
     testCompile("org.slf4j:slf4j-simple:1.7.25")
     testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:${properties["karibudsl_version"]}")
+    testCompile("com.vaadin:vaadin-client-compiled:${properties["vaadin8_version"]}")
 }
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit

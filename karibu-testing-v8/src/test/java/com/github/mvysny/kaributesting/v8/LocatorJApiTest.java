@@ -79,6 +79,7 @@ public class LocatorJApiTest {
         GridKt._getFormattedRow(new Grid<>(), 5);
         GridKt.expectRows(new Grid<>(), 0);
         GridKt.expectRow(new Grid<>(), 0, "John Doe", "25");
+        GridKt._clickItem(new Grid<>(), 0);
 
         MockVaadin.tearDown();
     }

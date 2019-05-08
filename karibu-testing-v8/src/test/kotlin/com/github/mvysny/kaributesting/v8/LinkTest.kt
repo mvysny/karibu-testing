@@ -55,6 +55,9 @@ class LinkTest : DynaTest({
             expect(true, contents) { contents.contains("configureBintray") }
             expect("link!") { ClassResource(LinkTest::class.java, "link.txt").download().toString(Charsets.UTF_8) }
         }
+        test("relative paths in theme resource") {
+            expect("mytheme-test") { ThemeResource("../mytheme/img/test.txt").download().toString(Charsets.UTF_8) }
+        }
     }
 
     group("download link") {

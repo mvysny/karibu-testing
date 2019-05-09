@@ -6,7 +6,7 @@ import javax.servlet.ServletContext
 import kotlin.test.expect
 
 class MockContextTest : DynaTest({
-    lateinit var ctx: ServletContext
+    lateinit var ctx: MockContext
     beforeEach { ctx = MockContext() }
 
     test("attributes") {
@@ -35,5 +35,14 @@ class MockContextTest : DynaTest({
         expect(false) { ctx.setInitParameter("foo", "baz") }
         expect("bar") { ctx.getInitParameter("foo") }
         expectList("foo") { ctx.initParameterNames.toList() }
+    }
+
+    test("realPath") {
+        ctx.realPathRoots = listOf("src/main/webapp/frontend", "src/main/webapp", "src/test/webapp")
+        expect(null) { ctx.getRealPath("/index.html") }
+        expect(true) { ctx.getRealPath("/VAADIN/themes/default/img/1.txt")!!.endsWith("/VAADIN/themes/default/img/1.txt") }
+        expect(true) { ctx.getRealPath("/VAADIN/themes/valo/../default/img/1.txt")!!.endsWith("/VAADIN/themes/default/img/1.txt") }
+        // stepping out of root is not allowed and returns null. Avoids browsing through the filesystem
+        expect(null) { ctx.getRealPath("/../../../build.gradle.kts") }
     }
 })

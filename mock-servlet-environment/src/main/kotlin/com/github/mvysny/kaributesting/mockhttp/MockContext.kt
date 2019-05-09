@@ -53,8 +53,8 @@ open class MockContext : ServletContext {
                 // to be able to resolve ThemeResource("../othertheme/img/foo.png") which work from the browser.
                 path = Paths.get(path).normalize().toString()
             }
+            // reject to serve "/VAADIN/../" resources
             if (path.startsWith("/VAADIN/")) {
-                // reject to serve "/VAADIN/../" resources
                 val resource: URL? = Thread.currentThread().contextClassLoader.getResource(path.trimStart('/'))
                 if (resource != null) {
                     return resource
@@ -130,12 +130,22 @@ open class MockContext : ServletContext {
         TODO("not implemented")
     }
 
-    override fun getRealPath(path: String): String? = listOf("src/main/webapp/frontend/$path", "src/main/webapp/$path").asSequence()
-        .map { File(moduleDir, it).absolutePath }
-        .filter { File(it).exists() }
-        .firstOrNull()
+    /**
+     * [getRealPath] will only resolve `path` in these folders.
+     */
+    var realPathRoots: List<String> = listOf("src/main/webapp/frontend", "src/main/webapp")
 
-    val initParameters = mutableMapOf<String, String>()
+    override fun getRealPath(path: String): String? {
+        for (realPathRoot in realPathRoots) {
+            val realPath: File = File(moduleDir, "$realPathRoot/$path").canonicalFile.absoluteFile
+            if (realPath.absolutePath.startsWith(File(realPathRoot).absolutePath) && realPath.exists()) {
+                return realPath.absolutePath
+            }
+        }
+        return null
+    }
+
+    val initParameters: MutableMap<String, String> = mutableMapOf<String, String>()
 
     override fun getInitParameter(name: String): String? = initParameters[name]
 

@@ -1,7 +1,6 @@
 repositories {
     jcenter()
     maven { setUrl("https://maven.vaadin.com/vaadin-prereleases/") }
-    maven { setUrl("https://oss.sonatype.org/content/repositories/vaadin-snapshots/") }
 }
 
 dependencies {

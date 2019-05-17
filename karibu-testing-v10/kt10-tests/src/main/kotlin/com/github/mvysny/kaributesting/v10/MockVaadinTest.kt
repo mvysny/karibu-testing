@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
@@ -131,6 +133,9 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
             expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
             expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
+            expect("helloworld") { RouteConfiguration.forApplicationScope().getUrl(HelloWorldView::class.java) }
+            expect("params/1") { RouteConfiguration.forApplicationScope().getUrl(ParametrizedView::class.java, 1) }
+            expect("parent/child") { RouteConfiguration.forApplicationScope().getUrl(ChildView::class.java) }
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/11

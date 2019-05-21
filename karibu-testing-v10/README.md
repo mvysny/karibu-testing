@@ -721,3 +721,15 @@ methods:
 ```kotlin
 expect("bar") { currentResponse.mock.getCookie("foo").value }
 ```
+
+## Notifications
+
+Testing notifications is easy - just take advantage of the `expectNotifications()` and `clearNotifications()` functions
+as in the following example:
+
+```kotlin
+Notification.show("Error")
+expectNotifications("Error")
+// expectNotifications also clears current notifications so that any further notifications won't be mixed with existing ones
+expectNotifications()
+```

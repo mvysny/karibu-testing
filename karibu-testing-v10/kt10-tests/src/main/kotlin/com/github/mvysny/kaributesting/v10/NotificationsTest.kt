@@ -21,7 +21,7 @@ internal fun DynaNodeGroup.notificationsTestBattery() {
     test("assert on shown notifications") {
         Notification.show("Error")
         expectNotifications("Error")
-        // it also clears the notifications, so there should be no more notifications
+        // expectNotifications also clears current notifications so that any further notifications won't be mixed with existing ones
         expectNotifications()
     }
 

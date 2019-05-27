@@ -124,7 +124,7 @@ class GridTest : DynaTest({
         test("can't click disabled grid") {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name) {
-                    setRenderer(ButtonRenderer<TestPerson> { e -> fail("shouldn't be called") })
+                    setRenderer(ButtonRenderer<TestPerson> { _ -> fail("shouldn't be called") })
                 }
                 addColumnFor(TestPerson::age)
                 setItems((0..10).map { TestPerson("name $it", it) })

@@ -70,8 +70,9 @@ fun <T> GridMenuItem<T>._click(gridItem: T?) {
     val parentMap = contextMenu.getParentMap()
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
-    val grid = contextMenu.target as Grid<T>
-    val key = grid.dataCommunicator.keyMapper.key(gridItem)
+    @Suppress("UNCHECKED_CAST")
+    val grid: Grid<T> = contextMenu.target as Grid<T>
+    val key: String? = grid.dataCommunicator.keyMapper.key(gridItem)
     requireNotNull(key) { "grid ${grid.toPrettyString()} generated null as key for $gridItem" }
     grid.element.setProperty("_contextMenuTargetItemKey", key)
     element._fireDomEvent(DomEvent(element, "click", JreJsonFactory().createObject()))

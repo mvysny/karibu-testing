@@ -48,6 +48,7 @@ open class MockContext : ServletContext {
 
         if (path.startsWith("/VAADIN/")) {
             // Vaadin 8 exposed directory
+            @Suppress("NAME_SHADOWING")
             var path = path
             if (path.contains("..")) {
                 // to be able to resolve ThemeResource("../othertheme/img/foo.png") which work from the browser.

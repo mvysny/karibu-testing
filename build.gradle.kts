@@ -43,7 +43,7 @@ subprojects {
 
         val sourceJar = task("sourceJar", Jar::class) {
             dependsOn(tasks["classes"])
-            classifier = "sources"
+            archiveClassifier.set("sources")
             from(sourceSets.main.get().allSource)
         }
 
@@ -52,7 +52,7 @@ subprojects {
             javadoc.outputFormat = "javadoc"
             javadoc.outputDirectory = "$buildDir/javadoc"
             dependsOn(javadoc)
-            classifier = "javadoc"
+            archiveClassifier.set("javadoc")
             from(javadoc.outputDirectory)
         }
 

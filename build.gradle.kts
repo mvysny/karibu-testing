@@ -18,12 +18,13 @@ allprojects {
     version = "1.1.7-SNAPSHOT"
     repositories {
         jcenter()
+        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases/") }
     }
 }
 
 subprojects {
     // here we should depend on latest Vaadin LTS version (Vaadin 10, Vaadin 14, ...)
-    ext["vaadin_platform_lts_version"] = ext["vaadin13_version"]
+    ext["vaadin_platform_lts_version"] = ext["vaadin14_version"]
 
     apply {
         plugin("maven-publish")

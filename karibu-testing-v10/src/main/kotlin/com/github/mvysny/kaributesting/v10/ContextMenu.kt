@@ -20,8 +20,8 @@ import kotlin.test.fail
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun ContextMenu._clickItemWithCaption(caption: String) {
-    val parentMap = getParentMap()
-    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in ContextMenu:\n${toPrettyTree()}")
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
+    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in ContextMenu:\n${toPrettyTree()}")
     (item as MenuItem)._click()
 }
 
@@ -31,8 +31,8 @@ fun ContextMenu._clickItemWithCaption(caption: String) {
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
-    val parentMap = getParentMap()
-    val item = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in GridContextMenu:\n${toPrettyTree()}")
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
+    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption } ?: fail("No menu item with caption $caption in GridContextMenu:\n${toPrettyTree()}")
     @Suppress("UNCHECKED_CAST")
     (item as GridMenuItem<T>)._click(gridItem)
 }
@@ -55,7 +55,17 @@ private fun ContextMenuBase<*, *, *>.getParentMap(): Map<MenuItemBase<*, *, *>, 
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun MenuItem._click() {
-    val parentMap = contextMenu.getParentMap()
+    val contextMenu: ContextMenu = contextMenu ?: fail("This function doesn't work on menu items attached to MenuBars")
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = contextMenu.getParentMap()
+    _click(parentMap)
+}
+
+/**
+ * Tries to click given menu item.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
     _fireEvent(ClickEvent<MenuItem>(this, true, 0, 0, 0, 0, 1, 1, false, false, false, false))
@@ -86,7 +96,7 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
             fail("${originalItem.toPrettyString()} is not visible because its parent item is not visible:\n${toPrettyTree()}")
         }
     }
-    val parent = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
+    val parent: Component = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
     when(parent) {
         is MenuItem -> parent.checkMenuItemVisible(originalItem, parentMap)
         is GridMenuItem<*> -> parent.checkMenuItemVisible(originalItem, parentMap)
@@ -95,6 +105,10 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
         }
         is GridContextMenu<*> -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
             parent.target.isEffectivelyVisible()
+        }
+	// e.g. MenuBar
+	is Component -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
+            parent.isEffectivelyVisible()
         }
         else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent: ${parent.toPrettyString()}")
     }
@@ -108,12 +122,16 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
             fail("${originalItem.toPrettyString()} is not enabled because its parent item is not enabled:\n${toPrettyTree()}")
         }
     }
-    val parent = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
+    val parent: Component = parentMap[this] ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
     when(parent) {
         is MenuItem -> parent.checkMenuItemEnabled(originalItem, parentMap)
         is GridMenuItem<*> -> parent.checkMenuItemEnabled(originalItem, parentMap)
         is ContextMenu -> Unit
         is GridContextMenu<*> -> Unit
+	// e.g. MenuBar
+	is Component -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
+            parent.isEffectivelyEnabled()
+        }
         else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent ${parent.toPrettyString()}")
     }
 }

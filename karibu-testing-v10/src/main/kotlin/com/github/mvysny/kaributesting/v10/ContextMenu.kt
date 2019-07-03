@@ -35,7 +35,8 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
             // every HasMenuItems implementor has the getItems() method including the MenuBar.
             // can't use MenuBar though, to keep compatibility with Vaadin 13
             val method: Method = this.javaClass.getMethod("getItems")
-            return method.invoke(this) as List<MenuItemBase<*, *, *>>
+            @Suppress("UNCHECKED_CAST")
+            method.invoke(this) as List<MenuItemBase<*, *, *>>
         }
     }
 }

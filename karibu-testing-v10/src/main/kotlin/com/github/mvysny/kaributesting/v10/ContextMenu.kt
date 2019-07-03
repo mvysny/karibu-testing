@@ -110,10 +110,9 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
             parent.target.isEffectivelyVisible()
         }
         // e.g. MenuBar
-        is Component -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
+        else -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
             parent.isEffectivelyVisible()
         }
-        else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent: ${parent.toPrettyString()}")
     }
 }
 
@@ -133,10 +132,8 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
         is ContextMenu -> Unit
         is GridContextMenu<*> -> Unit
         // e.g. MenuBar
-        is Component -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
+        else -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
             parent.isEffectivelyEnabled()
         }
-        else -> fail("Unimplemented case in Karibu-Testing, please file a bug. Unsupported menu item parent ${parent.toPrettyString()}")
     }
 }
-

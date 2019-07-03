@@ -2,15 +2,13 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
-import com.vaadin.flow.component.contextmenu.ContextMenu
-import com.vaadin.flow.component.contextmenu.ContextMenuBase
-import com.vaadin.flow.component.contextmenu.MenuItem
-import com.vaadin.flow.component.contextmenu.MenuItemBase
+import com.vaadin.flow.component.contextmenu.*
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
 import com.vaadin.flow.dom.DomEvent
 import elemental.json.impl.JreJsonFactory
+import java.lang.reflect.Method
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -19,11 +17,27 @@ import kotlin.test.fail
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun ContextMenu._clickItemWithCaption(caption: String) {
-    val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
+fun HasMenuItems._clickItemWithCaption(caption: String) {
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
-            ?: fail("No menu item with caption $caption in ContextMenu:\n${toPrettyTree()}")
-    (item as MenuItem)._click()
+            ?: fail("No menu item with caption $caption in ContextMenu:\n${(this as Component).toPrettyTree()}")
+    (item as MenuItem)._click(parentMap)
+}
+
+/**
+ * @receiver can be of type [HasMenuItems] or [GridContextMenu].
+ */
+private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
+    return when(this) {
+        is ContextMenuBase<*, *, *> -> getItems()
+        is SubMenuBase<*, *, *> -> getItems()
+        else -> {
+            // every HasMenuItems implementor has the getItems() method including the MenuBar.
+            // can't use MenuBar though, to keep compatibility with Vaadin 13
+            val method: Method = this.javaClass.getMethod("getItems")
+            return method.invoke(this) as List<MenuItemBase<*, *, *>>
+        }
+    }
 }
 
 /**
@@ -39,7 +53,7 @@ fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) 
     (item as GridMenuItem<T>)._click(gridItem)
 }
 
-private fun ContextMenuBase<*, *, *>.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
+private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
     val result: MutableMap<MenuItemBase<*, *, *>, Component> = mutableMapOf<MenuItemBase<*, *, *>, Component>()
 
     fun fillInParentFor(item: MenuItemBase<*, *, *>, parent: Component) {

@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.ClickEvent
@@ -31,9 +33,10 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
     return when(this) {
         is ContextMenuBase<*, *, *> -> getItems()
         is SubMenuBase<*, *, *> -> getItems()
+        is MenuItemBase<*, *, *> -> getItems()
         else -> {
             // every HasMenuItems implementor has the getItems() method including the MenuBar.
-            // can't use MenuBar though, to keep compatibility with Vaadin 13
+            // can't use the MenuBar type directly though, to keep compatibility with Vaadin 13
             val method: Method = this.javaClass.getMethod("getItems")
             @Suppress("UNCHECKED_CAST")
             method.invoke(this) as List<MenuItemBase<*, *, *>>

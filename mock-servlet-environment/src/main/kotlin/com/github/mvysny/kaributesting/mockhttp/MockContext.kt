@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.mockhttp
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
+import java.io.Serializable
 import java.lang.Exception
 import java.net.URL
 import java.nio.file.Path
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
 import javax.servlet.descriptor.JspConfigDescriptor
 
-open class MockContext : ServletContext {
+open class MockContext : ServletContext, Serializable {
     override fun getServlet(name: String?): Servlet? = null
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {

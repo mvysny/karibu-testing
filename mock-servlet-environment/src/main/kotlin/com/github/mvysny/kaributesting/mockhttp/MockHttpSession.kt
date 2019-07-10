@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.mockhttp
 
+import java.io.Serializable
 import java.util.Enumeration
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -15,7 +16,7 @@ open class MockHttpSession(
     private val servletContext: ServletContext,
     private val creationTime: Long,
     private var maxInactiveInterval: Int
-) : HttpSession {
+) : HttpSession, Serializable {
     private val attributes = ConcurrentHashMap<String, Any>()
     private val valid = AtomicBoolean(true)
 

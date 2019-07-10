@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.mockhttp
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectList
 import javax.servlet.ServletContext
 import kotlin.test.expect
@@ -44,5 +45,11 @@ class MockContextTest : DynaTest({
         expect(true) { ctx.getRealPath("/VAADIN/themes/valo/../default/img/1.txt")!!.endsWith("/VAADIN/themes/default/img/1.txt") }
         // stepping out of root is not allowed and returns null. Avoids browsing through the filesystem
         expect(null) { ctx.getRealPath("/../../../build.gradle.kts") }
+    }
+
+    test("serializable") {
+        ctx.setAttribute("foo", "bar")
+        ctx.setInitParameter("foo", "bar")
+        ctx.cloneBySerialization()
     }
 })

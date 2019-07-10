@@ -1,7 +1,9 @@
 package com.github.mvysny.kaributesting.mockhttp
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectList
+import java.io.Serializable
 import javax.servlet.http.HttpSession
 import kotlin.test.expect
 
@@ -24,5 +26,10 @@ class MockHttpSessionTest : DynaTest({
         session.removeAttribute("foo")
         expect(null) { session.getAttribute("foo") }
         expectList() { session.attributeNames.toList() }
+    }
+
+    test("serializable") {
+        session.setAttribute("foo", "bar")
+        (session as Serializable).cloneBySerialization()
     }
 })

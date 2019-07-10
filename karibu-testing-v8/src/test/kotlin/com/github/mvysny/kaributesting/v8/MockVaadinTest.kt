@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.*
 import com.vaadin.navigator.Navigator
@@ -52,6 +53,15 @@ class MockVaadinTest : DynaTest({
             expect(true) { UI.getCurrent().notificationConfiguration != null }
             expect(true) { UI.getCurrent().page != null }
             expect(null) { UI.getCurrent().navigator }  // null by default
+        }
+
+        test("serializable") {
+            UI.getCurrent().cloneBySerialization()
+            VaadinSession.getCurrent().cloneBySerialization()
+            // even that it says it's Serializable it's really not.
+            // VaadinService.getCurrent().cloneBySerialization()
+            // VaadinRequest.getCurrent().cloneBySerialization()
+            // VaadinResponse.getCurrent().cloneBySerialization()
         }
 
         test("setup() can be called multiple times in a row") {

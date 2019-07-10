@@ -11,7 +11,50 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletContext
-import javax.servlet.http.HttpSession
+
+private class MockVaadinService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
+    override fun isAtmosphereAvailable() = false
+}
+
+private class MockVaadinServlet : VaadinServlet() {
+    override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+        val service = MockVaadinService(this, deploymentConfiguration)
+        service.init()
+        return service
+    }
+
+    public override fun getService(): VaadinServletService =
+            super.getService()
+}
+
+private class MockVaadinSession(val httpSession: MockHttpSession,
+                                service: VaadinService,
+                                private val uiFactory: () -> UI) : VaadinSession(service) {
+    override fun close() {
+        super.close()
+
+        // We need to simulate the actual browser + servlet container behavior here.
+        // Imagine that we want a test scenario where the user logs out, and we want to check that a login prompt appears.
+
+        // To log out the user, the code typically closes the session and tells the browser to reload
+        // the page (Page.getCurrent().reload() or similar).
+        // Thus the page is reloaded by the browser, and since the session is gone, the servlet container
+        // will create a new, fresh session.
+
+        // That's exactly what we need to do here. We need to close the current UI and eradicate it,
+        // then we need to close the current session and eradicate it, and then we need to create a completely fresh
+        // new UI and Session.
+
+        // A problem appears when the uiFactory accidentally doesn't create a new, fresh instance of UI. Say that
+        // we call Spring injector to provide us an instance of the UI, but we accidentally scoped the UI to Session.
+        // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
+        // the previous UI instance which is still attached to the session. And it blows.
+
+        MockVaadin.clearVaadinObjects()
+        httpSession.destroy()
+        MockVaadin.createSession(httpSession, uiFactory)
+    }
+}
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -34,27 +77,17 @@ object MockVaadin {
      * @param httpSession allow you to use custom http session. Useful for MPR where Vaadin 8 + Vaadin 10 share one session
      * @param servletContext the servlet context to use
      */
-    @JvmStatic @JvmOverloads
-    fun setup(uiFactory: ()->UI = { MockUI() }, httpSession: MockHttpSession? = null, servletContext: ServletContext = MockContext()) {
+    @JvmStatic
+    @JvmOverloads
+    fun setup(uiFactory: () -> UI = { MockUI() }, httpSession: MockHttpSession? = null, servletContext: ServletContext = MockContext()) {
         // prepare mocking servlet environment
-        val servlet = object : VaadinServlet() {
-            override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-                val service = object : VaadinServletService(this, deploymentConfiguration) {
-                    override fun isAtmosphereAvailable() = false
-                }
-                service.init()
-                return service
-            }
-        }
+        val servlet = MockVaadinServlet()
         servlet.init(MockServletConfig(servletContext))
-        val httpSess = httpSession ?: MockHttpSession.create(servletContext)
+        val httpSess: MockHttpSession = httpSession
+                ?: MockHttpSession.create(servletContext)
 
         // mock Vaadin environment: Service
-        val service = VaadinServlet::class.java.getDeclaredMethod("getService").run {
-            isAccessible = true
-            invoke(servlet) as VaadinServletService
-        }
-        VaadinService.setCurrent(service)
+        VaadinService.setCurrent(servlet.service)
 
         // Session
         createSession(httpSess, uiFactory)
@@ -74,7 +107,7 @@ object MockVaadin {
         lastLocation = null
     }
 
-    private fun clearVaadinObjects() {
+    internal fun clearVaadinObjects() {
         closeCurrentUI()
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
@@ -88,34 +121,9 @@ object MockVaadin {
         strongRefSession = null
     }
 
-    private fun createSession(httpSession: MockHttpSession, uiFactory: () -> UI) {
-        val service = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
-        val session = object : VaadinSession(service) {
-            override fun close() {
-                super.close()
-
-                // We need to simulate the actual browser + servlet container behavior here.
-                // Imagine that we want a test scenario where the user logs out, and we want to check that a login prompt appears.
-
-                // To log out the user, the code typically closes the session and tells the browser to reload
-                // the page (Page.getCurrent().reload() or similar).
-                // Thus the page is reloaded by the browser, and since the session is gone, the servlet container
-                // will create a new, fresh session.
-
-                // That's exactly what we need to do here. We need to close the current UI and eradicate it,
-                // then we need to close the current session and eradicate it, and then we need to create a completely fresh
-                // new UI and Session.
-
-                // A problem appears when the uiFactory accidentally doesn't create a new, fresh instance of UI. Say that
-                // we call Spring injector to provide us an instance of the UI, but we accidentally scoped the UI to Session.
-                // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
-                // the previous UI instance which is still attached to the session. And it blows.
-
-                clearVaadinObjects()
-                httpSession.destroy()
-                createSession(httpSession, uiFactory)
-            }
-        }
+    internal fun createSession(httpSession: MockHttpSession, uiFactory: () -> UI) {
+        val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
+        val session = MockVaadinSession(httpSession, service, uiFactory)
 
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
@@ -155,12 +163,14 @@ object MockVaadin {
         strongRefUI = null
     }
 
-    private fun createUI(uiFactory: ()->UI) {
+    private fun createUI(uiFactory: () -> UI) {
         val ui = uiFactory()
-        require(ui.session == null) { "uiFactory produced UI $ui which is already attached to a Session, " +
-                "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the" +
-                " tests are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
-                "using Spring which reuses a scoped instance of the UI?" }
+        require(ui.session == null) {
+            "uiFactory produced UI $ui which is already attached to a Session, " +
+                    "yet we expect the UI to be a fresh new instance, not yet attached to a Session, so that the" +
+                    " tests are able to always start with a fresh UI with a pre-known state. Perhaps you're " +
+                    "using Spring which reuses a scoped instance of the UI?"
+        }
         ui.session = checkNotNull(VaadinSession.getCurrent())
         val request = checkNotNull(CurrentInstance.get(VaadinRequest::class.java))
         strongRefUI = ui
@@ -271,8 +281,12 @@ internal class MockUI : UI() {
 }
 
 
-val currentRequest: VaadinRequest get() = VaadinService.getCurrentRequest() ?: throw IllegalStateException("No current request")
-val currentResponse: VaadinResponse get() = VaadinService.getCurrentResponse() ?: throw IllegalStateException("No current response")
+val currentRequest: VaadinRequest
+    get() = VaadinService.getCurrentRequest()
+            ?: throw IllegalStateException("No current request")
+val currentResponse: VaadinResponse
+    get() = VaadinService.getCurrentResponse()
+            ?: throw IllegalStateException("No current response")
 
 /**
  * Retrieves the mock request which backs up [VaadinRequest].

@@ -61,6 +61,15 @@ private class MockVaadinSession(service: VaadinService,
     }
 }
 
+private class MockVaadinServlet(val routes: Routes,
+                          val serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService) : VaadinServlet() {
+    override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+        routes.register(servletContext)
+        val service: VaadinServletService = serviceFactory(this, deploymentConfiguration)
+        service.init()
+        return service
+    }
+}
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -93,14 +102,7 @@ object MockVaadin {
               serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService =
                       { servlet, dc -> MockService(servlet, dc) }) {
         // init servlet
-        val servlet = object : VaadinServlet() {
-            override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-                routes.register(servletContext)
-                val service = serviceFactory(this, deploymentConfiguration)
-                service.init()
-                return service
-            }
-        }
+        val servlet = MockVaadinServlet(routes, serviceFactory)
         setup(uiFactory, servlet)
     }
 

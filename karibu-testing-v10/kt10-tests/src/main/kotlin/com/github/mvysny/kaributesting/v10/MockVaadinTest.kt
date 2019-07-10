@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.text
@@ -62,6 +63,15 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { UI.getCurrent().internals != null }
             expect(true) { UI.getCurrent().page != null }
             expect(true) { UI.getCurrent().router != null }
+        }
+
+        test("serializable") {
+            UI.getCurrent().cloneBySerialization()
+            VaadinSession.getCurrent().cloneBySerialization()
+            // even that it says it's Serializable it's really not.
+            // VaadinService.getCurrent().cloneBySerialization()
+            // VaadinRequest.getCurrent().cloneBySerialization()
+            // VaadinResponse.getCurrent().cloneBySerialization()
         }
 
         test("setup() can be called multiple times in a row") {

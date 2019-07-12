@@ -341,6 +341,13 @@ class MockVaadinTest : DynaTest({
             expect("bar") { currentResponse.mock.getCookie("foo").value }
         }
     }
+
+    group("session") {
+        test("attributes") {
+            VaadinSession.getCurrent().session.setAttribute("foo", "bar")
+            expect("bar") { VaadinSession.getCurrent().mock.getAttribute("foo") }
+        }
+    }
 })
 
 @PushStateNavigation

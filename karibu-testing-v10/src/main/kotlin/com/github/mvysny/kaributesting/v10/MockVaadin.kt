@@ -342,3 +342,11 @@ val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).reque
  * ```
  */
 val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+
+/**
+ * Retrieves the mock session which backs up [VaadinSession].
+ * ```
+ * VaadinSession.getCurrent().mock
+ * ```
+ */
+val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession

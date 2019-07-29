@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import java.lang.IllegalStateException
 import javax.servlet.ServletContext
 import kotlin.test.expect
 
@@ -222,7 +223,7 @@ var <V, E: HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
     }
 
 // modify when this is fixed: https://github.com/vaadin/flow/issues/4068
-val Component.placeholder: String?
+var Component.placeholder: String?
     get() = when (this) {
         is TextField -> placeholder
         is TextArea -> placeholder
@@ -231,6 +232,17 @@ val Component.placeholder: String?
         is DatePicker -> placeholder
         is Input -> placeholder.orElse(null)
         else -> null
+    }
+    set(value) {
+        when (this) {
+            is TextField -> placeholder = value
+            is TextArea -> placeholder = value
+            is PasswordField -> placeholder = value
+            is ComboBox<*> -> this.placeholder = value
+            is DatePicker -> placeholder = value
+            is Input -> setPlaceholder(value)
+            else -> throw IllegalStateException("${toPrettyString()} doesn't support setting placeholder")
+        }
     }
 
 /**
@@ -249,4 +261,5 @@ fun Component.removeFromParent() {
  * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
  * rules are matched against given component only (not against its children).
  */
-fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean = SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean =
+        SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)

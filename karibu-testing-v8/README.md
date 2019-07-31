@@ -282,7 +282,7 @@ more complete full-stack app which demonstrates how to use the Navigator and the
 
 ## Advanced topics
 
-### Navigation
+### Navigation Basics
 
 A typical app will consist of multiple views. You can test the views of such app using two different approaches:
 
@@ -292,12 +292,51 @@ A typical app will consist of multiple views. You can test the views of such app
   also the component may lazy-initialize itself by the means of the onAttach listener which only gets fired when the component is attached to a UI.
   Therefore, this approach should only be used for reusable components which do not depend on a particular UI and do not
   lazy-init themselves.
-* Properly set up your UI by calling `MockVaadin.setup({ MyUI() })`. Your UI then typically initializes the Navigator and outfits it with a `ViewProvider`.
+* Properly set up your UI by calling `MockVaadin.setup({ MyUI() })`. Your UI will then typically initialize the Navigator and configure it with a `ViewProvider`.
   Because of that, you can simply call the Navigator's API from your tests to perform the navigation to the view, for example `UI.getCurrent().navigator.navigateTo("books")`.
-  However, if the `ViewProvider` was not properly initialized for Navigator itself,
-  this won't work unless the test code itself will populate the `ViewProvider`.
 
-If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), populating the `ViewProvider` is quite simple. Just check out the
+Examples:
+
+Kotlin:
+```kotlin
+class MyUITest : DynaTest({
+    beforeEach { MockVaadin.setup({ MyUI() }) }  // this will call MyUI.init() which configures the Navigator.
+    test("simple test") {
+        UI.getCurrent().navigator.navigateTo("your-view")
+
+        // now the view is ready and attached to your UI. We can test.
+        val grid = _get<Grid<*>>()
+        // etc etc
+    }
+})
+```
+
+Java:
+```java
+import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
+public class MyUITest {
+
+    @BeforeEach
+    public void beforeEach() {
+        MockVaadin.setup(MyUI::new);  // this will call MyUI.init() which configures the Navigator.
+    }
+
+    @Test
+    public void simpleTest() {
+        UI.getCurrent().getNavigator().navigateTo("your-view");
+
+        // now the view is ready and attached to your UI. We can test.
+        final Grid<Person> grid = _get(Grid.class);
+        // etc etc
+    }
+}
+```
+
+### Navigation With Karibu-DSL or Vaadin-on-Kotlin
+
+If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), chances
+are you're using the `@AutoView` and `AutoViewProvider` machinery.
+Populating the `AutoViewProvider` is quite simple. Just check out the
 test classes in the
 [Vaadin-on-Kotlin Example app](https://github.com/mvysny/vaadin-on-kotlin#example-project) on how that's done. In short:
 
@@ -340,7 +379,7 @@ import static com.github.vok.karibudsl.NavigatorKt.*;
 public class MyUITest {
     @BeforeAll
     public static void beforeAll() {
-        autoDiscoverViews("com.myproject")
+        autoDiscoverViews("com.myproject");
     }
 
     @BeforeEach

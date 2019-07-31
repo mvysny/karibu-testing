@@ -383,6 +383,21 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             currentResponse.addCookie(Cookie("foo", "bar"))
             expect("bar") { currentResponse.mock.getCookie("foo").value }
         }
+
+        test("cookies in UI.init()") {
+            MockVaadin.tearDown()
+            var initCalled = false
+            MockVaadin.setup(uiFactory = {
+                currentRequest.mock.addCookie(Cookie("foo", "bar"))
+                object : UI() {
+                    override fun init(request: VaadinRequest) {
+                        expectList("bar") { currentRequest.cookies!!.map { it.value } }
+                        initCalled = true
+                    }
+                }
+            })
+            expect(true) { initCalled }
+        }
     }
 
     group("session") {

@@ -745,3 +745,27 @@ expectNotifications("Error")
 // expectNotifications also clears current notifications so that any further notifications won't be mixed with existing ones
 expectNotifications()
 ```
+
+## Preparing Mock Environment For `UI.init()`
+
+Sometimes you already need to check for cookies in your `UI.init()` method. Since the `UI.init()` is called
+from `MockVaadin.setup()`, you can not set up mock cookies after `MockVaadin.setup()` has run.
+However, since `MockVaadin.setup()` also sets up mock request, you can not set up mock cookies
+before `MockVaadin.setup()`. The only way is therefore to setup mock cookies *during* the `MockVaadin.setup()`
+invocation, in the closure which creates the UI instance:
+
+Kotlin:
+```kotlin
+MockVaadin.setup(uiFactory = {
+    currentRequest.mock.addCookie(Cookie("foo", "bar"))
+    MyUI()
+})
+```
+
+Java:
+```java
+MockVaadin.setup(new Routes(), () -> {
+    MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+    return new MyUI();
+});
+```

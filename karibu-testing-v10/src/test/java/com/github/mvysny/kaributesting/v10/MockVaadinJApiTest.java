@@ -18,5 +18,10 @@ public class MockVaadinJApiTest {
     public MockVaadinJApiTest() {
         MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
         assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
+
+        MockVaadin.setup(new Routes(), () -> {
+            MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+            return new LocatorJApiTest.MyUI();
+        });
     }
 }

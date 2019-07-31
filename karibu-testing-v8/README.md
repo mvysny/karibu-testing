@@ -282,7 +282,7 @@ more complete full-stack app which demonstrates how to use the Navigator and the
 
 ## Advanced topics
 
-### Navigation Basics
+### Basic Navigation
 
 A typical app will consist of multiple views. You can test the views of such app using two different approaches:
 

@@ -334,7 +334,7 @@ public class MyUITest {
 
 ### Navigation With Karibu-DSL or Vaadin-on-Kotlin
 
-If you are using Karibu-DSL or Vaadin-on-Kotlin (which uses Karibu-DSL under the hood), chances
+If you are using [Karibu-DSL](https://github.com/mvysny/karibu-dsl) or [Vaadin-on-Kotlin](http://www.vaadinonkotlin.eu/) (which uses Karibu-DSL under the hood), chances
 are you're using the `@AutoView` and `AutoViewProvider` machinery.
 Populating the `AutoViewProvider` is quite simple. Just check out the
 test classes in the

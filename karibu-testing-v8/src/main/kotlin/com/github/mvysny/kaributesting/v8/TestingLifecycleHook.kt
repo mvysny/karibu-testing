@@ -40,6 +40,9 @@ interface TestingLifecycleHook {
     fun awaitAfterLookup() {}
 
     companion object {
+        /**
+         * A default lifecycle hook that simply runs default implementations of the hook functions.
+         */
         val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
     }
 }

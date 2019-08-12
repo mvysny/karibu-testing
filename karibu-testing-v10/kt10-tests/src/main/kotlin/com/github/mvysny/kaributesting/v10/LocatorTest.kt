@@ -3,7 +3,6 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
-import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -20,7 +19,7 @@ internal fun DynaNodeGroup.locatorTest() {
 
     beforeEach { MockVaadin.setup() }
     beforeEach { testingLifecycleHook = MyLifecycleHook() }
-    afterEach { testingLifecycleHook = TestingLifecycleHook.noop }
+    afterEach { testingLifecycleHook = TestingLifecycleHook.default }
     afterEach { MockVaadin.tearDown() }
 
     group("_get") {
@@ -182,7 +181,7 @@ internal fun DynaNodeGroup.locatorTest() {
     }
 
     group("unmocked env") {
-        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.noop }
+        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.default }
         test("lookup functions should work in unmocked environment") {
             Button()._get(Button::class.java)
             expectThrows(AssertionError::class) {

@@ -22,9 +22,8 @@ interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      *
-     * The default implementation does two things:
-     * * Calls all tasks submitted via [UI.beforeClientResponse]
-     * * Calls [cleanupDialogs]
+     * The default implementation calls the [MockVaadin.clientRoundtrip] method. When implementing this method, you should
+     * also call [MockVaadin.clientRoundtrip] (or simply call super).
      */
     fun awaitBeforeLookup() {
         if (UI.getCurrent() != null) {
@@ -39,7 +38,10 @@ interface TestingLifecycleHook {
     fun awaitAfterLookup() {}
 
     companion object {
-        val noop: TestingLifecycleHook get() = object : TestingLifecycleHook {}
+        /**
+         * A default lifecycle hook that simply runs default implementations of the hook functions.
+         */
+        val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
     }
 }
 
@@ -48,7 +50,7 @@ interface TestingLifecycleHook {
  * set your custom implementation here. See [TestingLifecycleHook] for more info on
  * where exactly you can hook into.
  */
-var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.noop
+var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 
 /**
  * Flow Server does not close the dialog when [Dialog.close] is called; instead it tells client-side dialog to close,

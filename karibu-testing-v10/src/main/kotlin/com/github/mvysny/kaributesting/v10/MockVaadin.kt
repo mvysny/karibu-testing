@@ -272,11 +272,20 @@ object MockVaadin {
     /**
      * Runs all tasks scheduled by [UI.access].
      *
-     * If [VaadinSession.errorHandler] is not set or [propagateExceptionToHandler] is false, any exceptions thrown from Commands taken by [UI.access] will make this function fail.
-     * The exceptions will be wrapped in [ExecutionException].
+     * If [VaadinSession.errorHandler] is not set or [propagateExceptionToHandler]
+     * is false, any exceptions thrown from [Command]s scheduled via the [UI.access] will make this function fail.
+     * The exceptions will be wrapped in [ExecutionException]. Generally
+     * it's best to keep [propagateExceptionToHandler] set to false to
+     * make any exceptions fail the test; however if you're testing
+     * how your own custom [VaadinSession.errorHandler] responds to exceptions then
+     * set this parameter to true.
      *
      * Called automatically by [clientRoundtrip] which is by default called automatically from [TestingLifecycleHook]. You generally
      * don't need to call this method unless you need to test your [ErrorHandler].
+     *
+     * @param propagateExceptionToHandler defaults to false. If true and [VaadinSession.errorHandler]
+     * is set, any exceptions thrown from [Command]s scheduled via the [UI.access] will be
+     * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
     fun runUIQueue(propagateExceptionToHandler: Boolean = false) {

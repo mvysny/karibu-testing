@@ -121,6 +121,16 @@ object MockVaadin {
     @JvmStatic
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
         check(vaadinVersion >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using $vaadinVersion" }
+
+        if (vaadinVersion >= 14) {
+            // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
+            // in DefaultDeploymentConfiguration.checkCompatibilityMode()
+            val compatMode = Constants.VAADIN_PREFIX + Constants.SERVLET_PARAMETER_COMPATIBILITY_MODE
+            if (System.getProperty(compatMode) == null) {
+                System.setProperty(compatMode, true.toString())
+            }
+        }
+
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
         VaadinService.setCurrent(servlet.service!!)

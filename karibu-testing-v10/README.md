@@ -769,3 +769,16 @@ MockVaadin.setup(new Routes(), () -> {
     return new MyUI();
 });
 ```
+
+## Bower versus NPM mode
+
+Vaadin 13 used Bower+webjars to manage JavaScript dependencies; Vaadin 14 switched to
+the npm+webpack management but still supports Bower+webjars dependency management.
+You can read more about both modes in the [Vaadin 13 -> Vaadin 14 migration guide](https://vaadin.com/docs/v14/flow/v14-migration/v14-migration-guide.html).
+
+By default Karibu-Testing mocks the Vaadin 14 environment to use the Bower mode.
+To enforce npm mode, just set this system property before your tests are run:
+
+```kotlin
+System.setProperty("vaadin.compatibilityMode", "false")
+```

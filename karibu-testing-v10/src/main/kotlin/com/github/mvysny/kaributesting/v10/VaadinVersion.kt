@@ -12,9 +12,6 @@ data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Co
     override fun toString() = "$major.$minor.$bugfix"
 }
 
-@Deprecated("use VaadinMeta.version")
-val vaadinVersion: Int get() = VaadinMeta.version
-
 object VaadinMeta {
     /**
      * Vaadin Flow `flow-server.jar` version: for example 1.2.0 for Vaadin 12

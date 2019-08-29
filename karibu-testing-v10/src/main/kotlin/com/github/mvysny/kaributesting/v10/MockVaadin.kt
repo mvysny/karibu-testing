@@ -126,9 +126,9 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinMeta.version >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using $vaadinVersion" }
+        check(VaadinMeta.version >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using ${VaadinMeta.version}" }
 
-        if (vaadinVersion >= 14) {
+        if (VaadinMeta.version >= 14) {
             mockVaadin14()
         }
 

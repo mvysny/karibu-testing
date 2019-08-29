@@ -1,11 +1,11 @@
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributesting.v10.allTests
-import com.github.mvysny.kaributesting.v10.vaadinVersion
 import kotlin.test.expect
 
 class AllTests : DynaTest({
     test("Vaadin version") {
-        expect(13) { vaadinVersion }
+        expect(13) { VaadinMeta.version }
     }
     allTests()
 })

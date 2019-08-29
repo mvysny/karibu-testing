@@ -380,10 +380,14 @@ In short, it is not possible to look up components inside of a Polymer Template,
 to a degree. It is recommended that you publish your `@Id`-annotated fields as `public` or `internal` and access them from your tests
 in the following manner:
 
+Kotlin:
+
 ```kotlin
 class ReviewsList : PolymerTemplate<TemplateModel>() {
     @Id("search")
     internal lateinit var search: TextField
+    @Id("addReview")
+    internal lateinit var addReview: Button\
     // ...
 }
 
@@ -393,6 +397,24 @@ test("create review") {
    
    // this will work:
    _get<ReviewsList>().addReview._click()
+}
+```
+
+Java:
+
+```java
+public class ReviewsList extends PolymerTemplate<TemplateModel> {
+    @Id("search")
+    TextField search;
+    @Id("addReview")
+    Button addReview;
+    // ...
+}
+
+@Test
+public void createReviewTest() {
+   ReviewsList list = _get(ReviewsList.class);
+   _click(list.addReview);
 }
 ```
 

@@ -169,7 +169,8 @@ object MockVaadin {
             val array: JsonArray = jsonFactory.createArray()
 
             val frontend: File = File("frontend").absoluteFile
-            frontend.walk().filter { it.isFile && it.name.toLowerCase().endsWith(".js") }
+            frontend.walk()
+                    .filter { it.isFile && it.name.toLowerCase().endsWith(".js") }
                     .forEach { f: File ->
                         val name: String = "." + f.absolutePath.removePrefix(frontend.absolutePath)
                         val source: String = f.readText()

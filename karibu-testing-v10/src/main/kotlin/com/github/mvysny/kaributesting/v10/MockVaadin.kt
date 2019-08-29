@@ -15,14 +15,10 @@ import elemental.json.JsonArray
 import elemental.json.JsonObject
 import elemental.json.impl.JreJsonFactory
 import java.io.File
-import java.io.IOException
 import java.lang.reflect.Field
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import java.util.stream.Collectors
 import javax.servlet.ServletContext
 
 private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
@@ -189,9 +185,8 @@ object MockVaadin {
             }
 
             // set it to the NpmTemplateParser
-            val parser: NpmTemplateParser = NpmTemplateParser.getInstance() as NpmTemplateParser
             val jsonStatsField: Field = NpmTemplateParser::class.java.getDeclaredField("jsonStats").apply { isAccessible = true }
-            jsonStatsField.set(parser, jsonStats)
+            jsonStatsField.set(NpmTemplateParser.getInstance(), jsonStats)
         }
     }
 

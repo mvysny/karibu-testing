@@ -4,15 +4,25 @@ import com.github.mvysny.kaributesting.mockhttp.*
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
+import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import elemental.json.JsonArray
+import elemental.json.JsonObject
+import elemental.json.impl.JreJsonFactory
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.Field
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import java.util.stream.Collectors
 import javax.servlet.ServletContext
 
 private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
@@ -120,15 +130,10 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(vaadinVersion >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using $vaadinVersion" }
+        check(VaadinMeta.version >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using $vaadinVersion" }
 
         if (vaadinVersion >= 14) {
-            // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
-            // in DefaultDeploymentConfiguration.checkCompatibilityMode()
-            val compatMode = Constants.VAADIN_PREFIX + Constants.SERVLET_PARAMETER_COMPATIBILITY_MODE
-            if (System.getProperty(compatMode) == null) {
-                System.setProperty(compatMode, true.toString())
-            }
+            mockVaadin14()
         }
 
         val ctx = MockContext()
@@ -137,6 +142,57 @@ object MockVaadin {
 
         // init Vaadin Session
         createSession(ctx, uiFactory)
+    }
+
+    private fun mockVaadin14() {
+        if (VaadinMeta.isCompatibilityMode) {
+            // Bower + WebJars mode
+
+            // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
+            // in DefaultDeploymentConfiguration.checkCompatibilityMode()
+            val compatMode = Constants.VAADIN_PREFIX + Constants.SERVLET_PARAMETER_COMPATIBILITY_MODE
+            if (System.getProperty(compatMode) == null) {
+                System.setProperty(compatMode, true.toString())
+            }
+
+        } else {
+            // NPM + WebPack mode
+
+            // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26
+            // Flow needs to load the sources for @JsModule and the current implementation
+            // reads that from a file named stats.json produced by webpack. We need to mock the stats.json file.
+
+            // this is needed so that NpmTemplateParser.isStatsFileReadNeeded() returns false
+            // so that NpmTemplateParser.getSourcesFromStats() doesn't go to actual webpack but
+            // uses our made-up jsonStats
+            System.setProperty("vaadin.productionMode", "true")
+            System.setProperty("vaadin.enableDevServer", "false")
+
+            // create jsonStats
+            val jsonFactory = JreJsonFactory()
+            val array: JsonArray = jsonFactory.createArray()
+
+            val frontend: File = File("frontend").absoluteFile
+            frontend.walk().filter { it.isFile && it.name.toLowerCase().endsWith(".js") }
+                    .forEach { f: File ->
+                        val name: String = "." + f.absolutePath.removePrefix(frontend.absolutePath)
+                        val source: String = f.readText()
+                        val obj: JsonObject = jsonFactory.createObject().apply {
+                            put("name", name)
+                            put("source", source)
+                        }
+                        array.set(array.length(), obj)
+                    }
+            val jsonStats: JsonObject = jsonFactory.createObject().apply {
+                put("modules", array)
+                put("hash", "")
+            }
+
+            // set it to the NpmTemplateParser
+            val parser: NpmTemplateParser = NpmTemplateParser.getInstance() as NpmTemplateParser
+            val jsonStatsField: Field = NpmTemplateParser::class.java.getDeclaredField("jsonStats").apply { isAccessible = true }
+            jsonStatsField.set(parser, jsonStats)
+        }
     }
 
     /**

@@ -32,6 +32,8 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
     }
 
     test("smoke-test class-loaded polymer template") {
-        MyButton()
+        if (VaadinMeta.isCompatibilityMode) {
+            MyButton()
+        }
     }
 }

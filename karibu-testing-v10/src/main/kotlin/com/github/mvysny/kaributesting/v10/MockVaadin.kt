@@ -11,9 +11,9 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import elemental.json.Json
 import elemental.json.JsonArray
 import elemental.json.JsonObject
-import elemental.json.impl.JreJsonFactory
 import java.io.File
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
@@ -165,25 +165,19 @@ object MockVaadin {
             System.setProperty("vaadin.enableDevServer", "false")
 
             // create jsonStats
-            val jsonFactory = JreJsonFactory()
-            val array: JsonArray = jsonFactory.createArray()
+            val jsfiles: JsonArray = Json.createArray()
 
             val frontend: File = File("frontend").absoluteFile
             frontend.walk()
                     .filter { it.isFile && it.name.toLowerCase().endsWith(".js") }
                     .forEach { f: File ->
+                        // the name of the file, relative to the frontend/ folder,
+                        // for example "./src/my-component.json"
                         val name: String = "." + f.absolutePath.removePrefix(frontend.absolutePath)
                         val source: String = f.readText()
-                        val obj: JsonObject = jsonFactory.createObject().apply {
-                            put("name", name)
-                            put("source", source)
-                        }
-                        array.set(array.length(), obj)
+                        jsfiles.add(jsonCreateObject("name" to name, "source" to source))
                     }
-            val jsonStats: JsonObject = jsonFactory.createObject().apply {
-                put("modules", array)
-                put("hash", "")
-            }
+            val jsonStats: JsonObject = jsonCreateObject("modules" to jsfiles, "hash" to "")
 
             // set it to the NpmTemplateParser
             val jsonStatsField: Field = NpmTemplateParser::class.java.getDeclaredField("jsonStats").apply { isAccessible = true }

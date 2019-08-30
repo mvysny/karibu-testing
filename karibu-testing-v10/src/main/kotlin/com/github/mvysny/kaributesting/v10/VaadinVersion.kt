@@ -1,9 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.server.Version
-import elemental.json.Json
 import elemental.json.JsonObject
-import java.net.URL
 
 data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {
     override fun compareTo(other: SemanticVersion): Int =
@@ -34,5 +32,3 @@ object VaadinMeta {
 
     val isCompatibilityMode: Boolean get() = flowBuildInfo?.getBoolean("compatibilityMode") ?: true
 }
-
-internal fun URL.readJson(): JsonObject = Json.parse(readText())

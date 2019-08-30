@@ -23,17 +23,8 @@ import io.github.classgraph.ScanResult
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.io.Serializable
-import java.lang.IllegalStateException
 import javax.servlet.ServletContext
-import kotlin.test.expect
-
-fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
-inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
-inline fun <reified T: Serializable> T.serializeDeserialize() = serializeToBytes().deserialize<T>()
 
 /**
  * A configuration object of all routes and error routes in the application. Simply use [autoDiscoverViews] to discover everything.
@@ -141,8 +132,6 @@ var Component.id_: String?
 val Component.isAttached: Boolean
     get() = ui.orElse(null)?.session != null
 
-val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
-
 val Component._isVisible: Boolean get() = when (this) {
     is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
     else -> isVisible
@@ -244,11 +233,6 @@ var Component.placeholder: String?
             else -> throw IllegalStateException("${toPrettyString()} doesn't support setting placeholder")
         }
     }
-
-/**
- * Expects that [actual] list of objects matches [expected] list of objects. Fails otherwise.
- */
-fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)
 
 /**
  * Removes the component from its parent. Does nothing if the component does not have a parent.

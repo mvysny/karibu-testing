@@ -12,6 +12,7 @@ class AllTests : DynaTest({
 
         test("Vaadin version") {
             expect(14) { VaadinMeta.version }
+            expect(false) { VaadinMeta.isCompatibilityMode }
             expect(false) { VaadinService.getCurrent().deploymentConfiguration.isCompatibilityMode }
         }
     }

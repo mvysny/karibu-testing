@@ -17,6 +17,9 @@ and you talk directly to your server-side View classes, the server Vaadin compon
 
 > If you like the library, please star it. The more stars, the more popularity and more maintainenance the library will receive.
 
+Check out a [30 second video of live coding with Karibu-Testing](https://www.youtube.com/watch?v=znVNEo9cj98) to get a taste
+on how simple this library is.
+
 ## Getting Started / Full Documentation
 
 For the Getting Started documentation and for the full API documentation:

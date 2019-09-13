@@ -18,6 +18,8 @@ import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
+import elemental.json.Json
+import elemental.json.JsonObject
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ScanResult
 import org.jsoup.nodes.Document
@@ -95,8 +97,20 @@ fun Component._fireEvent(event: ComponentEvent<*>) {
     ComponentUtil.fireEvent(this, event)
 }
 
+/**
+ * Fires a DOM [event] on this component.
+ */
 fun Element._fireDomEvent(event: DomEvent) {
     node.getFeature(ElementListenerMap::class.java).fireEvent(event)
+}
+
+/**
+ * Fires a DOM event on this component.
+ * @param eventType the event type, e.g. "click"
+ * @param eventData optional event data, defaults to an empty object.
+ */
+fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
+    element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
 
 /**

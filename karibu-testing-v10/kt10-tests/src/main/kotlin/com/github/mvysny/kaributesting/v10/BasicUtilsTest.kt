@@ -4,12 +4,12 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.checkBox
-import com.github.mvysny.karibudsl.v10.routerLink
 import com.vaadin.flow.component.Component
-import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.router.ErrorParameter
 import com.vaadin.flow.router.HasErrorParameter
@@ -128,6 +128,19 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
                 cb._value = true
             }
             expect(false) { cb.value }
+        }
+    }
+
+    group("fireDomEvent()") {
+        test("smoke") {
+            Div()._fireDomEvent("click")
+        }
+        test("listeners are called") {
+            val div = Div()
+            lateinit var event: DomEvent
+            div.element.addEventListener("click") { e -> event = e }
+            div._fireDomEvent("click")
+            expect("click") { event.type }
         }
     }
 }

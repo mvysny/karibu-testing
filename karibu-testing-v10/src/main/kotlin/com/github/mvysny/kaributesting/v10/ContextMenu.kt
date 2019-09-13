@@ -105,7 +105,7 @@ fun <T> GridMenuItem<T>._click(gridItem: T?) {
     val key: String? = grid.dataCommunicator.keyMapper.key(gridItem)
     requireNotNull(key) { "grid ${grid.toPrettyString()} generated null as key for $gridItem" }
     grid.element.setProperty("_contextMenuTargetItemKey", key)
-    element._fireDomEvent(DomEvent(element, "click", JreJsonFactory().createObject()))
+    _fireDomEvent("click")
 }
 
 private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBase<*, *, *>, parentMap: Map<MenuItemBase<*, *, *>, Component>) {

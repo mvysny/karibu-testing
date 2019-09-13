@@ -545,6 +545,23 @@ read-write, visible; in other words, fully prepared to receive user input.
 It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
 all the above items prior setting the new value. With Java: `_setValue(hasValue, "42");`
 
+### Firing DOM Events
+
+Listeners added via `Element.addEventListener()` API can be invoked easily:
+
+Kotlin:
+
+```kotlin
+val div = Div()
+div.element.addEventListener("click") { /* do something */ }
+div._fireDomEvent("click")
+```
+
+Java:
+```java
+BasicUtilsKt._fireDomEvent(new Div(), "click");
+```
+
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and

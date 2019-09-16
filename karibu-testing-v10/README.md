@@ -332,7 +332,7 @@ class MyUITest : DynaTest({
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         val grid = _get<Grid<*>>()
-        expect(1) { grid._size() }
+        grid.expectRows(1)
         // etc etc
     }
 })
@@ -362,7 +362,7 @@ public class MyUITest {
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         final Grid<Person> grid = _get(Grid.class);
-        assertEquals(1, _size(grid));
+        expectRows(grid, 1);
         // etc etc
     }
 })

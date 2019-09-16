@@ -95,6 +95,7 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnBy
  * @param click if [ComponentRenderer] doesn't produce a button, this is called, to click the component returned by the [ComponentRenderer]
  * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
+@JvmOverloads
 fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
                                      click: (Component) -> Unit = { component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")

@@ -5,6 +5,7 @@ import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.treegrid.TreeGrid
+import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import kotlin.test.expect
@@ -65,6 +66,32 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             grid.expectRow(0, "0", "0")
             grid.expectRow(1, "", "1")
             grid.expectRow(9, "", "9")
+        }
+        test("_dump") {
+            val roots = listOf(TestPerson("name 0", 0))
+            val grid = TreeGrid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+            }
+            expect("""--[Name]-[Age]--
+0:     └── name 0, 0
+""") {
+                grid._dump()
+            }
+            grid.expandRecursively(roots, 10)
+            expect("""--[Name]-[Age]--
+0:     └── name 0, 0
+1:         └── name 1, 1
+2:             └── name 2, 2
+3:                 └── name 3, 3
+4:                     └── name 4, 4
+5:                         └── name 5, 5
+6:                             └── name 6, 6
+--and 3 more
+""") {
+                grid._dump(0..6)
+            }
         }
     }
 }

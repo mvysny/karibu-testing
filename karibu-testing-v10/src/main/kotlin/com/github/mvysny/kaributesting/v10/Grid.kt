@@ -194,9 +194,12 @@ fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
+fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
+        columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
+
 fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
-    return columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
+    return _getFormattedRow(rowObject)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -269,10 +272,22 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
 fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
-    val dsIndices: IntRange = 0 until _size()
-    val displayIndices = rows.intersect(dsIndices)
-    for (i in displayIndices) {
-        _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
+    val dsIndices: IntRange
+    val displayIndices: Set<Int>
+    if (this@_dump is TreeGrid<T>) {
+        val tree: PrettyPrintTree = this@_dump._dataSourceToPrettyTree()
+        val lines = tree.print().split('\n').filterNotBlank().drop(1)
+        dsIndices = lines.indices
+        displayIndices = rows.intersect(dsIndices)
+        for (i in displayIndices) {
+            append("$i: ${lines[i]}\n")
+        }
+    } else {
+        dsIndices = 0 until _size()
+        displayIndices = rows.intersect(dsIndices)
+        for (i in displayIndices) {
+            _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
+        }
     }
     val andMore = dsIndices.size - displayIndices.size
     if (andMore > 0) {
@@ -456,3 +471,22 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
  * A very slow operation since it walks through all items returned by [_rowSequence].
  */
 fun TreeGrid<*>._size(): Int = _rowSequence().count()
+
+fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+    fun getChildrenOf(item: T): List<T> {
+        return if (isExpanded(item)) {
+            dataProvider.fetchChildren(HierarchicalQuery(null, item)).toList()
+        } else {
+            listOf<T>()
+        }
+    }
+
+    fun toPrettyTree(item: T): PrettyPrintTree {
+        val self = _getFormattedRow(item).joinToString(postfix = "\n")
+        val children = getChildrenOf(item)
+        return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
+    }
+
+    val roots: List<T> = dataProvider.fetch(HierarchicalQuery(null, null)).toList()
+    return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
+}

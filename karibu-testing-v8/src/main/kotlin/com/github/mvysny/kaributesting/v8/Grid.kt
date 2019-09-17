@@ -326,6 +326,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  *
  * Honors current grid ordering.
  */
+@Suppress("UNCHECKED_CAST")
 fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
 
     fun getChildrenOf(item: T): Iterator<T> {
@@ -353,6 +354,7 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
  */
 fun TreeGrid<*>._size(): Int = _rowSequence().count()
 
+@Suppress("UNCHECKED_CAST")
 fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
     fun getChildrenOf(item: T): List<T> {
         return if (isExpanded(item)) {

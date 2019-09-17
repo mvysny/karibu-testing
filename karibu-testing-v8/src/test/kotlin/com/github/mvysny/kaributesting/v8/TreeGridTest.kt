@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v8.addColumnFor
 import com.vaadin.data.TreeData
 import com.vaadin.data.provider.TreeDataProvider
+import com.vaadin.shared.MouseEventDetails
 import com.vaadin.ui.TreeGrid
 import com.vaadin.ui.renderers.ButtonRenderer
 import kotlin.test.expect
@@ -106,7 +107,7 @@ class TreeGridTest : DynaTest({
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
             }
             grid.expandRecursively(roots, 10)
-            grid._clickRenderer(8, "name")
+            grid._clickRenderer(8, "name", MouseEventDetails().apply { isCtrlKey = true })
             expect(true) { called }
         }
     }

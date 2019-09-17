@@ -6,6 +6,8 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.*
 import com.vaadin.flow.data.provider.*
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
@@ -67,11 +69,32 @@ fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this data provider.
+ *
+ * In case of [HierarchicalDataProvider]
+ * this returns the number of ALL items including all leafs.
  */
-fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int = size(Query(filter))
+fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
+    if (this is HierarchicalDataProvider<T, F>) {
+        return this._size(null, filter)
+    }
+    return size(Query(filter))
+}
 
 /**
- * Returns the number of items in this data provider.
+ * Returns the number of items in this data provider, including child items.
+ * The function traverses recursively until all children are found; then a total size
+ * is returned. The function uses [HierarchicalDataProvider.size] mostly, but
+ * also uses [HierarchicalDataProvider.fetchChildren] to discover children.
+ */
+fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
+    val countOfDirectChildren: Int = size(HierarchicalQuery(filter, parent))
+    val children: List<T> = fetchChildren(HierarchicalQuery(filter, parent)).toList()
+    val recursiveChildrenSizes: Int = children.sumBy { _size(it, filter) }
+    return countOfDirectChildren + recursiveChildrenSizes
+}
+
+/**
+ * Returns the number of items in this Grid.
  */
 fun Grid<*>._size(): Int {
     val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }

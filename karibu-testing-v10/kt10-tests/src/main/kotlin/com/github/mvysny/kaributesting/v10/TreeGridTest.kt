@@ -13,9 +13,10 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
     group("HierarchicalDataProvider") {
         group("_size") {
             test("simple") {
-                expect(20) {
-                    tree((0 until 20).toList())._size()
-                }
+                expect(20) { tree((0 until 20).toList())._size() }
+            }
+            test("size calculates sizes of all nodes") {
+                expect(10) { tree(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })._size() }
             }
         }
     }

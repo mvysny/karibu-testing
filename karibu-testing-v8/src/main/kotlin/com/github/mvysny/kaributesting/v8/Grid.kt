@@ -165,17 +165,17 @@ fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
  * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
+fun <T> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
 /**
  * Returns the formatted value of a Grid row as a list of strings, one for every visible column. Calls [_getFormatted] to
  * obtain the formatted cell value.
  * @param rowIndex the row index, 0 or higher.
  */
-fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
+fun <T> Grid<T>._getFormattedRow(rowObject: T): List<String> =
         columns.filterNot { it.isHidden }.map { it._getFormatted(rowObject) }
 
-fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
+fun <T> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
     return _getFormattedRow(rowObject)
 }
@@ -326,9 +326,9 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  *
  * Honors current grid ordering.
  */
-@Suppress("UNCHECKED_CAST")
 fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
 
+    @Suppress("UNCHECKED_CAST")
     fun getChildrenOf(item: T): Iterator<T> {
         return if (isExpanded(item)) {
             (dataProvider as HierarchicalDataProvider<T, Nothing?>)
@@ -341,8 +341,7 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
     fun itemSubtreeSequence(item: T): Sequence<T> =
             TreeIterator(item) { getChildrenOf(it) } .asSequence()
 
-    val roots: List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
-            .fetch(HierarchicalQuery(null, null)).toList()
+    val roots: List<T> = _getRootItems()
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
 }
 
@@ -354,8 +353,8 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
  */
 fun TreeGrid<*>._size(): Int = _rowSequence().count()
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+    @Suppress("UNCHECKED_CAST")
     fun getChildrenOf(item: T): List<T> {
         return if (isExpanded(item)) {
             (dataProvider as HierarchicalDataProvider<T, Nothing?>)
@@ -371,8 +370,18 @@ fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
         return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
     }
 
-    val roots: List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+    val roots: List<T> = _getRootItems()
+    return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> TreeGrid<T>._getRootItems(): List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
             .fetch(HierarchicalQuery(null, null))
             .toList()
-    return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
+
+/**
+ * Expands all nodes. May invoke massive data loading.
+ */
+fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
+    expandRecursively(_getRootItems(), depth)
 }

@@ -106,7 +106,7 @@ class TreeGridTest : DynaTest({
                 }
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
             }
-            grid.expandRecursively(roots, 10)
+            grid._expandAll()
             grid._clickRenderer(8, "name", MouseEventDetails().apply { isCtrlKey = true })
             expect(true) { called }
         }

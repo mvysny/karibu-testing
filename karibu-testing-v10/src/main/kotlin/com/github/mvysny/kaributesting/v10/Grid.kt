@@ -453,7 +453,7 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
     fun itemSubtreeSequence(item: T): Sequence<T> =
             TreeIterator(item) { getChildrenOf(it) } .asSequence()
 
-    val roots: List<T> = dataProvider.fetch(HierarchicalQuery(null, null)).toList()
+    val roots: List<T> = _getRootItems()
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
 }
 
@@ -480,6 +480,17 @@ fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
         return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
     }
 
-    val roots: List<T> = dataProvider.fetch(HierarchicalQuery(null, null)).toList()
+    val roots: List<T> = _getRootItems()
     return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> TreeGrid<T>._getRootItems(): List<T> =
+        dataProvider.fetch(HierarchicalQuery(null, null)).toList()
+
+/**
+ * Expands all nodes. May invoke massive data loading.
+ */
+fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
+    expandRecursively(_getRootItems(), depth)
 }

@@ -59,7 +59,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("", it.age + 1)) else listOf<TestPerson>() })
-                expandRecursively(roots, 10)
+                _expandAll()
             }
             grid.expectRow(0, "0", "0")
             grid.expectRow(1, "", "1")
@@ -101,7 +101,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 }).key = "name"
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
             }
-            grid.expandRecursively(roots, 10)
+            grid._expandAll()
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }

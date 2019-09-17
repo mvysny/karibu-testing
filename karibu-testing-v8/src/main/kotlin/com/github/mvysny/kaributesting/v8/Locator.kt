@@ -184,19 +184,21 @@ private fun Component.find(predicate: (Component) -> Boolean): List<Component> {
 
 private fun <T : Component> Iterable<(T) -> Boolean>.and(): (T) -> Boolean = { component -> all { it(component) } }
 
-private class TreeIterator<out T>(root: T, private val children: (T) -> Iterable<T>) : Iterator<T> {
+internal class TreeIterator<out T>(root: T, private val children: (T) -> Iterator<T>) : Iterator<T> {
     private val queue: Queue<T> = LinkedList<T>(listOf(root))
     override fun hasNext() = !queue.isEmpty()
     override fun next(): T {
         if (!hasNext()) throw NoSuchElementException()
         val result = queue.remove()
-        queue.addAll(children(result))
+        children(result).forEach { queue.add(it) }
         return result
     }
 }
 
 private fun Component.walk(): Iterable<Component> = Iterable {
-    TreeIterator(this) { component -> component as? HasComponents ?: listOf() }
+    TreeIterator(this) { component ->
+        (component as? HasComponents ?: listOf<Component>()).iterator()
+    }
 }
 
 /**

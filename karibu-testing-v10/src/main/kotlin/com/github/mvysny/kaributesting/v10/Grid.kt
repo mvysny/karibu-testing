@@ -212,13 +212,6 @@ fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
 }
 
 @Suppress("UNCHECKED_CAST")
-private val <T> Grid<T>.dataGenerator2: DataGenerator<T>
-    get() = Grid::class.java.getDeclaredMethod("getDataGenerator").run {
-        isAccessible = true
-        invoke(this@dataGenerator2) as DataGenerator<T>
-    }
-
-@Suppress("UNCHECKED_CAST")
 private val <T> Grid.Column<T>.internalId2: String
     get() = Grid.Column::class.java.getDeclaredMethod("getInternalId").run {
         isAccessible = true

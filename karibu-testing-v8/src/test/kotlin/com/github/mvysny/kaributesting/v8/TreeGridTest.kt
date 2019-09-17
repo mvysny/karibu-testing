@@ -91,25 +91,23 @@ class TreeGridTest : DynaTest({
                 grid._dump(0..6)
             }
         }
-        group("click renderer") {
-            test("ClickableRenderer") {
-                val roots = listOf(TestPerson("name 0", 0))
-                var called = false
-                val grid = TreeGrid<TestPerson>().apply {
-                    addColumnFor(TestPerson::name) {
-                        setRenderer(ButtonRenderer<TestPerson> { e ->
-                            called = true
-                            expect("name 8") { e.item.name }
-                            expect("name") { e.column.id }
-                            expect(true) { e.mouseEventDetails.isCtrlKey }
-                        })
-                    }
-                    dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+        test("click renderer") {
+            val roots = listOf(TestPerson("name 0", 0))
+            var called = false
+            val grid = TreeGrid<TestPerson>().apply {
+                addColumnFor(TestPerson::name) {
+                    setRenderer(ButtonRenderer<TestPerson> { e ->
+                        called = true
+                        expect("name 8") { e.item.name }
+                        expect("name") { e.column.id }
+                        expect(true) { e.mouseEventDetails.isCtrlKey }
+                    })
                 }
-                grid.expandRecursively(roots, 10)
-                grid._clickRenderer(8, "name")
-                expect(true) { called }
+                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
             }
+            grid.expandRecursively(roots, 10)
+            grid._clickRenderer(8, "name")
+            expect(true) { called }
         }
     }
 })

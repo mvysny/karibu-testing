@@ -9,6 +9,7 @@ import com.vaadin.shared.data.sort.SortDirection
 import com.vaadin.ui.Button
 import com.vaadin.ui.Component
 import com.vaadin.ui.Grid
+import com.vaadin.ui.TreeGrid
 import com.vaadin.ui.renderers.ClickableRenderer
 import com.vaadin.ui.renderers.ComponentRenderer
 import kotlin.reflect.KProperty1
@@ -45,25 +46,72 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @return the item at given row, not null.
  */
 fun <T> Grid<T>._get(rowIndex: Int): T {
-    val fetched = dataCommunicator.fetchItemsWithRange(rowIndex, 1)
+    val fetched = _fetch(rowIndex, 1)
     return fetched.firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
 }
 
 /**
+ * For [TreeGrid] this walks the [_rowSequence].
+ *
+ * WARNING: Very slow operation for [TreeGrid].
+ */
+fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
+    is TreeGrid<T> -> this._rowSequence().drop(offset).take(limit).toList()
+    else -> dataCommunicator.fetchItemsWithRange(offset, limit)
+}
+
+/**
  * Returns all items in given data provider. Uses current Grid sorting.
+ *
+ * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> = dataCommunicator.fetchItemsWithRange(0, Int.MAX_VALUE)
+fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this data provider.
+ *
+ * In case of [HierarchicalDataProvider]
+ * this returns the number of ALL items including all leafs.
  */
-fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int = size(Query(filter))
+fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
+    if (this is HierarchicalDataProvider<T, F>) {
+        return this._size(null, filter)
+    }
+    return size(Query(filter))
+}
+
+/**
+ * Returns the number of items in this data provider, including child items.
+ * The function traverses recursively until all children are found; then a total size
+ * is returned. The function uses [HierarchicalDataProvider.size] mostly, but
+ * also uses [HierarchicalDataProvider.fetchChildren] to discover children.
+ * Only children matching [filter] are considered for recursive computation of
+ * the size.
+ *
+ * Note that this can differ to `Grid._size()` since `Grid._size()` ignores children
+ * of collapsed tree nodes.
+ */
+fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
+    val query = HierarchicalQuery(filter, parent)
+    val countOfDirectChildren: Int = size(query)
+    val children: List<T> = fetchChildren(query).toList()
+    val recursiveChildrenSizes: Int = children.sumBy { _size(it, filter) }
+    return countOfDirectChildren + recursiveChildrenSizes
+}
 
 /**
  * Returns the number of items in this data provider.
+ *
+ * For [TreeGrid] this computes the number of items the [TreeGrid] is actually showing on-screen,
+ * ignoring children of collapsed nodes.
+ *
+ * A very slow operation for [TreeGrid] since it walks through all items returned by [_rowSequence].
  */
-fun Grid<*>._size(): Int = dataCommunicator.dataProviderSize
+fun Grid<*>._size(): Int = when(this) {
+    is TreeGrid<*> -> this._size()
+    else -> dataCommunicator.dataProviderSize
+}
 
 /**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Fails if [Grid.Column.getRenderer] is not a [ClickableRenderer].
@@ -124,9 +172,12 @@ fun <T: Any> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPrese
  * obtain the formatted cell value.
  * @param rowIndex the row index, 0 or higher.
  */
+fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
+        columns.filterNot { it.isHidden }.map { it._getFormatted(rowObject) }
+
 fun <T: Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
-    return columns.filterNot { it.isHidden } .map { it._getFormatted(rowObject) }
+    return _getFormattedRow(rowObject)
 }
 
 /**
@@ -168,10 +219,22 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
 fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
     visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]${getSortIndicator(it)}" }
-    val dsIndices: IntRange = 0 until _size()
-    val displayIndices = rows.intersect(dsIndices)
-    for (i in displayIndices) {
-        _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
+    val dsIndices: IntRange
+    val displayIndices: Set<Int>
+    if (this@_dump is TreeGrid<T>) {
+        val tree: PrettyPrintTree = this@_dump._dataSourceToPrettyTree()
+        val lines = tree.print().split('\n').filterNotBlank().drop(1)
+        dsIndices = lines.indices
+        displayIndices = rows.intersect(dsIndices)
+        for (i in displayIndices) {
+            append("$i: ${lines[i]}\n")
+        }
+    } else {
+        dsIndices = 0 until _size()
+        displayIndices = rows.intersect(dsIndices)
+        for (i in displayIndices) {
+            _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
+        }
     }
     val andMore = dsIndices.size - displayIndices.size
     if (andMore > 0) {
@@ -252,4 +315,62 @@ val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
  */
 fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     setSortOrder(sortOrder.map { GridSortOrder(getColumnById(it.sorted), it.direction) })
+}
+
+/**
+ * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.
+ * The sequence will *skip* children of collapsed nodes.
+ *
+ * Iterating the entire sequence is a very slow operation since it will repeatedly
+ * poll [HierarchicalDataProvider] for list of children.
+ *
+ * Honors current grid ordering.
+ */
+fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
+
+    fun getChildrenOf(item: T): Iterator<T> {
+        return if (isExpanded(item)) {
+            (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+                    .fetchChildren(HierarchicalQuery(null, item)).iterator()
+        } else {
+            listOf<T>().iterator()
+        }
+    }
+
+    fun itemSubtreeSequence(item: T): Sequence<T> =
+            TreeIterator(item) { getChildrenOf(it) } .asSequence()
+
+    val roots: List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+            .fetch(HierarchicalQuery(null, null)).toList()
+    return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
+}
+
+/**
+ * Returns the number of items the [TreeGrid] is actually showing. For example
+ * it doesn't count in children of collapsed nodes.
+ *
+ * A very slow operation since it walks through all items returned by [_rowSequence].
+ */
+fun TreeGrid<*>._size(): Int = _rowSequence().count()
+
+fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+    fun getChildrenOf(item: T): List<T> {
+        return if (isExpanded(item)) {
+            (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+                    .fetchChildren(HierarchicalQuery(null, item)).toList()
+        } else {
+            listOf<T>()
+        }
+    }
+
+    fun toPrettyTree(item: T): PrettyPrintTree {
+        val self = _getFormattedRow(item).joinToString(postfix = "\n")
+        val children = getChildrenOf(item)
+        return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
+    }
+
+    val roots: List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+            .fetch(HierarchicalQuery(null, null))
+            .toList()
+    return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
 }

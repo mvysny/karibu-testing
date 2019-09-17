@@ -85,10 +85,13 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  * The function traverses recursively until all children are found; then a total size
  * is returned. The function uses [HierarchicalDataProvider.size] mostly, but
  * also uses [HierarchicalDataProvider.fetchChildren] to discover children.
+ * Only children matching [filter] are considered for recursive computation of
+ * the size.
  */
 fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
-    val countOfDirectChildren: Int = size(HierarchicalQuery(filter, parent))
-    val children: List<T> = fetchChildren(HierarchicalQuery(filter, parent)).toList()
+    val query = HierarchicalQuery(filter, parent)
+    val countOfDirectChildren: Int = size(query)
+    val children: List<T> = fetchChildren(query).toList()
     val recursiveChildrenSizes: Int = children.sumBy { _size(it, filter) }
     return countOfDirectChildren + recursiveChildrenSizes
 }

@@ -5,6 +5,7 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.*
+import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
@@ -43,6 +44,11 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
 
 /**
  * Returns the item on given row. Fails if the row index is invalid. Uses current Grid sorting.
+ *
+ * For [TreeGrid] this returns the x-th displayed row; skips children of collapsed nodes.
+ * Uses [_rowSequence].
+ *
+ * WARNING: Very slow operation for [TreeGrid].
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
@@ -53,7 +59,15 @@ fun <T> Grid<T>._get(rowIndex: Int): T {
             ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
 }
 
-fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = dataCommunicator.fetch(offset, limit)
+/**
+ * For [TreeGrid] this walks the [_rowSequence].
+ *
+ * WARNING: Very slow operation for [TreeGrid].
+ */
+fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
+    is TreeGrid<T> -> this._rowSequence().drop(offset).take(limit).toList()
+    else -> dataCommunicator.fetch(offset, limit)
+}
 
 fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     val m = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
@@ -63,6 +77,9 @@ fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
 
 /**
  * Returns all items in given data provider. Uses current Grid sorting.
+ *
+ * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
+ *
  * @return the list of items.
  */
 fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
@@ -87,6 +104,9 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  * also uses [HierarchicalDataProvider.fetchChildren] to discover children.
  * Only children matching [filter] are considered for recursive computation of
  * the size.
+ *
+ * Note that this can differ to `Grid._size()` since `Grid._size()` ignores children
+ * of collapsed tree nodes.
  */
 fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
     val query = HierarchicalQuery(filter, parent)
@@ -98,8 +118,16 @@ fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = 
 
 /**
  * Returns the number of items in this Grid.
+ *
+ * For [TreeGrid] this computes the number of items the [TreeGrid] is actually showing on-screen,
+ * ignoring children of collapsed nodes.
+ *
+ * A very slow operation for [TreeGrid] since it walks through all items returned by [_rowSequence].
  */
 fun Grid<*>._size(): Int {
+    if (this is TreeGrid<*>) {
+        return this._size()
+    }
     val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
     return m.invoke(dataCommunicator) as Int
 }
@@ -394,3 +422,37 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = fa
     val itemKey = dataCommunicator.keyMapper.key(_get(rowIndex))
     _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
 }
+
+/**
+ * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.
+ * The sequence will *skip* children of collapsed nodes.
+ *
+ * Iterating the entire sequence is a very slow operation since it will repeatedly
+ * poll [HierarchicalDataProvider] for list of children.
+ *
+ * Honors current grid ordering.
+ */
+fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
+
+    fun getChildrenOf(item: T): Iterator<T> {
+        return if (isExpanded(item)) {
+            dataProvider.fetchChildren(HierarchicalQuery(null, item)).iterator()
+        } else {
+            listOf<T>().iterator()
+        }
+    }
+
+    fun itemSubtreeSequence(item: T): Sequence<T> =
+            TreeIterator(item) { getChildrenOf(it) } .asSequence()
+
+    val roots: List<T> = dataProvider.fetch(HierarchicalQuery(null, null)).toList()
+    return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
+}
+
+/**
+ * Returns the number of items the [TreeGrid] is actually showing. For example
+ * it doesn't count in children of collapsed nodes.
+ *
+ * A very slow operation since it walks through all items returned by [_rowSequence].
+ */
+fun TreeGrid<*>._size(): Int = _rowSequence().count()

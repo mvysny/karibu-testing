@@ -4,10 +4,12 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
+import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.treeGridTestbatch() {
@@ -91,6 +93,22 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
 --and 3 more
 """) {
                 grid._dump(0..6)
+            }
+        }
+        group("click renderer") {
+            test("ClickableRenderer") {
+                val roots = listOf(TestPerson("name 0", 0))
+                var called = false
+                val grid = TreeGrid<TestPerson>().apply {
+                    addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
+                        called = true
+                        expect("name 8") { person.name }
+                    }).key = "name"
+                    dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                }
+                grid.expandRecursively(roots, 10)
+                grid._clickRenderer(8, "name")
+                expect(true) { called }
             }
         }
     }

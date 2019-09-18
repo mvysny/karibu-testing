@@ -221,6 +221,10 @@ fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
         is BasicRenderer<T, *> -> {
             renderer.valueProvider.apply(rowObject)
         }
+        is ComponentRenderer<*, T> -> {
+            val component: Component = renderer.createComponent(rowObject)
+            component.toPrettyString()
+        }
         else -> null
     }
 }

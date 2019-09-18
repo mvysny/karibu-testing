@@ -91,10 +91,10 @@ internal fun DynaNodeGroup.gridTestbatch() {
         val grid = UI.getCurrent().grid<TestPerson> {
             addColumnFor(TestPerson::name)
             addColumn(NativeButtonRenderer<TestPerson>("View", { }))
+            addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
         }
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
-        // unfortunately Vaadin 10 Renderer/Column code is so complex it's impossible to obtain the value of a NativeButtonRenderer
-        grid.expectRow(0, "name 0", "View")
+        grid.expectRow(0, "name 0", "View", "Button[text='name 0']")
     }
 
     test("lookup finds components in header") {

@@ -108,6 +108,7 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  * Note that this can differ to `Grid._size()` since `Grid._size()` ignores children
  * of collapsed tree nodes.
  */
+@JvmOverloads
 fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
     val query = HierarchicalQuery(filter, parent)
     val countOfDirectChildren: Int = size(query)
@@ -262,6 +263,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
  * --and 198 more
  * ```
  */
+@JvmOverloads
 fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")

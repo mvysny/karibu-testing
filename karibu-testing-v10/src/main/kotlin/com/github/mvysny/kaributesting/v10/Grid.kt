@@ -12,6 +12,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.Renderer
+import com.vaadin.flow.function.ValueProvider
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
@@ -205,8 +206,8 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-    val valueProviders = renderer.valueProviders
-    val valueProvider = valueProviders[internalId2] ?: return null
+    val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
+    val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
     // there is no value provider for NativeButtonRenderer, just return null
     val value = valueProvider.apply(rowObject)
     return "" + value

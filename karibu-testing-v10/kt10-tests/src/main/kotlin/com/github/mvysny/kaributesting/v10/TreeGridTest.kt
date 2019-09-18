@@ -54,16 +54,16 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             }
         }
         test("_get") {
-            val roots = listOf(TestPerson("0", 0))
+            val roots = listOf(TestPerson("name 0", 0))
             val grid = TreeGrid<TestPerson>().apply {
-                addColumnFor(TestPerson::name)
+                addHierarchyColumn { it -> it.name }
                 addColumnFor(TestPerson::age)
-                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("", it.age + 1)) else listOf<TestPerson>() })
+                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
                 _expandAll()
             }
-            grid.expectRow(0, "0", "0")
-            grid.expectRow(1, "", "1")
-            grid.expectRow(9, "", "9")
+            grid.expectRow(0, "name 0", "0")
+            grid.expectRow(1, "name 1", "1")
+            grid.expectRow(9, "name 9", "9")
         }
         test("_dump") {
             val roots = listOf(TestPerson("name 0", 0))

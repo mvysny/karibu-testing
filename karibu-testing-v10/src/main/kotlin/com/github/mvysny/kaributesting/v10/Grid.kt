@@ -9,10 +9,10 @@ import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
-import com.vaadin.flow.data.renderer.ClickableRenderer
-import com.vaadin.flow.data.renderer.ComponentRenderer
-import com.vaadin.flow.data.renderer.Renderer
+import com.vaadin.flow.data.renderer.*
+import com.vaadin.flow.dom.Element
 import com.vaadin.flow.function.ValueProvider
+import org.jsoup.Jsoup
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
@@ -194,7 +194,8 @@ fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
  * @param rowIndex the row index, 0 or higher.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
+fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
+        getPresentationValue(rowObject).toString()
 
 fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
         columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
@@ -206,11 +207,43 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-    val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
-    val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
-    // there is no value provider for NativeButtonRenderer, just return null
-    val value = valueProvider.apply(rowObject)
-    return "" + value
+    return when (val renderer: Renderer<T> = this.renderer) {
+        is ColumnPathRenderer -> {
+            val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
+            val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
+            val value: Any? = valueProvider.apply(rowObject)
+            value.toString()
+        }
+        is TemplateRenderer<T> -> {
+            val renderedTemplateHtml: String = renderer.renderTemplate(rowObject)
+            Jsoup.parse(renderedTemplateHtml).textRecursively
+        }
+        is BasicRenderer<T, *> -> {
+            renderer.valueProvider.apply(rowObject)
+        }
+        else -> null
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V> get() {
+    val javaField = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
+        isAccessible = true
+    }
+    return javaField.get(this) as ValueProvider<T, V>
+}
+
+/**
+ * Renders the template for given [item]
+ */
+fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
+    var template: String = this.template
+    this.valueProviders.forEach { (k, v) ->
+        if (template.contains("[[item.$k]]")) {
+            template = template.replace("[[item.$k]]", v.apply(item).toString())
+        }
+    }
+    return template
 }
 
 @Suppress("UNCHECKED_CAST")

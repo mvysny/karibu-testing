@@ -94,7 +94,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         // unfortunately Vaadin 10 Renderer/Column code is so complex it's impossible to obtain the value of a NativeButtonRenderer
-        grid.expectRow(0, "name 0", "null")
+        grid.expectRow(0, "name 0", "View")
     }
 
     test("lookup finds components in header") {

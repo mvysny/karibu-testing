@@ -208,7 +208,7 @@ class GridTest : DynaTest({
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
             }
-            expectThrows(AssertionError::class, "Requested to get row 0 but the data provider only has 0") {
+            expectThrows(AssertionError::class, "Requested to get row 0 but the data provider only has 0 rows") {
                 grid._getFormatted(0, "name")
             }
         }

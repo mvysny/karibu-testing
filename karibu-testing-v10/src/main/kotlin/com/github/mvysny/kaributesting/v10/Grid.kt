@@ -56,7 +56,7 @@ fun <T> Grid<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val fetched = _fetch(rowIndex, 1)
     return fetched.firstOrNull()
-            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()}")
+            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
 }
 
 /**

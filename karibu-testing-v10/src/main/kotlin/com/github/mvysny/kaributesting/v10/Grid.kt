@@ -511,8 +511,8 @@ fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
     }
 
     fun toPrettyTree(item: T): PrettyPrintTree {
-        val self = _getFormattedRow(item).joinToString(postfix = "\n")
-        val children = getChildrenOf(item)
+        val self: String = _getFormattedRow(item).joinToString(postfix = "\n")
+        val children: List<T> = getChildrenOf(item)
         return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
     }
 

@@ -219,7 +219,13 @@ fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
             Jsoup.parse(renderedTemplateHtml).textRecursively
         }
         is BasicRenderer<T, *> -> {
-            renderer.valueProvider.apply(rowObject)
+            val value: Any? = renderer.valueProvider.apply(rowObject)
+            val getFormattedValueM = BasicRenderer::class.java
+                    .declaredMethods
+                    .filter { it.name == "getFormattedValue" }
+                    .first()
+                    .apply { isAccessible = true }
+            getFormattedValueM.invoke(renderer, value)
         }
         is ComponentRenderer<*, T> -> {
             val component: Component = renderer.createComponent(rowObject)

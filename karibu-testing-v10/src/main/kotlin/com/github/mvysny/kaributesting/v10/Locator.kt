@@ -185,28 +185,37 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
 
 private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }
 
-internal class TreeIterator<out T>(root: T, private val children: (T) -> Iterator<T>) : Iterator<T> {
-    private val queue: Queue<T> = LinkedList<T>(listOf(root))
+/**
+ * Walks the child tree, preorder depth-first: first the node, then its descendants,
+ * then its next sibling.
+ */
+internal class PreorderTreeIterator<out T>(root: T, private val children: (T) -> List<T>) : Iterator<T> {
+    private val queue: Deque<T> = LinkedList<T>(listOf(root))
     override fun hasNext() = !queue.isEmpty()
     override fun next(): T {
         if (!hasNext()) throw NoSuchElementException()
-        val result = queue.remove()
-        children(result).forEach { queue.add(it) }
+        val result: T = queue.pop()
+        children(result).reversed().forEach { queue.push(it) }
         return result
     }
 }
+
+/**
+ * Walks the component child tree, depth-first: first the component, then its descendants,
+ * then its next sibling.
+ */
 private fun Component.walk(): Iterable<Component> = Iterable {
-    TreeIterator(this) { component -> component.getAllChildren() }
+    PreorderTreeIterator(this) { component -> component.getAllChildren() }
 }
 
-private fun Component.getAllChildren(): Iterator<Component> = when(this) {
+private fun Component.getAllChildren(): List<Component> = when(this) {
     is Grid<*> -> {
         val columns = children.toList()
         val headerComponents = this.headerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
         val footerComponents = this.footerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
-        (columns + headerComponents + footerComponents).iterator()
+        columns + headerComponents + footerComponents
     }
-    else -> children.iterator()
+    else -> children.toList()
 }
 
 /**

@@ -10,7 +10,6 @@ import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
-import com.vaadin.flow.dom.Element
 import com.vaadin.flow.function.ValueProvider
 import org.jsoup.Jsoup
 import java.util.stream.Stream
@@ -341,8 +340,8 @@ fun Grid<*>.expectRows(count: Int) {
 }
 
 fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
-    val expected = row.toList()
-    val actual = _getFormattedRow(rowIndex)
+    val expected: List<String> = row.toList()
+    val actual: List<String> = _getFormattedRow(rowIndex)
     if (expected != actual) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
     }
@@ -488,16 +487,16 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = fa
  */
 fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
 
-    fun getChildrenOf(item: T): Iterator<T> {
+    fun getChildrenOf(item: T): List<T> {
         return if (isExpanded(item)) {
-            dataProvider.fetchChildren(HierarchicalQuery(null, item)).iterator()
+            dataProvider.fetchChildren(HierarchicalQuery(null, item)).toList()
         } else {
-            listOf<T>().iterator()
+            listOf<T>()
         }
     }
 
     fun itemSubtreeSequence(item: T): Sequence<T> =
-            TreeIterator(item) { getChildrenOf(it) } .asSequence()
+            PreorderTreeIterator(item) { getChildrenOf(it) } .asSequence()
 
     val roots: List<T> = _getRootItems()
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()

@@ -184,20 +184,24 @@ private fun Component.find(predicate: (Component) -> Boolean): List<Component> {
 
 private fun <T : Component> Iterable<(T) -> Boolean>.and(): (T) -> Boolean = { component -> all { it(component) } }
 
-internal class TreeIterator<out T>(root: T, private val children: (T) -> Iterator<T>) : Iterator<T> {
-    private val queue: Queue<T> = LinkedList<T>(listOf(root))
+/**
+ * Walks the child tree, preorder depth-first: first the node, then its descendants,
+ * then its next sibling.
+ */
+internal class PreorderTreeIterator<out T>(root: T, private val children: (T) -> List<T>) : Iterator<T> {
+    private val queue: Deque<T> = LinkedList<T>(listOf(root))
     override fun hasNext() = !queue.isEmpty()
     override fun next(): T {
         if (!hasNext()) throw NoSuchElementException()
-        val result = queue.remove()
-        children(result).forEach { queue.add(it) }
+        val result: T = queue.pop()
+        children(result).reversed().forEach { queue.push(it) }
         return result
     }
 }
 
 private fun Component.walk(): Iterable<Component> = Iterable {
-    TreeIterator(this) { component ->
-        (component as? HasComponents ?: listOf<Component>()).iterator()
+    PreorderTreeIterator(this) { component ->
+        (component as? HasComponents)?.toList() ?: listOf()
     }
 }
 

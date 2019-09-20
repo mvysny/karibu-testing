@@ -54,17 +54,55 @@ class TreeGridTest : DynaTest({
                 }
             }
         }
-        test("_get") {
-            val roots = listOf(TestPerson("0", 0))
-            val grid = TreeGrid<TestPerson>().apply {
-                addColumnFor(TestPerson::name)
-                addColumnFor(TestPerson::age)
-                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("", it.age + 1)) else listOf<TestPerson>() })
-                expandRecursively(roots, 10)
+        group("_get") {
+            test("degenerate tree") {
+                val roots = listOf(TestPerson("name 0", 0))
+                val grid = TreeGrid<TestPerson>().apply {
+                    addColumnFor(TestPerson::name)
+                    addColumnFor(TestPerson::age)
+                    dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                    _expandAll()
+                }
+                grid.expectRow(0, "name 0", "0")
+                grid.expectRow(1, "name 1", "1")
+                grid.expectRow(9, "name 9", "9")
             }
-            grid.expectRow(0, "0", "0")
-            grid.expectRow(1, "", "1")
-            grid.expectRow(9, "", "9")
+            test("balanced tree") {
+                val roots = listOf(TestPerson("name 0", 0))
+                val grid = TreeGrid<TestPerson>().apply {
+                    addColumnFor(TestPerson::name)
+                    addColumnFor(TestPerson::age)
+                    dataProvider = treedp<TestPerson>(roots) {
+                        if (it.age < 3) listOf(TestPerson("${it.name} 0", it.age + 1), TestPerson("${it.name} 1", it.age + 1))
+                        else listOf<TestPerson>()
+                    }
+                    _expandAll()
+                }
+                // expected tree:
+                // --[Name]-[Age]--
+                //0:     └── name 0, 0
+                //1:         ├── name 0 0, 1
+                //2:         │   ├── name 0 0 0, 2
+                //3:         │   │   ├── name 0 0 0 0, 3
+                //4:         │   │   └── name 0 0 0 1, 3
+                //5:         │   └── name 0 0 1, 2
+                //6:         │       ├── name 0 0 1 0, 3
+                grid.expectRow( 0, "name 0", "0")
+                grid.expectRow( 1, "name 0 0", "1")
+                grid.expectRow( 2, "name 0 0 0", "2")
+                grid.expectRow( 3, "name 0 0 0 0", "3")
+                grid.expectRow( 4, "name 0 0 0 1", "3")
+                grid.expectRow( 5, "name 0 0 1", "2")
+                grid.expectRow( 6, "name 0 0 1 0", "3")
+                grid.expectRow( 7, "name 0 0 1 1", "3")
+                grid.expectRow( 8, "name 0 1", "1")
+                grid.expectRow( 9, "name 0 1 0", "2")
+                grid.expectRow(10, "name 0 1 0 0", "3")
+                grid.expectRow(11, "name 0 1 0 1", "3")
+                grid.expectRow(12, "name 0 1 1", "2")
+                grid.expectRow(13, "name 0 1 1 0", "3")
+                grid.expectRow(14, "name 0 1 1 1", "3")
+            }
         }
         test("_dump") {
             val roots = listOf(TestPerson("name 0", 0))

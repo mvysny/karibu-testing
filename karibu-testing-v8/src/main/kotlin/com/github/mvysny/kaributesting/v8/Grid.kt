@@ -331,17 +331,17 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
 fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
 
     @Suppress("UNCHECKED_CAST")
-    fun getChildrenOf(item: T): Iterator<T> {
+    fun getChildrenOf(item: T): List<T> {
         return if (isExpanded(item)) {
             (dataProvider as HierarchicalDataProvider<T, Nothing?>)
-                    .fetchChildren(HierarchicalQuery(null, item)).iterator()
+                    .fetchChildren(HierarchicalQuery(null, item)).toList()
         } else {
-            listOf<T>().iterator()
+            listOf<T>()
         }
     }
 
     fun itemSubtreeSequence(item: T): Sequence<T> =
-            TreeIterator(item) { getChildrenOf(it) } .asSequence()
+            PreorderTreeIterator(item) { getChildrenOf(it) } .asSequence()
 
     val roots: List<T> = _getRootItems()
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()

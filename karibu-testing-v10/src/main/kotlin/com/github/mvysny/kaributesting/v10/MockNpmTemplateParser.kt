@@ -121,6 +121,8 @@ class MockNpmTemplateParser : TemplateParser {
 
     companion object {
         fun install() {
+            // okay this is ugly as hell, but there is no other way:
+            // https://github.com/vaadin/flow/issues/6537
             val instanceField = NpmTemplateParser::class.java.getDeclaredField("INSTANCE").apply {
                 isAccessible = true
                 makeNotFinal()

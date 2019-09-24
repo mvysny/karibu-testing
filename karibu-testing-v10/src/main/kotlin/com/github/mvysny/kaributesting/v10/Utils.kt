@@ -9,6 +9,8 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.lang.IllegalArgumentException
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.net.URL
 import kotlin.test.expect
 
@@ -44,4 +46,9 @@ private fun JsonObject.put(key: String, value: Any) {
 
 internal fun jsonCreateObject(vararg contents: Pair<String, Any>): JsonObject = Json.createObject().apply {
     contents.forEach { put(it.first, it.second) }
+}
+
+internal fun Field.makeNotFinal() {
+    val modifiersField = Field::class.java.getDeclaredField("modifiers").apply { isAccessible = true }
+    modifiersField.setInt(this, modifiers and Modifier.FINAL.inv())
 }

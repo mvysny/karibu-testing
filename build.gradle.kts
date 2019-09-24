@@ -19,6 +19,7 @@ allprojects {
     repositories {
         jcenter()
         maven { setUrl("https://maven.vaadin.com/vaadin-prereleases/") }
+        maven { setUrl("http://maven.vaadin.com/vaadin-addons") }
     }
 }
 

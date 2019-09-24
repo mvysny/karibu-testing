@@ -4,18 +4,12 @@ import com.github.mvysny.kaributesting.mockhttp.*
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
-import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
-import elemental.json.Json
-import elemental.json.JsonArray
-import elemental.json.JsonObject
-import java.io.File
-import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -153,35 +147,9 @@ object MockVaadin {
 
         } else {
             // NPM + WebPack mode
-
             // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26
-            // Flow needs to load the sources for @JsModule and the current implementation
-            // reads that from a file named stats.json produced by webpack. We need to mock the stats.json file.
 
-            // this is needed so that NpmTemplateParser.isStatsFileReadNeeded() returns false
-            // so that NpmTemplateParser.getSourcesFromStats() doesn't go to actual webpack but
-            // uses our made-up jsonStats
-            System.setProperty("vaadin.productionMode", "true")
-            System.setProperty("vaadin.enableDevServer", "false")
-
-            // create jsonStats
-            val jsfiles: JsonArray = Json.createArray()
-
-            val frontend: File = File("frontend").absoluteFile
-            frontend.walk()
-                    .filter { it.isFile && it.name.toLowerCase().endsWith(".js") }
-                    .forEach { f: File ->
-                        // the name of the file, relative to the frontend/ folder,
-                        // for example "./src/my-component.json"
-                        val name: String = "." + f.absolutePath.removePrefix(frontend.absolutePath)
-                        val source: String = f.readText()
-                        jsfiles.add(jsonCreateObject("name" to name, "source" to source))
-                    }
-            val jsonStats: JsonObject = jsonCreateObject("modules" to jsfiles, "hash" to "")
-
-            // set it to the NpmTemplateParser
-            val jsonStatsField: Field = NpmTemplateParser::class.java.getDeclaredField("jsonStats").apply { isAccessible = true }
-            jsonStatsField.set(NpmTemplateParser.getInstance(), jsonStats)
+            MockNpmTemplateParser.install()
         }
     }
 

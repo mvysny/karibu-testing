@@ -2,7 +2,7 @@ import java.nio.file.Files
 
 dependencies {
     testCompile(platform("com.vaadin:vaadin-bom:${properties["vaadin14_version"]}"))
-    testCompile("com.vaadin:vaadin-core:${properties["vaadin14_version"]}")
+    testCompile("com.vaadin:vaadin:${properties["vaadin14_version"]}")
     testCompile(project(":karibu-testing-v10:kt10-tests"))
 
     // for testing out the NPM template loading from META-INF/resources/frontend/

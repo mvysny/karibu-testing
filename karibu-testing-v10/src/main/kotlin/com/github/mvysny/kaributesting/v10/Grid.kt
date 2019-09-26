@@ -12,6 +12,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.ValueProvider
 import org.jsoup.Jsoup
+import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
@@ -538,4 +539,13 @@ fun <T> TreeGrid<T>._getRootItems(): List<T> =
  */
 fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
     expandRecursively(_getRootItems(), depth)
+}
+
+/**
+ * Returns the column's Internal ID.
+ */
+val Grid.Column<*>._internalId: String get() {
+    val getInternalIdMethod: Method = Grid.Column::class.java.getDeclaredMethod("getInternalId")
+    getInternalIdMethod.isAccessible = true
+    return getInternalIdMethod.invoke(this) as String
 }

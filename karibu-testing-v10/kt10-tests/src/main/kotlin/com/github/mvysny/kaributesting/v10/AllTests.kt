@@ -51,4 +51,7 @@ fun DynaNodeGroup.allTests() {
     group("download test battery") {
         downloadTestBattery()
     }
+    group("grid pro") {
+        gridProTestbatch()
+    }
 }

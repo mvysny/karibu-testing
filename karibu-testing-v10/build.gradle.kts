@@ -3,8 +3,9 @@ dependencies {
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     compileOnly(platform("com.vaadin:vaadin-bom:${properties["vaadin14_version"]}"))
-    compileOnly("com.vaadin:vaadin-core:${properties["vaadin14_version"]}")
-    testCompile("com.vaadin:vaadin-core:${properties["vaadin14_version"]}")
+    // depend on vaadin instead of vaadin-core, to bring in Grid Pro.
+    compileOnly("com.vaadin:vaadin:${properties["vaadin14_version"]}")
+    testCompile("com.vaadin:vaadin:${properties["vaadin14_version"]}")
 
     compile(project(":mock-servlet-environment"))
 

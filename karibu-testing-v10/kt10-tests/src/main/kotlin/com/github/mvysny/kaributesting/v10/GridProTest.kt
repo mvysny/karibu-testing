@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.vaadin.flow.component.gridpro.GridPro
+import com.vaadin.flow.component.textfield.NumberField
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.gridProTestbatch() {
@@ -25,4 +26,52 @@ internal fun DynaNodeGroup.gridProTestbatch() {
             expect(true) { listenerCalled }
         }
     }
+
+    group("item updater") {
+        test("string + textfield") {
+            val grid = GridPro<TestPerson>(TestPerson::class.java)
+            grid.removeAllColumns()
+            val col = grid.addEditColumn("age")
+                    .text { p, name -> p.name = name }
+            val p = TestPerson("Foo", 45)
+            grid._proedit(p) { col._text("Bar") }
+            expect("Bar") { p.name }
+        }
+        if (VaadinMeta.version >= 14) {
+            // Only GridPro 2.0.0 has custom fields
+            test("int + custom field") {
+                val grid = GridPro<TestPerson>(TestPerson::class.java)
+                grid.removeAllColumns()
+                val numberField = NumberField()
+                val col = grid.addEditColumn("age")
+                        .custom(numberField) { p, age -> p.age = age.toInt() }
+                val p = TestPerson("Foo", 45)
+                numberField.value = 3.15
+                grid._proedit(p) { col._customFlush() }
+                expect(3) { p.age }
+            }
+        }
+        test("boolean + checkbox") {
+            val grid = GridPro<TestProPerson>(TestProPerson::class.java)
+            grid.removeAllColumns()
+            val col = grid.addEditColumn("alive")
+                    .checkbox { p, alive -> p.alive = alive }
+            val p = TestProPerson("Foo", 45)
+            grid._proedit(p) { col._checkbox(false) }
+            expect(false) { p.alive }
+        }
+        test("select + enum") {
+            val grid = GridPro<TestProPerson>(TestProPerson::class.java)
+            grid.removeAllColumns()
+            val col = grid.addEditColumn("status")
+                    .select( { p: TestProPerson, status: MaritalStatus -> p.status = status }, MaritalStatus::class.java)
+            val p = TestProPerson("Foo", 45)
+            grid._proedit(p) { col._select(MaritalStatus.Divorced) }
+            expect(MaritalStatus.Divorced) { p.status }
+        }
+    }
 }
+
+enum class MaritalStatus { Single, Married, Divorced, Widowed }
+
+data class TestProPerson(var name: String, var age: Int, var alive: Boolean = true, var status: MaritalStatus = MaritalStatus.Single)

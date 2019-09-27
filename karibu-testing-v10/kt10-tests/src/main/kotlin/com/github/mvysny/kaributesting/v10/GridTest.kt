@@ -255,4 +255,4 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 }
 
-data class TestPerson(val name: String, val age: Int)
+data class TestPerson(var name: String, var age: Int)

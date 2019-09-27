@@ -823,3 +823,20 @@ To enforce npm mode, just set this system property before your tests are run:
 ```kotlin
 System.setProperty("vaadin.compatibilityMode", "false")
 ```
+
+# Support for Vaadin Pro Components
+
+## Grid Pro
+
+It is possible to mock the inline Grid Pro editor and invoke your `ItemUpdater`s
+as follows:
+
+```kotlin
+val person = Person(...)
+grid._proedit(person) {
+  nameColumn._text("John")
+  aliveColumn._checkbox(true)
+}
+expect("John") { person.name }
+expect(true) { person.isAlive }
+```

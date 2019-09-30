@@ -126,7 +126,7 @@ internal fun DynaNodeGroup.uploadTestbatch() {
             expect("text/plain") { it.mimeType }
             finishedCalled = true
         }
-        upload._uploadFail("hello.txt", "text/plain")
+        upload._uploadFail("hello.txt")
         expect(true) { startedCalled }
         expect(true) { failedCalled }
         expect(true) { finishedCalled }

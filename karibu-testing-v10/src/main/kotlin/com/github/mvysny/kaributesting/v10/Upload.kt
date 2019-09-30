@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.upload.*
+import java.net.URLConnection
 
 /**
  * Invokes [StartedEvent], then feeds given [file] to the [Upload.receiver], then
@@ -15,7 +16,8 @@ import com.vaadin.flow.component.upload.*
  *   is reached.
  * * The upload "runs" in the UI thread, so there is no way to test thread safety.
  */
-fun Upload._upload(fileName: String, mimeType: String, file: ByteArray) {
+@JvmOverloads
+fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName), file: ByteArray) {
     checkEditableByUser()
     _fireEvent(StartedEvent(this, fileName, mimeType, file.size.toLong()))
     val failure: Exception? = try {
@@ -41,7 +43,8 @@ fun Upload._upload(fileName: String, mimeType: String, file: ByteArray) {
  *
  * Currently the implememtation simply calls [_uploadFail].
  */
-fun Upload._uploadInterrupt(fileName: String, mimeType: String) {
+@JvmOverloads
+fun Upload._uploadInterrupt(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
     _uploadFail(fileName, mimeType)
 }
 
@@ -50,7 +53,8 @@ fun Upload._uploadInterrupt(fileName: String, mimeType: String) {
  * [Upload.receiver] and closes it immediately without writing anything, then
  * fires [FailedEvent] and [FinishedEvent].
  */
-fun Upload._uploadFail(fileName: String, mimeType: String) {
+@JvmOverloads
+fun Upload._uploadFail(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
     checkEditableByUser()
     _fireEvent(StartedEvent(this, fileName, mimeType, 100L))
     receiver.receiveUpload(fileName, mimeType).use {  }

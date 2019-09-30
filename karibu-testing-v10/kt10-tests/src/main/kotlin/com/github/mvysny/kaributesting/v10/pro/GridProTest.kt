@@ -1,6 +1,9 @@
-package com.github.mvysny.kaributesting.v10
+package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10.TestPerson
+import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.textfield.NumberField
 import kotlin.test.expect

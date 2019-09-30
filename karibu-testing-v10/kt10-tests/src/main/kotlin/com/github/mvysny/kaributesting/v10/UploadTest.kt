@@ -2,11 +2,11 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.lang.RuntimeException
 import kotlin.test.expect
@@ -102,7 +102,7 @@ internal fun DynaNodeGroup.uploadTestbatch() {
         upload.receiver = Receiver { fileName, mimeType ->
             expect("hello.txt") { fileName }
             expect("text/plain") { mimeType }
-            ByteOutputStream()
+            ByteArrayOutputStream()
         }
         var startedCalled = false
         var failedCalled = false

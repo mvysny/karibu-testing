@@ -817,16 +817,13 @@ Vaadin 13 used Bower+webjars to manage JavaScript dependencies; Vaadin 14 switch
 the npm+webpack management but still supports Bower+webjars dependency management.
 You can read more about both modes in the [Vaadin 13 -> Vaadin 14 migration guide](https://vaadin.com/docs/v14/flow/v14-migration/v14-migration-guide.html).
 
-By default Karibu-Testing mocks the Vaadin 14 environment to use the Bower mode.
-To enforce npm mode, just set this system property before your tests are run:
-
-```kotlin
-System.setProperty("vaadin.compatibilityMode", "false")
-```
+Karibu-Testing supports both modes.
 
 # Support for Vaadin Pro Components
 
 ## Grid Pro
+
+[Vaadin Grid Pro](https://vaadin.com/components/vaadin-grid-pro)
 
 It is possible to mock the inline Grid Pro editor and invoke your `ItemUpdater`s
 as follows:
@@ -839,4 +836,14 @@ grid._proedit(person) {
 }
 expect("John") { person.name }
 expect(true) { person.isAlive }
+```
+
+## Confirm Dialog
+
+[Vaadin Confirm Dialog](https://vaadin.com/components/vaadin-confirm-dialog)
+
+```kotlin
+_get<ConfirmDialog>()._fireConfirm()
+_get<ConfirmDialog>()._fireCancel()
+_get<ConfirmDialog>()._fireReject()
 ```

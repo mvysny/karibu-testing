@@ -59,4 +59,7 @@ fun DynaNodeGroup.allTests() {
     group("ConfirmDialog") {
         confirmDialogTestbatch()
     }
+    group("upload") {
+        uploadTestbatch()
+    }
 }

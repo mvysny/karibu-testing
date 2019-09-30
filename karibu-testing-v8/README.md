@@ -544,6 +544,32 @@ contents of the Grid.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump. In Java it's `GridKt.expectRow(new Grid<>(), 0, "John Doe", "25");`.
 
+### Support for Upload
+
+An entire upload lifecycle is mocked properly. Simply call the following to mock-upload a file:
+
+Kotlin:
+```kotlin
+upload._upload("hello.txt", "Hello world!".toByteArray())
+```
+
+Java:
+```java
+UploadKt._upload(upload, "hello.txt", "Hello world!".getBytes());
+```
+
+Invokes `StartedEvent`, then feeds given file to the `Upload.receiver`, then
+invokes the `SucceededEvent` and `FinishedEvent` listeners.
+Doesn't call `ProgressListener`.
+
+If writing to the receiver fails, `FailedEvent` is invoked instead of `SucceededEvent`, then
+the exception is re-thrown from this function, so that the test fails properly.
+
+To quickly test failure handling, simply call `_uploadFail()` instead.
+The function will first invoke `StartedEvent`, then poll
+`Upload.receiver` and closes it immediately without writing anything, then
+fire `FailedEvent` and `FinishedEvent`.
+
 ## Adding support for custom search criteria
 
 > *Note*: Java doesn't have extension methods and thus this feature is not supported in Java.

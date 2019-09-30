@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 
 fun DynaNodeGroup.allTests() {
@@ -54,5 +55,8 @@ fun DynaNodeGroup.allTests() {
     }
     group("grid pro") {
         gridProTestbatch()
+    }
+    group("ConfirmDialog") {
+        confirmDialogTestbatch()
     }
 }

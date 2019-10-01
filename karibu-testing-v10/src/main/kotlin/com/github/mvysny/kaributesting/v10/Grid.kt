@@ -12,6 +12,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.ValueProvider
 import org.jsoup.Jsoup
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1

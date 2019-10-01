@@ -281,7 +281,7 @@ var <T> Grid.Column<T>.header2: String
         // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
         val headerRendererField: Field = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer")
         headerRendererField.isAccessible = true
-        val e: Renderer<*>? = headerRendererField.get(this@header2) as Renderer<*>?
+        val e: Renderer<*>? = headerRendererField.get(this) as Renderer<*>?
 
         return e?.template ?: ""
     }

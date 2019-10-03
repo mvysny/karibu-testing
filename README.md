@@ -43,7 +43,8 @@ Advantages over the traditional testing with [Selenium](https://www.seleniumhq.o
   depending on their complexity.
 * *Reliable*: We don't need arbitrary sleeps since we're server-side and we can await until the request is fully processed.
   We don't use Selenium drivers which are known to fail randomly.
-* *Headless*: The tests run headless since there's no browser.
+* *Headless*: The tests run headless since there's no browser. There is no need to setup screen in
+  your CI environment.
 * *Simple*: the test runs in the same JVM as the server. You start the server in your `@BeforeClass` and
   stop the server in your `@AfterClass`. There is no need to use Maven's Integration plugin
   to start the server in the background (and then remember to kill it afterwards, otherwise all future CI tests

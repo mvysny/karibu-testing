@@ -4,6 +4,8 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.karibudsl.v8.comboBox
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.UI
+import java.util.*
+import kotlin.test.expect
 
 class ComboBoxTest : DynaTest({
     beforeEach { MockVaadin.setup() }
@@ -37,5 +39,14 @@ class ComboBoxTest : DynaTest({
                 expectList("foo 1", "foo 10") { cb.getSuggestions() }
             }
         }
+    }
+
+    test("custom value") {
+        var called: String? = null
+        val cb = ComboBox<String>().apply {
+            newItemProvider = ComboBox.NewItemProvider { called = it; Optional.of(called!!) }
+        }
+        cb._newItem("foo")
+        expect("foo") { called }
     }
 })

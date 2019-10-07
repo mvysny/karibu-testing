@@ -6,6 +6,7 @@ import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.select.Select
 import java.lang.IllegalStateException
+import kotlin.test.expect
 
 internal fun DynaNodeGroup.comboBoxTestbatch() {
     beforeEach { MockVaadin.setup() }
@@ -54,4 +55,5 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
             expectList("foo 0", "foo 1", "foo 2", "foo 3", "foo 4", "foo 5") { cb.getSuggestions() }
         }
     }
+
 }

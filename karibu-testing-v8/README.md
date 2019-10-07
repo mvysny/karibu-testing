@@ -570,6 +570,18 @@ The function will first invoke `StartedEvent`, then poll
 `Upload.receiver` and closes it immediately without writing anything, then
 fire `FailedEvent` and `FinishedEvent`.
 
+### Support for ComboBox/Select
+
+You can use static methods from `ComboBox.kt` to assert on the state of the combo box.
+For example, you can call `comboBox.getSuggestions()`/`ComboBoxKt.getSuggestions()` to return the current list
+of dropdown suggestions, formatted according to the current `ItemLabelGenerator`.
+
+You can also use `comboBox.setUserInput()`/`ComboBoxKt.setUserInput()` to simulate user typing into the ComboBox,
+filtering the suggestions.
+
+You can also use `comboBox._newItem()`/`ComboBoxKt._newItem()` to simulate user creating a
+new item in the ComboBox.
+
 ## Adding support for custom search criteria
 
 > *Note*: Java doesn't have extension methods and thus this feature is not supported in Java.

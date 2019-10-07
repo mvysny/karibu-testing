@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.function.SerializableConsumer
@@ -12,10 +13,21 @@ import com.vaadin.flow.function.SerializableConsumer
  * WARNING: Only works with Vaadin 12 or higher
  */
 fun <T> ComboBox<T>.setUserInput(userInput: String?) {
+    checkEditableByUser()
     check(ComboBox::class.java.declaredFields.any { it.name == "filterSlot" }) { "This function only works with Vaadin 12 or higher" }
     val comboBoxFilterSlot = ComboBox::class.java.getDeclaredField("filterSlot").apply { isAccessible = true }
     @Suppress("UNCHECKED_CAST")
     (comboBoxFilterSlot.get(this) as SerializableConsumer<String?>).accept(userInput)
+}
+
+/**
+ * Simulates the user creating a custom item. Only works if the field is editable by the user
+ * and allows custom values ([ComboBox.isAllowCustomValue] is true).
+ */
+fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
+    checkEditableByUser()
+    check(isAllowCustomValue) { "${toPrettyString()} doesn't allow custom values" }
+    _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
 
 /**

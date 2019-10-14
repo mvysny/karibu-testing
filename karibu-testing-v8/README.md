@@ -582,6 +582,14 @@ filtering the suggestions.
 You can also use `comboBox._newItem()`/`ComboBoxKt._newItem()` to simulate user creating a
 new item in the ComboBox.
 
+### Downloading Link Contents
+
+Call `anchor._download()` to download contents of the `Resource` to which the Anchor points to.
+Call `image.download()` to download contents of the `Resource` to which the Image points to.
+
+Only `ThemeResource` and `ConnectorResource`s such as `ClassResource`/`StreamResource`/`FileResource`
+are supported.
+
 ## Adding support for custom search criteria
 
 > *Note*: Java doesn't have extension methods and thus this feature is not supported in Java.

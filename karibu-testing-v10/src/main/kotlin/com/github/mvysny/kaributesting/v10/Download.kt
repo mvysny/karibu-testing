@@ -49,7 +49,7 @@ fun Image.download(): ByteArray {
  */
 fun downloadResource(uri: String): ByteArray {
     require(!uri.isBlank()) { "uri is blank" }
-    val s = VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)
+    val s: AbstractStreamResource? = VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)
     expect(true, "No such StreamResource registered: '$uri'. Available resources: ${VaadinSession.getCurrent().resourceRegistry.resources.keys}") {
         s != null
     }

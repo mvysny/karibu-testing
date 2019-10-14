@@ -584,7 +584,7 @@ new item in the ComboBox.
 
 ### Downloading Link Contents
 
-Call `anchor._download()` to download contents of the `Resource` to which the Anchor points to.
+Call `link._download()` to download contents of the `Resource` to which the Link points to.
 Call `image.download()` to download contents of the `Resource` to which the Image points to.
 
 Only `ThemeResource` and `ConnectorResource`s such as `ClassResource`/`StreamResource`/`FileResource`

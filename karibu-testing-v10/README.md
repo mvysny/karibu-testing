@@ -618,8 +618,8 @@ new item in the ComboBox.
 
 ### Downloading Anchor/Image Contents
 
-Call `anchor._download()` to download contents of the `StreamResource` to which the Anchor points to.
-Call `image.download()` to download contents of the `StreamResource` to which the Image points to.
+Call `anchor._download()`/`DownloadKt._download(anchor)` to download contents of the `StreamResource` to which the Anchor points to.
+Call `image.download()`/`DownloadKt.download(image)` to download contents of the `StreamResource` to which the Image points to.
 
 ## Adding support for custom search criteria
 

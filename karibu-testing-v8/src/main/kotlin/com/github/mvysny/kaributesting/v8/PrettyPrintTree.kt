@@ -1,9 +1,11 @@
 package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.data.HasValue
-import com.vaadin.ui.Component
-import com.vaadin.ui.HasComponents
-import com.vaadin.ui.Label
+import com.vaadin.server.*
+import com.vaadin.ui.*
+import org.jsoup.Jsoup
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 
 import java.util.ArrayList
 
@@ -77,6 +79,23 @@ fun Component.toPrettyString(): String {
     if (this is HasValue<*> || this is Label) {
         list.add("value='$value'")
     }
+    if (this is AbstractComponent) {
+        if (componentError != null) {
+            list.add("componentError='${componentError.message}'")
+        }
+        if (errorMessage != null && errorMessage != componentError) {
+            list.add("errorMessage='${errorMessage.message}'")
+        }
+    }
+    if (this is Grid<*>) {
+        list.add("columns=[${this.columns.filter { !it.isHidden }.joinToString { "'${it.caption}'" }}]")
+    }
+    if (this is Link) {
+        list.add("href='${resource?.toPrettyString() ?: ""}'")
+    }
+    if (this is Image) {
+        list.add("src='${source?.toPrettyString() ?: ""}'")
+    }
     var name = javaClass.simpleName
     if (name.isEmpty()) {
         // anonymous classes
@@ -84,3 +103,26 @@ fun Component.toPrettyString(): String {
     }
     return name + list
 }
+
+fun Resource.toPrettyString(): String = when(this) {
+    is ExternalResource -> this.url
+    is ClassResource -> this.toPrettyString()
+    is GenericFontIcon -> "${javaClass.simpleName}[${this.fontFamily}/0x${this.codepoint.toString(16)}]"
+    is StreamResource -> "${javaClass.simpleName}[$filename]"
+    is FileResource -> "${javaClass.simpleName}[$sourceFile]"
+    else -> "${javaClass.simpleName}[$this]"
+}
+
+fun ClassResource.toPrettyString(): String {
+    val getAssociatedClassMethod: Method = ClassResource::class.java.getDeclaredMethod("getAssociatedClass").apply { isAccessible = true }
+    val associatedClass: Class<*> = getAssociatedClassMethod.invoke(this) as Class<*>
+    val resourceNameField: Field = ClassResource::class.java.getDeclaredField("resourceName").apply { isAccessible = true }
+    val resourceName: String = resourceNameField.get(this) as String
+    return "ClassResource[${associatedClass.name}/$resourceName]"
+}
+
+/**
+ * Unescapes [ErrorMessage.getFormattedHtmlMessage] and converts it to sane string. E.g.
+ * `The&#32;user&#32;does&#32;not&#32;exist` is converted to `The user does not exist`.
+ */
+val ErrorMessage.message: String get() = Jsoup.parse(formattedHtmlMessage).text()

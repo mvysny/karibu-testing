@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.grid.Grid
@@ -98,6 +99,14 @@ fun Component.toPrettyString(): String {
     }
     if (this is HasValue<*, *>) {
         list.add("value='${(this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>).value}'")
+    }
+    if (this is HasValidation) {
+        if (this.isInvalid) {
+            list.add("INVALID")
+        }
+        if (!this.errorMessage.isNullOrBlank()) {
+            list.add("errorMessage='$errorMessage'")
+        }
     }
     if (this is Grid.Column<*> && this.header2.isNotBlank()) {
         list.add("header='${this.header2}'")

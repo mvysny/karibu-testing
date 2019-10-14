@@ -44,6 +44,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
         expect("Image[src='']") { Image().toPrettyString() }
         expect("Image[src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
+        expect("TextField[#25, value='', errorMessage='failed validation']") { TextField().apply { id_ = "25"; errorMessage = "failed validation" } .toPrettyString() }
     }
 
     test("menu dump") {

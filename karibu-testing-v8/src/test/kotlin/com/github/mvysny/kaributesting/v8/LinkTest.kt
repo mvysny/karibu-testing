@@ -33,7 +33,7 @@ class LinkTest : DynaTest({
     }
 
     test("clicking disabled link fails") {
-        expectThrows(IllegalStateException::class, "The Link[DISABLED, caption='foo'] is not enabled") {
+        expectThrows(IllegalStateException::class, "The Link[DISABLED, caption='foo', href='https://www.github.com'] is not enabled") {
             Link("foo", ExternalResource("https://www.github.com")).apply {
                 isEnabled = false
                 _click()
@@ -65,7 +65,7 @@ class LinkTest : DynaTest({
 
     group("download link") {
         test("disabled link") {
-            expectThrows(IllegalStateException::class, "The Link[DISABLED, caption='foo'] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Link[DISABLED, caption='foo', href='https://www.github.com'] is not enabled") {
                 Link("foo", ExternalResource("https://www.github.com")).apply {
                     isEnabled = false
                     _download()

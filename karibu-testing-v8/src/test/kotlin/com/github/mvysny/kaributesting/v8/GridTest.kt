@@ -80,7 +80,7 @@ class GridTest : DynaTest({
                 isEnabled = false
             }
             grid.addItemClickListener { fail("Should not be called") }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, columns=['Name', 'Age']] is not enabled") {
                 grid._clickItem(2)
             }
         }
@@ -130,7 +130,7 @@ class GridTest : DynaTest({
                 setItems((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, columns=['Name', 'Age']] is not enabled") {
                 grid._clickRenderer(8, "name")
             }
         }

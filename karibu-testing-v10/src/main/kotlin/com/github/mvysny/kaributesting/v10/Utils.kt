@@ -25,6 +25,9 @@ val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
  */
 fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)
 
+/**
+ * Parses the contents of given URL as a Json.
+ */
 internal fun URL.readJson(): JsonObject = Json.parse(readText())
 
 /**
@@ -48,7 +51,13 @@ internal fun jsonCreateObject(vararg contents: Pair<String, Any>): JsonObject = 
     contents.forEach { put(it.first, it.second) }
 }
 
+/**
+ * Makes a [Field] non-final.
+ *
+ * Contains dangerous reflection into Java [Field] which may not work with all Java VMs.
+ */
 internal fun Field.makeNotFinal() {
-    val modifiersField = Field::class.java.getDeclaredField("modifiers").apply { isAccessible = true }
+    // from https://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
+    val modifiersField: Field = Field::class.java.getDeclaredField("modifiers").apply { isAccessible = true }
     modifiersField.setInt(this, modifiers and Modifier.FINAL.inv())
 }

@@ -13,6 +13,7 @@ import com.vaadin.flow.server.startup.FakeBrowser
 import com.vaadin.flow.shared.ui.Dependency
 import org.jsoup.nodes.Element
 import java.io.File
+import java.lang.reflect.Field
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -123,11 +124,11 @@ class MockNpmTemplateParser : TemplateParser {
         fun install() {
             // okay this is ugly as hell, but there is no other way:
             // https://github.com/vaadin/flow/issues/6537
-            val instanceField = NpmTemplateParser::class.java.getDeclaredField("INSTANCE").apply {
+            val instanceField: Field = NpmTemplateParser::class.java.getDeclaredField("INSTANCE").apply {
                 isAccessible = true
                 makeNotFinal()
             }
-            val current = instanceField.get(null) as TemplateParser
+            val current: TemplateParser = instanceField.get(null) as TemplateParser
             if (current is NpmTemplateParser) {
                 instanceField.set(null, MockNpmTemplateParser())
             }

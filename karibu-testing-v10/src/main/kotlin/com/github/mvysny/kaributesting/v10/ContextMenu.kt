@@ -8,8 +8,6 @@ import com.vaadin.flow.component.contextmenu.*
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
-import com.vaadin.flow.dom.DomEvent
-import elemental.json.impl.JreJsonFactory
 import java.lang.reflect.Method
 import kotlin.test.expect
 import kotlin.test.fail
@@ -85,7 +83,7 @@ fun MenuItem._click() {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
+private fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
     _fireEvent(ClickEvent<MenuItem>(this, true, 0, 0, 0, 0, 1, 1, false, false, false, false))

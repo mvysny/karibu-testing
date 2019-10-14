@@ -776,6 +776,18 @@ Java:
 assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
 ```
 
+## Notifications
+
+Testing notifications is easy - just take advantage of the `expectNotifications()` and `clearNotifications()` functions
+as in the following example:
+
+```kotlin
+Notification.show("Error", "Given user can not be found", Notification.Type.ERROR_MESSAGE)
+expectNotifications("Error" to "Given user can not be found")
+// it also clears the notifications, so there should be no more notifications
+expectNotifications()
+```
+
 ## Preparing Mock Environment For `UI.init()`
 
 Sometimes you already need to check for cookies in your `UI.init()` method. Since the `UI.init()` is called

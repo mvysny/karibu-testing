@@ -9,6 +9,7 @@ import com.vaadin.flow.server.StreamResource
 import com.vaadin.flow.server.StreamResourceRegistry
 import com.vaadin.flow.server.VaadinSession
 import java.io.ByteArrayOutputStream
+import java.lang.reflect.Field
 import java.net.URI
 import kotlin.test.expect
 
@@ -59,6 +60,10 @@ fun downloadResource(uri: String): ByteArray {
     return bout.toByteArray()
 }
 
-private val resField = StreamResourceRegistry::class.java.getDeclaredField("res").apply { isAccessible = true }
+private val resField: Field = StreamResourceRegistry::class.java.getDeclaredField("res").apply { isAccessible = true }
+
+/**
+ * Retrieves current list of resources mappings from this registry.
+ */
 @Suppress("UNCHECKED_CAST")
 val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource> get() = resField.get(this) as Map<URI, AbstractStreamResource>

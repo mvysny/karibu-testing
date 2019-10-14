@@ -621,6 +621,27 @@ new item in the ComboBox.
 Call `anchor._download()`/`DownloadKt._download(anchor)` to download contents of the `StreamResource` to which the Anchor points to.
 Call `image.download()`/`DownloadKt.download(image)` to download contents of the `StreamResource` to which the Image points to.
 
+### Support for ContextMenu
+
+It's currently not possible to retrieve `ContextMenu` from the component it is attached to,
+nor `GridContextMenu` from the Grid it is attached to. Please add your vote for adding support for this
+to Vaadin: [https://github.com/vaadin/vaadin-context-menu-flow/issues/43](https://github.com/vaadin/vaadin-context-menu-flow/issues/43).
+
+As a workaround, you will have to remember references to ContextMenu in your views and components,
+and retrieve them via getters. Then, it's very easy to click on a menu item; simply call
+
+Kotlin:
+```kotlin
+contextMenu._clickItemWithCaption("Save")
+gridContextMenu._clickItemWithCaption("Delete", person)
+```
+
+Java:
+```java
+ContextMenuKt._clickItemWithCaption(contextMenu, "Save");
+ContextMenuKt._clickItemWithCaption(gridContextMenu, "Delete", person);
+```
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.
@@ -861,6 +882,10 @@ the npm+webpack management but still supports Bower+webjars dependency managemen
 You can read more about both modes in the [Vaadin 13 -> Vaadin 14 migration guide](https://vaadin.com/docs/v14/flow/v14-migration/v14-migration-guide.html).
 
 Karibu-Testing supports both modes.
+
+## Checking for Vaadin Versions
+
+The `VaadinMeta.version: Int` provides the current Vaadin version, e.g. `13` for Vaadin 13, `14` for Vaadin 14 or later.
 
 # Support for Vaadin Pro Components
 

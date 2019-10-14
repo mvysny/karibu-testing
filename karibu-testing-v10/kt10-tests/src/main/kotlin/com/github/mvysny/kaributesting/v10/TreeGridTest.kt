@@ -134,7 +134,6 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             val grid = TreeGrid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                var id = 0
                 dataProvider = treedp<TestPerson>(roots) {
                     if (it.age < 3) listOf(TestPerson("${it.name} 0", it.age + 1), TestPerson("${it.name} 1", it.age + 1))
                     else listOf<TestPerson>()

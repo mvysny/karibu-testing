@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.mvysny.kaributesting.v8
 
 import com.github.mvysny.dynatest.DynaTest

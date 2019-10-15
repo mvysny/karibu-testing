@@ -913,6 +913,7 @@ The `VaadinMeta.version: Int` provides the current Vaadin version, e.g. `13` for
 It is possible to mock the inline Grid Pro editor and invoke your `ItemUpdater`s
 as follows:
 
+Kotlin:
 ```kotlin
 val person = Person(...)
 grid._proedit(person) {
@@ -923,12 +924,26 @@ expect("John") { person.name }
 expect(true) { person.isAlive }
 ```
 
+Java:
+```java
+GridProKt._proedit(grid, person, it -> {
+    it._text(nameColumn, "John");
+    it._checkbox(aliveColumn, "true");
+});
+```
+
 ## Confirm Dialog
 
 [Vaadin Confirm Dialog](https://vaadin.com/components/vaadin-confirm-dialog)
 
+Kotlin:
 ```kotlin
 _get<ConfirmDialog>()._fireConfirm()
 _get<ConfirmDialog>()._fireCancel()
 _get<ConfirmDialog>()._fireReject()
+```
+
+Java:
+```java
+ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
 ```

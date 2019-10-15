@@ -62,4 +62,7 @@ fun DynaNodeGroup.allTests() {
     group("upload") {
         uploadTestbatch()
     }
+    group("login form test") {
+        loginFormTestbatch()
+    }
 }

@@ -642,6 +642,23 @@ ContextMenuKt._clickItemWithCaption(contextMenu, "Save");
 ContextMenuKt._clickItemWithCaption(gridContextMenu, "Delete", person);
 ```
 
+### Support for LoginForm and LoginOverlay
+
+The username/password text fields are not accessible from server-side so we can't
+fill those in directly. Instead we'll simply fire the login event as follows:
+
+Kotlin:
+```kotlin
+_get<LoginOverlay>()._login("nbu", "nbusr123")
+_get<LoginOverlay>()._forgotPassword()  // simulate the "forgot password" click
+```
+
+Java:
+```java
+LoginFormKt._login(_get(LoginOverlay.class), "nbu", "nbusr123");
+LoginFormKt._forgotPassword(_get(LoginOverlay.class));
+```
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

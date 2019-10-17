@@ -2,6 +2,7 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributesting.v10.allTests
+import com.github.mvysny.kaributesting.v10.jvmVersion
 import com.vaadin.flow.server.VaadinService
 import kotlin.test.expect
 
@@ -21,5 +22,10 @@ class AllTests : DynaTest({
             expect(false) { VaadinService.getCurrent().deploymentConfiguration.isCompatibilityMode }
         }
     }
-    allTests()
+
+    if (jvmVersion < 13) {
+        allTests()
+    } else {
+        // Sorry, no support for Vaadin 14+npm on Java 13 or higher: https://github.com/mvysny/karibu-testing/issues/29
+    }
 })

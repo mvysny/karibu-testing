@@ -42,6 +42,10 @@ to your `pom.xml`:
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
+> WARNING: Vaadin 14 + npm does not work on Java 13 or higher. Please see [Issue 29](https://github.com/mvysny/karibu-testing/issues/29)
+for more details and for workarounds. Please vote on [Vaadin Flow Issue 6537](https://github.com/vaadin/flow/issues/6537)
+to get this fixed. Thank you.
+
 ## Writing your first test
 
 Let's start by testing a custom component. Say that we have a `GreetingLabel` which greets the user nicely:

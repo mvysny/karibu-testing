@@ -57,7 +57,10 @@ internal fun jsonCreateObject(vararg contents: Pair<String, Any>): JsonObject = 
  * Contains dangerous reflection into Java [Field] which may not work with all Java VMs.
  */
 internal fun Field.makeNotFinal() {
+    if (!isFinal) return
     // from https://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
     val modifiersField: Field = Field::class.java.getDeclaredField("modifiers").apply { isAccessible = true }
     modifiersField.setInt(this, modifiers and Modifier.FINAL.inv())
 }
+
+val Field.isFinal: Boolean get() = (modifiers and Modifier.FINAL) != 0

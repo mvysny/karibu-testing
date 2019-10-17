@@ -30,7 +30,7 @@ Head to [Testing with Vaadin 8](karibu-testing-v8). Karibu-Testing is compatible
 
 ### Vaadin 10+
 
-Head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 10+ version (10, 11, 12, 13 etc).
+Head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 10+ version (10, 11, 12, 13, 14 etc).
 
 > *Note:* Starting with version 1.0.0, Karibu-Testing changed the Java package and the Maven group ID in order to be allowed to be present in Maven Central. Be sure
 to change the `groupId` to `com.github.mvysny.kaributesting` in your projects.

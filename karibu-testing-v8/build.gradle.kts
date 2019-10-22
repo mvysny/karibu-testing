@@ -4,7 +4,7 @@ dependencies {
 
     testCompile("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
     compile(kotlin("test"))
-    testCompile("org.slf4j:slf4j-simple:1.7.25")
+    testCompile("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
     testCompile("com.github.mvysny.karibudsl:karibu-dsl-v8:${properties["karibudsl_version"]}")
     testCompile("com.vaadin:vaadin-client-compiled:${properties["vaadin8_version"]}")
 }

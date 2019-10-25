@@ -3,9 +3,12 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.vaadin.flow.component.treegrid.TreeGrid
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import java.util.stream.Stream
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.treeGridTestbatch() {
@@ -21,6 +24,29 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             test("size calculates sizes of all nodes") {
                 expect(10) { treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })._size() }
             }
+        }
+    }
+
+    group("lying HierarchicalDataProvider") {
+        test("hasChildren=false but returns children") {
+            val lyingHDP = object : AbstractBackEndHierarchicalDataProvider<Int, Nothing?>() {
+                override fun hasChildren(item: Int): Boolean = false
+                override fun fetchChildrenFromBackEnd(query: HierarchicalQuery<Int, Nothing?>): Stream<Int> {
+                    val p = query.parent ?: 0
+                    return (if (p >= 3) listOf<Int>() else listOf(p + 1)).stream()
+                }
+                override fun getChildCount(query: HierarchicalQuery<Int, Nothing?>): Int = 1
+            }
+            expect(1) { lyingHDP._size() }
+        }
+        test("size=0 but returns root items") {
+            val lyingHDP = object : AbstractBackEndHierarchicalDataProvider<Int, Nothing?>() {
+                override fun hasChildren(item: Int): Boolean = true
+                override fun fetchChildrenFromBackEnd(query: HierarchicalQuery<Int, Nothing?>): Stream<Int> =
+                        (if (query.parent != null) listOf<Int>() else listOf(0)).stream()
+                override fun getChildCount(query: HierarchicalQuery<Int, Nothing?>): Int = 0
+            }
+            expect(0) { lyingHDP._size() }
         }
     }
 

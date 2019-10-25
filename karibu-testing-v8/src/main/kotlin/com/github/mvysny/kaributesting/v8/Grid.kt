@@ -91,15 +91,12 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  *
  * Note that this can differ to `Grid._size()` since `Grid._size()` ignores children
  * of collapsed tree nodes.
+ * @param root start with this item; defaults to null to iterate all items
+ * @param filter filter to pass to [HierarchicalQuery]
  */
 @JvmOverloads
-fun <T, F> HierarchicalDataProvider<T, F>._size(parent: T? = null, filter: F? = null): Int {
-    val query = HierarchicalQuery(filter, parent)
-    val countOfDirectChildren: Int = size(query)
-    val children: List<T> = fetchChildren(query).toList()
-    val recursiveChildrenSizes: Int = children.sumBy { _size(it, filter) }
-    return countOfDirectChildren + recursiveChildrenSizes
-}
+fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
+        _rowSequence(root, filter = filter).count()
 
 /**
  * Returns the number of items in this data provider.
@@ -328,22 +325,40 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  *
  * Honors current grid ordering.
  */
-fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
+@JvmOverloads
+@Suppress("UNCHECKED_CAST")
+fun <T> TreeGrid<T>._rowSequence(filter: Any? = null): Sequence<T> {
+    val isExpanded: (T) -> Boolean = { item: T -> isExpanded(item) }
+    return (dataProvider as HierarchicalDataProvider<T, Any?>)._rowSequence(null, isExpanded, filter)
+}
 
-    @Suppress("UNCHECKED_CAST")
-    fun getChildrenOf(item: T): List<T> {
-        return if (isExpanded(item)) {
-            (dataProvider as HierarchicalDataProvider<T, Nothing?>)
-                    .fetchChildren(HierarchicalQuery(null, item)).toList()
-        } else {
-            listOf<T>()
-        }
+/**
+ * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.
+ * The sequence will *skip* children of collapsed nodes.
+ *
+ * Iterating the entire sequence is a very slow operation since it will repeatedly
+ * poll [HierarchicalDataProvider] for list of children.
+ *
+ * Honors current grid ordering.
+ * @param root start with this item; defaults to null to iterate all items
+ * @param isExpanded if returns null for an item, children of that item are skipped
+ * @param filter filter to pass to [HierarchicalQuery]
+ */
+@JvmOverloads
+fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
+                                                       isExpanded: (T)->Boolean = { true },
+                                                       filter: F? = null): Sequence<T> {
+
+    fun getChildrenOf(item: T?): List<T> = if (item == null || isExpanded(item)) {
+        checkedFetch(HierarchicalQuery<T, F>(filter, item))
+    } else {
+        listOf<T>()
     }
 
     fun itemSubtreeSequence(item: T): Sequence<T> =
             PreorderTreeIterator(item) { getChildrenOf(it) } .asSequence()
 
-    val roots: List<T> = _getRootItems()
+    val roots: List<T> = getChildrenOf(root)
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
 }
 
@@ -355,16 +370,26 @@ fun <T> TreeGrid<T>._rowSequence(): Sequence<T> {
  */
 fun TreeGrid<*>._size(): Int = _rowSequence().count()
 
+private fun <T, F> HierarchicalDataProvider<T, F>.checkedSize(query: HierarchicalQuery<T, F>): Int {
+    if (query.parent != null && !hasChildren(query.parent)) return 0
+    val result: Int = size(query)
+    check(result >= 0) { "size($query) returned negative count: $result" }
+    return result
+}
+private fun <T, F> HierarchicalDataProvider<T, F>.checkedFetch(query: HierarchicalQuery<T, F>): List<T> = when {
+    checkedSize(query) == 0 -> listOf()
+    else -> fetchChildren(query).toList()
+}
+
 fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
     @Suppress("UNCHECKED_CAST")
-    fun getChildrenOf(item: T): List<T> {
-        return if (isExpanded(item)) {
-            (dataProvider as HierarchicalDataProvider<T, Nothing?>)
-                    .fetchChildren(HierarchicalQuery(null, item)).toList()
-        } else {
-            listOf<T>()
-        }
-    }
+    fun getChildrenOf(item: T?): List<T> =
+            if (item == null || isExpanded(item)) {
+                (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+                        .checkedFetch(HierarchicalQuery<T, Nothing?>(null, item))
+            } else {
+                listOf<T>()
+            }
 
     fun toPrettyTree(item: T): PrettyPrintTree {
         val self: String = _getFormattedRow(item).joinToString(postfix = "\n")
@@ -372,7 +397,7 @@ fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
         return PrettyPrintTree(self, children.map { toPrettyTree(it) } .toMutableList())
     }
 
-    val roots: List<T> = _getRootItems()
+    val roots: List<T> = getChildrenOf(null)
     return PrettyPrintTree("TreeGrid", roots.map { toPrettyTree(it) } .toMutableList())
 }
 

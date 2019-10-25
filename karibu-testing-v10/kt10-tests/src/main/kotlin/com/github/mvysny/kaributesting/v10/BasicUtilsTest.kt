@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.router.ErrorParameter
@@ -142,6 +143,22 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             div._fireDomEvent("click")
             expect("click") { event.type }
         }
+    }
+
+    test("_focus") {
+        val f = TextField()
+        var called = false
+        f.addFocusListener { called = true }
+        f._focus()
+        expect(true) { called }
+    }
+
+    test("_blur") {
+        val f = TextField()
+        var called = false
+        f.addBlurListener { called = true }
+        f._blur()
+        expect(true) { called }
     }
 }
 

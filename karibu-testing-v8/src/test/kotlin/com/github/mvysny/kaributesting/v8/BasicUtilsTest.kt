@@ -4,10 +4,7 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.button
 import com.github.mvysny.karibudsl.v8.checkBox
-import com.vaadin.ui.Button
-import com.vaadin.ui.CheckBox
-import com.vaadin.ui.UI
-import com.vaadin.ui.VerticalLayout
+import com.vaadin.ui.*
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -75,5 +72,24 @@ class BasicUtilsTest : DynaTest({
         expect("mytheme") { currentTheme }
         UI.getCurrent().theme = "pink"
         expect("pink") { currentTheme }
+    }
+
+
+    test("_focus") {
+        val f = TextField()
+        UI.getCurrent().content = f
+        var called = false
+        f.addFocusListener { called = true }
+        f._focus()
+        expect(true) { called }
+        expect(f) { UI.getCurrent()._pendingFocus }
+    }
+
+    test("_blur") {
+        val f = TextField()
+        var called = false
+        f.addBlurListener { called = true }
+        f._blur()
+        expect(true) { called }
     }
 })

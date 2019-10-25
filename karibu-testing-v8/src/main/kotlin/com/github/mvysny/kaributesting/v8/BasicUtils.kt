@@ -4,6 +4,7 @@ package com.github.mvysny.kaributesting.v8
 
 import com.vaadin.annotations.Theme
 import com.vaadin.data.HasValue
+import com.vaadin.event.FieldEvents
 import com.vaadin.server.AbstractClientConnector
 import com.vaadin.server.VaadinRequest
 import com.vaadin.shared.communication.ClientRpc
@@ -113,4 +114,27 @@ val currentTheme: String get() {
     return ui.theme
             ?: ui.javaClass.getAnnotation(Theme::class.java)?.value
             ?: ui.session.service.getConfiguredTheme(VaadinRequest.getCurrent())
+}
+
+/**
+ * Fires [FieldEvents.FocusEvent] on the component, but only if it's editable.
+ */
+fun <T> T._focus() where T: Component.Focusable, T: FieldEvents.FocusNotifier {
+    checkEditableByUser()
+    focus()
+    (this as AbstractClientConnector)._fireEvent(FieldEvents.FocusEvent(this))
+}
+
+/**
+ * Fires [FieldEvents.BlurEvent] on the component, but only if it's editable.
+ */
+fun <T> T._blur() where T: Component, T: FieldEvents.BlurNotifier {
+    checkEditableByUser()
+    (this as AbstractClientConnector)._fireEvent(FieldEvents.BlurEvent(this))
+}
+
+val UI._pendingFocus: Component? get() {
+    val pendingFocusField = UI::class.java.getDeclaredField("pendingFocus")
+    pendingFocusField.isAccessible = true
+    return pendingFocusField.get(this) as Component?
 }

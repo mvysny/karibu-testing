@@ -566,6 +566,12 @@ Java:
 BasicUtilsKt._fireDomEvent(new Div(), "click");
 ```
 
+### Focus/Blur
+
+Server-side can only track focus by listening on `FocusEvent` and `BlurEvent`. To simulate focus:
+* Call `focusable._focus()`/`BasicUtilsKt._focus(focusable)` to fire the `FocusEvent` event;
+* Call `focusable._blur()`/`BasicUtilsKt._blur(focusable)` to fire the `BlurEvent` event;
+
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and

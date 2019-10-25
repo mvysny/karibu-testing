@@ -261,3 +261,19 @@ fun Component.removeFromParent() {
  */
 fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean =
         SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+
+/**
+ * Fires [FocusNotifier.FocusEvent] on the component, but only if it's editable.
+ */
+fun <T> T._focus() where T: Focusable<*>, T: Component{
+    checkEditableByUser()
+    _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
+}
+
+/**
+ * Fires [BlurNotifier.BlurEvent] on the component, but only if it's editable.
+ */
+fun <T> T._blur() where T: Focusable<*>, T: Component {
+    checkEditableByUser()
+    _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
+}

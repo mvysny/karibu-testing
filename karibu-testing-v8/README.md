@@ -528,6 +528,12 @@ read-write, visible; in other words, fully prepared to receive user input.
 It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
 all the above items prior setting the new value. In Java it's `_setValue(hasValue, value)` since Java doesn't have extension methods.
 
+### Focus/Blur
+
+Server-side can only track focus by listening on `FocusEvent` and `BlurEvent`. To simulate focus:
+* Call `focusable._focus()`/`BasicUtilsKt._focus(focusable)` to fire the `FocusEvent` event;
+* Call `focusable._blur()`/`BasicUtilsKt._blur(focusable)` to fire the `BlurEvent` event;
+
 ### Support for Grid
 
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and

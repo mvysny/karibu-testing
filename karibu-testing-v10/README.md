@@ -914,6 +914,16 @@ Karibu-Testing supports both modes.
 
 The `VaadinMeta.version: Int` provides the current Vaadin version, e.g. `13` for Vaadin 13, `14` for Vaadin 14 or later.
 
+## Support For Polymer Templates
+
+Unfortunately it is not possible to look up child components of Polymer Templates,
+since the DOM contents of Polymer Templates is not transferred server-side.
+The exception is `@Id`-referenced components for which DOM tree is transferred server-side,
+but only partially: buttons have empty captions; layouts have empty contents and so
+it's useless to assert on the state of such incomplete states.
+
+Please read more about the topic at [#1 Can't look up components inside of PolymerTemplate](https://github.com/mvysny/karibu-testing/issues/1).
+
 # Support for Vaadin Pro Components
 
 ## Grid Pro

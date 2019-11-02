@@ -5,6 +5,7 @@ import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import java.io.File
 import java.lang.reflect.Field
+import java.net.URL
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -23,19 +24,19 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
             }
         }
 
-        // try loading from the local fs
         if (url.startsWith("./")) {
+            val relativeUrl = url.substring(2)
+
+            // try loading from the local fs
             val frontend: File = File("frontend").absoluteFile
-            val templateFile = File(frontend, url.substring(2))
+            val templateFile = File(frontend, relativeUrl)
             if (templateFile.exists()) {
                 return templateFile.readText()
             }
-        }
 
-        // try loading from classpath
-        if (url.startsWith("./")) {
-            val classpathEntry = "META-INF/resources/frontend/${url.substring(2)}"
-            val resource = Thread.currentThread().contextClassLoader.getResource(classpathEntry)
+            // try loading from classpath
+            val classpathEntry = "META-INF/resources/frontend/$relativeUrl"
+            val resource: URL? = Thread.currentThread().contextClassLoader.getResource(classpathEntry)
             if (resource != null) {
                 return resource.readText()
             }

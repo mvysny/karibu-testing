@@ -24,9 +24,6 @@ allprojects {
 }
 
 subprojects {
-    // here we should depend on latest Vaadin LTS version (Vaadin 10, Vaadin 14, ...)
-    ext["vaadin_platform_lts_version"] = ext["vaadin14_version"]
-
     apply {
         plugin("maven-publish")
         plugin("kotlin")

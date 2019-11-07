@@ -51,7 +51,7 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
             // try the `node_modules/` folder.
             val nodeModules: File = File("node_modules").absoluteFile
             require(nodeModules.exists()) {
-                "$nodeModules folder doesn't exist, cannot load template sources for <$tag> $url. Please make sure that the `node_modules/` folder is populated, by running mvn vaadin:build-frontend before the tests"
+                "$nodeModules folder doesn't exist, cannot load template sources for <$tag> $url. Please make sure that the `node_modules/` folder is populated, by running mvn vaadin:build-frontend before the tests. Read https://github.com/mvysny/karibu-testing/blob/master/karibu-testing-v10/README.md for more info"
             }
             val templateFile = File(nodeModules, url)
             if (templateFile.exists()) {
@@ -60,7 +60,7 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         }
 
         throw RuntimeException("""Can't load template sources for <$tag> $url. Please:
- 1. make sure that the `node_modules/` folder is populated, by running mvn vaadin:build-frontend
+ 1. make sure that the `node_modules/` folder is populated, by running mvn vaadin:build-frontend . Read https://github.com/mvysny/karibu-testing/blob/master/karibu-testing-v10/README.md for more info
  2. as a workaround, introduce your own CustomNpmTemplateLoader to MockNpmTemplateParser.customLoaders which is able to load the template""")
     }
 

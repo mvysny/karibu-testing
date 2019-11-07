@@ -49,7 +49,11 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         } else {
             // probably a npm module such as @appreciated/color-picker-field
             // try the `node_modules/` folder.
-            val templateFile: File = File("node_modules", url).absoluteFile
+            val nodeModules: File = File("node_modules").absoluteFile
+            require(nodeModules.exists()) {
+                "$nodeModules folder doesn't exist, cannot load template sources for <$tag> $url. Please make sure that the `node_modules/` folder is populated, by running mvn vaadin:prepare-frontend"
+            }
+            val templateFile = File(nodeModules, url)
             if (templateFile.exists()) {
                 return templateFile.readText()
             }

@@ -51,7 +51,7 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
             // try the `node_modules/` folder.
             val nodeModules: File = File("node_modules").absoluteFile
             require(nodeModules.exists()) {
-                "$nodeModules folder doesn't exist, cannot load template sources for <$tag> $url. Please make sure that the `node_modules/` folder is populated, by running mvn vaadin:prepare-frontend"
+                "$nodeModules folder doesn't exist, cannot load template sources for <$tag> $url. Please make sure that the `node_modules/` folder is populated, by running mvn vaadin:build-frontend before the tests"
             }
             val templateFile = File(nodeModules, url)
             if (templateFile.exists()) {

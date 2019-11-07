@@ -26,8 +26,15 @@ class NpmPolymerTemplateTest : DynaTest({
 
         test("proper error message on unloadable component") {
             expectThrows(RuntimeException::class, "Can't load template sources for <non-existent> ./non-existent.js. Please:") {
-                UnloadableComponent()
+                UnloadablePTComponent()
             }
+            expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> @foo/non-existent.js. Please:") {
+                UnloadablePTComponent2()
+            }
+        }
+
+        test("UnloadableComponent works without any mocking") {
+            UnloadableComponent()
         }
     } else {
         // Sorry, no support for Vaadin 14+npm on Java 13 or higher: https://github.com/mvysny/karibu-testing/issues/29
@@ -41,4 +48,16 @@ class ColorPickerField : PolymerTemplate<TemplateModel>()
 
 @Tag("non-existent")
 @JsModule("./non-existent.js")
-class UnloadableComponent : PolymerTemplate<TemplateModel>()
+class UnloadablePTComponent : PolymerTemplate<TemplateModel>()
+
+@Tag("non-existent3")
+@JsModule("@foo/non-existent.js")
+class UnloadablePTComponent2 : PolymerTemplate<TemplateModel>()
+
+/**
+ * Still loads and works with KT (even though the JS file is missing on the FS).
+ * The reason is that only PolymerTemplate-based components actually attempt to parse the js file server-side.
+ */
+@Tag("non-existent2")
+@JsModule("./non-existent.js")
+class UnloadableComponent : Component()

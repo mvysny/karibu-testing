@@ -424,6 +424,41 @@ public void createReviewTest() {
 }
 ```
 
+#### PolymerTemplates which load stuff from the `node_modules` folder
+
+(Requires Karibu-Testing 1.1.16 or higher)
+
+If you try to use `JsModule(@foo/bar.js)` with your PolymerTemplate, Karibu-Testing
+will try to load the JS file from the local `node_modules/` folder. That will usually
+work in your dev env, but fail in your CI since `node_modules/` is not created.
+
+In CI, you will thus receive the following error message:
+
+> `node_modules` folder doesn't exist, cannot load template sources for <my-component> @mycomponent/my-component.js
+
+In such case, you need to run `mvn vaadin:build-frontend` goal before you run your tests, to populate the
+`node_modules/` folder. Be sure to run `vaadin:build-frontend` goal after your classes
+has been compiled (since build-frontend analyzes `*.class` files), otherwise the `node_modules/` folder
+will simply be empty, and Karibu-Testing will still complain about the missing template file.
+
+The best way is to run `mvn clean package vaadin:build-frontend verify` from your CI, to
+run the plugins in correct order.
+
+It is also handy to cache the `node_modules/` folder with your CI, since the folder is huge
+and it takes 60 seconds to just populate it from the NPM Interwebz. For example with GitLab CI:
+
+```yaml
+cache:
+  paths:
+    - .m2
+    - node_modules
+```
+
+Populating `node_modules/` requires the `node` and `npm` programs to be present. In the worst
+case you can use the com.github.eirslett:frontend-maven-plugin to install those tools locally.
+See [vaadin14-embedded-jetty](https://github.com/mvysny/vaadin14-embedded-jetty#heroku-integration)
+for more information.
+
 ## API
 
 ### Looking up components

@@ -49,7 +49,7 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         } else {
             // probably a npm module such as @appreciated/color-picker-field
             // try the `node_modules/` folder.
-            val templateFile = File("node_modules", url).absoluteFile
+            val templateFile: File = File("node_modules", url).absoluteFile
             if (templateFile.exists()) {
                 return templateFile.readText()
             }

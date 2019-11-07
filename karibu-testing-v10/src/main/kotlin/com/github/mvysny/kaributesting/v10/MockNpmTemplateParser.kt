@@ -4,6 +4,7 @@ import com.github.mvysny.kaributesting.v10.MockNpmTemplateParser.Companion.custo
 import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import java.io.File
+import java.lang.RuntimeException
 import java.lang.reflect.Field
 import java.net.URL
 import java.util.concurrent.CopyOnWriteArrayList
@@ -25,7 +26,8 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         }
 
         if (url.startsWith("./")) {
-            val relativeUrl = url.substring(2)
+            // relative URLs, located in `frontend/` folder or `META-INF/resources/frontend/` resource
+            val relativeUrl: String = url.substring(2)
 
             // try loading from the local fs
             val frontend: File = File("frontend").absoluteFile
@@ -40,9 +42,18 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
             if (resource != null) {
                 return resource.readText()
             }
+        } else {
+            // probably a npm module such as @appreciated/color-picker-field
+            // try the `node_modules/` folder.
+            val templateFile = File("node_modules", url).absoluteFile
+            if (templateFile.exists()) {
+                return templateFile.readText()
+            }
         }
 
-        return null
+        throw RuntimeException("""Can't load template sources for <$tag> $url. Please:
+ 1. make sure that the node_modules folder is populated, by running mvn vaadin:prepare-frontend
+ 2. as a workaround, introduce your own CustomNpmTemplateLoader to MockNpmTemplateParser.customLoaders which is able to load the template""")
     }
 
     companion object {

@@ -4,18 +4,20 @@ import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributesting.v10.allTests
 import com.github.mvysny.kaributesting.v10.jvmVersion
 import com.vaadin.flow.server.VaadinService
+import java.net.URL
 import kotlin.test.expect
 
 class AllTests : DynaTest({
     if (jvmVersion < 13) {
+
+        test("flow-build-info.json exists") {
+            val res: URL? = Thread.currentThread().contextClassLoader.getResource("META-INF/VAADIN/config/flow-build-info.json")
+            expect(true, "flow-build-info.json is not on the classpath!") { res != null }
+        }
+
         group("Vaadin env") {
             beforeEach { MockVaadin.setup() }
             afterEach { MockVaadin.tearDown() }
-
-            test("flow-build-info.json exists") {
-                val res = Thread.currentThread().contextClassLoader.getResource("META-INF/VAADIN/config/flow-build-info.json")
-                expect(true, "flow-build-info.json is not on the classpath!") { res != null }
-            }
 
             test("Vaadin version") {
                 expect(14) { VaadinMeta.version }

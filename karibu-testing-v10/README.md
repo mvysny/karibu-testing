@@ -436,6 +436,10 @@ In CI, you will thus receive the following error message:
 
 > `node_modules` folder doesn't exist, cannot load template sources for <my-component> @mycomponent/my-component.js
 
+or
+
+> Can't load template sources for <my-component> @mycomponent/my-component.js. Please: ...
+
 In such case, you need to run `mvn vaadin:build-frontend` goal before you run your tests, to populate the
 `node_modules/` folder. Be sure to run `vaadin:build-frontend` goal after your classes
 has been compiled (since build-frontend analyzes `*.class` files), otherwise the `node_modules/` folder

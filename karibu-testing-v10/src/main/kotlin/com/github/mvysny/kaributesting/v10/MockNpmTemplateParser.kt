@@ -52,7 +52,7 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         }
 
         throw RuntimeException("""Can't load template sources for <$tag> $url. Please:
- 1. make sure that the node_modules folder is populated, by running mvn vaadin:prepare-frontend
+ 1. make sure that the `node_modules/` folder is populated, by running mvn vaadin:prepare-frontend
  2. as a workaround, introduce your own CustomNpmTemplateLoader to MockNpmTemplateParser.customLoaders which is able to load the template""")
     }
 

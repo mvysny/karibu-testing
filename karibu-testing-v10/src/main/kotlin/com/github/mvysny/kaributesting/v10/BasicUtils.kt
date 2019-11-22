@@ -4,6 +4,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.html.Input
@@ -114,12 +115,19 @@ fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.crea
 }
 
 /**
- * Determines the component's `label` (it's the HTML element's `label` property actually). Intended to be used for fields such as [TextField].
+ * Determines the component's `label` (usually it's the HTML element's `label` property, but it's [Checkbox.getLabel] for checkbox).
+ * Intended to be used for fields such as [TextField].
  */
 var Component.label: String
-    get() = element.getProperty("label") ?: ""
+    get() = when (this) {
+        is Checkbox -> label
+        else -> element.getProperty("label") ?: ""
+    }
     set(value) {
-        element.setProperty("label", if (value.isBlank()) null else value)
+        when (this) {
+            is Checkbox -> label = value
+            else -> element.setProperty("label", if (value.isBlank()) null else value)
+        }
     }
 
 /**

@@ -153,9 +153,16 @@ var Component.id_: String?
     get() = id.orElse(null)
     set(value) { setId(value) }
 
+/**
+ * Checks whether the component is attached to the UI and to the Session.
+ */
 val Component.isAttached: Boolean
     get() = ui.orElse(null)?.session != null
 
+/**
+ * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
+ * the text must be non-empty).
+ */
 val Component._isVisible: Boolean get() = when (this) {
     is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
     else -> isVisible

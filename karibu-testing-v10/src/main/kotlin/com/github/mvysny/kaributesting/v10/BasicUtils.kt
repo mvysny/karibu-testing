@@ -145,6 +145,8 @@ var Component.caption: String
         }
     }
 /**
+ * The same as [Component.getId] but without Optional.
+ *
  * Workaround for https://github.com/vaadin/flow/issues/664
  */
 var Component.id_: String?

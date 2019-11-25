@@ -50,12 +50,12 @@ fun <T> Grid<T>._get(rowIndex: Int): T {
         // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
         val size: Int = _size()
         if (rowIndex >= size) {
-            throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
+            throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
         }
     }
     val fetched: List<T> = _fetch(rowIndex, 1)
     return fetched.firstOrNull()
-            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
+            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
 }
 
 /**
@@ -223,7 +223,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
  * ```
  */
 @JvmOverloads
-fun <T: Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
+fun <T> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
     visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]${getSortIndicator(it)}" }
     val dsIndices: IntRange
@@ -264,8 +264,8 @@ fun Grid<*>.expectRows(count: Int) {
  */
 @Suppress("NAME_SHADOWING")
 fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
-    val expected = expected.toList()
-    val actual = _getFormattedRow(rowIndex)
+    val expected: List<String> = expected.toList()
+    val actual: List<String> = _getFormattedRow(rowIndex)
     if (expected != actual) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
     }

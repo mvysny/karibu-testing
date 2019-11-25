@@ -55,18 +55,18 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T> Grid<T>._get(rowIndex: Int): T {
+fun <T : Any> Grid<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     if (this !is TreeGrid) {
         // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
         val size: Int = _size()
         if (rowIndex >= size) {
-            throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
+            throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
         }
     }
     val fetched: List<T> = _fetch(rowIndex, 1)
     return fetched.firstOrNull()
-            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows")
+            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
 }
 
 /**
@@ -475,10 +475,10 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
  */
 @JvmOverloads
-fun <T> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
+fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
-    val itemKey = dataCommunicator.keyMapper.key(_get(rowIndex))
+    val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
     _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
 }
 

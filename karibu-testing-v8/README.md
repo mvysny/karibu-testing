@@ -784,14 +784,14 @@ assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie(
 
 ## Notifications
 
-Testing notifications is easy - just take advantage of the `expectNotifications()` and `clearNotifications()` functions
+Testing notifications is easy - just take advantage of the `expectNotifications()`, `expectNoNotifications()` and `clearNotifications()` functions
 as in the following example:
 
 ```kotlin
 Notification.show("Error", "Given user can not be found", Notification.Type.ERROR_MESSAGE)
 expectNotifications("Error" to "Given user can not be found")
 // it also clears the notifications, so there should be no more notifications
-expectNotifications()
+expectNoNotifications()
 ```
 
 ## Preparing Mock Environment For `UI.init()`

@@ -9,7 +9,7 @@ class NotificationsTest : DynaTest({
     afterEach { MockVaadin.tearDown() }
 
     test("initially there are no notifications") {
-        expectNotifications()
+        expectNoNotifications()
     }
 
     test("expectNotifications() fails if there are expected notifications but no actual notifications") {
@@ -22,7 +22,7 @@ class NotificationsTest : DynaTest({
         Notification.show("Error", "Given user can not be found", Notification.Type.ERROR_MESSAGE)
         expectNotifications("Error" to "Given user can not be found")
         // it also clears the notifications, so there should be no more notifications
-        expectNotifications()
+        expectNoNotifications()
     }
 
     test("get notifications") {
@@ -34,6 +34,6 @@ class NotificationsTest : DynaTest({
     test("clear notifications") {
         Notification.show("Error", "Given user can not be found", Notification.Type.ERROR_MESSAGE)
         clearNotifications()
-        expectNotifications()
+        expectNoNotifications()
     }
 })

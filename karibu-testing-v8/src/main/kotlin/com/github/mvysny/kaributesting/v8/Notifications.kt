@@ -18,6 +18,11 @@ fun expectNotifications(vararg descriptions: Pair<String, String?>) {
 }
 
 /**
+ * Expects that there are no notifications displayed.
+ */
+fun expectNoNotifications() = expectNotifications()
+
+/**
  * Clears and removes all notifications from screen.
  */
 fun clearNotifications() {

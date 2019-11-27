@@ -9,7 +9,7 @@ internal fun DynaNodeGroup.notificationsTestBattery() {
     afterEach { MockVaadin.tearDown() }
 
     test("initially there are no notifications") {
-        expectNotifications()
+        expectNoNotifications()
     }
 
     test("expectNotifications() fails if there are expected notifications but no actual notifications") {
@@ -22,12 +22,12 @@ internal fun DynaNodeGroup.notificationsTestBattery() {
         Notification.show("Error")
         expectNotifications("Error")
         // expectNotifications also clears current notifications so that any further notifications won't be mixed with existing ones
-        expectNotifications()
+        expectNoNotifications()
     }
 
     test("clear notifications") {
         Notification.show("Given user can not be found")
         clearNotifications()
-        expectNotifications()
+        expectNoNotifications()
     }
 }

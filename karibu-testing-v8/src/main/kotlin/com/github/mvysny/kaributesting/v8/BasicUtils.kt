@@ -11,6 +11,7 @@ import com.vaadin.shared.communication.ClientRpc
 import com.vaadin.ui.*
 import java.util.*
 import kotlin.test.expect
+import kotlin.test.fail
 
 /**
  * Allows us to fire any Vaadin event on any Vaadin component.
@@ -41,6 +42,19 @@ fun Component.checkEditableByUser() {
     check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }
     if (this is HasValue<*>) {
         check(!this.isReadOnly) { "The ${toPrettyString()} is read-only" }
+    }
+}
+
+/**
+ * Fails if the component is editable. See [checkEditableByUser] for more details.
+ * @throws AssertionError if the component is editable.
+ */
+fun Component.expectNotEditableByUser() {
+    try {
+        checkEditableByUser()
+        fail("The ${toPrettyString()} is editable")
+    } catch (ex: IllegalStateException) {
+        // okay
     }
 }
 

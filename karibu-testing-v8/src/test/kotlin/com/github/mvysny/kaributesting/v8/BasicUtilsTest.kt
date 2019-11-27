@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v8.button
 import com.github.mvysny.karibudsl.v8.checkBox
+import com.github.mvysny.karibudsl.v8.textField
 import com.vaadin.ui.*
 import kotlin.test.expect
 import kotlin.test.fail
@@ -62,6 +63,50 @@ class BasicUtilsTest : DynaTest({
                 cb._value = true
             }
             expect(false) { cb.value }
+        }
+    }
+
+    group("checkEditableByUser") {
+        test("disabled textfield fails") {
+            expectThrows(java.lang.IllegalStateException::class, "The TextField[DISABLED, value=''] is not enabled") {
+                TextField().apply { isEnabled = false }.checkEditableByUser()
+            }
+        }
+        test("invisible textfield fails") {
+            expectThrows(java.lang.IllegalStateException::class, "The TextField[INVIS, value=''] is not effectively visible") {
+                TextField().apply { isVisible = false }.checkEditableByUser()
+            }
+        }
+        test("textfield in invisible layout fails") {
+            expectThrows(java.lang.IllegalStateException::class, "The TextField[value=''] is not effectively visible") {
+                VerticalLayout().apply {
+                    isVisible = false
+                    textField().also { it.checkEditableByUser() }
+                }
+            }
+        }
+        test("textfield succeeds") {
+            TextField().checkEditableByUser()
+        }
+    }
+
+    group("expectNotEditableByUser") {
+        test("disabled textfield fails") {
+            TextField().apply { isEnabled = false }.expectNotEditableByUser()
+        }
+        test("invisible textfield fails") {
+            TextField().apply { isVisible = false }.expectNotEditableByUser()
+        }
+        test("textfield in invisible layout fails") {
+            VerticalLayout().apply {
+                isVisible = false
+                textField().also { it.expectNotEditableByUser() }
+            }
+        }
+        test("textfield succeeds") {
+            expectThrows(AssertionError::class, "The TextField[value=''] is editable") {
+                TextField().expectNotEditableByUser()
+            }
         }
     }
 

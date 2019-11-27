@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.button.Button
+import kotlin.test.fail
 
 /**
  * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
@@ -19,4 +20,17 @@ fun Button._click() {
  */
 fun Button._checkClickable() {
     checkEditableByUser()
+}
+
+/**
+ * Fails if the button is clickable.
+ * @throws AssertionError if the button is clickable.
+ */
+fun Button._expectNotClickable() {
+    try {
+        _checkClickable()
+        fail("The ${toPrettyString()} is clickable")
+    } catch (ex: IllegalStateException) {
+        // okay
+    }
 }

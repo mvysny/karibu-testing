@@ -28,6 +28,7 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import java.io.Serializable
 import javax.servlet.ServletContext
+import kotlin.test.fail
 
 /**
  * A configuration object of all routes and error routes in the application. Simply use [autoDiscoverViews] to discover everything.
@@ -197,6 +198,19 @@ fun Component.checkEditableByUser() {
         @Suppress("UNCHECKED_CAST")
         val hasValue = this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>
         check(!hasValue.isReadOnly) { "The ${toPrettyString()} is read-only" }
+    }
+}
+
+/**
+ * Fails if the component is editable. See [checkEditableByUser] for more details.
+ * @throws AssertionError if the component is editable.
+ */
+fun Component.expectNotEditableByUser() {
+    try {
+        checkEditableByUser()
+        fail("The ${toPrettyString()} is editable")
+    } catch (ex: IllegalStateException) {
+        // okay
     }
 }
 

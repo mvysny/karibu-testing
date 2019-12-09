@@ -13,6 +13,8 @@ different environments:
   in Vaadin 14 + Bower + WebJars + Polymer 2 (so-called Compatibility mode)
 * [kt10-testrun-vaadin14-npm](../kt10-testrun-vaadin14-npm) which runs the tests
   in Vaadin 14 + NPM + WebPack + Polymer 3
+* [kt10-testrun-vaadin15](../kt10-testrun-vaadin15) which runs the tests
+  in Vaadin 15
 
 This project is internal to Karibu-Testing and is not published anywhere.
 Under normal circumstances these would be simply placed in

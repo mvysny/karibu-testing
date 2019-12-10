@@ -11,6 +11,10 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.ItemClickEvent
+import com.vaadin.flow.component.grid.dnd.GridDragStartEvent
+import com.vaadin.flow.component.grid.dnd.GridDropEvent
+import com.vaadin.flow.component.grid.dnd.GridDropLocation
+import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -275,6 +279,19 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(false) { event!!.isCtrlKey }
             expect(false) { event!!.isMetaKey }
             expect(false) { event!!.isShiftKey }
+        }
+    }
+    if (VaadinMeta.version >= 14) {
+        group("drag n drop") {
+            test("smoke") {
+                UI.getCurrent().grid<String> {
+                    val grid: Grid<String> = this
+                    grid.dropMode = GridDropMode.ON_TOP
+                    grid.isRowsDraggable = true
+                    grid.addDragStartListener { }
+                    grid.addDropListener { }
+                }
+            }
         }
     }
 }

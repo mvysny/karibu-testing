@@ -202,6 +202,13 @@ object MockVaadin {
         strongRefSession = null
     }
 
+    /**
+     * Change & call [setup] to set a different browser.
+     *
+     * The default is Firefox 71 on Ubuntu Linux.
+     */
+    var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0"
+
     internal fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
         val httpSession: MockHttpSession = MockHttpSession.create(ctx)
@@ -216,7 +223,7 @@ object MockVaadin {
         // init Vaadin Request
         val mockRequest = MockRequest(httpSession)
         // so that session.browser.updateRequestDetails() also creates browserDetails
-        mockRequest.headers["User-Agent"] = listOf("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0")
+        mockRequest.headers["User-Agent"] = listOf(userAgent)
         val request = VaadinServletRequest(mockRequest, service)
         strongRefReq = request
         session.browser.updateRequestDetails(request)

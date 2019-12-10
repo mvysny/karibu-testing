@@ -50,6 +50,9 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinSession.getCurrent().browser.locale != null }
             expect(false) { VaadinSession.getCurrent().browser.isIOS }
             expect(true) { VaadinSession.getCurrent().browser.isFirefox }
+            expect(false) { VaadinSession.getCurrent().browser.isTooOldToFunctionProperly }
+            expect(true) { VaadinSession.getCurrent().browser.isEs6Supported }
+            expect(false) { VaadinSession.getCurrent().browser.isEs5AdapterNeeded }
             expect(true) { VaadinResponse.getCurrent() != null }
         }
 

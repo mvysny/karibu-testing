@@ -15,80 +15,12 @@ import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.internal.nodefeature.ElementListenerMap
-import com.vaadin.flow.router.HasErrorParameter
-import com.vaadin.flow.router.Route
-import com.vaadin.flow.server.startup.ApplicationRouteRegistry
-import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import elemental.json.Json
 import elemental.json.JsonObject
-import io.github.classgraph.ClassGraph
-import io.github.classgraph.ScanResult
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
-import java.io.Serializable
-import javax.servlet.ServletContext
 import kotlin.test.fail
-
-/**
- * A configuration object of all routes and error routes in the application. Simply use [autoDiscoverViews] to discover everything.
- *
- * To speed up the tests, you can create one instance of this class only, then reuse that instance in every
- * call to [MockVaadin.setup].
- * @property routes a list of all route views in your application. Vaadin will ignore any routes not present here.
- * @property errorRoutes a list of all route views in your application. Vaadin will ignore any routes not present here.
- */
-data class Routes(val routes: MutableSet<Class<out Component>> = mutableSetOf(),
-                  val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf()): Serializable {
-
-    /**
-     * Manually register error routes. No longer needed since [autoDiscoverViews] can now detect error routes.
-     */
-    @Deprecated("No longer needed, error routes are now auto-detected with autoDiscoverViews()", ReplaceWith(""))
-    fun addErrorRoutes(vararg routes: Class<out HasErrorParameter<*>>): Routes = apply {
-        errorRoutes.addAll(routes.toSet())
-    }
-
-    /**
-     * Registers all routes to Vaadin 13 registry. Automatically called from [MockVaadin.setup].
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun register(sc: ServletContext) {
-        RouteRegistryInitializer().onStartup(routes.toSet(), sc)
-        ApplicationRouteRegistry.getInstance(sc).setErrorNavigationTargets(errorRoutes.map { it as Class<out Component> } .toSet())
-    }
-
-    /**
-     * Auto-discovers everything, registers it into `this` and returns `this`.
-     * * [Route]-annotated views
-     * * [HasErrorParameter] error views
-     * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
-     * @param autoDetectErrorRoutes if false then [HasErrorParameter] error views are not auto-detected. This emulates
-     * the old behavior of this method.
-     * @return this
-     */
-    @JvmOverloads
-    fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
-        val scan: ScanResult = ClassGraph().enableClassInfo()
-                .enableAnnotationInfo()
-                .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName))).scan()
-        scan.use { scanResult ->
-            scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info ->
-                Class.forName(info.name).asSubclass(Component::class.java)
-            }
-            if (autoDetectErrorRoutes) {
-                scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info ->
-                    Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
-                }
-            }
-        }
-
-        println("Auto-discovered views: $this")
-    }
-
-    override fun toString(): String =
-            "Routes(routes=${routes.joinToString { it.simpleName }}, errorRoutes=${errorRoutes.joinToString { it.simpleName }})"
-}
 
 /**
  * Allows us to fire any Vaadin event on any Vaadin component.
@@ -152,7 +84,9 @@ var Component.caption: String
  */
 var Component.id_: String?
     get() = id.orElse(null)
-    set(value) { setId(value) }
+    set(value) {
+        setId(value)
+    }
 
 /**
  * Checks whether the component is attached to the UI and to the Session.
@@ -164,19 +98,21 @@ val Component.isAttached: Boolean
  * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
  * the text must be non-empty).
  */
-val Component._isVisible: Boolean get() = when (this) {
-    is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
-    else -> isVisible
-}
+val Component._isVisible: Boolean
+    get() = when (this) {
+        is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
+        else -> isVisible
+    }
 
 /**
  * Returns direct text contents (it doesn't peek into the child elements).
  */
-val Component._text: String? get() = when (this) {
-    is HasText -> text
-    is Text -> text   // workaround for https://github.com/vaadin/flow/issues/3606
-    else -> null
-}
+val Component._text: String?
+    get() = when (this) {
+        is HasText -> text
+        is Text -> text   // workaround for https://github.com/vaadin/flow/issues/3606
+        else -> null
+    }
 
 /**
  * Checks that a component is actually editable by the user:
@@ -219,16 +155,18 @@ internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.
 /**
  * This function actually works, as opposed to [Element.getTextRecursively].
  */
-val Element.textRecursively2: String get() {
-    // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
-    val node = ElementUtil.toJsoup(Document(""), this)
-    return node.textRecursively
-}
+val Element.textRecursively2: String
+    get() {
+        // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
+        val node = ElementUtil.toJsoup(Document(""), this)
+        return node.textRecursively
+    }
 
-val Node.textRecursively: String get() = when (this) {
-    is TextNode -> this.text()
-    else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
-}
+val Node.textRecursively: String
+    get() = when (this) {
+        is TextNode -> this.text()
+        else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
+    }
 
 /**
  * Computes that this component and all of its parents are enabled.
@@ -239,17 +177,18 @@ fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent 
 /**
  * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.
  */
-val Component.isEnabled: Boolean get() = when (this) {
-    is HasEnabled -> isEnabled
-    else -> true
-}
+val Component.isEnabled: Boolean
+    get() = when (this) {
+        is HasEnabled -> isEnabled
+        else -> true
+    }
 
 /**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-var <V, E: HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
+var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
     get() = value
     set(v) {
         (this as Component).checkEditableByUser()
@@ -290,13 +229,13 @@ fun Component.removeFromParent() {
  * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
  * rules are matched against given component only (not against its children).
  */
-fun Component.matches(spec: SearchSpec<Component>.()->Unit): Boolean =
+fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
         SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
 
 /**
  * Fires [FocusNotifier.FocusEvent] on the component, but only if it's editable.
  */
-fun <T> T._focus() where T: Focusable<*>, T: Component{
+fun <T> T._focus() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
 }
@@ -304,7 +243,7 @@ fun <T> T._focus() where T: Focusable<*>, T: Component{
 /**
  * Fires [BlurNotifier.BlurEvent] on the component, but only if it's editable.
  */
-fun <T> T._blur() where T: Focusable<*>, T: Component {
+fun <T> T._blur() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
 }

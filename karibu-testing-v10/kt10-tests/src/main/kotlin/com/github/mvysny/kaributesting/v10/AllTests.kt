@@ -5,6 +5,9 @@ import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 
 fun DynaNodeGroup.allTests() {
+    group("routes test") {
+        routesTestBatch()
+    }
     group("basic utils") {
         basicUtilsTestbatch()
     }

@@ -428,6 +428,7 @@ class HelloWorldView : VerticalLayout() {
 }
 
 @Route("")
+@PWA(name = "My Foo PWA", shortName = "Foo PWA")
 class WelcomeView : VerticalLayout() {
     init {
         width = null

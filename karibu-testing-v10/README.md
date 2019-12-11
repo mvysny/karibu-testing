@@ -780,6 +780,26 @@ java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching
         └── TextField[caption='Street', value='']
 ```
 
+## Speed+Performance Optimizations
+
+The `Routes.autoDiscoverViews("com.vaadin.flow.demo")` walks through all classes and examines
+them for view annotations. This can potentially take 50ms for every test, which adds up in the end.
+The best way is to discover the views only once; after all, the set of views is static and doesn't
+typically change. In order to do that, calculate the
+
+```
+val routes: Routes = Routes.autoDiscoverViews("com.vaadin.flow.demo")
+```
+
+only once, e.g. in `beforeClass{}` or `@BeforeAll`-annotated method, and store the resulting
+routes in a static field.
+
+Another thing that takes up a lot of time is to initialize the PWA (especially the icons)
+in the `PwaRegistry` class. That can take up to 1-2 seconds on every test. That's why
+by default Karibu-Testing 1.1.19+ configures Vaadin to ignore the `@PWA` annotation and
+does not initialize the `PwaRegistry`. However, if you need this functionality for some reason,
+simply set `Routes.skipPwaInit` to `false`.
+
 ## Using Karibu-Testing with Spring or Guice
 
 To have dependencies injected into your views as they are constructed, you need to register a custom `Instantiator` into Vaadin.

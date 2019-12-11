@@ -614,6 +614,7 @@ class AddressPanel : FormLayout() {
 The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
 
 ```kotlin
+
 val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } ._value
 ```
 
@@ -667,6 +668,20 @@ java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching
         ├── CheckBox[caption='Primary Address', value='false']
         └── TextField[caption='Street', value='']
 ```
+
+## Speed+Performance Optimizations
+
+The `Routes.autoDiscoverViews("com.vaadin.demo")` walks through all classes and examines
+them for view annotations. This can potentially take 50ms for every test, which adds up in the end.
+The best way is to discover the views only once; after all, the set of views is static and doesn't
+typically change. In order to do that, calculate the
+
+```
+val routes: Routes = Routes.autoDiscoverViews("com.vaadin.demo")
+```
+
+only once, e.g. in `beforeClass{}` or `@BeforeAll`-annotated method, and store the resulting
+routes in a static field.
 
 ## Plugging into the testing lifecycle
 

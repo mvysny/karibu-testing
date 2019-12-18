@@ -9,8 +9,8 @@ The Unit Testing library for [Vaadin](https://vaadin.com/). Karibu-Testing remov
 both the browser and the servlet container in order to test your Vaadin-based apps.
 
 1. *containerless testing*: You don't need to launch the servlet container.
-Karibu-Testing creates Vaadin Session, the UI and other necessary Vaadin classes,
-in order for your tests and server classes to run completely outside of servlet container.
+Karibu-Testing creates Vaadin Session, the UI and other necessary Vaadin classes
+straight in the JVM which runs your JUnit tests.
 2. *browserless testing*: You look up components straight from
 `UI.getCurrent()`, bypassing browser and the JavaScript->Server bridge completely.
 You directly call methods on your server-side View classes and the server-side Java Vaadin components.

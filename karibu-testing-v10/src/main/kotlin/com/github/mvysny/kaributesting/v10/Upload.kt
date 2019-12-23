@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.upload.*
@@ -41,7 +43,7 @@ fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessConte
  * Tests the "upload interrupted" scenario. First invokes [StartedEvent], then polls [Upload.receiver], then
  * fires [FailedEvent] and [FinishedEvent].
  *
- * Currently the implememtation simply calls [_uploadFail].
+ * Currently the implementation simply calls [_uploadFail].
  */
 @JvmOverloads
 fun Upload._uploadInterrupt(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {

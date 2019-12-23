@@ -4,8 +4,6 @@ import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import java.io.Serializable
 
-// @todo mavi delete when karibu-dsl 0.7.5 is released
-
 /**
  * Represents an icon name and a collection from which the icon came.
  */
@@ -49,8 +47,6 @@ data class IconName(val collection: String, val name: String) : Serializable {
          */
         fun of(vaadinIcon: VaadinIcon) = IconName("vaadin", vaadinIcon.name.toLowerCase().replace('_', '-'))
     }
-
-
 }
 
 /**
@@ -66,6 +62,6 @@ var Icon.iconName: IconName?
         }
         return null
     }
-    set(value: IconName?) {
+    set(value) {
         element.setAttribute("icon", value?.toString() ?: "")
     }

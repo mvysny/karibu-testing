@@ -1,14 +1,15 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.iconButton
 import com.github.mvysny.karibudsl.v10.span
 import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.VaadinIcon
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.locatorAddonsTestbatch() {
@@ -18,7 +19,7 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
 
     group("captionContains") {
         test("fails when caption doesn't match") {
-            UI.getCurrent().add(Button("bar"))
+            UI.getCurrent().button("bar")
             expectThrows(AssertionError::class, message = "and captionContains('foo')") {
                 _get<Button> { captionContains("foo") }
             }
@@ -40,13 +41,13 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
 
     group("textContains") {
         test("fails when text doesn't match") {
-            UI.getCurrent().add(Span("bar"))
+            UI.getCurrent().span("bar")
             expectThrows(AssertionError::class, message = "and textContains('foo')") {
                 _get<Span> { textContains("foo") }
             }
         }
         test("succeeds when text matches") {
-            UI.getCurrent().add(Span("foo bar"))
+            UI.getCurrent().span("foo bar")
             _get<Span> { textContains("foo") }
         }
         test("picks proper span when text matches") {
@@ -57,6 +58,14 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
                 }
             }
             expect("foo bar") { _get<Span> { textContains("foo") }.text }
+        }
+    }
+    group("buttonIconIs") {
+        test("smoke") {
+            UI.getCurrent().button("iconless")
+            val btn: Button = UI.getCurrent().iconButton(VaadinIcon.VAADIN_H.create())
+            UI.getCurrent().iconButton(VaadinIcon.HOURGLASS.create())
+            expect(btn) { _get<Button> { buttonIconIs(VaadinIcon.VAADIN_H) } }
         }
     }
 }

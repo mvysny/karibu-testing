@@ -11,6 +11,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Image
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
@@ -45,6 +46,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("Image[src='']") { Image().toPrettyString() }
         expect("Image[src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
         expect("TextField[#25, value='', errorMessage='failed validation']") { TextField().apply { id_ = "25"; errorMessage = "failed validation" } .toPrettyString() }
+        expect("Icon[icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
+        expect("Button[icon='vaadin:abacus']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
     }
 
     test("menu dump") {

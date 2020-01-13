@@ -3,7 +3,6 @@ package com.github.mvysny.kaributesting.v8
 import com.vaadin.data.HasValue
 import com.vaadin.server.*
 import com.vaadin.ui.*
-import org.jsoup.Jsoup
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -120,9 +119,3 @@ fun ClassResource.toPrettyString(): String {
     val resourceName: String = resourceNameField.get(this) as String
     return "ClassResource[${associatedClass.name}/$resourceName]"
 }
-
-/**
- * Unescapes [ErrorMessage.getFormattedHtmlMessage] and converts it to sane string. E.g.
- * `The&#32;user&#32;does&#32;not&#32;exist` is converted to `The user does not exist`.
- */
-val ErrorMessage.message: String get() = Jsoup.parse(formattedHtmlMessage).text()

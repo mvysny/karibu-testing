@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.combobox.ComboBox

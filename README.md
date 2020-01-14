@@ -77,13 +77,13 @@ A list of a very simple example projects that employ Karibu Testing:
 
 * Vaadin 8 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
 * Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
-* Vaadin 10 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
-* Vaadin 10 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
+* Vaadin 14 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 14 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
 * Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
-* Vaadin 10 + Spring Boot + Java + Maven + JUnit 4: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
-* Vaadin 10 + Vaadin-on-Kotlin + Gradle: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
-* Vaadin 10 + Vaadin-on-Kotlin + Gradle: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
-* Vaadin 10 + Vaadin-on-Kotlin + Gradle: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
+* Vaadin 11 + Spring Boot + Java + Maven + JUnit 4: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
+* Vaadin 13 + Vaadin-on-Kotlin + Gradle: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
+* Vaadin 14 + Vaadin-on-Kotlin + Gradle: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
+* Vaadin 14 + Vaadin-on-Kotlin + Gradle: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
 
 ## Integrating Karibu-Testing With Your App
 

@@ -46,7 +46,7 @@ class PrettyPrintTreeTest : DynaTest({
             expect("ThemeResource[kvak]") { ThemeResource("kvak").toPrettyString() }
             expect("StreamResource[kvak.png]") { StreamResource({ null }, "kvak.png").toPrettyString() }
             expect("ClassResource[com.github.mvysny.kaributesting.v8.MockUI/foo.png]") { ClassResource("foo.png").toPrettyString() }
-            expect("FileResource[/tmp/image.png]") { FileResource(File("/tmp/image.png")).toPrettyString() }
+            expect("FileResource[/tmp/image.png]") { FileResource(File("/tmp/image.png")).toPrettyString().replace('\\', '/') }
             expect("FontAwesome[ADJUST]") { FontAwesome.ADJUST.toPrettyString() }
         }
     }

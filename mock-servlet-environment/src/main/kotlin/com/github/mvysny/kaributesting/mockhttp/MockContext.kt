@@ -54,6 +54,8 @@ open class MockContext : ServletContext, Serializable {
             if (path.contains("..")) {
                 // to be able to resolve ThemeResource("../othertheme/img/foo.png") which work from the browser.
                 path = Paths.get(path).normalize().toString()
+                // convert Windows path separators to Linux ones, so that the follow-up code works
+                path = path.replace('\\', '/')
             }
             // reject to serve "/VAADIN/../" resources
             if (path.startsWith("/VAADIN/")) {

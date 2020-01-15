@@ -15,7 +15,7 @@ import kotlin.test.fail
  *
  * See [_checkClickable] for more details.
  * @param clickedComponent the component being clicked, needs to be [checkEditableByUser]. The component must descend from this layout.
- * @throws IllegalStateException if the layout is not visible or not enabled.
+ * @throws IllegalStateException if either the layout or the [clickedComponent] is not visible or not enabled.
  */
 @JvmOverloads
 fun LayoutEvents.LayoutClickNotifier._click(clickedComponent: Component,

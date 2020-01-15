@@ -517,7 +517,16 @@ Vaadin Button contains the `click()` method, however that method is not well fit
   should fail as well.
  
 It is therefore important that we use the `Button._click()` extension method provided by the Karibu Testing library, which checks
-all the above points, prior running the click listeners (in Java it's `_click(button)` since Java doesn't have extension methods).
+all the above items, prior running the click listeners (in Java it's `_click(button)` since Java doesn't have extension methods).
+
+#### Layout Click
+
+It is also possible to fire the `LayoutClickEvent` as follows:
+
+* Kotlin: `VerticalLayout._click(label)`
+* Java: `LayoutKt._click(layout, label)`
+
+Both the layout and the clicked component need to be visible and enabled.
 
 ### Changing values
 

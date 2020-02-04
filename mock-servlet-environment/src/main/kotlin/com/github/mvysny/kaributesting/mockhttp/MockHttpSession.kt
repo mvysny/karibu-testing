@@ -11,11 +11,14 @@ import javax.servlet.ServletContext
 import javax.servlet.http.HttpSession
 import javax.servlet.http.HttpSessionContext
 
+/**
+ * A standalone implementation of the [HttpSession] interface.
+ */
 open class MockHttpSession(
-    private val sessionId: String,
-    private val servletContext: ServletContext,
-    private val creationTime: Long,
-    private var maxInactiveInterval: Int
+        private val sessionId: String,
+        private val servletContext: ServletContext,
+        private val creationTime: Long,
+        private var maxInactiveInterval: Int
 ) : HttpSession, Serializable {
     private val attributes = ConcurrentHashMap<String, Any>()
     private val valid = AtomicBoolean(true)

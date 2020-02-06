@@ -2,7 +2,6 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.dependency.HtmlImport
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.polymertemplate.Id
@@ -17,7 +16,6 @@ import com.vaadin.flow.templatemodel.TemplateModel
  */
 @PageTitle("Review List")
 @Tag("reviews-list")
-@HtmlImport("frontend://reviews-list.html") // only present in kt10-testrun-vaadin14 and kt10-testrun-vaadin13
 @JsModule("./src/reviews-list.js") // only present in kt10-testrun-vaadin14-npm
 class ReviewsList : PolymerTemplate<TemplateModel>() {
 
@@ -28,10 +26,3 @@ class ReviewsList : PolymerTemplate<TemplateModel>() {
     @Id("header")
     internal lateinit var header: H1
 }
-
-/**
- * Test that the polymer template can be loaded from a classpath entry.
- */
-@Tag("vaadin-button")
-@HtmlImport("frontend://bower_components/vaadin-button/src/vaadin-button.html")
-class MyButton : PolymerTemplate<TemplateModel>()

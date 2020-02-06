@@ -48,11 +48,13 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinSession.getCurrent().service != null }
             expect(true) { VaadinSession.getCurrent().browser != null }
             expect(true) { VaadinSession.getCurrent().browser.locale != null }
-            expect(false) { VaadinSession.getCurrent().browser.isIOS }
+            expect(false) { VaadinSession.getCurrent().browser.isIPhone }
             expect(true) { VaadinSession.getCurrent().browser.isFirefox }
             expect(false) { VaadinSession.getCurrent().browser.isTooOldToFunctionProperly }
-            expect(true) { VaadinSession.getCurrent().browser.isEs6Supported }
-            expect(false) { VaadinSession.getCurrent().browser.isEs5AdapterNeeded }
+            expect(false) { VaadinSession.getCurrent().browser.isChrome }
+            expect(false) { VaadinSession.getCurrent().browser.isChromeOS }
+            expect(false) { VaadinSession.getCurrent().browser.isAndroid }
+            expect(false) { VaadinSession.getCurrent().browser.isEdge }
             expect(true) { VaadinResponse.getCurrent() != null }
         }
 
@@ -145,9 +147,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         test("UI.getUrl() to view works in mocked env") {
-            expect("helloworld") { UI.getCurrent().router.getUrl(HelloWorldView::class.java) }
-            expect("params/1") { UI.getCurrent().router.getUrl(ParametrizedView::class.java, 1) }
-            expect("parent/child") { UI.getCurrent().router.getUrl(ChildView::class.java) }
+            val routeConfig = RouteConfiguration.forRegistry(UI.getCurrent().router.registry)
+            expect("helloworld") { routeConfig.getUrl(HelloWorldView::class.java) }
+            expect("params/1") { routeConfig.getUrl(ParametrizedView::class.java, 1) }
+            expect("parent/child") { routeConfig.getUrl(ChildView::class.java) }
             expect("helloworld") { RouteConfiguration.forApplicationScope().getUrl(HelloWorldView::class.java) }
             expect("params/1") { RouteConfiguration.forApplicationScope().getUrl(ParametrizedView::class.java, 1) }
             expect("parent/child") { RouteConfiguration.forApplicationScope().getUrl(ChildView::class.java) }

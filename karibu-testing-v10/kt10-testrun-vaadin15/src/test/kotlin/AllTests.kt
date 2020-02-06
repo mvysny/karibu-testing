@@ -3,7 +3,6 @@ import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributesting.v10.allTests
 import com.github.mvysny.kaributesting.v10.jvmVersion
-import com.vaadin.flow.server.VaadinService
 import java.net.URL
 import kotlin.test.expect
 
@@ -22,7 +21,6 @@ class AllTests : DynaTest({
             test("Vaadin version") {
                 expect(15) { VaadinMeta.version }
                 expect(false) { VaadinMeta.isCompatibilityMode }
-                expect(false) { VaadinService.getCurrent().deploymentConfiguration.isCompatibilityMode }
             }
         }
         allTests()

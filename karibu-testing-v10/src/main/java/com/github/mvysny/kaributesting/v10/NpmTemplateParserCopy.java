@@ -15,34 +15,34 @@
  */
 package com.github.mvysny.kaributesting.v10;
 
-import com.vaadin.flow.component.dependency.JsModule;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.vaadin.flow.component.polymertemplate.BundleParser;
-import com.vaadin.flow.component.polymertemplate.DefaultTemplateParser;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
+import org.jsoup.UncheckedIOException;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.function.DeploymentConfiguration;
 import com.vaadin.flow.internal.AnnotationReader;
 import com.vaadin.flow.internal.Pair;
 import com.vaadin.flow.server.DependencyFilter;
 import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.server.frontend.FrontendUtils;
-import com.vaadin.flow.server.startup.FakeBrowser;
 import com.vaadin.flow.shared.ui.Dependency;
-import elemental.json.JsonObject;
-import org.jsoup.UncheckedIOException;
-import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.flow.shared.ui.LoadMode;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+import elemental.json.JsonObject;
 
 /**
  * Npm template parser implementation.
@@ -51,8 +51,9 @@ import java.util.stream.Collectors;
  * class and tries to find the one that contains template definition using the
  * tag name.
  * <p>
- * The class is Singleton. Use {@link DefaultTemplateParser#getInstance()} to
- * get its instance.
+ * The class is Singleton. Use {@link NpmTemplateParserCopy#getInstance()} to get
+ * its instance.
+ *
  *
  * @author Vaadin Ltd
  * @since 2.0
@@ -61,16 +62,13 @@ import java.util.stream.Collectors;
  */
 public class NpmTemplateParserCopy implements TemplateParser {
 
-    // mavi: the INSTANCE is non-final so that it can be changed
-    private static TemplateParser INSTANCE = new NpmTemplateParserCopy();
+    private static final TemplateParser INSTANCE = new NpmTemplateParserCopy();
 
     private final HashMap<String, String> cache = new HashMap<>();
     private final ReentrantLock lock = new ReentrantLock();
     private JsonObject jsonStats;
 
-    // mavi: private -> protected
     protected NpmTemplateParserCopy() {
-        // Doesn't allow external instantiation
     }
 
     public static TemplateParser getInstance() {
@@ -82,19 +80,16 @@ public class NpmTemplateParserCopy implements TemplateParser {
             Class<? extends PolymerTemplate<?>> clazz, String tag,
             VaadinService service) {
 
-        WebBrowser browser = FakeBrowser.getEs6();
-
         List<Dependency> dependencies = AnnotationReader
                 .getAnnotationsFor(clazz, JsModule.class).stream()
-                .map(htmlImport -> new Dependency(Dependency.Type.JS_MODULE,
-                        htmlImport.value(), htmlImport.loadMode()))
+                .map(jsModule -> new Dependency(Dependency.Type.JS_MODULE,
+                        jsModule.value(),
+                        LoadMode.EAGER)) // load mode doesn't matter here
                 .collect(Collectors.toList());
 
-        DependencyFilter.FilterContext filterContext = new DependencyFilter.FilterContext(
-                service, browser);
         for (DependencyFilter filter : service.getDependencyFilters()) {
             dependencies = filter.filter(new ArrayList<>(dependencies),
-                    filterContext);
+                    service);
         }
 
         Pair<Dependency, String> chosenDep = null;
@@ -126,26 +121,28 @@ public class NpmTemplateParserCopy implements TemplateParser {
         }
 
         if (chosenDep != null) {
-            // Template needs to be wrapped in an element with id, to look
-            // like a P2 template
-            Element parent = new Element(tag);
-            parent.attr("id", tag);
 
             Element templateElement = BundleParser.parseTemplateElement(
                     chosenDep.getFirst().getUrl(), chosenDep.getSecond());
-            templateElement.appendTo(parent);
+            if (!JsoupUtils.getDomModule(templateElement, null).isPresent()) {
+                // Template needs to be wrapped in an element with id, to look
+                // like a P2 template
+                Element parent = new Element(tag);
+                parent.attr("id", tag);
+                templateElement.appendTo(parent);
+            }
 
             return new TemplateData(chosenDep.getFirst().getUrl(),
                     templateElement);
         }
 
         throw new IllegalStateException(String.format("Couldn't find the "
-                + "definition of the element with tag '%s' "
-                + "in any template file declared using '@%s' annotations. "
-                + "Check the availability of the template files in your WAR "
-                + "file or provide alternative implementation of the "
-                + "method getTemplateContent() which should return an element "
-                + "representing the content of the template file", tag,
+                        + "definition of the element with tag '%s' "
+                        + "in any template file declared using '@%s' annotations. "
+                        + "Check the availability of the template files in your WAR "
+                        + "file or provide alternative implementation of the "
+                        + "method getTemplateContent() which should return an element "
+                        + "representing the content of the template file", tag,
                 JsModule.class.getSimpleName()));
     }
 
@@ -158,7 +155,6 @@ public class NpmTemplateParserCopy implements TemplateParser {
         return url.endsWith("/" + tag + ".js");
     }
 
-    // mavi: changed private -> protected
     protected String getSourcesFromTemplate(String tag, String url) {
         InputStream content = getClass().getClassLoader()
                 .getResourceAsStream(url);
@@ -235,4 +231,59 @@ public class NpmTemplateParserCopy implements TemplateParser {
     private Logger getLogger() {
         return LoggerFactory.getLogger(NpmTemplateParserCopy.class.getName());
     }
+
+    /**
+     * Utilities for JSOUP DOM manipulations.
+     *
+     * @author Vaadin Ltd
+     *
+     */
+    private static class JsoupUtils {
+
+        private JsoupUtils() {
+            // Utility class
+        }
+
+        /**
+         * Removes all comments from the {@code node} tree.
+         *
+         * @param node
+         *            a Jsoup node
+         */
+        static void removeCommentsRecursively(Node node) {
+            int i = 0;
+            while (i < node.childNodeSize()) {
+                Node child = node.childNode(i);
+                if (child instanceof Comment) {
+                    child.remove();
+                } else {
+                    removeCommentsRecursively(child);
+                    i++;
+                }
+            }
+        }
+
+        /**
+         * Finds {@code "dom-module"} element inside the {@code parent}.
+         * <p>
+         * If {@code id} is provided then {@code "dom-module"} element is searched
+         * with the given {@code id} value.
+         *
+         * @param parent
+         *            the parent element
+         * @param id
+         *            optional id attribute value to search {@code "dom-module"}
+         *            element, may be {@code null}
+         * @return
+         */
+        static Optional<Element> getDomModule(Element parent, String id) {
+            Stream<Element> stream = parent.getElementsByTag("dom-module").stream();
+            if (id != null) {
+                stream = stream.filter(element -> id.equals(element.id()));
+            }
+            return stream.findFirst();
+        }
+
+    }
+
 }

@@ -64,9 +64,9 @@ private class MockVaadinSession(service: VaadinService,
 private class MockVaadinServlet(val routes: Routes,
                           val serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService) : VaadinServlet() {
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-        routes.register(servletContext)
         val service: VaadinServletService = serviceFactory(this, deploymentConfiguration)
         service.init()
+        routes.register(service.context as VaadinServletContext)
         return service
     }
 }
@@ -120,11 +120,9 @@ object MockVaadin {
      */
     @JvmStatic
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinMeta.version >= 13) { "Karibu-Testing only works with Vaadin 13+ but you're using ${VaadinMeta.version}" }
+        check(VaadinMeta.version >= 15) { "Karibu-Testing only works with Vaadin 15+ but you're using ${VaadinMeta.version}" }
 
-        if (VaadinMeta.version >= 14) {
-            mockVaadin14()
-        }
+        mockVaadin15()
 
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
@@ -134,23 +132,11 @@ object MockVaadin {
         createSession(ctx, uiFactory)
     }
 
-    private fun mockVaadin14() {
-        if (VaadinMeta.isCompatibilityMode) {
-            // Bower + WebJars mode
+    private fun mockVaadin15() {
+        // NPM + WebPack mode
+        // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26
 
-            // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
-            // in DefaultDeploymentConfiguration.checkCompatibilityMode()
-            val compatMode = Constants.VAADIN_PREFIX + Constants.SERVLET_PARAMETER_COMPATIBILITY_MODE
-            if (System.getProperty(compatMode) == null) {
-                System.setProperty(compatMode, true.toString())
-            }
-
-        } else {
-            // NPM + WebPack mode
-            // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26
-
-            MockNpmTemplateParser.install()
-        }
+        MockNpmTemplateParser.install()
     }
 
     /**

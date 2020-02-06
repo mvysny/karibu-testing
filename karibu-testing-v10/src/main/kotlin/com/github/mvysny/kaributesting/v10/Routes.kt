@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
@@ -10,7 +11,6 @@ import io.github.classgraph.ScanResult
 import java.io.Serializable
 import java.lang.reflect.Field
 import java.util.concurrent.atomic.AtomicReference
-import javax.servlet.ServletContext
 import kotlin.test.expect
 
 /**
@@ -38,11 +38,11 @@ data class Routes(
     }
 
     /**
-     * Registers all routes to Vaadin 13 registry. Automatically called from [MockVaadin.setup].
+     * Registers all routes to Vaadin 15 registry. Automatically called from [MockVaadin.setup].
      */
     @Suppress("UNCHECKED_CAST")
-    fun register(sc: ServletContext) {
-        RouteRegistryInitializer().onStartup(routes.toSet(), sc)
+    fun register(sc: VaadinServletContext) {
+        RouteRegistryInitializer().onStartup(routes.toSet(), sc.context)
         val registry: ApplicationRouteRegistry = ApplicationRouteRegistry.getInstance(sc)
         registry.setErrorNavigationTargets(errorRoutes.map { it as Class<out Component> }.toSet())
         if (skipPwaInit) {

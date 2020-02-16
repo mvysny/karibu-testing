@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * * a local filesystem (`frontend/`)
  * * from classpath `META-INF/resources/frontend/`
  */
-class MockNpmTemplateParser : NpmTemplateParserCopy() {
+class MockNpmTemplateParser : NpmTemplateParser() {
 
     /**
      * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`

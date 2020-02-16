@@ -4,6 +4,8 @@ import com.github.mvysny.kaributesting.mockhttp.*
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
+import com.vaadin.flow.component.polymertemplate.TemplateParser
+import com.vaadin.flow.di.Instantiator
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
@@ -122,21 +124,12 @@ object MockVaadin {
     fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
         check(VaadinMeta.version >= 15) { "Karibu-Testing only works with Vaadin 15+ but you're using ${VaadinMeta.version}" }
 
-        mockVaadin15()
-
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
         VaadinService.setCurrent(servlet.service!!)
 
         // init Vaadin Session
         createSession(ctx, uiFactory)
-    }
-
-    private fun mockVaadin15() {
-        // NPM + WebPack mode
-        // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26
-
-        MockNpmTemplateParser.install()
     }
 
     /**
@@ -347,6 +340,14 @@ open class MockedUI : UI()
 open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
+    override fun getInstantiator(): Instantiator = MockInstantiator(super.getInstantiator())
+}
+
+/**
+ * Makes sure to load [MockNpmTemplateParser].
+ */
+open class MockInstantiator(val delegate: Instantiator) : Instantiator by delegate {
+    override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
 }
 
 val currentRequest: VaadinRequest

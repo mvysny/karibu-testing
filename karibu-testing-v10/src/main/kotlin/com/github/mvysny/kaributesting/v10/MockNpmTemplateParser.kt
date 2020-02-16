@@ -2,10 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.MockNpmTemplateParser.Companion.customLoaders
 import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
-import com.vaadin.flow.component.polymertemplate.TemplateParser
 import java.io.File
 import java.lang.RuntimeException
-import java.lang.reflect.Field
 import java.net.URL
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -65,19 +63,6 @@ class MockNpmTemplateParser : NpmTemplateParser() {
     }
 
     companion object {
-        fun install() {
-            // okay this is ugly as hell, but there is no other way:
-            // https://github.com/vaadin/flow/issues/6537
-            val instanceField: Field = NpmTemplateParser::class.java.getDeclaredField("INSTANCE").apply {
-                isAccessible = true
-                makeNotFinal()
-            }
-            val current: TemplateParser = instanceField.get(null) as TemplateParser
-            if (current is NpmTemplateParser) {
-                instanceField.set(null, MockNpmTemplateParser())
-            }
-        }
-
         /**
          * Register custom template loaders here if the default algorithm doesn't work for your app for some reason.
          */

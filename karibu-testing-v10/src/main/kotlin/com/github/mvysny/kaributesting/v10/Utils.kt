@@ -9,9 +9,6 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.net.URL
 import kotlin.test.expect
 
@@ -51,29 +48,6 @@ private fun JsonObject.put(key: String, value: Any) {
 internal fun jsonCreateObject(vararg contents: Pair<String, Any>): JsonObject = Json.createObject().apply {
     contents.forEach { put(it.first, it.second) }
 }
-
-/**
- * Makes a [Field] non-final.
- *
- * Contains dangerous reflection into Java [Field] which may not work with all Java VMs.
- */
-internal fun Field.makeNotFinal() {
-    if (!isFinal) return
-    // from https://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
-    val modifiersField: Field = try {
-        Field::class.java.getDeclaredField("modifiers")
-    } catch (ex: NoSuchFieldException) {
-        if (jvmVersion >= 13) {
-            throw RuntimeException("Unfortunately Karibu-Testing cannot hook into the NpmTemplateParser.INSTANCE field on Java 13 or higher; see https://github.com/mvysny/karibu-testing/issues/29 for more details.", ex)
-        } else {
-            throw ex
-        }
-    }
-    modifiersField.isAccessible = true
-    modifiersField.setInt(this, modifiers and Modifier.FINAL.inv())
-}
-
-val Field.isFinal: Boolean get() = (modifiers and Modifier.FINAL) != 0
 
 /**
  * Returns the major JVM version, e.g. 6 for Java 1.6, 8 for Java 8, 11 for Java 11 etc.

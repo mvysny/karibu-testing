@@ -43,9 +43,9 @@ to your `pom.xml`:
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
-**WARNING**: On Java 13 and higher, Karibu-Testing does not work in the Vaadin 14 + npm mode. Please see [Issue 29](https://github.com/mvysny/karibu-testing/issues/29)
-for more details and for workarounds. Please vote on [Vaadin Flow Issue 6537](https://github.com/vaadin/flow/issues/6537)
-to get this fixed. Thank you.
+> **WARNING**: On Java 13 and higher, Karibu-Testing 1.1.x does not work with PolymerTemplates in the Vaadin 14 + npm mode. Please see [Issue 29](https://github.com/mvysny/karibu-testing/issues/29)
+for more details and for workarounds. The workaround is to either use Vaadin 15 and Karibu-Testing 1.2.x,
+or downgrade Java to version 11, or don't use PolymerTemplates (they're going away anyway: [Vaadin Future](https://vaadin.com/blog/vaadin-15-and-beyond-an-insiders-look-at-vaadins-future) "All component instances will exist solely on the client-side" - so no `@Id`-references).
 
 ## Writing your first test
 

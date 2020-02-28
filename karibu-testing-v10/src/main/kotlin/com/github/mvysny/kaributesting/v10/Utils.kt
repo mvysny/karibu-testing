@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
-import java.lang.IllegalArgumentException
 import java.net.URL
 import kotlin.test.expect
 
@@ -35,27 +34,17 @@ fun JsonArray.add(value: JsonValue) {
     set(length(), value)
 }
 
-private fun JsonObject.put(key: String, value: Any) {
-    when (value) {
-        is JsonValue -> put(key, value)
-        is String -> put(key, value)
-        is Double -> put(key, value)
-        is Boolean -> put(key, value)
-        else -> throw IllegalArgumentException("Unsupported value type ${value.javaClass} for $value")
-    }
-}
-
-internal fun jsonCreateObject(vararg contents: Pair<String, Any>): JsonObject = Json.createObject().apply {
-    contents.forEach { put(it.first, it.second) }
-}
-
 /**
  * Returns the major JVM version, e.g. 6 for Java 1.6, 8 for Java 8, 11 for Java 11 etc.
  */
 val jvmVersion: Int get() = System.getProperty("java.version").parseJvmVersion()
 
+/**
+ * Returns the major JVM version, 1 for 1.1, 2 for 1.2, 3 for 1.3, 4 for 1.4, 5
+ * for 1.5 etc.
+ */
 internal fun String.parseJvmVersion(): Int {
     // taken from https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-    val version = removePrefix("1.").takeWhile { it.isDigit() }
+    val version: String = removePrefix("1.").takeWhile { it.isDigit() }
     return version.toInt()
 }

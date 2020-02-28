@@ -19,7 +19,7 @@ object VaadinMeta {
     val flowVersion: SemanticVersion get() = SemanticVersion(Version.getMajorVersion(), Version.getMinorVersion(), Version.getRevision())
 
     /**
-     * Guesses Vaadin version from [flowVersion]. Returns one of 14 or 15.
+     * Returns Vaadin version. Returns one of 14 or 15.
      */
     val version: Int get() {
         // for Vaadin 14+ the version can be detected from the VaadinCoreShrinkWrap class.

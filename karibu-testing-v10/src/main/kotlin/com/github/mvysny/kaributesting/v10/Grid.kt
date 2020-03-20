@@ -30,7 +30,7 @@ import kotlin.test.fail
  */
 fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
-    val fetched = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
+    val fetched: Stream<T> = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
     return fetched.toList().firstOrNull()
             ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
 }
@@ -80,7 +80,7 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
 }
 
 fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
-    val m = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
+    val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
     @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()
 }
@@ -185,7 +185,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
  * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
- * @param columnId the column ID.
+ * @param columnKey the column ID.
  */
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
@@ -197,7 +197,7 @@ fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
 /**
  * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
- * @param rowIndex the row index, 0 or higher.
+ * @param rowObject the bean
  */
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
@@ -241,9 +241,9 @@ fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     }
 }
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ConflictingExtensionProperty") // conflicting property is "protected"
 val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V> get() {
-    val javaField = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
+    val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
         isAccessible = true
     }
     return javaField.get(this) as ValueProvider<T, V>
@@ -295,7 +295,7 @@ var <T> Grid.Column<T>.header2: String
     }
 
 private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
-    val so = sortOrder.firstOrNull { it.sorted == column }
+    val so: GridSortOrder<T>? = sortOrder.firstOrNull { it.sorted == column }
     return when {
         so == null -> ""
         so.direction == SortDirection.ASCENDING -> "v"
@@ -363,15 +363,15 @@ internal val HeaderRow.HeaderCell.column: Any
         return getColumn.invoke(this)
     }
 
-private val abstractCellClass = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
-private val abstractColumnClass = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
+private val abstractCellClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
+private val abstractColumnClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
 
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */
 private val FooterRow.FooterCell.column: Any
     get() {
-        val getColumn = abstractCellClass.getDeclaredMethod("getColumn")
+        val getColumn: Method = abstractCellClass.getDeclaredMethod("getColumn")
         getColumn.isAccessible = true
         return getColumn.invoke(this)
     }
@@ -382,7 +382,7 @@ private val FooterRow.FooterCell.column: Any
  * @throws IllegalArgumentException if no such column exists.
  */
 fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
-    val cell = cells.firstOrNull { (it.column as Grid.Column<*>).key == property.name }
+    val cell: HeaderRow.HeaderCell? = cells.firstOrNull { (it.column as Grid.Column<*>).key == property.name }
     require(cell != null) { "This grid has no property named ${property.name}: $cells" }
     return cell
 }
@@ -394,9 +394,9 @@ fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
 private val Any.columnKey: String?
     get() {
         abstractColumnClass.cast(this)
-        val method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
+        val method: Method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
         method.isAccessible = true
-        val gridColumn = method.invoke(this) as Grid.Column<*>
+        val gridColumn: Grid.Column<*> = method.invoke(this) as Grid.Column<*>
         return gridColumn.key
     }
 
@@ -406,22 +406,22 @@ private val Any.columnKey: String?
  * @throws IllegalArgumentException if no such column exists.
  */
 fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell {
-    val cell = cells.firstOrNull { it.column.columnKey == property.name }
+    val cell: FooterRow.FooterCell? = cells.firstOrNull { it.column.columnKey == property.name }
     require(cell != null) { "This grid has no property named ${property.name}: $cells" }
     return cell
 }
 
 val HeaderRow.HeaderCell.renderer: Renderer<*>?
     get() {
-        val method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
+        val method: Method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
         method.isAccessible = true
-        val renderer = method.invoke(column)
+        val renderer: Any = method.invoke(column)
         return renderer as Renderer<*>?
     }
 
 val FooterRow.FooterCell.renderer: Renderer<*>?
     get() {
-        val method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
+        val method: Method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
         method.isAccessible = true
         val renderer = method.invoke(column)
         return renderer as Renderer<*>?
@@ -432,7 +432,7 @@ val FooterRow.FooterCell.renderer: Renderer<*>?
  */
 var FooterRow.FooterCell.component: Component?
     get() {
-        val cr = (renderer as? ComponentRenderer<*, *>) ?: return null
+        val cr: ComponentRenderer<*, *> = (renderer as? ComponentRenderer<*, *>) ?: return null
         return cr.createComponent(null)
     }
     set(value) {
@@ -446,7 +446,7 @@ private val gridSorterComponentRendererClass = Class.forName("com.vaadin.flow.co
  */
 var HeaderRow.HeaderCell.component: Component?
     get() {
-        val r = renderer
+        val r: Renderer<*>? = renderer
         if (!gridSorterComponentRendererClass.isInstance(r)) return null
         val componentField = gridSorterComponentRendererClass.getDeclaredField("component")
         componentField.isAccessible = true

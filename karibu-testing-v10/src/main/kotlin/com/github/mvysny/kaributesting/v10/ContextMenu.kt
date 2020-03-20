@@ -119,11 +119,17 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
     when (parent) {
         is MenuItem -> parent.checkMenuItemVisible(originalItem, parentMap)
         is GridMenuItem<*> -> parent.checkMenuItemVisible(originalItem, parentMap)
-        is ContextMenu -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
-            parent.target.isEffectivelyVisible()
+        is ContextMenu -> {
+            checkNotNull(parent.target) { "The context menu ${parent.toPrettyString()} is not attached to any component" }
+            expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
+                parent.target.isEffectivelyVisible()
+            }
         }
-        is GridContextMenu<*> -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
-            parent.target.isEffectivelyVisible()
+        is GridContextMenu<*> -> {
+            checkNotNull(parent.target) { "The context menu ${parent.toPrettyString()} is not attached to any component" }
+            expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.target.toPrettyString()} which is not effectively visible") {
+                parent.target.isEffectivelyVisible()
+            }
         }
         // e.g. MenuBar
         else -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {

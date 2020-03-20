@@ -105,7 +105,7 @@ inline fun <reified T: Component> Component._get(noinline block: SearchSpec<T>.(
  * @throws IllegalArgumentException if no component matched, or if more than one component matches.
  */
 fun <T: Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): T {
-    val result = _find(clazz) {
+    val result: List<T> = _find(clazz) {
         count = 1..1
         block()
         check(count == 1..1) { "You're calling _get which is supposed to return exactly 1 component, yet you tried to specify the count of $count" }
@@ -135,9 +135,9 @@ fun <T: Component> _get(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): T 
  * @return the list of matching components, may be empty.
  */
 fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): List<T> {
-    val spec = SearchSpec(clazz)
+    val spec: SearchSpec<T> = SearchSpec(clazz)
     spec.block()
-    val result = find(spec.toPredicate())
+    val result: List<Component> = find(spec.toPredicate())
     if (result.size !in spec.count) {
         val loc: String = currentPath ?: "?"
         val message = when {

@@ -1,0 +1,7 @@
+Ignore - only used for testing, otherwise Flow will fail with
+
+    java.lang.IllegalStateException: Running project in development mode with no access to folder 'frontend'.
+    Build project in production mode instead, see https://vaadin.com/docs/v15/flow/production/tutorial-production-mode-basic.html
+        at com.vaadin.flow.server.DeploymentConfigurationFactory.verifyFolderExists(DeploymentConfigurationFactory.java:403)
+        at com.vaadin.flow.server.DeploymentConfigurationFactory.readBuildInfo(DeploymentConfigurationFactory.java:232)
+        ...

@@ -11,20 +11,8 @@ dependencies {
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     // depend on vaadin instead of vaadin-core, to bring in Grid Pro.
-    compileOnly("com.vaadin:vaadin:${properties["vaadin14_version"]}") {
-        // Webjars are only needed when running in Vaadin 13 compatibility mode
-        listOf("com.vaadin.webjar", "org.webjars.bowergithub.insites",
-                "org.webjars.bowergithub.polymer", "org.webjars.bowergithub.polymerelements",
-                "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents")
-                .forEach { exclude(group = it) }
-    }
-    testImplementation("com.vaadin:vaadin:${properties["vaadin14_version"]}") {
-        // Webjars are only needed when running in Vaadin 13 compatibility mode
-        listOf("com.vaadin.webjar", "org.webjars.bowergithub.insites",
-                "org.webjars.bowergithub.polymer", "org.webjars.bowergithub.polymerelements",
-                "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents")
-                .forEach { exclude(group = it) }
-    }
+    compileOnly("com.vaadin:vaadin:${properties["vaadin15_version"]}")
+    testImplementation("com.vaadin:vaadin:${properties["vaadin15_version"]}")
 
     api(project(":karibu-testing-v10"))
 

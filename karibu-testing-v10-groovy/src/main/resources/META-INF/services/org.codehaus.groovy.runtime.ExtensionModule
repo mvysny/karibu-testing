@@ -6,4 +6,5 @@ extensionClasses = com.github.mvysny.kaributesting.v10.groovy.ButtonUtils,\
   com.github.mvysny.kaributesting.v10.groovy.BinderUtils,\
   com.github.mvysny.kaributesting.v10.groovy.UploadUtils,\
   com.github.mvysny.kaributesting.v10.groovy.RouterLinkUtils,\
-  com.github.mvysny.kaributesting.v10.groovy.LoginFormUtils
+  com.github.mvysny.kaributesting.v10.groovy.LoginFormUtils,\
+  com.github.mvysny.kaributesting.v10.groovy.LocatorExtensionMethods

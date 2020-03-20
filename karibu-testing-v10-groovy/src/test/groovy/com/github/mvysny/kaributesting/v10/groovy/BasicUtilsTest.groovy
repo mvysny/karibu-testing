@@ -6,6 +6,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
@@ -57,5 +58,7 @@ class BasicUtilsTest {
         new TextArea()._focus()
         new TextArea()._blur()
         Notification.show("foo").text
+        new Icon().iconName
+        new Icon().iconName = null
     }
 }

@@ -6,6 +6,8 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
@@ -55,5 +57,8 @@ class BasicUtilsTest {
         expect(false) { new Button("Hello!").matches { caption = "Bar" } }
         new TextArea()._focus()
         new TextArea()._blur()
+        Notification.show("foo").text
+        new Icon().iconName
+        new Icon().iconName = null
     }
 }

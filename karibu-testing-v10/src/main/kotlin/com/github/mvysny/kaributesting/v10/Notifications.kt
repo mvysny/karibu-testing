@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.Element
+import java.lang.reflect.Field
 import kotlin.streams.toList
 
 /**
@@ -20,8 +21,9 @@ fun getNotifications(): List<Notification> {
  * Returns the notification text.
  */
 fun Notification.getText(): String {
-    val f = Notification::class.java.getDeclaredField("templateElement").apply { isAccessible = true }
-    val e = f.get(this) as Element
+    val f: Field = Notification::class.java.getDeclaredField("templateElement")
+    f.isAccessible = true
+    val e: Element = f.get(this) as Element
     return e.getProperty("innerHTML") ?: ""
 }
 

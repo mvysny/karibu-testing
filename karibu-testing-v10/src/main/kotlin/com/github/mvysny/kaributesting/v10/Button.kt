@@ -12,7 +12,7 @@ import kotlin.test.fail
  */
 fun Button._click() {
     _checkClickable()
-    click()  // this doesn't work on Vaadin 12 but it works properly with Vaadin 13
+    click()
 }
 
 /**

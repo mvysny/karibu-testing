@@ -1,11 +1,13 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
+import com.github.mvysny.kaributesting.v10.NotificationsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.ComponentEvent
 import com.vaadin.flow.component.Focusable
 import com.vaadin.flow.component.HasValue
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import elemental.json.Json
@@ -215,5 +217,12 @@ class BasicUtils {
     @CompileDynamic
     static void _blur(@NotNull Component self) {
         BasicUtilsKt._blur(self)
+    }
+
+    /**
+     * Returns the notification text.
+     */
+    static String getText(@NotNull Notification self) {
+        NotificationsKt.getText(self)
     }
 }

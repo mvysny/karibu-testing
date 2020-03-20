@@ -23,7 +23,8 @@ fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessConte
     checkEditableByUser()
     _fireEvent(StartedEvent(this, fileName, mimeType, file.size.toLong()))
     val failure: Exception? = try {
-        receiver.receiveUpload(fileName, mimeType).use { sout -> sout.write(file) }
+        val r: Receiver = checkNotNull(receiver) { "${toPrettyString()}: receiver has not been set" }
+        r.receiveUpload(fileName, mimeType).use { sout -> sout.write(file) }
         null
     } catch (e: Exception) {
         e

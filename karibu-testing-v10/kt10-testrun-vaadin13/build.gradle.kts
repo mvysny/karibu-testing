@@ -1,5 +1,5 @@
 dependencies {
-    compile(platform("com.vaadin:vaadin-bom:${properties["vaadin13_version"]}"))
-    compile("com.vaadin:vaadin:${properties["vaadin13_version"]}")
-    compile(project(":karibu-testing-v10:kt10-tests"))
+    testImplementation(platform("com.vaadin:vaadin-bom:${properties["vaadin13_version"]}"))
+    testImplementation("com.vaadin:vaadin:${properties["vaadin13_version"]}")
+    testImplementation(project(":karibu-testing-v10:kt10-tests"))
 }

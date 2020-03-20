@@ -1,6 +1,7 @@
 dependencies {
     api("com.vaadin:vaadin-server:${properties["vaadin8_version"]}")
     api(project(":mock-servlet-environment"))
+    implementation("org.slf4j:slf4j-api:${properties["slf4j_version"]}")
 
     testImplementation("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
     api(kotlin("test"))

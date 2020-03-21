@@ -1156,7 +1156,7 @@ _get<ConfirmDialog>()._fireCancel()
 _get<ConfirmDialog>()._fireReject()
 ```
 
-Groovy:
+Groovy (since KT 1.1.21 / 1.2.1):
 ```groovy
 _get(ConfirmDialog)._fireConfirm()
 _get(ConfirmDialog)._fireCancel()

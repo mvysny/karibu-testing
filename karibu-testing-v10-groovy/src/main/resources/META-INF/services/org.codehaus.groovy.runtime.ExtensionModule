@@ -12,4 +12,5 @@ extensionClasses = com.github.mvysny.kaributesting.v10.groovy.ButtonUtils,\
   com.github.mvysny.kaributesting.v10.groovy.ContextMenuUtils,\
   com.github.mvysny.kaributesting.v10.groovy.ComboBoxUtils,\
   com.github.mvysny.kaributesting.v10.groovy.GridExtensionMethods,\
-  com.github.mvysny.kaributesting.v10.groovy.MockVaadinExtensionMethods
+  com.github.mvysny.kaributesting.v10.groovy.MockVaadinExtensionMethods,\
+  com.github.mvysny.kaributesting.v10.groovy.pro.ConfirmDialogExtensionMethods

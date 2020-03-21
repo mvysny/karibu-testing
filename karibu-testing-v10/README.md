@@ -1143,6 +1143,8 @@ GridProKt._proedit(grid, person, it -> {
 });
 ```
 
+Groovy: unsupported at the moment.
+
 ## Confirm Dialog
 
 [Vaadin Confirm Dialog](https://vaadin.com/components/vaadin-confirm-dialog)
@@ -1152,6 +1154,13 @@ Kotlin:
 _get<ConfirmDialog>()._fireConfirm()
 _get<ConfirmDialog>()._fireCancel()
 _get<ConfirmDialog>()._fireReject()
+```
+
+Groovy:
+```groovy
+_get(ConfirmDialog)._fireConfirm()
+_get(ConfirmDialog)._fireCancel()
+_get(ConfirmDialog)._fireReject()
 ```
 
 Java:

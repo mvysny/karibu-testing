@@ -348,10 +348,13 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;
 
 ## Example projects
 
-The [Vaadin 10 Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu10-helloworld-application) is a very simple project consisting of just
+The [Vaadin 10 Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu10-helloworld-application)
+is a very simple Kotlin-based project consisting of just
 one view and a single test for that view.
 
-TODO Groovy Builder Example
+The [Vaadin Groovy Builder Example App](https://github.com/mvysny/vaadin-groovy-builder-example)
+is a very simple Groovy-based project consisting of just
+one view and a single test for that view.
 
 Please head to the [Beverage Buddy](https://github.com/mvysny/beverage-buddy-vok/) for a more complete example application -
 it is a very simple Vaadin-on-Kotlin-based

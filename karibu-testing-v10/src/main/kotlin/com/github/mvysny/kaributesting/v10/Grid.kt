@@ -363,15 +363,15 @@ internal val HeaderRow.HeaderCell.column: Any
         return getColumn.invoke(this)
     }
 
-private val abstractCellClass = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
-private val abstractColumnClass = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
+private val abstractCellClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
+private val abstractColumnClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
 
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */
 private val FooterRow.FooterCell.column: Any
     get() {
-        val getColumn = abstractCellClass.getDeclaredMethod("getColumn")
+        val getColumn: Method = abstractCellClass.getDeclaredMethod("getColumn")
         getColumn.isAccessible = true
         return getColumn.invoke(this)
     }
@@ -381,9 +381,17 @@ private val FooterRow.FooterCell.column: Any
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
-    val cell = cells.firstOrNull { (it.column as Grid.Column<*>).key == property.name }
-    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell =
+        getCell(property.name)
+
+/**
+ * Retrieves the cell for given [Grid.Column.getKey].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
+    val cell: HeaderRow.HeaderCell? = cells.firstOrNull { (it.column as Grid.Column<*>).key == key }
+    require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
 }
 
@@ -394,7 +402,7 @@ fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
 private val Any.columnKey: String?
     get() {
         abstractColumnClass.cast(this)
-        val method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
+        val method: Method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
         method.isAccessible = true
         val gridColumn = method.invoke(this) as Grid.Column<*>
         return gridColumn.key
@@ -405,9 +413,17 @@ private val Any.columnKey: String?
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell {
-    val cell = cells.firstOrNull { it.column.columnKey == property.name }
-    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell =
+        getCell(property.name)
+
+/**
+ * Retrieves the cell for given [Grid.Column.getKey].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun FooterRow.getCell(key: String): FooterRow.FooterCell {
+    val cell: FooterRow.FooterCell? = cells.firstOrNull { it.column.columnKey == key }
+    require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
 }
 

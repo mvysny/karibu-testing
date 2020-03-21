@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull
  * @author mavi
  */
 @CompileStatic
-class PrettyPrintTree {
+class PrettyPrintTreeUtils {
     @NotNull
     static String toPrettyTree(@NotNull Component self) {
         PrettyPrintTreeKt.toPrettyTree(self)

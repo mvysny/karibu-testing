@@ -381,9 +381,17 @@ private val FooterRow.FooterCell.column: Any
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell {
-    val cell: HeaderRow.HeaderCell? = cells.firstOrNull { (it.column as Grid.Column<*>).key == property.name }
-    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell =
+        getCell(property.name)
+
+/**
+ * Retrieves the cell for given [Grid.Column.getKey].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
+    val cell: HeaderRow.HeaderCell? = cells.firstOrNull { (it.column as Grid.Column<*>).key == key }
+    require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
 }
 
@@ -405,9 +413,17 @@ private val Any.columnKey: String?
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell {
-    val cell: FooterRow.FooterCell? = cells.firstOrNull { it.column.columnKey == property.name }
-    require(cell != null) { "This grid has no property named ${property.name}: $cells" }
+fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell =
+        getCell(property.name)
+
+/**
+ * Retrieves the cell for given [Grid.Column.getKey].
+ * @return the corresponding cell
+ * @throws IllegalArgumentException if no such column exists.
+ */
+fun FooterRow.getCell(key: String): FooterRow.FooterCell {
+    val cell: FooterRow.FooterCell? = cells.firstOrNull { it.column.columnKey == key }
+    require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
 }
 

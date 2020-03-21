@@ -20,6 +20,8 @@ You directly call methods on your server-side View classes and on the server-sid
 Check out a [30 second video of live coding with Karibu-Testing](https://www.youtube.com/watch?v=znVNEo9cj98) to get a taste
 on how simple this library is.
 
+The library supports Kotlin, Java and Groovy (Groovy support for Vaadin 14+ only).
+
 ## Getting Started / Full Documentation
 
 For the Getting Started documentation and for the full API documentation:

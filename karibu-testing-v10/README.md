@@ -25,6 +25,9 @@ dependencies {
 
 > Note: obtain the newest version from the tag name above
 
+For Groovy, use `testCompile "com.github.mvysny.kaributesting:karibu-testing-v10-groovy:x.y.z"`
+instead. Groovy support has been added starting from Karibu-Testing 1.1.20 and higher, and 1.2.1 and higher.
+
 For Maven it's really easy: Karibu-Testing is published on Maven Central, so all you need to do is to add the dependency
 to your `pom.xml`:
 
@@ -44,8 +47,7 @@ to your `pom.xml`:
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
 **WARNING**: On Java 13 and higher, Karibu-Testing does not work in the Vaadin 14 + npm mode. Please see [Issue 29](https://github.com/mvysny/karibu-testing/issues/29)
-for more details and for workarounds. Please vote on [Vaadin Flow Issue 6537](https://github.com/vaadin/flow/issues/6537)
-to get this fixed. Thank you.
+for more details.
 
 ## Writing your first test
 
@@ -83,7 +85,20 @@ public class MyUITest {
 })
 ```
 
-Nothing special here - we have just instantiated the component as we would a regular Java object, and then we asserted that the text is updated properly.
+Groovy:
+```groovy
+class MyUITest {
+    @Test
+    void testProperGreeting() {
+        GreetingLabel label = new GreetingLabel()
+        label.greet("world")
+        assertEquals("Hello, world", label.getText())
+    }
+})
+```
+
+Nothing special here - we have just instantiated the component as we would a
+regular Java object, and then we asserted that the text is updated properly.
 The test actually works, no further setup is necessary.
 
 You can apply this approach to test even larger components;
@@ -129,12 +144,18 @@ It will produce the following screen:
   you are free to create your UI in any way you see fit: be it design html files, or even plain Java code.
   All of those styles are compatible with the Karibu-Testing library - it doesn't matter how exactly the UI has been created.
 
-In order to test this app, we need to instantiate and initialize an `UI`. In order to properly initialize the `UI` class, a proper Vaadin
+> **Note:** With Groovy you can build your Vaadin UI using the [Vaadin Groovy Builder](https://github.com/mvysny/vaadin-groovy-builder) library.
+
+In order to test this app, we need to instantiate and initialize an `UI`.
+In order to properly initialize the `UI` class, a proper Vaadin
 environment needs to be prepared:
 
 * We need to prepare the `VaadinSession` in a way that `VaadinSession.getCurrent()` returns a proper session
-* We need to run the testing code with Vaadin lock obtained (since we're going to invoke Vaadin components and that can only be done on the UI thread)
-* We need to create the UI instance and initialize it properly - besides other things we need to call the `UI.doInit()` method.
+* We need to run the testing code with Vaadin lock obtained
+  (since we're going to invoke Vaadin components and that can only be done
+  on the UI thread)
+* We need to create the UI instance and initialize it properly - besides other
+  things we need to call the `UI.doInit()` method.
 
 Luckily, this is exactly what the `MockVaadin.setup()` function does. It will prepare everything for us and even initialize the `UI`; we just need
 to provide the auto-detected set of `@Route`s to the function:
@@ -148,7 +169,7 @@ class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup(routes) }
 })
 ```
-Java:
+Java, Groovy:
 ```java
 public class MyUITest {
     private static Routes routes;
@@ -166,7 +187,8 @@ public class MyUITest {
 }
 ```
 
-> **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest) testing framework which runs on top of JUnit5. You can of course use whatever
+> **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest)
+testing framework which runs on top of JUnit5. You can of course use whichever
 testing library you prefer.
 
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `MainView` (since our
@@ -232,7 +254,9 @@ The Karibu-Testing library provides three functions for this purpose; for now we
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
   if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`.
   In Java you need to `import static com.github.mvysny.kaributesting.v10.LocatorJ.*;`; then you can call
-  `_get(Button.class, spec -> spec.withCaption("Click me"));`.
+  `_get(Button.class, spec -> spec.withCaption("Click me"));`. In Groovy you'll need
+  to `import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;`; then you can call
+    `_get(Button) { caption = "Click me" }` 
 
 This particular function will search for all components nested within `UI.getCurrent()`.
 You can call the function in a different way, which will restrict the search to some particular layout
@@ -240,6 +264,7 @@ which is handy when you're testing a standalone custom UI component outside of t
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
   In Java: `_get(component, Button.class, spec -> spec.withCaption("Click me"));`.
+  In Groovy: `component._get(Button) { caption = "Click me" }`
 
 > **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`,
   or for `_get(UI.getCurrent(), Button.class, spec -> spec.withCaption("Click me"));`
@@ -287,7 +312,34 @@ public class MyUITest {
         // look up the Example Template and assert on its value
         assertEquals("Clicked!", _get(ExampleTemplate.class).getValue());
     }
-})
+}
+```
+
+Groovy:
+```groovy
+import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;
+@CompileStatic class MyUITest {
+    private static Routes routes
+
+    @BeforeAll
+    static void createRoutes() {
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo")
+    }
+
+    @BeforeEach
+    void setupVaadin() {
+        MockVaadin.setup(routes)
+    }
+
+    @Test
+    void testGreeting() {
+        // simulate a button click as if clicked by the user
+        _get(Button) { caption = "Click me" } ._click()
+
+        // look up the Example Template and assert on its value
+        assertEquals("Clicked!", _get(ExampleTemplate)._value)
+    }
+}
 ```
 
 > **Important note:** The lookup methods will only consider *visible* components - for example `_get<Button>()` will fail if the
@@ -298,6 +350,8 @@ public class MyUITest {
 
 The [Vaadin 10 Karibu-DSL Helloworld Application](https://github.com/mvysny/karibu10-helloworld-application) is a very simple project consisting of just
 one view and a single test for that view.
+
+TODO Groovy Builder Example
 
 Please head to the [Beverage Buddy](https://github.com/mvysny/beverage-buddy-vok/) for a more complete example application -
 it is a very simple Vaadin-on-Kotlin-based
@@ -373,7 +427,39 @@ public class MyUITest {
 })
 ```
 
+Groovy:
+```groovy
+import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
+@CompileStatic class MyUITest {
+    private static Routes routes
+
+    @BeforeAll
+    static void createRoutes() {
+        routes = new Routes().autoDiscoverViews("com.vaadin.flow.demo")
+    }
+
+    @BeforeEach
+    void setupVaadin() {
+        MockVaadin.setup(routes)
+    }
+
+    @Test
+    void testGreeting() {
+        // navigate to the "Categories" list route.
+        UI.current.navigateTo("categories")
+
+        // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
+        Grid<Person> grid = _get(Grid)
+        grid.expectRows(1)
+        // etc etc
+    }
+})
+```
+
 ### Polymer Templates
+
+> **Note:** Polymer Templates is a leaky abstraction and will most probably go away
+in future Vaadin versions.
 
 Testing components nested inside Polymer Templates with browserless approach is nearly impossible since the child components are either
 not accessible from the server-side altogether, or they are only a "shallow shells" of components constructed server-side.
@@ -472,17 +558,22 @@ This library provides three methods for looking up components.
 
 * `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
   if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`.
-  Java: `_get(Button.class, spec -> spec.withCaption("Click me"));`
+  Java: `_get(Button.class, spec -> spec.withCaption("Click me"));`.
+  Groovy: `_get(Button) { caption = "Click me" }`.
 * `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
   an empty list if there is no such component. For example: `_find<VerticalLayout> { id = "form" }`;
-  Java: `_find(VerticalLayout.class, spec -> spec.withId("form"));`
+  Java: `_find(VerticalLayout.class, spec -> spec.withId("form"));`.
+  Groovy: `_find(VerticalLayout) { id = "form" }`.
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
-  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`; Java:
-  `_expectNone(Button.class, spec -> spec.withCaption("Delete"));`
+  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`;
+  Java: `_expectNone(Button.class, spec -> spec.withCaption("Delete"));`.
+  Groovy: `_expectNone(Button) { caption = "Delete" }`.
 * `_expectOne<type of component> { criteria }` will expect that there is
   exactly one **visible** component matching given criteria in the current UI; the function will fail if
   none, or more than one components are matching. For example: `_expectOne<Button> { caption = "Delete" }`. Java:
-  `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`. Note: this is
+  `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`.
+  Groovy: `_assertOne(Button) { caption = "Delete" }`.
+  Note: this is
   exactly the same as `_get()`, but it may communicate the intent of the test better in the case when you're
   only asserting that there is exactly one such component.
 * `_expect<type of component> { criteria }` is a generic version of the above methods which asserts
@@ -495,7 +586,8 @@ This library provides three methods for looking up components.
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
   components - they will simply ignore invisible ones.
 
-This set of functions operates on `UI.getCurrent()`. However, often it is handy to test a component separately from the UI, and perform the lookup only
+This set of functions operates on `UI.getCurrent()`. However,
+often it is handy to test a component separately from the UI, and perform the lookup only
 in that component. There are `Component._get()`, `Component._find()`,
 `Component._expectNone()` and `Component._expect()` counterparts, added to every Vaadin
 component as an extension method. For example:
@@ -510,6 +602,19 @@ test("add new person happy flow") {
     val form = AddNewPersonForm()
     form._get<TextField> { caption = "Name:" } ._value = "John Doe"
     form._get<Button> { caption = "Create" } ._click()
+}
+```
+
+Groovy:
+```kotlin
+class AddNewPersonForm : VerticalLayout() {
+    // nests fields, uses binder, etc etc
+}
+
+@Test void "add new person happy flow"() {
+    def form = new AddNewPersonForm()
+    form._get(TextField) { caption = "Name:" } ._value = "John Doe"
+    form._get(Button) { caption = "Create" } ._click()
 }
 ```
 
@@ -535,8 +640,12 @@ Such methods are also useful for example when locking the lookup scope into a pa
 ```kotlin
 _get<FlexLayout> { id = "form" } ._get<TextField> { caption = "Age" } ._value = "45"
 ```
+```groovy
+_get(FlexLayout) { id = "form" } ._get(TextField) { caption = "Age" } ._value = "45"
+```
 
-Since there is no way to see the UI of the app with this kind of approach (since there's no browser), the lookup functions will dump the component tree
+Since there is no way to see the UI of the app with this kind of approach
+(since there's no browser), the lookup functions will dump the component tree
 on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
 ```
 java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name': []. Component tree:
@@ -578,7 +687,7 @@ checks the following points prior running the click listeners:
 * If the button is effectively invisible (it may be visible itself, but it's nested in a layout that's invisible), the user can't really
   interact with the button. In this case, the `_click()` method will fail as well.
 
-With Java, you simply call `_click(button)`.
+The above approach works with Kotlin and Groovy. With Java, you simply call `_click(button)`.
 
 ### Changing values
 
@@ -586,17 +695,25 @@ The `HasValue.setValue()` function succeeds even if the component in question is
 want to simulate user input and we want to change the value of, say, a `Combobox`, we expect the Combobox to be enabled,
 read-write, visible; in other words, fully prepared to receive user input.
 
-It is therefore important to use the `HasValue._value` extension property provided by the Karibu Testing library, which checks
-all the above items prior setting the new value. With Java: `_setValue(hasValue, "42");`
+It is therefore important to use the `HasValue._value` extension property
+provided by the Karibu Testing library, which checks
+all the above items prior setting the new value (Kotlin, Groovy).
+With Java: `_setValue(hasValue, "42");`
 
 ### Firing DOM Events
 
 Listeners added via `Element.addEventListener()` API can be invoked easily:
 
 Kotlin:
-
 ```kotlin
 val div = Div()
+div.element.addEventListener("click") { /* do something */ }
+div._fireDomEvent("click")
+```
+
+Groovy:
+```groovy
+val div = new Div()
 div.element.addEventListener("click") { /* do something */ }
 div._fireDomEvent("click")
 ```
@@ -617,9 +734,9 @@ Server-side can only track focus by listening on `FocusEvent` and `BlurEvent`. T
 The Vaadin Grid is the most complex component in Vaadin, and therefore it requires a special set of testing methods, to assert the state and
 contents of the Grid.
 
-* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item.
+* You can retrieve a bean at particular index; for example `grid._get(0)` will return the first item (Kotlin, Groovy).
   Java: you need to `import static com.github.mvysny.kaributesting.v10.GridKt.*;`, then you can call `_get(grid, 0);`.
-* You can check for the total amount of items shown in the grid, by calling `grid._size()`. Java: `_size(grid);`
+* You can check for the total amount of items shown in the grid, by calling `grid._size()` (Kotlin, Groovy). Java: `_size(grid);`
 * You can obtain a full formatted row as seen by the user, by calling `grid._getFormattedRow(rowIndex)` - it will return that particular row as
   `List<String>`. In Java: `_getFormattedRow(grid, rowIndex)`
 * You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
@@ -635,6 +752,11 @@ An entire upload lifecycle is mocked properly. Simply call the following to mock
 Kotlin:
 ```kotlin
 upload._upload("hello.txt", "Hello world!".toByteArray())
+```
+
+Groovy:
+```groovy
+upload._upload("hello.txt", "Hello world!".bytes)
 ```
 
 Java:
@@ -680,7 +802,7 @@ to Vaadin: [https://github.com/vaadin/vaadin-context-menu-flow/issues/43](https:
 As a workaround, you will have to remember references to ContextMenu in your views and components,
 and retrieve them via getters. Then, it's very easy to click on a menu item; simply call
 
-Kotlin:
+Kotlin, Groovy:
 ```kotlin
 contextMenu._clickItemWithCaption("Save")
 gridContextMenu._clickItemWithCaption("Delete", person)
@@ -701,6 +823,12 @@ Kotlin:
 ```kotlin
 _get<LoginOverlay>()._login("nbu", "nbusr123")
 _get<LoginOverlay>()._forgotPassword()  // simulate the "forgot password" click
+```
+
+Groovy:
+```groovy
+_get(LoginOverlay)._login("nbu", "nbusr123")
+_get(LoginOverlay)._forgotPassword()  // simulate the "forgot password" click
 ```
 
 Java:
@@ -780,6 +908,11 @@ java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching
         ├── CheckBox[caption='Primary Address', value='false']
         └── TextField[caption='Street', value='']
 ```
+
+Groovy: Similar thing can be done by using the Groovy extension methods mechanism.
+Simply add the `setPrimary(boolean)` extension function to the `SearchSpec` class.
+See [Groovy Extension Modules Example](https://mrhaki.blogspot.com/2013/01/groovy-goodness-adding-extra-methods.html)
+for more details.
 
 ## Speed+Performance Optimizations
 
@@ -921,6 +1054,11 @@ Kotlin:
 expect("bar") { currentResponse.mock.getCookie("foo").value }
 ```
 
+Groovy (since Karibu-Testing 1.1.21/1.2.1):
+```groovy
+expect("bar") { VaadinResponse.current.mock.getCookie("foo").value }
+```
+
 Java:
 ```java
 assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
@@ -928,7 +1066,8 @@ assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie(
 
 ## Notifications
 
-Testing notifications is easy - just take advantage of the `expectNotifications()`, `expectNoNotifications()` and `clearNotifications()` functions
+Testing notifications is easy - just take advantage of the `expectNotifications()`,
+`expectNoNotifications()` and `clearNotifications()` functions
 as in the following example:
 
 ```kotlin
@@ -937,6 +1076,8 @@ expectNotifications("Error")
 // expectNotifications also clears current notifications so that any further notifications won't be mixed with existing ones
 expectNoNotifications()
 ```
+
+For Java and Groovy, those functions are present in the `NotificationsKt` class.
 
 ## Preparing Mock Environment For `UI.init()`
 

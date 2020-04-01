@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull
 /**
  * @author mavi
  */
+@CompileStatic
 class LocatorExtensionMethods {
     /**
      * Finds a VISIBLE component of given type which matches given [block]. This component and all of its descendants are searched.

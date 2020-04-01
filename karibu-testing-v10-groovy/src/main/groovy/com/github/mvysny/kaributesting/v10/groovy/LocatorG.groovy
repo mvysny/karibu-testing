@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull
  * Just static-import all methods from this class.
  * @author mavi
  */
+@CompileStatic
 class LocatorG {
     /**
      * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.

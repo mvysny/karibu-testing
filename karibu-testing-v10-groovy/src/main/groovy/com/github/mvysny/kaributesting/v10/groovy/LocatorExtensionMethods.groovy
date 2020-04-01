@@ -31,7 +31,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -50,7 +50,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -68,7 +68,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -86,7 +86,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -112,6 +112,6 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 }

@@ -32,7 +32,7 @@ class LocatorG {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -50,7 +50,7 @@ class LocatorG {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -67,7 +67,7 @@ class LocatorG {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -84,7 +84,7 @@ class LocatorG {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -108,6 +108,6 @@ class LocatorG {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 }

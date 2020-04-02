@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull
 /**
  * @author mavi
  */
+@CompileStatic
 class LocatorExtensionMethods {
     /**
      * Finds a VISIBLE component of given type which matches given [block]. This component and all of its descendants are searched.
@@ -30,7 +31,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -49,7 +50,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -67,7 +68,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -85,7 +86,7 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 
     /**
@@ -111,6 +112,6 @@ class LocatorExtensionMethods {
                 spec()
                 return Unit.INSTANCE
             }
-        })
+        } as Function1)
     }
 }

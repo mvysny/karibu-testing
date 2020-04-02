@@ -5,12 +5,14 @@ import com.vaadin.flow.component.contextmenu.HasMenuItems
 import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 /**
  * @author mavi
  */
+@CompileStatic
 class ContextMenuUtils {
     /**
      * Tries to find a menu item with given caption and click it.

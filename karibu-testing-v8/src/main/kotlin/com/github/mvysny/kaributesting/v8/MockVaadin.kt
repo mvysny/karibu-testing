@@ -80,7 +80,9 @@ object MockVaadin {
      */
     @JvmStatic
     @JvmOverloads
-    fun setup(uiFactory: () -> UI = { MockUI() }, httpSession: MockHttpSession? = null, servletContext: ServletContext = MockContext()) {
+    fun setup(uiFactory: () -> UI = { MockUI() },
+              httpSession: MockHttpSession? = null,
+              servletContext: ServletContext = MockContext()) {
         if (System.getProperty("vaadin.productionMode") == null) {
             // set the production mode to true, to suppress the repeated annoying warning message:
             // WARNING:

@@ -17,7 +17,10 @@ import static kotlin.test.AssertionsKt.expect
  */
 @CompileStatic
 class LocatorExtensionMethodsTest {
-    @BeforeEach void setup() { MockVaadin.setup() }
+    @BeforeEach void setup() {
+        TestAssumptions.assumeTestable()
+        MockVaadin.setup()
+    }
     @AfterEach void teardown() { MockVaadin.tearDown() }
 
     @Test

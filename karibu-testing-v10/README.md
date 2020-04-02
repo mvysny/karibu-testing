@@ -1167,3 +1167,11 @@ Java:
 ```java
 ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
 ```
+
+# MPR (Multi-Platform Runtime)
+
+It is possible to use Karibu-Testing to test [Vaadin MPR](https://vaadin.com/docs/v14/mpr/Overview.html)-based apps.
+The [Vaadin14 MPR Gradle Demo](https://gitlab.com/mvysny/vaadin14-mpr-gradle-demo)
+project demoes this possibility in the
+[MyUITest](https://gitlab.com/mvysny/vaadin14-mpr-gradle-demo/-/blob/master/src/test/kotlin/org/test/MyUITest.kt)
+class.

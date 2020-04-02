@@ -6,6 +6,7 @@ import com.vaadin.shared.Version
 import com.vaadin.shared.ui.ui.PageClientRpc
 import com.vaadin.ui.UI
 import com.vaadin.util.CurrentInstance
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.ExecutionException
@@ -63,7 +64,7 @@ object MockVaadin {
     private var strongRefRequest: VaadinRequest? = null
     private var strongRefResponse: VaadinResponse? = null
     private var lastLocation: String? = null
-    val log = LoggerFactory.getLogger(MockVaadin::class.java)
+    val log: Logger = LoggerFactory.getLogger(MockVaadin::class.java)
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
      *
@@ -80,6 +81,17 @@ object MockVaadin {
     @JvmStatic
     @JvmOverloads
     fun setup(uiFactory: () -> UI = { MockUI() }, httpSession: MockHttpSession? = null, servletContext: ServletContext = MockContext()) {
+        if (System.getProperty("vaadin.productionMode") == null) {
+            // set the production mode to true, to suppress the repeated annoying warning message:
+            // WARNING:
+            // =================================================================
+            // Vaadin is running in DEBUG MODE.
+            // Add productionMode=true to web.xml to disable debug features.
+            // To show debug window, add ?debug to your application URL.
+            // =================================================================
+            System.setProperty("vaadin.productionMode", "true")
+        }
+
         // prepare mocking servlet environment
         val servlet = MockVaadinServlet()
         servlet.init(MockServletConfig(servletContext))

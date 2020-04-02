@@ -103,7 +103,7 @@ class MockVaadinTest : DynaTest({
 
     group("proper mocking") {
         test("configuration mocked as well") {
-            expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
+            expect(true) { VaadinSession.getCurrent().configuration.isProductionMode }
         }
 
         test("verifyAttachCalled") {

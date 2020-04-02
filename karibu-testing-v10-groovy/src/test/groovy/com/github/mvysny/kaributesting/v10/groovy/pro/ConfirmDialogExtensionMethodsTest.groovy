@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10.groovy.pro
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10.groovy.TestAssumptions
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import groovy.transform.CompileStatic
@@ -14,7 +15,10 @@ import org.junit.jupiter.api.Test
  */
 @CompileStatic
 class ConfirmDialogExtensionMethodsTest {
-    @BeforeEach void setup() { MockVaadin.setup() }
+    @BeforeEach void setup() {
+        TestAssumptions.assumeTestable()
+        MockVaadin.setup()
+    }
     @AfterEach void teardown() { MockVaadin.tearDown() }
 
     @Test

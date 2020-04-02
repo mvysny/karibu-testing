@@ -14,7 +14,10 @@ import org.junit.jupiter.api.Test
  */
 @CompileStatic
 class BinderUtilsTest {
-    @BeforeEach void setup() { MockVaadin.setup() }
+    @BeforeEach void setup() {
+        TestAssumptions.assumeTestable()
+        MockVaadin.setup()
+    }
     @AfterEach void teardown() { MockVaadin.tearDown() }
 
     @Test

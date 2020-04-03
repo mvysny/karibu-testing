@@ -12,9 +12,12 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import java.io.File
+import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import javax.servlet.ServletConfig
 import javax.servlet.ServletContext
 
 private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
@@ -65,6 +68,20 @@ private class MockVaadinSession(service: VaadinService,
 
 private class MockVaadinServlet(val routes: Routes,
                           val serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService) : VaadinServlet() {
+
+    override fun createDeploymentConfiguration(): DeploymentConfiguration {
+        // we need to skip the test at DeploymentConfigurationFactory.verifyMode otherwise
+        // testing a Vaadin 15 component module in npm mode without webpack.config.js nor flow-build-info.json would fail.
+        if (VaadinMeta.flowBuildInfo == null) {
+            // probably inside a Vaadin 15 component module. create a dummy token file so that
+            // DeploymentConfigurationFactory.verifyMode() is happy.
+            val tokenFile: File = File.createTempFile("flow-build-info", "json")
+            tokenFile.writeText("{}")
+            servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
+        }
+        return super.createDeploymentConfiguration()
+    }
+
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
         val service: VaadinServletService = serviceFactory(this, deploymentConfiguration)
         service.init()

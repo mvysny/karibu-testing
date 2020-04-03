@@ -1,0 +1,3 @@
+moduleName = karibu-testing-pro-builder-module
+moduleVersion = 1.1.23
+extensionClasses = com.github.mvysny.kaributesting.v10.groovy.pro.ConfirmDialogExtensionMethods

@@ -1,5 +1,5 @@
 moduleName = karibu-testing-builder-module
-moduleVersion = 1.1.20
+moduleVersion = 1.1.23
 extensionClasses = com.github.mvysny.kaributesting.v10.groovy.ButtonUtils,\
   com.github.mvysny.kaributesting.v10.groovy.BasicUtils,\
   com.github.mvysny.kaributesting.v10.groovy.PrettyPrintTreeUtils,\
@@ -12,5 +12,4 @@ extensionClasses = com.github.mvysny.kaributesting.v10.groovy.ButtonUtils,\
   com.github.mvysny.kaributesting.v10.groovy.ContextMenuUtils,\
   com.github.mvysny.kaributesting.v10.groovy.ComboBoxUtils,\
   com.github.mvysny.kaributesting.v10.groovy.GridExtensionMethods,\
-  com.github.mvysny.kaributesting.v10.groovy.MockVaadinExtensionMethods,\
-  com.github.mvysny.kaributesting.v10.groovy.pro.ConfirmDialogExtensionMethods
+  com.github.mvysny.kaributesting.v10.groovy.MockVaadinExtensionMethods

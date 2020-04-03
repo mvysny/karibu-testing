@@ -10,9 +10,11 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import javax.servlet.ServletConfig
 import javax.servlet.ServletContext
 
 private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
@@ -63,8 +65,21 @@ private class MockVaadinSession(service: VaadinService,
 
 private class MockVaadinServlet(val routes: Routes,
                           val serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService) : VaadinServlet() {
+    override fun init(servletConfig: ServletConfig) {
+        routes.register(servletConfig.servletContext)
+        super.init(servletConfig)
+    }
+
+    override fun createDeploymentConfiguration(initParameters: Properties): DeploymentConfiguration {
+        // make sure that Vaadin 14+ starts in npm mode even with `frontend/` and `flow-build-info.json` missing.
+        // this check is required for testing a jar module with Vaadin 14 components.
+        if (VaadinMeta.version >= 14) {
+            initParameters.remove(DeploymentConfigurationFactory.DEV_MODE_ENABLE_STRATEGY)
+        }
+        return super.createDeploymentConfiguration(initParameters)
+    }
+
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-        routes.register(servletContext)
         val service: VaadinServletService = serviceFactory(this, deploymentConfiguration)
         service.init()
         return service
@@ -140,9 +155,8 @@ object MockVaadin {
 
             // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
             // in DefaultDeploymentConfiguration.checkCompatibilityMode()
-            val compatMode = Constants.VAADIN_PREFIX + Constants.SERVLET_PARAMETER_COMPATIBILITY_MODE
-            if (System.getProperty(compatMode) == null) {
-                System.setProperty(compatMode, true.toString())
+            if (System.getProperty("vaadin.compatibilityMode") == null) {
+                System.setProperty("vaadin.compatibilityMode", "true")
             }
 
         } else {

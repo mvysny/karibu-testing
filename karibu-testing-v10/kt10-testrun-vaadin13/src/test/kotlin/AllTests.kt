@@ -6,6 +6,8 @@ import kotlin.test.expect
 class AllTests : DynaTest({
     test("Vaadin version") {
         expect(13) { VaadinMeta.version }
+        expect(true) { VaadinMeta.isCompatibilityMode }
+        expect(null) { VaadinMeta.flowBuildInfo }
     }
     allTests()
 })

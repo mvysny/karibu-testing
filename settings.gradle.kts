@@ -6,4 +6,5 @@ include("karibu-testing-v8",
         "karibu-testing-v10:kt10-testrun-vaadin13",
         "karibu-testing-v10:kt10-testrun-vaadin14",
         "karibu-testing-v10:kt10-testrun-vaadin14-npm",
+        "karibu-testing-v10:kt10-testrun-vaadin14-npm-module",
         "karibu-testing-v10:kt10-testrun-vaadin15")

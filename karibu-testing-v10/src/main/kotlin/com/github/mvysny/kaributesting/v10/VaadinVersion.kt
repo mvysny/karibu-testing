@@ -43,7 +43,20 @@ object VaadinMeta {
             .getResource("META-INF/VAADIN/config/flow-build-info.json")
             ?.readJson()
 
+    /**
+     * Tells Karibu-Testing whether we run the tests in the compatibility mode or not.
+     * If we run in npm mode, Karibu-Testing needs to hook into PolymerTemplate loading mechanism.
+     *
+     * You can force a particular mode by calling `System.setProperty("vaadin.compatibilityMode", "true")`.
+     *
+     * This value is also applied to Vaadin's DeploymentConfiguration.
+     */
     val isCompatibilityMode: Boolean get() {
+        // allow overriding this via a system property
+        if (System.getProperty("vaadin.compatibilityMode") != null) {
+            return System.getProperty("vaadin.compatibilityMode").toBoolean()
+        }
+
         if (version <= 13) {
             // Vaadin 13 and lower always uses Bower mode
             return true

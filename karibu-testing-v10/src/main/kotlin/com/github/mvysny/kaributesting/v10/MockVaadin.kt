@@ -76,6 +76,7 @@ private class MockVaadinServlet(val routes: Routes,
         if (VaadinMeta.version >= 14) {
             initParameters.remove(DeploymentConfigurationFactory.DEV_MODE_ENABLE_STRATEGY)
         }
+        initParameters.setProperty("compatibilityMode", VaadinMeta.isCompatibilityMode.toString())
         return super.createDeploymentConfiguration(initParameters)
     }
 
@@ -152,13 +153,7 @@ object MockVaadin {
     private fun mockVaadin14() {
         if (VaadinMeta.isCompatibilityMode) {
             // Bower + WebJars mode
-
-            // make sure that we explicitly set the compat mode, otherwise Vaadin 14.0.0.rc9 will fail with IllegalStateException
-            // in DefaultDeploymentConfiguration.checkCompatibilityMode()
-            if (System.getProperty("vaadin.compatibilityMode") == null) {
-                System.setProperty("vaadin.compatibilityMode", "true")
-            }
-
+            // nothing special to do here.
         } else {
             // NPM + WebPack mode
             // we need to mock PolymerTemplate loading: https://github.com/mvysny/karibu-testing/issues/26

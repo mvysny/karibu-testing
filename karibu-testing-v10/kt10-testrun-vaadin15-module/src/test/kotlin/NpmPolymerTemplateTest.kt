@@ -6,7 +6,7 @@ import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.dependency.JsModule
 
 class NpmPolymerTemplateTest : DynaTest({
-    if (jvmVersion < 13) {
+    if (jvmVersion < 12) {
         beforeEach { MockVaadin.setup() }
         afterEach { MockVaadin.tearDown() }
 
@@ -14,7 +14,7 @@ class NpmPolymerTemplateTest : DynaTest({
             UnloadableComponent()
         }
     } else {
-        // Sorry, no support for Vaadin 14+npm on Java 13 or higher: https://github.com/mvysny/karibu-testing/issues/29
+        println("Sorry, no support for Vaadin 14+npm on Java 12 or higher: https://github.com/mvysny/karibu-testing/issues/31")
     }
 })
 

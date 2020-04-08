@@ -8,7 +8,7 @@ import java.net.URL
 import kotlin.test.expect
 
 class AllTests : DynaTest({
-    if (jvmVersion < 13) {
+    if (jvmVersion < 12) {
 
         test("flow-build-info.json exists") {
             val res: URL? = Thread.currentThread().contextClassLoader.getResource("META-INF/VAADIN/config/flow-build-info.json")
@@ -27,6 +27,6 @@ class AllTests : DynaTest({
         }
         allTests()
     } else {
-        // Sorry, no support for Vaadin 15 on Java 13 or higher: https://github.com/mvysny/karibu-testing/issues/29
+        println("Sorry, no support for Vaadin 14+npm on Java 12 or higher: https://github.com/mvysny/karibu-testing/issues/31")
     }
 })

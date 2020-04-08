@@ -63,8 +63,8 @@ internal fun Field.makeNotFinal() {
     val modifiersField: Field = try {
         Field::class.java.getDeclaredField("modifiers")
     } catch (ex: NoSuchFieldException) {
-        if (jvmVersion >= 13) {
-            throw RuntimeException("Unfortunately Karibu-Testing cannot hook into the NpmTemplateParser.INSTANCE field on Java 13 or higher; see https://github.com/mvysny/karibu-testing/issues/29 for more details.", ex)
+        if (jvmVersion >= 12) {
+            throw RuntimeException("Unfortunately Karibu-Testing cannot hook into the NpmTemplateParser.INSTANCE field on Java 12 or higher; see https://github.com/mvysny/karibu-testing/issues/31 for more details.", ex)
         } else {
             throw ex
         }
@@ -82,6 +82,6 @@ val jvmVersion: Int get() = System.getProperty("java.version").parseJvmVersion()
 
 internal fun String.parseJvmVersion(): Int {
     // taken from https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-    val version = removePrefix("1.").takeWhile { it.isDigit() }
+    val version: String = removePrefix("1.").takeWhile { it.isDigit() }
     return version.toInt()
 }

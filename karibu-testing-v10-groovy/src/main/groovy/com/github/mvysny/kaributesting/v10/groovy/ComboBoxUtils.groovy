@@ -31,6 +31,7 @@ class ComboBoxUtils {
     /**
      * Fetches items currently displayed in the suggestion box.
      */
+    @NotNull
     static <T> List<T> getSuggestionItems(@NotNull ComboBox<T> self) {
         ComboBoxKt.getSuggestionItems(self)
     }
@@ -38,6 +39,7 @@ class ComboBoxUtils {
     /**
      * Fetches captions of items currently displayed in the suggestion box.
      */
+    @NotNull
     static List<String> getSuggestions(@NotNull ComboBox self) {
         ComboBoxKt.getSuggestions(self)
     }
@@ -45,6 +47,7 @@ class ComboBoxUtils {
     /**
      * Fetches items currently displayed in the suggestion box.
      */
+    @NotNull
     static <T> List<T> getSuggestionItems(@NotNull Select<T> self) {
         ComboBoxKt.getSuggestionItems(self)
     }
@@ -52,6 +55,7 @@ class ComboBoxUtils {
     /**
      * Fetches captions of items currently displayed in the suggestion box.
      */
+    @NotNull
     static List<String> getSuggestions(@NotNull Select self) {
         ComboBoxKt.getSuggestions(self)
     }

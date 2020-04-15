@@ -22,19 +22,19 @@ class DownloadUtils {
         DownloadKt._download(self)
     }
 
-/**
- * Downloads contents of this link. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
- */
+    /**
+     * Downloads contents of this link. Only works with [StreamResource]; all other resources
+     * are rejected with [AssertionError].
+     */
     @NotNull
     static byte[] download(@NotNull Anchor self) {
         DownloadKt.download(self)
     }
 
-/**
- * Downloads contents of this image. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
- */
+    /**
+     * Downloads contents of this image. Only works with [StreamResource]; all other resources
+     * are rejected with [AssertionError].
+     */
     @NotNull
     static byte[] download(@NotNull Image self) {
         DownloadKt.download(self)

@@ -6,22 +6,28 @@ import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 
 /**
+ * {@link Upload}-related utilities.
  * @author mavi
  */
 @CompileStatic
 class UploadUtils {
     /**
-     * Invokes [StartedEvent], then feeds given [file] to the [Upload.receiver], then
-     * invokes the [SucceededEvent] and [FinishedEvent] listeners.
-     * Doesn't call [com.vaadin.flow.component.upload.ProgressListener].
-     *
-     * If writing to the receiver fails, [FailedEvent] is invoked instead of [SucceededEvent], then
+     * Invokes {@link com.vaadin.flow.component.upload.StartedEvent}, then feeds given
+     * file to the {@link Upload#getReceiver()}, then
+     * invokes the {@link com.vaadin.flow.component.upload.SucceededEvent} and
+     * {@link com.vaadin.flow.component.upload.FinishedEvent} listeners.
+     * Doesn't call {@link com.vaadin.flow.component.upload.ProgressListener}.
+     * <p></p>
+     * If writing to the receiver fails, {@link com.vaadin.flow.component.upload.FailedEvent}
+     * is invoked instead of {@link com.vaadin.flow.component.upload.SucceededEvent}, then
      * the exception is re-thrown from this function, so that the test fails properly.
-     *
+     * <p></p>
      * Limitations:
-     * * The upload button is not automatically disabled in mocked environment after the max upload file
-     *   is reached.
-     * * The upload "runs" in the UI thread, so there is no way to test thread safety.
+     * <ul>
+     * <li>The upload button is not automatically disabled in mocked environment after the max upload file
+     *   is reached.</li>
+     * <li>The upload "runs" in the UI thread, so there is no way to test thread safety.</li>
+     * </ul>
      */
     static void _upload(@NotNull Upload self, @NotNull String fileName,
                         @NotNull String mimeType = URLConnection.guessContentTypeFromName(fileName),
@@ -30,10 +36,11 @@ class UploadUtils {
     }
 
     /**
-     * Tests the "upload interrupted" scenario. First invokes [StartedEvent], then polls [Upload.receiver], then
-     * fires [FailedEvent] and [FinishedEvent].
-     *
-     * Currently the implementation simply calls [_uploadFail].
+     * Tests the "upload interrupted" scenario. First invokes
+     * {@link com.vaadin.flow.component.upload.StartedEvent}, then polls {@link Upload#getReceiver()}, then
+     * fires {@link com.vaadin.flow.component.upload.FailedEvent} and {@link com.vaadin.flow.component.upload.FinishedEvent}.
+     * <p></p>
+     * Currently the implementation simply calls {@link #_uploadFail}.
      */
     static void _uploadInterrupt(@NotNull Upload self, @NotNull String fileName,
                                  @NotNull String mimeType = URLConnection.guessContentTypeFromName(fileName)) {
@@ -41,9 +48,10 @@ class UploadUtils {
     }
 
     /**
-     * Tests the "upload failed" scenario. First invokes [StartedEvent], then polls
-     * [Upload.receiver] and closes it immediately without writing anything, then
-     * fires [FailedEvent] and [FinishedEvent].
+     * Tests the "upload failed" scenario. First invokes
+     * {@link com.vaadin.flow.component.upload.StartedEvent}, then polls
+     * {@link Upload#getReceiver()} and closes it immediately without writing anything, then
+     * fires {@link com.vaadin.flow.component.upload.FailedEvent} and {@link com.vaadin.flow.component.upload.FinishedEvent}.
      */
     static void _uploadFail(@NotNull Upload self, @NotNull String fileName,
                             @NotNull String mimeType = URLConnection.guessContentTypeFromName(fileName)) {

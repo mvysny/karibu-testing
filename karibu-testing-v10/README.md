@@ -858,7 +858,7 @@ class AddressPanel : FormLayout() {
 }
 ```
 
-You can easily retrieve the checkbox nested in the FormItem as follows:
+You can easily retrieve the fields nested in FormItems as follows:
 
 ```kotlin
 val isPrimary = _get<FormLayout.FormItem> { caption = "Primary Address" } .field as Checkbox

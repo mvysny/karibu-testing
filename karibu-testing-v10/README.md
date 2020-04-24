@@ -841,6 +841,30 @@ LoginFormKt._login(_get(LoginOverlay.class), "nbu", "nbusr123");
 LoginFormKt._forgotPassword(_get(LoginOverlay.class));
 ```
 
+### Support for fields nested in FormLayout.FormItem
+
+Suppose you have the following form:
+
+```kotlin
+class AddressPanel : FormLayout() {
+    init {
+        formItem("Primary Address") {
+            checkBox()
+        }
+        formItem("Street") {
+            textField()
+        }
+    }
+}
+```
+
+You can easily retrieve the checkbox nested in the FormItem as follows:
+
+```kotlin
+val isPrimary = _get<FormLayout.FormItem> { caption = "Primary Address" } .field as Checkbox
+expect(true) { isPrimary._value }
+```
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

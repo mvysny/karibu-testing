@@ -6,6 +6,7 @@ import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.contextmenu.ContextMenu
+import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.html.Anchor
@@ -37,7 +38,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("Text[text='foo']") { Text("foo").toPrettyString() }
         expect("Div[INVIS]") { Div().apply { isVisible = false } .toPrettyString() }
         expect("TextField[#25, value='']") { TextField().apply { id_ = "25" } .toPrettyString() }
-        expect("Button[text='click me']") { Button("click me").toPrettyString() }
+        expect("Button[caption='click me']") { Button("click me").toPrettyString() }
         expect("TextArea[label='label', value='some text']") { TextArea("label").apply { value = "some text" } .toPrettyString() }
         expect("Grid[]") { Grid<Any>().toPrettyString() }
         expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it } .apply { header2 = "My Header" } }.toPrettyString() }
@@ -48,6 +49,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("TextField[#25, value='', errorMessage='failed validation']") { TextField().apply { id_ = "25"; errorMessage = "failed validation" } .toPrettyString() }
         expect("Icon[icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
         expect("Button[icon='vaadin:abacus']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
+        expect("FormItem[caption='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
     }
 
     test("menu dump") {

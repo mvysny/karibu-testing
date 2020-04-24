@@ -78,6 +78,10 @@ fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
 @Suppress("UNCHECKED_CAST")
 fun Component.toPrettyString(): String {
     val list = LinkedList<String>()
+    val slot: String? = element.getAttribute("slot")
+    if (!slot.isNullOrBlank()) {
+        list.add("slot='$slot'")
+    }
     if (id.isPresent) {
         list.add("#${id.get()}")
     }
@@ -96,7 +100,10 @@ fun Component.toPrettyString(): String {
     if (label.isNotBlank()) {
         list.add("label='$label'")
     }
-    if (!_text.isNullOrBlank()) {
+    if (label != caption && caption.isNotBlank()) {
+        list.add("caption='$caption'")
+    }
+    if (!_text.isNullOrBlank() && this !is Button) {
         list.add("text='$_text'")
     }
     if (this is HasValue<*, *>) {

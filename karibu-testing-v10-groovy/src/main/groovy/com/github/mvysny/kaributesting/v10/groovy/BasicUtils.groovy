@@ -67,6 +67,9 @@ class BasicUtils {
 
     /**
      * The Component's caption: [Button.getText] for [Button], [label] for fields such as [TextField].
+     * <p></p>
+     * For FormItem: Concatenates texts from all elements placed in the `label` slot. This effectively
+     * returns whatever was provided in the String label via [FormLayout.addFormItem].
      */
     @NotNull
     static String getCaption(@NotNull Component self) {

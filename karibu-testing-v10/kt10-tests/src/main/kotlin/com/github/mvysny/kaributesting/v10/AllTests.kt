@@ -71,4 +71,7 @@ fun DynaNodeGroup.allTests() {
     group("binder test") {
         binderTestbatch()
     }
+    group("form layout test") {
+        formLayoutTest()
+    }
 }

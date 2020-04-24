@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.Input
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextArea
@@ -20,6 +21,7 @@ import elemental.json.JsonObject
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
+import java.lang.IllegalArgumentException
 import kotlin.test.fail
 
 /**
@@ -69,11 +71,13 @@ var Component.label: String
 var Component.caption: String
     get() = when (this) {
         is Button -> text
+        is FormLayout.FormItem -> this.caption
         else -> label
     }
     set(value) {
         when (this) {
             is Button -> text = value
+            is FormLayout.FormItem -> throw IllegalArgumentException("Setting the caption of FormItem is currently unsupported")
             else -> label = value
         }
     }

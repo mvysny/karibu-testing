@@ -74,4 +74,7 @@ fun DynaNodeGroup.allTests() {
     group("form layout test") {
         formLayoutTest()
     }
+    group("menu bar") {
+        menuBarTestbatch()
+    }
 }

@@ -20,7 +20,22 @@ import kotlin.test.fail
 fun HasMenuItems._clickItemWithCaption(caption: String) {
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
-            ?: fail("No menu item with caption $caption in ContextMenu:\n${(this as Component).toPrettyTree()}")
+            ?: fail("No menu item with caption $caption in this menu:\n${(this as Component).toPrettyTree()}")
+    (item as MenuItem)._click(parentMap)
+}
+
+/**
+ * Clicks a menu [item]. The item must belong to this menu.
+ *
+ * Intended to be used with MenuBars. See [Issue 33](https://github.com/mvysny/karibu-testing/issues/33) for more details.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+fun HasMenuItems._click(item: MenuItem) {
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
+    if (!parentMap.keys.contains(item)) {
+        fail("${item.toPrettyString()} is not contained in this menu:\n${(this as Component).toPrettyTree()}")
+    }
     (item as MenuItem)._click(parentMap)
 }
 
@@ -68,12 +83,17 @@ private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
 }
 
 /**
- * Tries to click given menu item.
+ * Tries to click given menu item. Fails if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ *
+ * Doesn't work for MenuItems nested in MenuBar.
+ * Use either [HasMenuItems._clickItemWithCaption] or [HasMenuItems._click].
+ * See [Issue 33](https://github.com/mvysny/karibu-testing/issues/33) for more details.
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun MenuItem._click() {
-    val contextMenu: ContextMenu = contextMenu ?: fail("This function doesn't work on menu items attached to MenuBars")
+    val contextMenu: ContextMenu = contextMenu ?: fail("This function doesn't work on menu items attached to MenuBars. Use either menuBar._clickItemWithCaption(\"foo\") or menuBar._click(menuItem). See https://github.com/mvysny/karibu-testing/issues/33 for more details")
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = contextMenu.getParentMap()
     _click(parentMap)
 }

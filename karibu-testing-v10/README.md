@@ -818,6 +818,20 @@ ContextMenuKt._clickItemWithCaption(contextMenu, "Save");
 ContextMenuKt._clickItemWithCaption(gridContextMenu, "Delete", person);
 ```
 
+### Support for MenuBar
+
+It's very easy to click on a menu item; simply call
+
+Kotlin, Groovy:
+```kotlin
+menuBar._clickItemWithCaption("Save")
+```
+
+Java:
+```java
+ContextMenuKt._clickItemWithCaption(menuBar, "Save");
+```
+
 ### Support for LoginForm and LoginOverlay
 
 The username/password text fields are not accessible from server-side so we can't

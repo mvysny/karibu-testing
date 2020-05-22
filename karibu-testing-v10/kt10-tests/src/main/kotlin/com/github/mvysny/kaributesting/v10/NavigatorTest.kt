@@ -2,7 +2,18 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
+import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.navigateToView
+import com.github.mvysny.karibudsl.v10.onLeftClick
+import com.github.mvysny.karibudsl.v10.span
+import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.router.BeforeLeaveEvent
+import com.vaadin.flow.router.BeforeLeaveObserver
+import com.vaadin.flow.router.Route
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.navigatorTest() {
@@ -24,5 +35,85 @@ internal fun DynaNodeGroup.navigatorTest() {
         expectThrows(AssertionError::class) {
             expectView<TestingView>()
         }
+    }
+
+    // tests for https://github.com/mvysny/karibu-testing/issues/34
+    group("delayed navigation") {
+        test("view") {
+            var a: BeforeLeaveEvent.ContinueNavigationAction? = null
+            UI.getCurrent().addBeforeLeaveListener { e ->
+                expect(null) { a }
+                a = e.postpone()
+            }
+            navigateToView<TestingView>()
+            _expectNone<TestingView>()
+            a!!.proceed()
+            _expectOne<TestingView>()
+        }
+
+        test("notification") {
+            var a: BeforeLeaveEvent.ContinueNavigationAction? = null
+            UI.getCurrent().addBeforeLeaveListener { e ->
+                expect(null) { a }
+                a = e.postpone()
+                Notification.show("postponing")
+            }
+            navigateToView<TestingView>()
+            expectNotifications("postponing")
+            a!!.proceed()
+            expectNoNotifications()
+        }
+
+        test("dialog - stay on page") {
+            navigateToView<NavigationPostponeView>()
+            _expectNone<Dialog>()
+
+            navigateToView<TestingView>()
+            //  the navigation should be postponed
+            _expectOne<NavigationPostponeView>()
+            _expectOne<Dialog>()
+            _expectNone<TestingView>()
+
+            // cancel the navigation
+            _get<Button> { caption = "No" } ._click()
+            // the navigation should have been canceled
+            _expectOne<NavigationPostponeView>()
+            _expectNone<Dialog>()
+            _expectNone<TestingView>()
+        }
+
+        test("dialog - leave") {
+            navigateToView<NavigationPostponeView>()
+            _expectNone<Dialog>()
+
+            navigateToView<TestingView>()
+            //  the navigation should be postponed
+            _expectOne<NavigationPostponeView>()
+            _expectOne<Dialog>()
+            _expectNone<TestingView>()
+
+            // cancel the navigation
+            _get<Button> { caption = "Yes" } ._click()
+            // the navigation should have proceeded
+            _expectNone<NavigationPostponeView>()
+            _expectNone<Dialog>()
+            _expectOne<TestingView>()
+        }
+    }
+}
+
+@Route("navigation-postpone")
+class NavigationPostponeView : VerticalLayout(), BeforeLeaveObserver {
+    override fun beforeLeave(event: BeforeLeaveEvent) {
+        val action = event.postpone()
+        Dialog().apply {
+            span("Are you sure you want to leave such a beautiful view?")
+            button("Yes") {
+                onLeftClick { action.proceed(); close() }
+            }
+            button("No") {
+                onLeftClick { close() }
+            }
+        }.open()
     }
 }

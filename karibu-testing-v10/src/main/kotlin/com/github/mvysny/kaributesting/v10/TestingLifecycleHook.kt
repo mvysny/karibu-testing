@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import java.lang.reflect.Method
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
@@ -63,6 +64,19 @@ fun cleanupDialogs() {
     UI.getCurrent().children.forEach {
         if (it is Dialog && !it.isOpened) {
             it.element.removeFromParent()
+        }
+    }
+
+    // also clean up ConfirmDialog. But careful - this is a Pro component and may not be on classpath.
+    val dlgClass: Class<*>? = try {
+        Class.forName("com.vaadin.flow.component.confirmdialog.ConfirmDialog")
+    } catch (e: ClassNotFoundException) { null }
+    if (dlgClass != null) {
+        val isOpenedMethod: Method = dlgClass.getMethod("isOpened")
+        UI.getCurrent().children.forEach {
+            if (dlgClass.isInstance(it) && !(isOpenedMethod.invoke(it) as Boolean)) {
+                it.element.removeFromParent()
+            }
         }
     }
 }

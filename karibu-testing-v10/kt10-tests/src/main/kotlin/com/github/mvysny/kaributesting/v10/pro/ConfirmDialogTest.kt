@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10._expectNone
 import com.github.mvysny.kaributesting.v10._expectOne
 import com.github.mvysny.kaributesting.v10._get
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
@@ -23,6 +24,7 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         ConfirmDialog("Foo", "Bar", "Yes") { confirmCalled = true }.open()
         _get<ConfirmDialog>()._fireConfirm()
         expect(true) { confirmCalled }
+        _expectNone<ConfirmDialog>()  // make sure the ConfirmDialog is closed: https://github.com/mvysny/karibu-testing/issues/34
     }
 
     test("cancel") {
@@ -32,6 +34,7 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         dialog.open()
         _get<ConfirmDialog>()._fireCancel()
         expect(true) { cancelCalled }
+        _expectNone<ConfirmDialog>()  // make sure the ConfirmDialog is closed: https://github.com/mvysny/karibu-testing/issues/34
     }
 
     test("reject") {
@@ -42,5 +45,6 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         dialog.open()
         _get<ConfirmDialog>()._fireReject()
         expect(true) { rejectCalled }
+        _expectNone<ConfirmDialog>()  // make sure the ConfirmDialog is closed: https://github.com/mvysny/karibu-testing/issues/34
     }
 }

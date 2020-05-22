@@ -9,8 +9,7 @@ import kotlin.test.expect
 fun DynaNodeGroup.routesTestBatch() {
     test("All views discovered") {
         val routes: Routes = Routes().autoDiscoverViews("com.github")
-        expect(setOf(ChildView::class.java, HelloWorldView::class.java, ParametrizedView::class.java,
-                TestingView::class.java, WelcomeView::class.java)) { routes.routes.toSet() }
+        expect(allViews) { routes.routes.toSet() }
         expect(setOf(ErrorView::class.java)) { routes.errorRoutes.toSet() }
     }
 

@@ -3,8 +3,14 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
+import java.util.*
 
 fun DynaNodeGroup.allTests() {
+    beforeEach {
+        // make sure that Validator produces messages in English
+        Locale.setDefault(Locale.ENGLISH)
+    }
+
     group("routes test") {
         routesTestBatch()
     }

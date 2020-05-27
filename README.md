@@ -118,6 +118,36 @@ for more details.
 * The [browserless web testing](https://mvysny.github.io/browserless-web-testing/) article describes this technique in more depth.
 * The [Testing the UI without a browser](https://vaadin.com/blog/testing-the-ui-without-a-browser) blog post summarizes this technique.
 
+## FAQ
+
+Q: I'm getting `java.lang.IllegalStateException: UI.getCurrent() must not be null`
+
+A: You probably forgot to call `MockVaadin.setup()` before the test. Just call `MockVaadin.setup()`
+   e.g. from your `@Before`-annotated method if you're using JUnit.
+
+Q: I'm getting `RouteNotFoundError` instead of my views (Vaadin 14+)
+
+A: The `@Route`-annotated view classes have not been discovered and registered.
+   Please discover the routes via `new Routes().autoDiscoverViews("com.example.yourpackage")`
+   (make sure to use the correct Java package where all of your views are placed)
+   then call `MockVaadin.setup(routes)`.
+   
+Q: Performance speed-up tips?
+
+1. (Vaadin 14+): the view auto-discovery is rather slow: you can discover the routes
+   only once (for example in your `@BeforeClass`-annotated method), then store the `Routes`
+   instance into a static field and reuse it for every call to `MockVaadin.setup(routes)`.
+2. (Vaadin 14+): `new Routes().autoDiscoverViews("")` is slower than
+   `new Routes().autoDiscoverViews("com.example.yourpackage")`
+3. (Vaadin 14+): PWA icon computation is horribly slow (2 seconds per test); make
+   sure it's off (the `Routes.skipPwaInit` should be `true` which is also the default value).
+4. Instead of logging in by filing the login form before every test, you can simply
+   login by placing `User` instance into your session directly (this of course
+   pretty much depends on how security is handled in your app).
+5. The first test is usually slower since all Vaadin-related classes need to be loaded
+   (could take 1-2 seconds to run); however any subsequent tests should be much faster
+   (~5-60 milliseconds).
+
 # License
 
 Licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)

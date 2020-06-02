@@ -558,12 +558,15 @@ or
 
 > Can't load template sources for <my-component> @mycomponent/my-component.js. Please: ...
 
-In such case, you need to run `mvn vaadin:build-frontend` goal before you run your tests, to populate the
+In such case, you need to run `mvn vaadin:build-frontend` goal (Maven) or
+`gradle vaadinBuildFrontend` (Gradle) before
+you run your tests, to populate the
 `node_modules/` folder. Be sure to run `vaadin:build-frontend` goal after your classes
 has been compiled (since build-frontend analyzes `*.class` files), otherwise the `node_modules/` folder
 will simply be empty, and Karibu-Testing will still complain about the missing template file.
 
-The best way is to run `mvn clean package vaadin:build-frontend verify` from your CI, to
+The best way is to run `mvn clean package vaadin:build-frontend verify` (Maven) or
+`gradle clean vaadinBuildFrontend build -Pvaadin.productionMode` (Gradle) from your CI, to
 run the plugins in correct order.
 
 It is also handy to cache the `node_modules/` folder with your CI, since the folder is huge
@@ -576,10 +579,9 @@ cache:
     - node_modules
 ```
 
-Populating `node_modules/` requires the `node` and `npm` programs to be present. In the worst
-case you can use the com.github.eirslett:frontend-maven-plugin to install those tools locally.
-See [vaadin14-embedded-jetty](https://github.com/mvysny/vaadin14-embedded-jetty#heroku-integration)
-for more information.
+Populating `node_modules/` requires the `node` and `npm` programs to be present.
+However Vaadin 14.2.0 Maven plugin (Gradle plugin 0.7.0) will
+install those for you automatically, there's no need for you to do anything.
 
 ## API
 

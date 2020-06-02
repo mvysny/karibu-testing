@@ -492,6 +492,7 @@ Please see the following example code:
 Kotlin:
 
 ```kotlin
+@Route("reviews")
 class ReviewsList : PolymerTemplate<TemplateModel>() {
     @Id("search")
     internal lateinit var search: TextField
@@ -504,7 +505,7 @@ test("create review") {
    // this doesn't work because of https://github.com/mvysny/karibu-testing/issues/1
    //  _get<Button> { caption = "New review" } ._click()
    
-   // this will work:
+   // You'll need to look up the PolymerTemplate itself, then retrieve the button from the Kotlin field:
    _get<ReviewsList>().addReview._click()
 }
 ```
@@ -512,6 +513,7 @@ test("create review") {
 Java:
 
 ```java
+@Route("reviews")
 public class ReviewsList extends PolymerTemplate<TemplateModel> {
     @Id("search")
     TextField search;
@@ -522,6 +524,10 @@ public class ReviewsList extends PolymerTemplate<TemplateModel> {
 
 @Test
 public void createReviewTest() {
+   // this doesn't work because of https://github.com/mvysny/karibu-testing/issues/1
+   // _click(_get(Button, spec -> spec.withCaption("New review"));
+
+   // You'll need to look up the PolymerTemplate itself, then retrieve the button from the Java field:
    ReviewsList list = _get(ReviewsList.class);
    _click(list.addReview);
 }

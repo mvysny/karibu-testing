@@ -7,6 +7,7 @@ import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate
@@ -140,15 +141,24 @@ fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.()->Uni
     val result: List<Component> = find(spec.toPredicate())
     if (result.size !in spec.count) {
         val loc: String = currentPath ?: "?"
-        val message = when {
+        var message: String = when {
             result.isEmpty() -> "/$loc: No visible ${clazz.simpleName}"
             result.size < spec.count.first -> "/$loc: Too few (${result.size}) visible ${clazz.simpleName}s"
             else -> "/$loc: Too many visible ${clazz.simpleName}s (${result.size})"
         }
+        message = "$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}"
+
+        // if there's a PolymerTemplate, warn that Karibu-Testing can't really locate components in there:
+        // https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates
+        // fixes https://github.com/mvysny/karibu-testing/issues/35
+        val hasPolymerTemplates: Boolean = walk().any { it is PolymerTemplate<*> }
+        if (hasPolymerTemplates) {
+            message = "$message\nWarning: Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates for more details."
+        }
 
         // find() used to fail with IllegalArgumentException which makes sense for a general-purpose utility method. However,
         // since find() is used in tests overwhelmingly, not finding the correct set of components is generally treated as an assertion error.
-        throw AssertionError("$message in ${toPrettyString()} matching $spec: [${result.joinToString { it.toPrettyString() }}]. Component tree:\n${toPrettyTree()}")
+        throw AssertionError(message)
     }
     return result.filterIsInstance(clazz)
 }
@@ -176,10 +186,12 @@ fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): L
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitBeforeLookup()
-    val descendants = walk().toList()
+    val descendants: List<Component> = walk().toList()
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
-    if (error != null) throw AssertionError("An internal server error occurred; check log for the actual stack-trace. Error text: ${error.element.text}\n${UI.getCurrent().toPrettyTree()}")
+    if (error != null) {
+        throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error.element.text}\n${UI.getCurrent().toPrettyTree()}")
+    }
     return descendants.filter { it.isEffectivelyVisible() && predicate(it) }
 }
 

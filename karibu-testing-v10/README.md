@@ -459,10 +459,9 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
 
 ### Polymer Templates
 
-> **Note:** Polymer Templates is a leaky abstraction and will most probably go away
-in future Vaadin versions.
-
-Testing components nested inside Polymer Templates with browserless approach is nearly impossible since the child components are either
+Testing PolymerTemplates with Karibu is a bit tricky.
+The purpose of PolymerTemplates is to move as much code as possible to the
+client-side, while Karibu is designed to test server-side code. The child components are either
 not accessible from the server-side altogether, or they are only a "shallow shells" of components constructed server-side.
 For example, a Vaadin `Button` nested in a Template will have empty caption server-side,
 even though it has a caption defined client-side (and the caption shows properly in the browser).
@@ -470,7 +469,8 @@ even though it has a caption defined client-side (and the caption shows properly
 Please read the discussion at [Can't look up components inside of PolymerTemplate](https://github.com/mvysny/karibu-testing/issues/1)
 for a technical explanation of this phenomenon.
 
-In short, it is not possible to look up components inside of a Polymer Template, but it is possible to use the API of nested components
+In short, it is not possible to look up components inside of a Polymer Template,
+however fear not - it is still possible to use the API of nested components
 to a degree. It is recommended that you publish your `@Id`-annotated fields as `public` or `internal` and access them from your tests
 in the following manner:
 

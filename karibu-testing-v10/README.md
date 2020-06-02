@@ -483,7 +483,9 @@ Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
 To work around the look-up issue,
 simply publish your `@Id`-annotated
 fields as `public` or `internal` (Kotlin) or with package visibility (Java).
-Also since the click handlers are defined server-side, you can still invoke those easily.
+
+Also you can still invoke event listeners (such as button clicks) easily since
+the event listeners are defined server-side.
 
 Please see the following example code:
 

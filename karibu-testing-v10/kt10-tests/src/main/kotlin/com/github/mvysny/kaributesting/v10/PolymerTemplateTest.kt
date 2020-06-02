@@ -3,7 +3,11 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectList
+import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
+import java.lang.IllegalStateException
 import kotlin.test.expect
 import kotlin.streams.*
 
@@ -29,5 +33,21 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
         val list = ReviewsList()
         expectList() { list.children.toList() }
         expectList(list) { list._find<Component>() }
+    }
+
+    // https://github.com/mvysny/karibu-testing/issues/35
+    test("when lookup of a component fails, notify user that it might be because of PolymerTemplate") {
+        UI.getCurrent().add(ReviewsList())
+        expectThrows(AssertionError::class, "Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates") {
+            _get<Button>()
+        }
+    }
+
+    // https://github.com/mvysny/karibu-testing/issues/35
+    test("when a lookup of a component fails and there is no PolymerTemplate, don't mention anything") {
+        val ex: AssertionError = expectThrows(AssertionError::class) {
+            _get<Button>()
+        }
+        expect(false, ex.message) { ex.message!!.contains("PolymerTemplate", true) }
     }
 }

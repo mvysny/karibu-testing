@@ -530,6 +530,18 @@ public void createReviewTest() {
 }
 ```
 
+#### Nested Polymer Templates
+
+Sometimes you have a PolymerTemplate nested inside another PolymerTemplate, etc.
+In order to access components from the inner PolymerTemplate, you will have to do
+the following:
+
+1. Use Karibu-Testing to discover the outermost PolymerTemplate
+2. Now Karibu-Testing is unable to discover the children of that PolymerTemplate;
+   you will therefore have to expose the inner PolymerTemplate via a field of the outer PolymerTemplate,
+   then access the inner PolymerTemplate via that field.
+
+
 #### PolymerTemplates which load stuff from the `node_modules` folder
 
 (Requires Karibu-Testing 1.1.16 or higher)

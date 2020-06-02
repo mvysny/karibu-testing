@@ -462,17 +462,29 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
 Testing PolymerTemplates with Karibu is a bit tricky.
 The purpose of PolymerTemplates is to move as much code as possible to the
 client-side, while Karibu is designed to test server-side code. The child components are either
-not accessible from the server-side altogether, or they are only a "shallow shells" of components constructed server-side.
-For example, a Vaadin `Button` nested in a Template will have empty caption server-side,
-even though it has a caption defined client-side (and the caption shows properly in the browser).
+not accessible from the server-side altogether, or they are only
+"shallow shells" of components constructed server-side - almost none of their properties
+are transferred to the server-side.
 
+For example, a Vaadin `Button` nested in a Template will have empty caption server-side,
+even though the element clearly has a text client-side (and the caption shows properly in the browser).
 Please read the discussion at [Can't look up components inside of PolymerTemplate](https://github.com/mvysny/karibu-testing/issues/1)
 for a technical explanation of this phenomenon.
 
-In short, it is not possible to look up components inside of a Polymer Template,
-however fear not - it is still possible to use the API of nested components
-to a degree. It is recommended that you publish your `@Id`-annotated fields as `public` or `internal` and access them from your tests
-in the following manner:
+Also the Vaadin's `VerticalLayout` (and all other layouts) will not have any child
+components present on the server-side, even though they're present in the template itself:
+the `verticalLayout.getChildren()` will return an empty Stream.
+That makes it impossible for Karibu-Testing to look up components inside of a Polymer Template.
+
+Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
+To work around the look-up issue,
+simply publish your `@Id`-annotated
+fields as `public` or `internal` (Kotlin) or with package visibility (Java).
+
+Also you can still invoke event listeners (such as button clicks) easily since
+the event listeners are defined server-side.
+
+Please see the following example code:
 
 Kotlin:
 

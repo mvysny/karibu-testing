@@ -326,11 +326,11 @@ object MockVaadin {
         VaadinSession.getCurrent()!!.apply {
             // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
             // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
-            val errors = mutableListOf<Throwable>()
-            val oldErrorHandler = errorHandler
+            val errors: MutableList<Throwable> = mutableListOf<Throwable>()
+            val oldErrorHandler: ErrorHandler? = errorHandler
             if (oldErrorHandler == null || oldErrorHandler is DefaultErrorHandler || !propagateExceptionToHandler) {
                 errorHandler = ErrorHandler {
-                    var t = it.throwable
+                    var t: Throwable = it.throwable
                     if (t !is ExecutionException) {
                         // for some weird reason t may not be ExecutionException when it originates from a coroutine :confused:
                         // the stacktrace would point someplace random. Wrap it in ExecutionException whose stacktrace will point to the test
@@ -348,7 +348,7 @@ object MockVaadin {
                 errorHandler = oldErrorHandler
             }
 
-            if (!errors.isEmpty()) {
+            if (errors.isNotEmpty()) {
                 errors.drop(1).forEach { errors[0].addSuppressed(it) }
                 throw errors[0]
             }

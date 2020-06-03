@@ -106,7 +106,11 @@ public class LocatorJ {
 
     /**
      * Fires a value change event which "comes from the client".
+     * <p></p>
+     * The event is only fired if it is actually possible to do so by the user.
+     * If the component is read-only or disabled, an exception is thrown.
      * @param fromClient whether the event comes from the client or not.
+     * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver, boolean fromClient) {
         HasValueUtilsKt._fireValueChange(receiver, fromClient);
@@ -114,6 +118,10 @@ public class LocatorJ {
 
     /**
      * Fires a value change event which "comes from the client".
+     * <p></p>
+     * The event is only fired if it is actually possible to do so by the user.
+     * If the component is read-only or disabled, an exception is thrown.
+     * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver) {
         _fireValueChange(receiver, true);

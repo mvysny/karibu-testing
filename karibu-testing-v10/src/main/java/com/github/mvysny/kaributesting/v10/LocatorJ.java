@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
@@ -100,7 +101,22 @@ public class LocatorJ {
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     public static <V, E extends HasValue.ValueChangeEvent<V>> void _setValue(@NotNull HasValue<E, V> receiver, @Nullable V value) {
-        BasicUtilsKt.set_value(receiver, value);
+        HasValueUtilsKt.set_value(receiver, value);
+    }
+
+    /**
+     * Fires a value change event which "comes from the client".
+     * @param fromClient whether the event comes from the client or not.
+     */
+    public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver, boolean fromClient) {
+        HasValueUtilsKt._fireValueChange(receiver, fromClient);
+    }
+
+    /**
+     * Fires a value change event which "comes from the client".
+     */
+    public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver) {
+        _fireValueChange(receiver, true);
     }
 
     /**

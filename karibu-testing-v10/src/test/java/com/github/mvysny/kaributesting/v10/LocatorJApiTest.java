@@ -55,6 +55,7 @@ public class LocatorJApiTest {
 
         _click(new Button());
         _setValue(new TextField(), "John");
+        _fireValueChange(new TextField());
 
         @SuppressWarnings("unchecked")
         final Grid<Person> grid = _get(Grid.class);

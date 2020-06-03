@@ -1,0 +1,38 @@
+package com.github.mvysny.kaributesting.v10.groovy
+
+import com.github.mvysny.kaributesting.v10.HasValueUtilsKt
+import com.vaadin.flow.component.AbstractField
+import com.vaadin.flow.component.HasValue
+import groovy.transform.CompileStatic
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
+
+/**
+ * @author Martin Vysny <mavi@vaadin.com>
+ */
+@CompileStatic
+class HasValueUtils {
+    /**
+     * Gets the value of given component. Alias for {@link com.vaadin.flow.component.HasValue#getValue()}.
+     */
+    @Nullable
+    static <V, E extends HasValue.ValueChangeEvent<V>> V get_value(@NotNull HasValue<E, V> self) {
+        return HasValueUtilsKt.get_value(self)
+    }
+    /**
+     * Sets the value of given component, but only if it is actually possible to do so by the user.
+     * If the component is read-only or disabled, an exception is thrown.
+     * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
+     */
+    static <V, E extends HasValue.ValueChangeEvent<V>> void set_value(@NotNull HasValue<E, V> self, @Nullable V value) {
+        HasValueUtilsKt.set_value(self, value)
+    }
+
+    /**
+     * Fires a value change event which "comes from the client".
+     * @param fromClient defaults to true
+     */
+    static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C self, boolean fromClient = true) {
+        HasValueUtilsKt._fireValueChange(self, fromClient)
+    }
+}

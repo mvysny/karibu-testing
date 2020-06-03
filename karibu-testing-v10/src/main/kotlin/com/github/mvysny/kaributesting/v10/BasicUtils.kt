@@ -190,18 +190,6 @@ val Component.isEnabled: Boolean
         else -> true
     }
 
-/**
- * Sets the value of given component, but only if it is actually possible to do so by the user.
- * If the component is read-only or disabled, an exception is thrown.
- * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
- */
-var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
-    get() = value
-    set(v) {
-        (this as Component).checkEditableByUser()
-        value = v
-    }
-
 // modify when this is fixed: https://github.com/vaadin/flow/issues/4068
 var Component.placeholder: String?
     get() = when (this) {

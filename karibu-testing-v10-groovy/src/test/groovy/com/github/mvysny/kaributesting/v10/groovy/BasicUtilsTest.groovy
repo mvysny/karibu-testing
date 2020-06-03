@@ -51,8 +51,6 @@ class BasicUtilsTest {
         new Checkbox().element.getTextRecursively()
         new Checkbox().isEffectivelyEnabled()
         new Checkbox().isEnabled()
-        new TextField()._value
-        new TextField()._value = "bar"
         new TextField().placeholder
         new TextField().placeholder = ""
         new Button().removeFromParent()

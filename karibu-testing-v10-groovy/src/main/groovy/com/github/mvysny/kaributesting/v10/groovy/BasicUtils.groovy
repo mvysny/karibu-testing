@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
+import com.github.mvysny.kaributesting.v10.HasValueUtilsKt
 import com.github.mvysny.kaributesting.v10.IconKt
 import com.github.mvysny.kaributesting.v10.IconName
 import com.github.mvysny.kaributesting.v10.NotificationsKt
@@ -157,23 +158,11 @@ class BasicUtils {
     }
 
     /**
-     * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.
+     * Checks whether this component is {@link com.vaadin.flow.component.HasEnabled#isEnabled()}.
+     * All components not implementing {@link com.vaadin.flow.component.HasEnabled} are considered enabled.
      */
     static boolean isEnabled(@NotNull Component self) {
         return BasicUtilsKt.isEnabled(self)
-    }
-
-    /**
-     * Sets the value of given component, but only if it is actually possible to do so by the user.
-     * If the component is read-only or disabled, an exception is thrown.
-     * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
-     */
-    @Nullable
-    static <V, E extends HasValue.ValueChangeEvent<V>> V get_value(@NotNull HasValue<E, V> self) {
-        return BasicUtilsKt.get_value(self)
-    }
-    static <V, E extends HasValue.ValueChangeEvent<V>> void set_value(@NotNull HasValue<E, V> self, @Nullable V value) {
-        BasicUtilsKt.set_value(self, value)
     }
 
     // modify when this is fixed: https://github.com/vaadin/flow/issues/4068

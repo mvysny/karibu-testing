@@ -733,8 +733,17 @@ read-write, visible; in other words, fully prepared to receive user input.
 
 It is therefore important to use the `HasValue._value` extension property
 provided by the Karibu Testing library, which checks
-all the above items prior setting the new value (Kotlin, Groovy).
-With Java: `_setValue(hasValue, "42");`
+all the above items prior setting the new value:
+
+* Kotlin, Groovy: `textField._value = "42"`
+* Java: `LocatorJ._setValue(textField, "42");`
+
+Changing the value fires the ValueChangeEvent with `fromClient` set to false.
+However, sometimes you need to fire a "client-side" value-change event,
+to test a code reacting to such events. In such case please use:
+
+* Kotlin, Groovy: `textField._fireValueChange()`
+* Java: `LocatorJ._fireValueChange(textField)`
 
 ### Firing DOM Events
 

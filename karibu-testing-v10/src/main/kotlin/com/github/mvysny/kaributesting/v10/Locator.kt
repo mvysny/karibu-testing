@@ -203,7 +203,7 @@ private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { compon
  */
 internal class PreorderTreeIterator<out T>(root: T, private val children: (T) -> List<T>) : Iterator<T> {
     private val queue: Deque<T> = LinkedList<T>(listOf(root))
-    override fun hasNext() = !queue.isEmpty()
+    override fun hasNext(): Boolean = !queue.isEmpty()
     override fun next(): T {
         if (!hasNext()) throw NoSuchElementException()
         val result: T = queue.pop()
@@ -217,17 +217,7 @@ internal class PreorderTreeIterator<out T>(root: T, private val children: (T) ->
  * then its next sibling.
  */
 private fun Component.walk(): Iterable<Component> = Iterable {
-    PreorderTreeIterator(this) { component -> component.getAllChildren() }
-}
-
-private fun Component.getAllChildren(): List<Component> = when(this) {
-    is Grid<*> -> {
-        val columns = children.toList()
-        val headerComponents = this.headerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
-        val footerComponents = this.footerRows.flatMap { it.cells.mapNotNull { cell -> cell.component } }
-        columns + headerComponents + footerComponents
-    }
-    else -> children.toList()
+    PreorderTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }
 }
 
 /**

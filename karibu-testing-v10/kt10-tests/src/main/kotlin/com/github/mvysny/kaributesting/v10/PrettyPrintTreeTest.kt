@@ -87,4 +87,33 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
     │   └── GridMenuItem[text='click me']
     └── GridMenuItem[text='save as']""".trim()) { cm.toPrettyTree().trim() }
     }
+
+    // tests https://github.com/mvysny/karibu-testing/issues/37
+    test("grid filters dump") {
+        val grid = UI.getCurrent().grid<String> {
+            val col = addColumn(karibuDslI18n)
+            appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
+        }
+        expect("""
+└── Grid[]
+    └── Column[]
+        └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+    }
+
+    // tests https://github.com/mvysny/karibu-testing/issues/37
+    test("grid filters dump for joined column") {
+        val grid = UI.getCurrent().grid<String> {
+            val col1 = addColumn(karibuDslI18n)
+            val col2 = addColumn(karibuDslI18n)
+            appendHeaderRow()
+            prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
+        }
+        expect("""
+└── Grid[]
+    └── ColumnGroup[]
+        ├── Column[]
+        │   └── TextField[label='Filter:', value='']
+        └── Column[]
+            └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+    }
 }

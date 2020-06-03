@@ -1,8 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.grid.Grid
 import java.lang.reflect.Method
+import kotlin.streams.toList
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
@@ -37,6 +41,24 @@ interface TestingLifecycleHook {
      * Invoked even if the `_get()`/`_find()`/`_expectNone()` function fails.
      */
     fun awaitAfterLookup() {}
+
+    /**
+     * Provides all children of given component. Provides workarounds for certain components:
+     * * For [Grid.Column] the function will also return cell components nested in all headers and footers for that particular column.
+     * * For [MenuItemBase] the function returns all items of a sub-menu.
+     */
+    fun getAllChildren(component: Component): List<Component> = when(component) {
+        is Grid.Column<*> -> {
+            val grid: Grid<*> = component.grid
+            val headerComponents: List<Component> = grid.headerRows.mapNotNull { it.getCell(component).component }
+            val footerComponents: List<Component> = grid.footerRows.mapNotNull { it.getCell(component).component }
+            headerComponents + footerComponents
+        }
+        is MenuItemBase<*, *, *> -> {
+            component.getSubMenu().getItems()
+        }
+        else -> component.children.toList()
+    }
 
     companion object {
         /**

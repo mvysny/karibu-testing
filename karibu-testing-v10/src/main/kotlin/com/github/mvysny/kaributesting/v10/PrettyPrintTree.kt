@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Image
@@ -50,13 +49,8 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
 
         fun ofVaadin(root: Component): PrettyPrintTree {
             val result = PrettyPrintTree(root.toPrettyString(), mutableListOf())
-            for (child in root.children) {
+            for (child: Component in testingLifecycleHook.getAllChildren(root)) {
                 result.children.add(ofVaadin(child))
-            }
-            if (root is MenuItemBase<*, *, *>) {
-                for (item in root.getSubMenu().getItems()) {
-                    result.children.add(ofVaadin(item))
-                }
             }
             return result
         }

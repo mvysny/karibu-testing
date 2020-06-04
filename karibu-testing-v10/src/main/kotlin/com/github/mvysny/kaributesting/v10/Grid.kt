@@ -271,24 +271,37 @@ private val <T> Grid.Column<T>.internalId2: String
 
 val Renderer<*>.template: String
     get() {
-        val template = Renderer::class.java.getDeclaredField("template").run {
+        val template: String? = Renderer::class.java.getDeclaredField("template").run {
             isAccessible = true
             get(this@template) as String?
         }
         return template ?: ""
     }
 
+private fun Any.gridAbstractHeaderGetHeader(): String {
+    // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
+    val headerRendererField: Field = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer")
+    headerRendererField.isAccessible = true
+    val e: Renderer<*>? = headerRendererField.get(this) as Renderer<*>?
+    return e?.template ?: ""
+}
+
 /**
- * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String). The result value is undefined if a component has been set as the header.
+ * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String).
+ * The result value is undefined if a component has been set as the header.
  */
 var <T> Grid.Column<T>.header2: String
     get() {
         // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
-        val headerRendererField: Field = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer")
-        headerRendererField.isAccessible = true
-        val e: Renderer<*>? = headerRendererField.get(this) as Renderer<*>?
-
-        return e?.template ?: ""
+        var result: String = gridAbstractHeaderGetHeader()
+        if (result.isEmpty()) {
+            // in case of grouped cells, the header is stored in a parent ColumnGroup.
+            val parent: Component = parent.orElse(null)
+            if (parent.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" && parent.children.count() == 1L) {
+                result = parent.gridAbstractHeaderGetHeader()
+            }
+        }
+        return result
     }
     set(value) {
         setHeader(value)

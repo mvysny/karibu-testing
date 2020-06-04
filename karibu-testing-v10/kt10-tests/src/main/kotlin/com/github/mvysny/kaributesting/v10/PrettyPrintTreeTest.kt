@@ -36,17 +36,17 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
 
     test("toPrettyString()") {
         expect("Text[text='foo']") { Text("foo").toPrettyString() }
-        expect("Div[INVIS]") { Div().apply { isVisible = false } .toPrettyString() }
-        expect("TextField[#25, value='']") { TextField().apply { id_ = "25" } .toPrettyString() }
+        expect("Div[INVIS]") { Div().apply { isVisible = false }.toPrettyString() }
+        expect("TextField[#25, value='']") { TextField().apply { id_ = "25" }.toPrettyString() }
         expect("Button[caption='click me']") { Button("click me").toPrettyString() }
-        expect("TextArea[label='label', value='some text']") { TextArea("label").apply { value = "some text" } .toPrettyString() }
+        expect("TextArea[label='label', value='some text']") { TextArea("label").apply { value = "some text" }.toPrettyString() }
         expect("Grid[]") { Grid<Any>().toPrettyString() }
-        expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it } .apply { header2 = "My Header" } }.toPrettyString() }
+        expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it }.apply { header2 = "My Header" } }.toPrettyString() }
         expect("Anchor[href='']") { Anchor().toPrettyString() }
         expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
         expect("Image[src='']") { Image().toPrettyString() }
         expect("Image[src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
-        expect("TextField[#25, value='', errorMessage='failed validation']") { TextField().apply { id_ = "25"; errorMessage = "failed validation" } .toPrettyString() }
+        expect("TextField[#25, value='', errorMessage='failed validation']") { TextField().apply { id_ = "25"; errorMessage = "failed validation" }.toPrettyString() }
         expect("Icon[icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
         expect("Button[icon='vaadin:abacus']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
         expect("FormItem[caption='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
@@ -70,50 +70,65 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
     └── MenuItem[text='save as']""".trim()) { cm.toPrettyTree().trim() }
 
     }
-    test("grid menu dump") {
-        lateinit var cm: GridContextMenu<String>
-        UI.getCurrent().grid<String> {
-            cm = gridContextMenu {
-                item("menu") {
-                    isEnabled = false
-                    item("click me", { _ -> fail("shouldn't be called") })
-                }
-                item("save as")
+
+    group("grid") {
+        test("column headers") {
+            val grid: Grid<String> = UI.getCurrent().grid<String> {
+                addColumn(karibuDslI18n).setHeader("Hello!")
             }
+            expect("""
+└── Grid[]
+    └── Column[header='Hello!']
+""".trim()) { grid.toPrettyTree().trim() }
         }
-        expect("""
+
+        test("grid menu dump") {
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("menu") {
+                        isEnabled = false
+                        item("click me", { _ -> fail("shouldn't be called") })
+                    }
+                    item("save as")
+                }
+            }
+            expect("""
 └── GridContextMenu[]
     ├── GridMenuItem[DISABLED, text='menu']
     │   └── GridMenuItem[text='click me']
     └── GridMenuItem[text='save as']""".trim()) { cm.toPrettyTree().trim() }
-    }
-
-    // tests https://github.com/mvysny/karibu-testing/issues/37
-    test("grid filters dump") {
-        val grid = UI.getCurrent().grid<String> {
-            val col = addColumn(karibuDslI18n)
-            appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
         }
-        expect("""
+
+        // tests https://github.com/mvysny/karibu-testing/issues/37
+        test("grid filters dump") {
+            val grid: Grid<String> = UI.getCurrent().grid<String> {
+                val col: Grid.Column<String> = addColumn(karibuDslI18n)
+                appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
+            }
+            expect("""
 └── Grid[]
     └── Column[]
         └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
-    }
-
-    // tests https://github.com/mvysny/karibu-testing/issues/37
-    test("grid filters dump for joined column") {
-        val grid = UI.getCurrent().grid<String> {
-            val col1 = addColumn(karibuDslI18n)
-            val col2 = addColumn(karibuDslI18n)
-            appendHeaderRow()
-            prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
         }
-        expect("""
+
+        // tests https://github.com/mvysny/karibu-testing/issues/37
+        test("grid filters dump for joined column") {
+            val grid: Grid<String> = UI.getCurrent().grid<String> {
+                val col1: Grid.Column<String> = addColumn(karibuDslI18n).setHeader("foo")
+                val col2: Grid.Column<String> = addColumn(karibuDslI18n).setHeader("bar")
+                appendHeaderRow()
+                prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
+            }
+            expect("""
 └── Grid[]
     └── ColumnGroup[]
-        ├── Column[]
-        │   └── TextField[label='Filter:', value='']
-        └── Column[]
-            └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+        ├── ColumnGroup[]
+        │   └── Column[header='foo']
+        │       └── TextField[label='Filter:', value='']
+        └── ColumnGroup[]
+            └── Column[header='bar']
+                └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+        }
     }
 }

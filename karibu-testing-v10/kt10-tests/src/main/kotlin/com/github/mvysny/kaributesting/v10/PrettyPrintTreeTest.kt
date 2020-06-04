@@ -102,8 +102,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
 
         // tests https://github.com/mvysny/karibu-testing/issues/37
         test("grid filters dump") {
-            val grid = UI.getCurrent().grid<String> {
-                val col = addColumn(karibuDslI18n)
+            val grid: Grid<String> = UI.getCurrent().grid<String> {
+                val col: Grid.Column<String> = addColumn(karibuDslI18n)
                 appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
             }
             expect("""

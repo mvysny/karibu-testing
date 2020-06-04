@@ -2,10 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.addColumnFor
+import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v10.component
-import com.github.mvysny.karibudsl.v10.grid
-import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -119,6 +117,19 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo") }.header2 }
         expect("") { grid.addColumn({ it }).apply { setHeader(Text("Foo")) }.header2 }
         expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo"); setSortProperty("name") }.header2 }
+    }
+
+    test("header2 with joined columns") {
+        lateinit var col1: Grid.Column<String>
+        lateinit var col2: Grid.Column<String>
+        val grid: Grid<String> = UI.getCurrent().grid<String> {
+            col1 = addColumn(karibuDslI18n).setHeader("foo")
+            col2 = addColumn(karibuDslI18n).setHeader("bar")
+            appendHeaderRow()
+            prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
+        }
+        expect("foo") { col1.header2 }
+        expect("bar") { col2.header2 }
     }
 
     test("renderers") {

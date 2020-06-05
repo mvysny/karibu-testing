@@ -159,7 +159,7 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnBy
  */
 @JvmOverloads
 fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
-                                     click: (Component) -> Unit = { component ->
+                                     click: (Component) -> Unit = { component: Component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
     checkEditableByUser()
@@ -170,7 +170,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
         @Suppress("UNCHECKED_CAST")
         (renderer as ClickableRenderer<T>).onClick(item)
     } else if (renderer is ComponentRenderer<*, *>) {
-        val component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+        val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
         if (component is Button) {
             component._click()
         } else {

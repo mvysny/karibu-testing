@@ -508,7 +508,9 @@ fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolea
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
     val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
-    _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
+    @Suppress("DEPRECATION") // Vaadin 13 doesn't have the constructor with the "internalColumnId"
+    val event = ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
+    _fireEvent(event)
 }
 
 /**

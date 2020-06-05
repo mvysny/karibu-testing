@@ -159,18 +159,18 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnBy
  */
 @JvmOverloads
 fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
-                                     click: (Component) -> Unit = { component ->
+                                     click: (Component) -> Unit = { component: Component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
     checkEditableByUser()
-    val column = _getColumnByKey(columnKey)
-    val renderer = column.renderer
+    val column: Grid.Column<T> = _getColumnByKey(columnKey)
+    val renderer: Renderer<T>? = column.renderer
     val item: T = _get(rowIndex)
     if (renderer is ClickableRenderer<*>) {
         @Suppress("UNCHECKED_CAST")
         (renderer as ClickableRenderer<T>).onClick(item)
     } else if (renderer is ComponentRenderer<*, *>) {
-        val component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+        val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
         if (component is Button) {
             component._click()
         } else {
@@ -508,7 +508,9 @@ fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolea
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
     val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
-    _fireEvent(ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey))
+    @Suppress("DEPRECATION") // Vaadin 13 doesn't have the constructor with the "internalColumnId"
+    val event = ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
+    _fireEvent(event)
 }
 
 /**

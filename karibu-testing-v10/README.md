@@ -789,6 +789,8 @@ contents of the Grid.
   In Java: `expectRows(grid, 25)`
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
+* You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
+  or a `Button` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
 ### Support for Upload
 

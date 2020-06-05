@@ -163,8 +163,8 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
     checkEditableByUser()
-    val column = _getColumnByKey(columnKey)
-    val renderer = column.renderer
+    val column: Grid.Column<T> = _getColumnByKey(columnKey)
+    val renderer: Renderer<T>? = column.renderer
     val item: T = _get(rowIndex)
     if (renderer is ClickableRenderer<*>) {
         @Suppress("UNCHECKED_CAST")

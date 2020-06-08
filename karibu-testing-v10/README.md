@@ -789,6 +789,39 @@ contents of the Grid.
 * You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
   or a `Button` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
+#### Grid Filters
+
+The filtering code is not called when your code calls `DataProvider.refreshAll()`,
+and it's not obvious why.
+
+The gist of the problem is as follows: when the Vaadin app is running with the full client-side code, then the `dataProvider.setFilter()`
+calls `dataProvider.refreshAll()` at some point. That call informs the client-side
+Grid code that it needs to throw away all data and ask for a fresh data.
+Grid then makes a request to Vaadin Servlet, which redirects the call to
+`DataProvider`'s data fetching code, which in turn applies the filters.
+
+With Karibu-Testing there is no client-side, therefore `dataProvider.refreshAll()`
+does nothing since there is no client-side that can re-fetch the data, and
+thus `DataProvider`'s fetching code does not get called.
+
+However, there is another possibility to test the filters:
+they are invoked every time you call one of
+Karibu-Testing's `GridKt` methods such as `expectRows()` or `expectRow()` or `_clickRenderer()`,
+or one of the "lower-level" functions `_get(0)` or `_size()` or `_getFormattedRow()`.
+
+The reasoning is that in this particular case the unit-test itself can "play the
+role of the client-side": after the filter has been modified, the most reasonable
+thing for the test to do is to assert on the rows of the Grid;
+Karibu-Testing will then call `DataProvider`'s data fetching
+methods which will in turn invoke the filters themselves.
+
+#### Grid Sorting
+
+The same thing applies to Grid sorting: the `Grid.sort()` methods does not trigger
+the `DataProvider`'s fetching methods. However, the sorting is
+automatically applied by Karibu-Testing as if by the Grid itself,
+when you call Karibu-Testing's `GridKt` methods.
+
 ### Support for Upload
 
 An entire upload lifecycle is mocked properly. Simply call the following to mock-upload a file:

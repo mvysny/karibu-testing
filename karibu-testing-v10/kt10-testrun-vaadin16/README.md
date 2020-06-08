@@ -1,9 +1,9 @@
-# Test Runner For Vaadin 15 tests
+# Test Runner For Vaadin 16 tests
 
-Vaadin 15 only supports NPM+WebPack mode - it doesn't support Bower mode.
+Vaadin 16 only supports NPM+WebPack mode - it doesn't support Bower mode.
 
 Runs all tests from the [kt10-tests](../kt10-tests) test battery.
-Simulates a WAR app with the setup "Vaadin 15 + npm + webpack + Polymer 3".
+Simulates a WAR app with the setup "Vaadin 16 + npm + webpack + Polymer 3".
 
 The setup is activated by having
 a specially placed [flow-build-info.json](src/test/resources/META-INF/VAADIN/config/flow-build-info.json)

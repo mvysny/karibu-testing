@@ -1,0 +1,64 @@
+package com.github.mvysny.kaributesting.v10
+
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.data.renderer.BasicRenderer
+import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.data.renderer.Renderer
+import com.vaadin.flow.data.renderer.TemplateRenderer
+import com.vaadin.flow.function.ValueProvider
+import org.jsoup.Jsoup
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+
+/**
+ * Returns the output of this renderer for given [rowObject] formatted as close as possible
+ * to the client-side output.
+ */
+fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
+    is TemplateRenderer<T> -> {
+        val renderedTemplateHtml: String = renderTemplate(rowObject)
+        Jsoup.parse(renderedTemplateHtml).textRecursively
+    }
+    is BasicRenderer<T, *> -> {
+        val value: Any? = valueProvider.apply(rowObject)
+        val getFormattedValueM: Method = BasicRenderer::class.java.declaredMethods
+                .first { it.name == "getFormattedValue" }
+        getFormattedValueM.isAccessible = true
+        getFormattedValueM.invoke(this, value)
+    }
+    is ComponentRenderer<*, T> -> {
+        val component: Component = createComponent(rowObject)
+        component.toPrettyString()
+    }
+    else -> null
+}
+
+/**
+ * Renders the template for given [item]
+ */
+fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
+    var template: String = this.template
+    this.valueProviders.forEach { (k, v) ->
+        if (template.contains("[[item.$k]]")) {
+            template = template.replace("[[item.$k]]", v.apply(item).toString())
+        }
+    }
+    return template
+}
+
+@Suppress("UNCHECKED_CAST")
+val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
+    get() {
+    val javaField = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
+        isAccessible = true
+    }
+    return javaField.get(this) as ValueProvider<T, V>
+}
+
+val Renderer<*>.template: String
+    get() {
+        val templateF: Field = Renderer::class.java.getDeclaredField("template")
+        templateF.isAccessible = true
+        val template: String? = templateF.get(this) as String?
+        return template ?: ""
+    }

@@ -30,7 +30,7 @@ import kotlin.test.fail
  */
 fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
-    val fetched: Stream<T> = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
+    val fetched: Stream<T> = fetch(Query(rowIndex, 1, sortOrders, inMemorySorting, filter))
     return fetched.toList().firstOrNull()
             ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
 }
@@ -41,7 +41,7 @@ fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrde
  * @return the list of items.
  */
 fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
-    val fetched = fetch(Query<T, F>(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
+    val fetched: Stream<T> = fetch(Query(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
     return fetched.toList()
 }
 
@@ -213,53 +213,14 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
-    return when (val renderer: Renderer<T> = this.renderer) {
-        is ColumnPathRenderer -> {
-            val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
-            val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
-            val value: Any? = valueProvider.apply(rowObject)
-            value.toString()
-        }
-        is TemplateRenderer<T> -> {
-            val renderedTemplateHtml: String = renderer.renderTemplate(rowObject)
-            Jsoup.parse(renderedTemplateHtml).textRecursively
-        }
-        is BasicRenderer<T, *> -> {
-            val value: Any? = renderer.valueProvider.apply(rowObject)
-            val getFormattedValueM = BasicRenderer::class.java
-                    .declaredMethods
-                    .filter { it.name == "getFormattedValue" }
-                    .first()
-                    .apply { isAccessible = true }
-            getFormattedValueM.invoke(renderer, value)
-        }
-        is ComponentRenderer<*, T> -> {
-            val component: Component = renderer.createComponent(rowObject)
-            component.toPrettyString()
-        }
-        else -> null
+    val renderer: Renderer<T> = this.renderer
+    if (renderer is ColumnPathRenderer) {
+        val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
+        val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
+        val value: Any? = valueProvider.apply(rowObject)
+        return value.toString()
     }
-}
-
-@Suppress("UNCHECKED_CAST", "ConflictingExtensionProperty") // conflicting property is "protected"
-val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V> get() {
-    val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
-        isAccessible = true
-    }
-    return javaField.get(this) as ValueProvider<T, V>
-}
-
-/**
- * Renders the template for given [item]
- */
-fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
-    var template: String = this.template
-    this.valueProviders.forEach { (k, v) ->
-        if (template.contains("[[item.$k]]")) {
-            template = template.replace("[[item.$k]]", v.apply(item).toString())
-        }
-    }
-    return template
+    return renderer._getPresentationValue(rowObject)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -267,15 +228,6 @@ private val <T> Grid.Column<T>.internalId2: String
     get() = Grid.Column::class.java.getDeclaredMethod("getInternalId").run {
         isAccessible = true
         invoke(this@internalId2) as String
-    }
-
-val Renderer<*>.template: String
-    get() {
-        val template: String? = Renderer::class.java.getDeclaredField("template").run {
-            isAccessible = true
-            get(this@template) as String?
-        }
-        return template ?: ""
     }
 
 private fun Any.gridAbstractHeaderGetHeader(): String {
@@ -303,7 +255,7 @@ var <T> Grid.Column<T>.header2: String
         }
         return result
     }
-    set(value) {
+    set(value: String) {
         setHeader(value)
     }
 
@@ -371,7 +323,7 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
  */
 internal val HeaderRow.HeaderCell.column: Any
     get() {
-        val getColumn = abstractCellClass.getDeclaredMethod("getColumn")
+        val getColumn: Method = abstractCellClass.getDeclaredMethod("getColumn")
         getColumn.isAccessible = true
         return getColumn.invoke(this)
     }

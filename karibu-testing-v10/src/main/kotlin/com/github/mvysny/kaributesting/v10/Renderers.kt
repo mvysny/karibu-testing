@@ -11,9 +11,10 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 
 /**
- * Formats the value produced by this Renderer in a nice way.
+ * Returns the output of this renderer for given [rowObject] formatted as close as possible
+ * to the client-side output.
  */
-fun <T: Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
+fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
     is TemplateRenderer<T> -> {
         val renderedTemplateHtml: String = renderTemplate(rowObject)
         Jsoup.parse(renderedTemplateHtml).textRecursively
@@ -32,15 +33,6 @@ fun <T: Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this)
     else -> null
 }
 
-@Suppress("UNCHECKED_CAST", "ConflictingExtensionProperty") // conflicting property is "protected"
-val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
-    get() {
-    val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
-        isAccessible = true
-    }
-    return javaField.get(this) as ValueProvider<T, V>
-}
-
 /**
  * Renders the template for given [item]
  */
@@ -54,11 +46,18 @@ fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     return template
 }
 
+@Suppress("UNCHECKED_CAST")
+val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
+    get() {
+        val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
+        javaField.isAccessible = true
+        return javaField.get(this) as ValueProvider<T, V>
+    }
+
 val Renderer<*>.template: String
     get() {
-        val template: String? = Renderer::class.java.getDeclaredField("template").run {
-            isAccessible = true
-            get(this@template) as String?
-        }
+        val templateF: Field = Renderer::class.java.getDeclaredField("template")
+        templateF.isAccessible = true
+        val template: String? = templateF.get(this) as String?
         return template ?: ""
     }

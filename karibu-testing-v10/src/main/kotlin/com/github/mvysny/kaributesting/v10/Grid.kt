@@ -215,11 +215,11 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val renderer: Renderer<T> = this.renderer
     if (renderer is ColumnPathRenderer) {
-        val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
-        val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
-        val value: Any? = valueProvider.apply(rowObject)
-        return value.toString()
-    }
+            val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
+            val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
+            val value: Any? = valueProvider.apply(rowObject)
+            value.toString()
+        }
     return renderer._getPresentationValue(rowObject)
 }
 

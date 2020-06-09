@@ -32,24 +32,26 @@ internal fun DynaNodeGroup.gridTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    test("_size") {
-        expect(20) {
-            ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._size()
+    group("DataProvider") {
+        test("_size") {
+            expect(20) {
+                ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._size()
+            }
         }
-    }
 
-    test("_get") {
-        expect("name 5") {
-            ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name
+        test("_get") {
+            expect("name 5") {
+                ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name
+            }
+            expectThrows(AssertionError::class, "Requested to get row 30 but the data provider only has 20 rows") {
+                ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(30)
+            }
         }
-        expectThrows(AssertionError::class, "Requested to get row 30 but the data provider only has 20 rows") {
-            ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(30)
-        }
-    }
 
-    test("_findAll") {
-        val list = (0 until 20).map { TestPerson("name $it", it) }
-        expect(list) { ListDataProvider<TestPerson>(list)._findAll() }
+        test("_findAll") {
+            val list = (0 until 20).map { TestPerson("name $it", it) }
+            expect(list) { ListDataProvider<TestPerson>(list)._findAll() }
+        }
     }
 
     test("_dump") {

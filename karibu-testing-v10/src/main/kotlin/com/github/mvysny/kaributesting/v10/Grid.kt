@@ -80,7 +80,8 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
 }
 
 fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
-    val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply { isAccessible = true }
+    val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)
+    m.isAccessible = true
     @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()
 }

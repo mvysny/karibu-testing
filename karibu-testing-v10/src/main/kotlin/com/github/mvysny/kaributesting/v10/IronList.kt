@@ -77,7 +77,7 @@ fun <T : Any> IronList<T>._getFormattedRow(rowIndex: Int): String {
  */
 @JvmOverloads
 fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
-    appendln("----------------------")
+    append("----------------------\n")
     val dsIndices: IntRange
     val displayIndices: Set<Int>
         dsIndices = 0 until _size()
@@ -85,7 +85,8 @@ fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
         for (i in displayIndices) {
             append(i)
             append(": ")
-            appendln(_getFormattedRow(i))
+            append(_getFormattedRow(i))
+            append('\n')
         }
     val andMore: Int = dsIndices.size - displayIndices.size
     if (andMore > 0) {

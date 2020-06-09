@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.GridKt
 import com.github.mvysny.kaributesting.v10.PrettyPrintTree
+import com.github.mvysny.kaributesting.v10.RenderersKt
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
@@ -217,7 +218,7 @@ class GridExtensionMethods {
 
     @NotNull
     static <T, V> ValueProvider<T, V> getValueProvider2(@NotNull BasicRenderer<T, V> self) {
-        GridKt.getValueProvider(self)
+        RenderersKt.getValueProvider(self)
     }
 
     /**
@@ -225,12 +226,12 @@ class GridExtensionMethods {
      */
     @NotNull
     static <T> String renderTemplate(@NotNull TemplateRenderer<T> self, @NotNull T item) {
-        GridKt.renderTemplate(self, item)
+        RenderersKt.renderTemplate(self, item)
     }
 
     @NotNull
     static String getTemplate(@NotNull Renderer<?> self) {
-        GridKt.getTemplate(self)
+        RenderersKt.getTemplate(self)
     }
 
     /**

@@ -211,15 +211,20 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     return _getFormattedRow(rowObject)
 }
 
+/**
+ * Returns the output of renderer set for this column for given [rowObject] formatted as close as possible
+ * to the client-side output.
+ */
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val renderer: Renderer<T> = this.renderer
     if (renderer is ColumnPathRenderer) {
-            val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
-            val valueProvider: ValueProvider<T, *> = valueProviders[internalId2] ?: return null
-            val value: Any? = valueProvider.apply(rowObject)
-            value.toString()
-        }
+        val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
+        val valueProvider: ValueProvider<T, *> = valueProviders[internalId2]
+                ?: return null
+        val value: Any? = valueProvider.apply(rowObject)
+        return value.toString()
+    }
     return renderer._getPresentationValue(rowObject)
 }
 
@@ -248,8 +253,8 @@ var <T> Grid.Column<T>.header2: String
         var result: String = gridAbstractHeaderGetHeader()
         if (result.isEmpty()) {
             // in case of grouped cells, the header is stored in a parent ColumnGroup.
-            val parent: Component = parent.orElse(null)
-            if (parent.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" && parent.children.count() == 1L) {
+            val parent: Component? = parent.orElse(null)
+            if (parent != null && parent.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" && parent.children.count() == 1L) {
                 result = parent.gridAbstractHeaderGetHeader()
             }
         }

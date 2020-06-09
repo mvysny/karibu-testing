@@ -16,11 +16,11 @@ import java.lang.reflect.Method
  */
 fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
     is TemplateRenderer<T> -> {
-        val renderedTemplateHtml: String = renderTemplate(rowObject)
+        val renderedTemplateHtml: String = this.renderTemplate(rowObject)
         Jsoup.parse(renderedTemplateHtml).textRecursively
     }
     is BasicRenderer<T, *> -> {
-        val value: Any? = valueProvider.apply(rowObject)
+        val value: Any? = this.valueProvider.apply(rowObject)
         val getFormattedValueM: Method = BasicRenderer::class.java.declaredMethods
                 .first { it.name == "getFormattedValue" }
         getFormattedValueM.isAccessible = true
@@ -46,6 +46,9 @@ fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     return template
 }
 
+/**
+ * Returns the [ValueProvider] set to [BasicRenderer].
+ */
 @Suppress("UNCHECKED_CAST")
 val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
     get() {
@@ -54,6 +57,9 @@ val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
         return javaField.get(this) as ValueProvider<T, V>
     }
 
+/**
+ * Returns the Polymer Template set to the [Renderer].
+ */
 val Renderer<*>.template: String
     get() {
         val templateF: Field = Renderer::class.java.getDeclaredField("template")

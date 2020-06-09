@@ -38,7 +38,7 @@ fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this
  */
 fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     var template: String = this.template
-    this.valueProviders.forEach { (k, v) ->
+    this.valueProviders.forEach { (k: String, v: ValueProvider<T, *>) ->
         if (template.contains("[[item.$k]]")) {
             template = template.replace("[[item.$k]]", v.apply(item).toString())
         }
@@ -49,11 +49,10 @@ fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
 @Suppress("UNCHECKED_CAST")
 val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
     get() {
-    val javaField = BasicRenderer::class.java.getDeclaredField("valueProvider").apply {
-        isAccessible = true
+        val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
+        javaField.isAccessible = true
+        return javaField.get(this) as ValueProvider<T, V>
     }
-    return javaField.get(this) as ValueProvider<T, V>
-}
 
 val Renderer<*>.template: String
     get() {

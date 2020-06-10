@@ -16,24 +16,26 @@ import kotlin.streams.toList
  *
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
+ * @throws AssertionError if the row index is out of bounds.
  */
 fun <T : Any> IronList<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
-        val size: Int = _size()
-        if (rowIndex >= size) {
-            throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
-        }
+    val size: Int = _size()
+    if (rowIndex >= size) {
+        throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
+    }
     val fetched: List<T> = _fetch(rowIndex, 1)
     return fetched.firstOrNull()
             ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
 }
 
 /**
- * Fetches an item from [IronList]'s data provider.
+ * Fetches items from [IronList]'s data provider.
  */
 fun <T> IronList<T>._fetch(offset: Int, limit: Int): List<T> {
+    @Suppress("UNCHECKED_CAST")
     val stream: Stream<T> = (dataProvider as DataProvider<T, Any?>)
-        .fetch(Query<T, Any?>(offset, limit, listOf(), null, null))
+            .fetch(Query<T, Any?>(offset, limit, listOf(), null, null))
     return stream.toList()
 }
 
@@ -48,11 +50,12 @@ fun <T> IronList<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
  */
 fun IronList<*>._size(): Int = dataProvider._size()
 
-val <T> IronList<T>._renderer: Renderer<T> get() {
-    val f: Field = IronList::class.java.getDeclaredField("renderer")
-    f.isAccessible = true
-    return f.get(this) as Renderer<T>
-}
+val <T> IronList<T>._renderer: Renderer<T>
+    get() {
+        val f: Field = IronList::class.java.getDeclaredField("renderer")
+        f.isAccessible = true
+        return f.get(this) as Renderer<T>
+    }
 
 /**
  * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
@@ -78,16 +81,14 @@ fun <T : Any> IronList<T>._getFormattedRow(rowIndex: Int): String {
 @JvmOverloads
 fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
     append("----------------------\n")
-    val dsIndices: IntRange
-    val displayIndices: Set<Int>
-        dsIndices = 0 until _size()
-        displayIndices = rows.intersect(dsIndices)
-        for (i in displayIndices) {
-            append(i)
-            append(": ")
-            append(_getFormattedRow(i))
-            append('\n')
-        }
+    val dsIndices: IntRange = 0 until _size()
+    val displayIndices: Set<Int> = rows.intersect(dsIndices)
+    for (i in displayIndices) {
+        append(i)
+        append(": ")
+        append(_getFormattedRow(i))
+        append('\n')
+    }
     val andMore: Int = dsIndices.size - displayIndices.size
     if (andMore > 0) {
         append("--and $andMore more\n")

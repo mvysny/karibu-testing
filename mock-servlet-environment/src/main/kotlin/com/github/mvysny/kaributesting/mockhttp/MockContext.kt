@@ -6,6 +6,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.lang.Exception
 import java.net.URL
+import java.net.URLConnection
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -17,7 +18,7 @@ open class MockContext : ServletContext, Serializable {
     override fun getServlet(name: String?): Servlet? = null
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getEffectiveMajorVersion(): Int = 3
@@ -69,15 +70,15 @@ open class MockContext : ServletContext, Serializable {
     }
 
     override fun addListener(className: String?) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun <T : EventListener?> addListener(t: T) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addListener(listenerClass: Class<out EventListener>?) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getClassLoader(): ClassLoader = Thread.currentThread().contextClassLoader
@@ -99,11 +100,11 @@ open class MockContext : ServletContext, Serializable {
     }
 
     override fun getFilterRegistration(filterName: String?): FilterRegistration {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun setSessionTrackingModes(sessionTrackingModes: MutableSet<SessionTrackingMode>) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun setInitParameter(name: String, value: String): Boolean = initParameters.putIfAbsent(name, value) == null
@@ -111,27 +112,25 @@ open class MockContext : ServletContext, Serializable {
     override fun getResourceAsStream(path: String): InputStream? = getResource(path)?.openStream()
 
     override fun getNamedDispatcher(name: String?): RequestDispatcher {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getFilterRegistrations(): MutableMap<String, out FilterRegistration> {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getServletNames(): Enumeration<String> = Collections.emptyEnumeration()
 
     override fun getDefaultSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
 
-    override fun getMimeType(file: String?): String {
-        TODO("not implemented")
-    }
+    override fun getMimeType(file: String): String = URLConnection.guessContentTypeFromName(file) ?: "application/octet-stream"
 
     override fun declareRoles(vararg roleNames: String?) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun <T : Filter?> createFilter(clazz: Class<T>?): T {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     /**
@@ -156,7 +155,7 @@ open class MockContext : ServletContext, Serializable {
     override fun getMinorVersion(): Int = 0
 
     override fun getJspConfigDescriptor(): JspConfigDescriptor {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun removeAttribute(name: String) {
@@ -164,35 +163,35 @@ open class MockContext : ServletContext, Serializable {
     }
 
     override fun getServletContextName(): String {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addFilter(filterName: String?, className: String?): FilterRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addFilter(filterName: String?, filter: Filter?): FilterRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addFilter(filterName: String?, filterClass: Class<out Filter>?): FilterRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getContextPath(): String = ""
 
     override fun getSessionCookieConfig(): SessionCookieConfig {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getVirtualServerName(): String = "mock/localhost" // Tomcat returns "Catalina/localhost"
 
     override fun getContext(uripath: String?): ServletContext {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getRequestDispatcher(path: String?): RequestDispatcher {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     private val attributes = ConcurrentHashMap<String, Any>()
@@ -204,23 +203,23 @@ open class MockContext : ServletContext, Serializable {
     }
 
     override fun getServletRegistration(servletName: String?): ServletRegistration {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun <T : EventListener?> createListener(clazz: Class<T>?): T {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addServlet(servletName: String?, className: String?): ServletRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addServlet(servletName: String?, servlet: Servlet?): ServletRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun addServlet(servletName: String?, servletClass: Class<out Servlet>?): ServletRegistration.Dynamic {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getServlets(): Enumeration<Servlet> = Collections.emptyEnumeration()
@@ -228,7 +227,7 @@ open class MockContext : ServletContext, Serializable {
     override fun getEffectiveMinorVersion(): Int = 0
 
     override fun getServletRegistrations(): MutableMap<String, out ServletRegistration> {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getResourcePaths(path: String?): MutableSet<String> = mutableSetOf()

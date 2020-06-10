@@ -10,7 +10,7 @@ import javax.servlet.http.*
 open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getInputStream(): ServletInputStream {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun startAsync(): AsyncContext {
@@ -40,15 +40,15 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getContentLengthLong(): Long = -1
 
     override fun getRealPath(path: String?): String {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun login(username: String?, password: String?) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun isRequestedSessionIdValid(): Boolean {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getServerPort(): Int = MockHttpEnvironment.serverPort
@@ -66,7 +66,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getLocalAddr(): String = "127.0.0.1"
 
     override fun <T : HttpUpgradeHandler?> upgrade(handlerClass: Class<T>?): T {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun isRequestedSessionIdFromCookie(): Boolean = false
@@ -97,7 +97,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getScheme(): String = "http"
 
     override fun logout() {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getLocalName(): String = "localhost"
@@ -107,17 +107,17 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getParameterNames(): Enumeration<String> = Collections.enumeration(parameters.keys)
 
     override fun authenticate(response: HttpServletResponse?): Boolean {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getPathTranslated(): String {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getIntHeader(name: String): Int = getHeader(name)?.toInt() ?: -1
 
     override fun changeSessionId(): String {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getAsyncContext(): AsyncContext {
@@ -127,11 +127,11 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getRequestURI(): String = "/"
 
     override fun getRequestDispatcher(path: String?): RequestDispatcher {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun isUserInRole(role: String?): Boolean {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getPathInfo(): String? = null
@@ -169,7 +169,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
     override fun getUserPrincipal(): Principal? = MockHttpEnvironment.userPrincipal
 
     override fun getReader(): BufferedReader {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun getLocales(): Enumeration<Locale> = Collections.enumeration(listOf(locale))

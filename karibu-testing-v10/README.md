@@ -789,6 +789,8 @@ contents of the Grid.
 * You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
   or a `Button` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
+See `GridKt` class for more details.
+
 #### Grid Filters
 
 The filtering code is not called when your code calls `DataProvider.refreshAll()`,
@@ -821,6 +823,24 @@ The same thing applies to Grid sorting: the `Grid.sort()` methods does not trigg
 the `DataProvider`'s fetching methods. However, the sorting is
 automatically applied by Karibu-Testing as if by the Grid itself,
 when you call Karibu-Testing's `GridKt` methods.
+
+### IronList
+
+Similar to Grid, but one column only, no sorting, no filtering, no header,
+good for lazy list of items akin to Android's ListView.
+
+* You can retrieve a bean at particular index; for example `ironList._get(0)` will return the first item (Kotlin, Groovy).
+  Java: you need to `import static com.github.mvysny.kaributesting.v10.IronListKt.*;`, then you can call `_get(ironList, 0);`.
+* You can check for the total amount of items shown in the list, by calling `ironList._size()` (Kotlin, Groovy). Java: `_size(ironList);`
+* You can obtain a full formatted row as seen by the user, by calling `ironList._getFormattedRow(rowIndex)` - it will return that particular row as
+  `String`. In Java: `_getFormattedRow(ironList, rowIndex)`
+* You can assert on the number of rows in the list, by calling `ironList.expectRows(25)`. If there is a different amount of rows, the function will
+  fail and will dump first 10 rows of the list, so that you can see the actual contents of the ironList.
+  In Java: `expectRows(ironList, 25)`
+* You can assert on a formatted output of particular row of the iron list: `ironList.expectRow(rowIndex, "John Doe")`. If the row looks different,
+  the function will fail with a proper list dump.
+
+See `IronListKt` class for more details.
 
 ### Support for Upload
 

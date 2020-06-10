@@ -41,7 +41,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     override fun encodeRedirectURL(url: String): String = url
 
     override fun sendRedirect(location: String) {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     var _bufferSize = 4096
@@ -91,11 +91,11 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     override fun getBufferSize(): Int = _bufferSize
 
     override fun resetBuffer() {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun reset() {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun setDateHeader(name: String, date: Long) {
@@ -109,7 +109,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     override fun getCharacterEncoding(): String = _characterEncoding
 
     override fun isCommitted(): Boolean {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun setStatus(sc: Int) {
@@ -127,7 +127,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     override fun getContentType(): String? = _contentType
 
     override fun getWriter(): PrintWriter {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun containsHeader(name: String): Boolean = headers.containsKey(name)
@@ -143,7 +143,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     }
 
     override fun getOutputStream(): ServletOutputStream {
-        TODO("not implemented")
+        throw UnsupportedOperationException("not implemented")
     }
 
     override fun setContentType(type: String?) {

@@ -259,7 +259,7 @@ class GridExtensionMethods {
         GridKt.expectRows(self, count)
     }
 
-    static void expectRow(@NotNull Grid<?> self, int rowIndex, String... row) {
+    static void expectRow(@NotNull Grid<?> self, int rowIndex, @NotNull String... row) {
         GridKt.expectRow(self, rowIndex, row)
     }
 

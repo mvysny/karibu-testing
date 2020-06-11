@@ -96,8 +96,9 @@ fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
 }
 
 fun IronList<*>.expectRows(count: Int) {
-    if (_size() != count) {
-        throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
+    val actual: Int = _size()
+    if (actual != count) {
+        throw AssertionError("${this.toPrettyString()}: expected $count rows but got $actual\n${_dump()}")
     }
 }
 

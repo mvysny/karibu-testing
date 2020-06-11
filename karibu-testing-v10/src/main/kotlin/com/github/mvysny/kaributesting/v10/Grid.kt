@@ -311,8 +311,9 @@ fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
 }
 
 fun Grid<*>.expectRows(count: Int) {
-    if (_size() != count) {
-        throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
+    val actual = _size()
+    if (actual != count) {
+        throw AssertionError("${this.toPrettyString()}: expected $count rows but got $actual\n${_dump()}")
     }
 }
 

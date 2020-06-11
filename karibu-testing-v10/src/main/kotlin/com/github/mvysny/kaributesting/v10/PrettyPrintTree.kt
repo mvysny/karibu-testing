@@ -8,6 +8,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.data.binder.HasItems
 import java.util.*
 import kotlin.streams.toList
 
@@ -129,8 +130,14 @@ fun Component.toPrettyString(): String {
     if (this is Button && icon is Icon) {
         list.add("icon='${(icon as Icon).iconName}'")
     }
+    if (this is Grid<*> && this.beanType != null) {
+        list.add("<${this.beanType.simpleName}>")
+    }
+    if (this is HasItems<*>) {
+        list.add("dataprovider='${this.dataProvider}'")
+    }
     prettyStringHook(this, list)
-    var name = javaClass.simpleName
+    var name: String = javaClass.simpleName
     if (name.isEmpty()) {
         // anonymous classes
         name = javaClass.name

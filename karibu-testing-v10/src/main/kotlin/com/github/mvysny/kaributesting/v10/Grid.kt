@@ -4,8 +4,17 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.checkbox.CheckboxGroup
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.grid.*
+import com.vaadin.flow.component.ironlist.IronList
+import com.vaadin.flow.component.listbox.ListBoxBase
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup
+import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.treegrid.TreeGrid
+import com.vaadin.flow.data.binder.HasDataProvider
+import com.vaadin.flow.data.binder.HasFilterableDataProvider
+import com.vaadin.flow.data.binder.HasItems
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
@@ -571,4 +580,19 @@ val Grid.Column<*>._internalId: String get() {
     val getInternalIdMethod: Method = Grid.Column::class.java.getDeclaredMethod("getInternalId")
     getInternalIdMethod.isAccessible = true
     return getInternalIdMethod.invoke(this) as String
+}
+
+/**
+ * Returns the data provider currently set to this [HasItems].
+ */
+val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
+    // until https://github.com/vaadin/flow/issues/6296 is resolved
+    is Grid<T> -> this.dataProvider
+    is IronList<T> -> this.dataProvider
+    is Select<T> -> this.dataProvider
+    is ListBoxBase<*, T, *> -> this.getDataProvider()
+    is RadioButtonGroup<T> -> this.dataProvider
+    is CheckboxGroup<T> -> this.dataProvider
+    is ComboBox<T> -> this.dataProvider
+    else -> null
 }

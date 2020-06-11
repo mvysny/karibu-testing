@@ -121,9 +121,14 @@ for more details.
 ## FAQ
 
 Q: I'm getting `java.lang.IllegalStateException: UI.getCurrent() must not be null`
+   or `no VaadinSession bound to current thread`.
 
 A: You probably forgot to call `MockVaadin.setup()` before the test. Just call `MockVaadin.setup()`
    e.g. from your `@Before`-annotated method if you're using JUnit.
+   
+A: Alternatively it could be that Spring is instantiating Vaadin component eagerly
+   when the ApplicationContext is constructed. One workaround is to mark
+   Vaadin components with `@Lazy` so that they are instantiated lazily.
 
 Q: I'm getting `RouteNotFoundError` instead of my views (Vaadin 14+)
 

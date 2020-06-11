@@ -63,13 +63,14 @@ you can just add the server jars onto testing classpath and call Vaadin server A
 
 A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the browserless testing technique.
 
-## The Karibu-Testing library is Standalone and Fully Supports Java
+## The Karibu-Testing library is Standalone and Fully Supports Java and Groovy
 
 Even though the Karibu-Testing is endorsed by [Vaadin-on-Kotlin](http://vaadinonkotlin.eu), the Karibu-Testing
 does not really depend on any other technology than Vaadin. You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use Karibu-Testing.
-You don't even need to write your app nor your tests in Kotlin, since the library provides both Kotlin and Java API.
+You don't even need to write your app nor your tests in Kotlin, since the library provides native API
+for Kotlin, Java and Groovy.
 You can thus plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
-in Java or Kotlin, whichever suits you more.
+in Java, Kotlin or Groovy, whichever suits you more.
 
 Karibu-Testing is published on Maven Central, so it's very easy to add as a Maven dependency.
 

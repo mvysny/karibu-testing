@@ -14,6 +14,8 @@ import com.vaadin.flow.component.grid.dnd.GridDropEvent
 import com.vaadin.flow.component.grid.dnd.GridDropLocation
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.binder.HasDataProvider
+import com.vaadin.flow.data.binder.HasItems
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
@@ -195,12 +197,12 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(true) { called }
         }
         test("fails on disabled grid") {
-            val grid = Grid<TestPerson>().apply {
+            val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") { fail("Shouldn't be called") }).key = "name"
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
                 grid._clickRenderer(2, "name")
             }
         }
@@ -219,12 +221,13 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     test("_getColumnByKey()") {
-        val grid = Grid<TestPerson>().apply {
+        val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
+            setItems2(listOf())
         }
         expect("name") { grid._getColumnByKey("name").key }
-        expectThrows(AssertionError::class, "Grid[]: No such column with key 'foo'; available columns: [name, age]") {
+        expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{0 items}']: No such column with key 'foo'; available columns: [name, age]") {
             grid._getColumnByKey("foo")
         }
     }
@@ -267,11 +270,11 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
                 addItemClickListener { fail("Shouldn't be called") }
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
                 grid._clickItem(2)
             }
         }
@@ -310,3 +313,14 @@ internal fun DynaNodeGroup.gridTestbatch() {
 }
 
 data class TestPerson(var name: String, var age: Int)
+
+fun <T> HasDataProvider<T>.setItems2(items: Collection<T>) {
+    setDataProvider(ListDataProvider2(items))
+}
+
+/**
+ * Need to have this class because of https://github.com/vaadin/flow/issues/8553
+ */
+class ListDataProvider2<T>(items: Collection<T>): ListDataProvider<T>(items) {
+    override fun toString(): String = "ListDataProvider2{${items.size} items}"
+}

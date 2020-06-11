@@ -40,7 +40,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("TextField[#25, value='']") { TextField().apply { id_ = "25" }.toPrettyString() }
         expect("Button[caption='click me']") { Button("click me").toPrettyString() }
         expect("TextArea[label='label', value='some text']") { TextArea("label").apply { value = "some text" }.toPrettyString() }
-        expect("Grid[]") { Grid<Any>().toPrettyString() }
+        expect("Grid[<String>, dataprovider='ListDataProvider2{0 items}']") { Grid<String>(String::class.java).apply { setItems2(listOf()) }.toPrettyString() }
         expect("Column[header='My Header']") { Grid<Any>().run { addColumn { it }.apply { header2 = "My Header" } }.toPrettyString() }
         expect("Anchor[href='']") { Anchor().toPrettyString() }
         expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
@@ -75,9 +75,10 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         test("column headers") {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 addColumn(karibuDslI18n).setHeader("Hello!")
+                setItems2(listOf())
             }
             expect("""
-└── Grid[]
+└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
     └── Column[header='Hello!']
 """.trim()) { grid.toPrettyTree().trim() }
         }
@@ -105,9 +106,10 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 val col: Grid.Column<String> = addColumn(karibuDslI18n)
                 appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
+                setItems2(listOf())
             }
             expect("""
-└── Grid[]
+└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
     └── Column[]
         └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
         }
@@ -119,9 +121,10 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 val col2: Grid.Column<String> = addColumn(karibuDslI18n).setHeader("bar")
                 appendHeaderRow()
                 prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
+                setItems2(listOf())
             }
             expect("""
-└── Grid[]
+└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
     └── ColumnGroup[]
         ├── ColumnGroup[]
         │   └── Column[header='foo']

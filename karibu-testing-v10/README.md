@@ -792,7 +792,23 @@ contents of the Grid.
 * You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
   or a `Button` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
-See `GridKt` class for more details.
+If your `ComponentRenderer` produces something else than a `Button`, you will need to
+tell Karibu-Testing how to click on such a component:
+
+Java:
+```java
+GridKt._clickRenderer(grid, 0, "foo", component -> {
+    ((Checkbox) component).setValue(true);
+    return null;
+});
+```
+
+Kotlin:
+```kotlin
+grid._clickRenderer(0, "foo", { (it as Checkbox).value = true })
+```
+
+Please see the `GridKt` class for more details.
 
 #### Grid Filters
 

@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.CheckboxGroup
@@ -182,6 +183,8 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
     } else if (renderer is ComponentRenderer<*, *>) {
         val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
         if (component is Button) {
+            component._click()
+        } else if (component is ClickNotifier<*>) {
             component._click()
         } else {
             click(component)

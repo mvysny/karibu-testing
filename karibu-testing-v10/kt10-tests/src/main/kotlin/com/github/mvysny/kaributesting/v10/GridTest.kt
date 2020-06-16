@@ -7,6 +7,7 @@ import com.github.mvysny.karibudsl.v10.component
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent
@@ -182,11 +183,25 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
-        test("ComponentRenderer") {
+        test("ComponentRenderer with Button") {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
                     onLeftClick {
+                        called = true
+                        expect("name 8") { person.name }
+                    }
+                } }).key = "name"
+                setItems((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._clickRenderer(8, "name")
+            expect(true) { called }
+        }
+        test("ComponentRenderer with CheckBox") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                addColumn(ComponentRenderer<Checkbox, TestPerson> { person -> Checkbox("View").apply {
+                    addClickListener {
                         called = true
                         expect("name 8") { person.name }
                     }

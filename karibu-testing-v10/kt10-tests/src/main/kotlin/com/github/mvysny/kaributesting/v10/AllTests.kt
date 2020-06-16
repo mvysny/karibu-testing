@@ -17,6 +17,9 @@ fun DynaNodeGroup.allTests() {
     group("basic utils") {
         basicUtilsTestbatch()
     }
+    group("button") {
+        buttonTestbatch()
+    }
     group("HasValue utils") {
         hasValueTestbatch()
     }

@@ -787,9 +787,9 @@ contents of the Grid.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
 * You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
-  or a `Button` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
+  or a `Button`/`ClickNotifier` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
-If your `ComponentRenderer` produces something else than a `Button`, you will need to
+If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`, you will need to
 tell Karibu-Testing how to click on such a component:
 
 Java:
@@ -986,6 +986,21 @@ You can easily retrieve the fields nested in FormItems as follows:
 ```kotlin
 val isPrimary = _get<FormLayout.FormItem> { caption = "Primary Address" } .field as Checkbox
 expect(true) { isPrimary._value }
+```
+
+### Support for RouterLink
+
+See the `RouterLinkKt` class for a list of utility methods for the `RouterLink` component.
+Currently there's just one: `_click()` which simply calls `UI.navigate()` under the hood:
+
+kotlin, groovy:
+```kotlin
+customersLink._click()
+```
+
+Java:
+```java
+RouterLinkKt._click(customersLink);
 ```
 
 ## Adding support for custom search criteria

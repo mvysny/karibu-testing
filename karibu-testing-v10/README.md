@@ -1103,16 +1103,10 @@ by default Karibu-Testing 1.1.19+ configures Vaadin to ignore the `@PWA` annotat
 does not initialize the `PwaRegistry`. However, if you need this functionality for some reason,
 simply set `Routes.skipPwaInit` to `false`.
 
-## Using Karibu-Testing with Spring or Guice
+## Using Karibu-Testing with Spring
 
-To have dependencies injected into your views as they are constructed, you need to register a custom `Instantiator` into Vaadin.
-The [Vaadin Spring Add-on](https://vaadin.com/directory/component/vaadin-spring) provides an implementation of the `Instantiator` which you can use.
-
-To use a custom `Instantiator`:
- 
-1. Implement your own `VaadinServletService` (or extend pre-provided `MockService`) and override `VaadinServletService.loadInstantiators`,
-   to load a proper Instantiator
-2. Register your `VaadinServletService` in `MockVaadin.setup()`, the `serviceFactory` parameter.
+Please see [t-shirt shop example](https://github.com/mvysny/t-shirt-shop-example) on
+an example on how to use Karibu-Testing with a Spring app.
 
 ## Plugging into the testing lifecycle
 

@@ -991,6 +991,21 @@ val isPrimary = _get<FormLayout.FormItem> { caption = "Primary Address" } .field
 expect(true) { isPrimary._value }
 ```
 
+### Support for RouterLink
+
+See the `RouterLinkKt` class for a list of utility methods for the `RouterLink` component.
+Currently there's just one: `_click()` which simply calls `UI.navigate()` under the hood:
+
+kotlin, groovy:
+```kotlin
+customersLink._click()
+```
+
+Java:
+```java
+RouterLinkKt._click(customersLink);
+```
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

@@ -6,6 +6,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.Text
@@ -20,7 +21,12 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.http.Cookie
+import kotlin.concurrent.read
+import kotlin.concurrent.thread
+import kotlin.concurrent.write
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -412,6 +418,72 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         test("attributes") {
             VaadinSession.getCurrent().session.setAttribute("foo", "bar")
             expect("bar") { VaadinSession.getCurrent().mock.getAttribute("foo") }
+        }
+    }
+
+    group("multiple threads") {
+        test("UIs/Sessions not reused between threads") {
+            fun newVaadinThread(): Pair<UI, VaadinSession> {
+                val uiref = AtomicReference<UI>()
+                val sessionref = AtomicReference<VaadinSession>()
+                thread {
+                    MockVaadin.setup()
+                    uiref.set(UI.getCurrent())
+                    sessionref.set(VaadinSession.getCurrent())
+                } .join()
+                return uiref.get()!! to sessionref.get()!!
+            }
+
+            val pair1 = newVaadinThread()
+            val pair2 = newVaadinThread()
+            expect(false) { pair1.first == pair2.first }
+            expect(false) { pair1.second == pair2.second }
+        }
+
+        test("executor example") {
+            // a simple service which only counts the number of calls
+            class MyService {
+                private var count = 0
+                private val lock = ReentrantReadWriteLock()
+
+                fun callService() {
+                    lock.write { Thread.sleep(10); count++ }
+                }
+                fun getCount(): Int = lock.read { count }
+            }
+            val service = MyService()
+
+            // an ExecutorService which configures Vaadin for every thread created.
+            val e: ExecutorService = Executors.newFixedThreadPool(4) { runnable ->
+                Thread {
+                    MockVaadin.setup(routes)
+                    runnable.run()
+                    MockVaadin.tearDown()
+                }
+            }
+
+            try {
+                // submit a task to all threads
+                repeat(4) {
+                    e.submit {
+                        try {
+                            UI.getCurrent().navigate("helloworld")
+                            _get<Button> { caption = "Hello, World!" }.onLeftClick {
+                                service.callService()
+                            }
+                            _get<Button> { caption = "Hello, World!" }._click()
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            } finally {
+                e.shutdown()
+                e.awaitTermination(10, TimeUnit.SECONDS)
+            }
+
+            // make sure that every thread called the service
+            expect(4) { service.getCount() }
         }
     }
 }

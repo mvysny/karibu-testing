@@ -1338,3 +1338,66 @@ The [Vaadin14 MPR Gradle Demo](https://gitlab.com/mvysny/vaadin14-mpr-gradle-dem
 project demoes this possibility in the
 [MyUITest](https://gitlab.com/mvysny/vaadin14-mpr-gradle-demo/-/blob/master/src/test/kotlin/org/test/MyUITest.kt)
 class.
+
+# Parallel testing with multiple UIs
+
+The testing scenario here is to simulate two users, using the same
+Vaadin app with two separate UIs at the same time.
+
+The UI, VaadinSession and all other Vaadin objects are tied to the thread
+who called `MockVaadin.setup()`. Therefore, it is possible to have multiple UIs
+by starting two (or more) threads from the test method, then
+calling `MockVaadin.setup()` from all of those threads.
+
+**WARNING:** Make sure you're using Karibu-Testing 1.1.27+ or 1.2.1+, otherwise
+the threads may randomly clear the Vaadin UI/Session instances (`UI.getCurrent()`
+may randomly start to return null).
+
+The example below uses an `ExecutorService` which manages a pool of four threads,
+sending commands to those threads by the means of submitting jobs:
+
+```kotlin
+// a simple service which only counts the number of calls
+class MyService {
+    private var count = 0
+    private val lock = ReentrantReadWriteLock()
+
+    fun callService() {
+        lock.write { Thread.sleep(10); count++ }
+    }
+    fun getCount(): Int = lock.read { count }
+}
+val service = MyService()
+
+// an ExecutorService which configures Vaadin for every thread created.
+val e: ExecutorService = Executors.newFixedThreadPool(4) { runnable ->
+    Thread {
+        MockVaadin.setup(routes)
+        runnable.run()
+        MockVaadin.tearDown()
+    }
+}
+
+try {
+    // submit a task to all threads, to call a service in parallel.
+    repeat(4) {
+        e.submit {
+            try {
+                UI.getCurrent().navigate("helloworld")
+                _get<Button> { caption = "Hello, World!" }.onLeftClick {
+                    service.callService()
+                }
+                _get<Button> { caption = "Hello, World!" }._click()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+        }
+    }
+} finally {
+    e.shutdown()
+    e.awaitTermination(10, TimeUnit.SECONDS)
+}
+
+// make sure that every thread called the service
+expect(4) { service.getCount() }
+```

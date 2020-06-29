@@ -89,11 +89,12 @@ private class MockVaadinServlet(val routes: Routes,
 
 object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
-    private var strongRefSession: VaadinSession? = null
-    private var strongRefUI: UI? = null
-    private var strongRefReq: VaadinRequest? = null
-    private var strongRefRes: VaadinResponse? = null
-    private var lastNavigation: Location? = null
+    // use ThreadLocals so that multiple threads may initialize fresh Vaadin instances at the same time.
+    private val strongRefSession = ThreadLocal<VaadinSession>()
+    private val strongRefUI = ThreadLocal<UI>()
+    private val strongRefReq = ThreadLocal<VaadinRequest>()
+    private val strongRefRes = ThreadLocal<VaadinResponse>()
+    private val lastNavigation = ThreadLocal<Location>()
 
     /**
      * Mocks Vaadin for the current test method:
@@ -176,11 +177,11 @@ object MockVaadin {
 
     internal fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
-        lastNavigation = ui.internals.activeViewLocation
+        lastNavigation.set(ui.internals.activeViewLocation)
         ui.close()
         ui._fireEvent(DetachEvent(ui))
         UI.setCurrent(null)
-        strongRefUI = null
+        strongRefUI.remove()
     }
 
     /**
@@ -194,7 +195,7 @@ object MockVaadin {
     fun tearDown() {
         clearVaadinInstances()
         VaadinService.setCurrent(null)
-        lastNavigation = null
+        lastNavigation.remove()
     }
 
     internal fun clearVaadinInstances() {
@@ -202,13 +203,13 @@ object MockVaadin {
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
         CurrentInstance.set(VaadinResponse::class.java, null)
-        strongRefReq = null
-        strongRefRes = null
+        strongRefReq.remove()
+        strongRefRes.remove()
     }
 
     private fun closeCurrentSession() {
         VaadinSession.setCurrent(null)
-        strongRefSession = null
+        strongRefSession.remove()
     }
 
     /**
@@ -227,20 +228,20 @@ object MockVaadin {
         session.configuration = service.deploymentConfiguration
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         VaadinSession.setCurrent(session)
-        strongRefSession = session
+        strongRefSession.set(session)
 
         // init Vaadin Request
         val mockRequest = MockRequest(httpSession)
         // so that session.browser.updateRequestDetails() also creates browserDetails
         mockRequest.headers["User-Agent"] = listOf(userAgent)
         val request = VaadinServletRequest(mockRequest, service)
-        strongRefReq = request
+        strongRefReq.set(request)
         session.browser.updateRequestDetails(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 
         // init Vaadin Response
         val response = VaadinServletResponse(MockResponse(httpSession), service)
-        strongRefRes = response
+        strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 
         // create UI
@@ -265,15 +266,15 @@ object MockVaadin {
         ui.internals.session = session
         UI.setCurrent(ui)
         ui.doInit(request, 1)
-        strongRefUI = ui
+        strongRefUI.set(ui)
 
         session.addUI(ui)
         session.service.fireUIInitListeners(ui)
 
         // navigate to the initial page
-        if (lastNavigation != null) {
-            UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation!!, NavigationTrigger.PROGRAMMATIC)
-            lastNavigation = null
+        if (lastNavigation.get() != null) {
+            UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation.get()!!, NavigationTrigger.PROGRAMMATIC)
+            lastNavigation.remove()
         } else {
             UI.getCurrent().navigate("")
         }

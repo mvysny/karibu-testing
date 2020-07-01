@@ -25,6 +25,19 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
+    test("clicking menu item calls the 'menu open' listeners") {
+        var called = false
+        lateinit var cm: ContextMenu
+        UI.getCurrent().div {
+            cm = contextMenu {
+                item("click me")
+            }
+        }
+        cm.addOpenedChangeListener { called = true }
+        cm._clickItemWithCaption("click me")
+        expect(true) { called }
+    }
+
     test("clicking non-existent menu fails") {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -145,6 +158,44 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 }
             }
             cm._clickItemWithCaption("click me", "foo")
+            expect("foo") { clicked }
+        }
+
+        test("context menu opened listener fired") {
+            var listenerCalled = false
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    addGridContextMenuOpenedListener {
+                        expect("foo") { it.item.orElse(null) }
+                        listenerCalled = true
+                    }
+                    item("click me")
+                }
+            }
+            cm._clickItemWithCaption("click me", "foo")
+            expect(true) { listenerCalled }
+        }
+
+        // test for https://github.com/mvysny/karibu-testing/issues/40
+        test("dynamic menu content populated correctly") {
+            var clicked: String? = null
+            var listenerCalled = false
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    setDynamicContentHandler { item ->
+                        expect("foo") { item }
+                        expect(false) { listenerCalled } // should only be called once
+                        listenerCalled = true
+                        cm.removeAll()
+                        cm.item("click me", { e -> clicked = e })
+                        true
+                    }
+                }
+            }
+            cm._clickItemWithCaption("click me", "foo")
+            expect(true) { listenerCalled }
             expect("foo") { clicked }
         }
     }

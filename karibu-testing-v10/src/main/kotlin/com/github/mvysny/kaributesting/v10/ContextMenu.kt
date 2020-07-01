@@ -18,10 +18,16 @@ import kotlin.test.fail
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun HasMenuItems._clickItemWithCaption(caption: String) {
+    // fires ContextMenuOpenedListener to simulate menu opening
+    (this as Component).element.setProperty("opened", true)
+
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
             ?: fail("No menu item with caption $caption in this menu:\n${(this as Component).toPrettyTree()}")
     (item as MenuItem)._click(parentMap)
+
+    // fires ContextMenuOpenedListener to simulate menu closing
+    (this as Component).element.setProperty("opened", false)
 }
 
 /**
@@ -63,11 +69,26 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
+    // fires ContextMenuOpenedListener to simulate menu opening
+    _setContextMenuTargetItemKey(gridItem)
+    element.setProperty("opened", true)
+
+    // notify the context menu dynamic item generator
+    dynamicContentHandler?.also { it ->
+        val openMenu: Boolean = it.test(gridItem)
+        if (!openMenu) {
+            fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
+        }
+    }
+
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
     val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
             ?: fail("No menu item with caption $caption in GridContextMenu:\n${toPrettyTree()}")
     @Suppress("UNCHECKED_CAST")
     (item as GridMenuItem<T>)._click(gridItem)
+
+    // fires ContextMenuOpenedListener to simulate menu closing
+    element.setProperty("opened", false)
 }
 
 private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
@@ -115,15 +136,20 @@ private fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 fun <T> GridMenuItem<T>._click(gridItem: T?) {
-    val parentMap = contextMenu.getParentMap()
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = contextMenu.getParentMap()
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
+
+    contextMenu._setContextMenuTargetItemKey(gridItem)
+    _fireDomEvent("click")
+}
+
+private fun <T> GridContextMenu<T>._setContextMenuTargetItemKey(gridItem: T?) {
     @Suppress("UNCHECKED_CAST")
-    val grid: Grid<T> = contextMenu.target as Grid<T>
+    val grid: Grid<T> = target as Grid<T>
     val key: String? = grid.dataCommunicator.keyMapper.key(gridItem)
     requireNotNull(key) { "grid ${grid.toPrettyString()} generated null as key for $gridItem" }
     grid.element.setProperty("_contextMenuTargetItemKey", key)
-    _fireDomEvent("click")
 }
 
 private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBase<*, *, *>, parentMap: Map<MenuItemBase<*, *, *>, Component>) {

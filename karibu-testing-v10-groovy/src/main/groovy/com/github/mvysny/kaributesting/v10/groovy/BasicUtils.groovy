@@ -91,7 +91,9 @@ class BasicUtils {
     }
 
     /**
-     * Checks whether the component is attached to the UI and to the Session.
+     * Checks whether the component is attached to the UI.
+     * <p></p>
+     * Returns true for attached components even if the UI itself is closed.
      */
     static boolean isAttached(@NotNull Component self) {
         return BasicUtilsKt.isAttached(self)

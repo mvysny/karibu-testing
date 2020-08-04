@@ -133,8 +133,16 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                     detachCallCount++
                 }
             }
-            vl.addAttachListener { attachCallCount++ }
-            vl.addDetachListener { detachCallCount++ }
+            vl.addAttachListener {
+                expect(true) { vl.isAttached }
+                attachCallCount++
+            }
+            vl.addDetachListener {
+                // a bug in Vaadin? I'd expect the node to be detached (null parent etc) at this point...
+                // See https://github.com/vaadin/flow/issues/7911#issuecomment-668433530
+                expect(true) { vl.isAttached }
+                detachCallCount++
+            }
 
             // attach
             UI.getCurrent().add(vl)

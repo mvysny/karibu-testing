@@ -96,10 +96,13 @@ var Component.id_: String?
     }
 
 /**
- * Checks whether the component is attached to the UI and to the Session.
+ * Checks whether this component is currently attached to an [UI].
+ *
+ * Returns true for attached components even if the UI itself is closed.
  */
 val Component.isAttached: Boolean
-    get() = ui.orElse(null)?.session != null
+    // see https://github.com/vaadin/flow/issues/7911
+    get() = element.node.isAttached
 
 /**
  * Checks whether the component is visible (usually [Component.isVisible] but for [Text]

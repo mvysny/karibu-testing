@@ -9,6 +9,7 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
 import com.vaadin.flow.component.AttachEvent
+import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -119,17 +120,39 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         test("verifyAttachCalled") {
-            var attachCalled = 0
+            var attachCallCount = 0
+            var detachCallCount = 0
             val vl = object : VerticalLayout() {
                 override fun onAttach(attachEvent: AttachEvent?) {
                     super.onAttach(attachEvent)
-                    attachCalled++
+                    attachCallCount++
+                }
+
+                override fun onDetach(detachEvent: DetachEvent?) {
+                    super.onDetach(detachEvent)
+                    detachCallCount++
                 }
             }
-            vl.addAttachListener { attachCalled++ }
+            vl.addAttachListener { attachCallCount++ }
+            vl.addDetachListener { detachCallCount++ }
+
+            // attach
             UI.getCurrent().add(vl)
-            expect(2) { attachCalled }
+            expect(2) { attachCallCount }
             expect(true) { vl.isAttached }
+            expect(0) { detachCallCount }
+
+            // close UI - detach is not called.
+            UI.getCurrent().close()
+            expect(2) { attachCallCount }
+            expect(true) { vl.isAttached }
+            expect(0) { detachCallCount }
+
+            // detach
+            vl.removeFromParent()
+            expect(2) { attachCallCount }
+            expect(false) { vl.isAttached }
+            expect(2) { detachCallCount }
         }
 
         test("navigation works in mocked env") {

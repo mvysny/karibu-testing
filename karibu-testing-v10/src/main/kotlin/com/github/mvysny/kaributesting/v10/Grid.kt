@@ -93,7 +93,7 @@ fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     if (VaadinMeta.version >= 17) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
         // https://github.com/vaadin/flow/issues/8828
-        // don't use Int.MAX_VALUE - 100 otherwise Vaadin 17 will stack-overflow.
+        // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
         require(limit <= 1000) { "Vaadin 17+ doesn't handle fetching of many items very well unfortunately. The sane limit is 1000 but you asked for $limit" }
     }
     val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)

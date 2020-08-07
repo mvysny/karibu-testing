@@ -178,7 +178,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                     called = true
                     expect("name 8") { person.name }
                 }).key = "name"
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
             }
             grid._clickRenderer(8, "name")
             expect(true) { called }
@@ -192,7 +192,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                         expect("name 8") { person.name }
                     }
                 } }).key = "name"
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
             }
             grid._clickRenderer(8, "name")
             expect(true) { called }
@@ -206,7 +206,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                         expect("name 8") { person.name }
                     }
                 } }).key = "name"
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
             }
             grid._clickRenderer(8, "name")
             expect(true) { called }
@@ -227,7 +227,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         val grid = Grid<TestPerson>().apply {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
-            setItems((0..10).map { TestPerson("name $it", it) })
+            setItems2((0..10).map { TestPerson("name $it", it) })
         }
         grid.sort(TestPerson::age.desc)
         expect((0..10).map { TestPerson("name $it", it) }.reversed()) { grid._findAll() }
@@ -253,7 +253,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
             }
             expectThrows(AssertionError::class, "No such column with key 'surname'; available columns: [name, age]") {
                 grid._getFormatted(0, "surname")
@@ -274,7 +274,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
             }
             expect("name 0") { grid._getFormatted(0, "name") }
         }
@@ -298,7 +298,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                setItems((0..10).map { TestPerson("name $it", it) })
+                setItems2((0..10).map { TestPerson("name $it", it) })
                 addItemClickListener { e -> event = e }
             }
             grid._clickItem(2)
@@ -330,7 +330,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
 data class TestPerson(var name: String, var age: Int)
 
 fun <T> Grid<T>.setItems2(items: Collection<T>) {
-    setDataProvider(ListDataProvider2(items))
+    dataProvider = ListDataProvider2(items)
 }
 
 /**

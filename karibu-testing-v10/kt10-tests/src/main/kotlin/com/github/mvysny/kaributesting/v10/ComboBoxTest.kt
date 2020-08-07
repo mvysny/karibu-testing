@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.select.Select
 import java.lang.IllegalStateException
 import kotlin.test.expect
@@ -41,7 +42,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
     group("Select.getSuggestionItems()") {
         test("simple strings") {
             val cb = Select<String>().apply {
-                setItems(listOf("aaa", "bbb", "ccc"))
+                setItems2(listOf("aaa", "bbb", "ccc"))
             }
             expectList("aaa", "bbb", "ccc") { cb.getSuggestionItems() }
             expectList("aaa", "bbb", "ccc") { cb.getSuggestions() }
@@ -49,11 +50,16 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
 
         test("full-blown example") {
             val cb = Select<TestPerson>().apply {
-                setItems((0..5).map { TestPerson("foo $it", it) })
+                setItems2((0..5).map { TestPerson("foo $it", it) })
                 setItemLabelGenerator { it.name }
             }
             expectList("foo 0", "foo 1", "foo 2", "foo 3", "foo 4", "foo 5") { cb.getSuggestions() }
         }
     }
+}
 
+fun <T> Select<T>.setItems2(items: Collection<T>) {
+    // this way it's also compatible with Vaadin 17:
+    // https://github.com/vaadin/flow/issues/8831
+    dataProvider = ListDataProvider2(items)
 }

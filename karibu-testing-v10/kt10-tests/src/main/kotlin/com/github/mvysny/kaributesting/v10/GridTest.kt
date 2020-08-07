@@ -329,7 +329,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
 
 data class TestPerson(var name: String, var age: Int)
 
-fun <T> HasDataProvider<T>.setItems2(items: Collection<T>) {
+fun <T> Grid<T>.setItems2(items: Collection<T>) {
     setDataProvider(ListDataProvider2(items))
 }
 

@@ -133,7 +133,7 @@ fun Component.toPrettyString(): String {
     if (this is Grid<*> && this.beanType != null) {
         list.add("<${this.beanType.simpleName}>")
     }
-    if (this is HasItems<*>) {
+    if (this.dataProvider != null) {
         list.add("dataprovider='${this.dataProvider}'")
     }
     prettyStringHook(this, list)

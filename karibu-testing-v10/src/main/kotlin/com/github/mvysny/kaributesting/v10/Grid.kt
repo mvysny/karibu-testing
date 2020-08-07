@@ -599,3 +599,20 @@ val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
     is ComboBox<T> -> this.dataProvider
     else -> null
 }
+
+/**
+ * Returns the data provider currently set to this Component.
+ *
+ * Works both with Vaadin 16 and Vaadin 17: Vaadin 17 components no longer implement HasItems.
+ */
+val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
+    // until https://github.com/vaadin/flow/issues/6296 is resolved
+    is Grid<*> -> this.dataProvider
+    is IronList<*> -> this.dataProvider
+    is Select<*> -> this.dataProvider
+    is ListBoxBase<*, *, *> -> this.getDataProvider()
+    is RadioButtonGroup<*> -> this.dataProvider
+    is CheckboxGroup<*> -> this.dataProvider
+    is ComboBox<*> -> this.dataProvider
+    else -> null
+}

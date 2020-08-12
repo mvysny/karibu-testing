@@ -34,7 +34,7 @@ fun Component._fireEvent(event: ComponentEvent<*>) {
 }
 
 /**
- * Fires a DOM [event] on this component.
+ * Fires a DOM [event] on this element.
  */
 fun Element._fireDomEvent(event: DomEvent) {
     node.getFeature(ElementListenerMap::class.java).fireEvent(event)
@@ -45,6 +45,7 @@ fun Element._fireDomEvent(event: DomEvent) {
  * @param eventType the event type, e.g. "click"
  * @param eventData optional event data, defaults to an empty object.
  */
+@JvmOverloads
 fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }

@@ -80,7 +80,12 @@ fun <T : Any> Grid<T>._get(rowIndex: Int): T {
 }
 
 /**
+ * Returns all items in given data provider. Uses current Grid sorting.
+ *
  * For [TreeGrid] this walks the [_rowSequence].
+ *
+ * The Grid never sets any filters into the data provider, however any
+ * ConfigurableFilterDataProvider will automatically apply its filters.
  *
  * WARNING: Very slow operation for [TreeGrid].
  */
@@ -100,6 +105,9 @@ fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
  * Returns all items in given data provider. Uses current Grid sorting.
  *
  * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
+ *
+ * The Grid never sets any filters into the data provider, however any
+ * ConfigurableFilterDataProvider will automatically apply its filters.
  *
  * @return the list of items.
  */

@@ -246,3 +246,14 @@ fun <T> T._blur() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
 }
+
+/**
+ * Closes the UI and simulates the end of the request. The [UI.close] is called,
+ * but also the session is set to null which fires the detach listeners and makes
+ * the UI and all of its components detached.
+ */
+fun UI._close() {
+    close()
+    // Mock closing of UI after request handled
+    UI.getCurrent().internals.session = null
+}

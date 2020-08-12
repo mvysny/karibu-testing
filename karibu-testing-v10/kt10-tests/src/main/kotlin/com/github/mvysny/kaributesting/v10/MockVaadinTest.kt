@@ -8,6 +8,7 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
+import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text
@@ -161,6 +162,25 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(2) { attachCallCount }
             expect(false) { vl.isAttached }
             expect(2) { detachCallCount }
+        }
+
+        test("detach on forceful UI close") {
+            val vl = UI.getCurrent().verticalLayout()
+            var detachCalled = 0
+            vl.addDetachListener { detachCalled++ }
+            expect(true) { vl.isAttached }
+
+            // close UI - detach is not called.
+            UI.getCurrent().close()
+            expect(true) { vl.isAttached }
+            expect(0) { detachCalled }
+            expect(true) { UI.getCurrent().isAttached }
+
+            // Mock closing of UI after request handled
+            UI.getCurrent()._close()
+            expect(false) { vl.isAttached }
+            expect(1) { detachCalled }
+            expect(false) { UI.getCurrent().isAttached }
         }
 
         test("navigation works in mocked env") {

@@ -80,7 +80,7 @@ fun <T : Any> Grid<T>._get(rowIndex: Int): T {
 }
 
 /**
- * Returns all items in given data provider. Uses current Grid sorting.
+ * Returns items in given range from Grid's data provider. Uses current Grid sorting.
  *
  * For [TreeGrid] this walks the [_rowSequence].
  *
@@ -94,6 +94,12 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
     else -> dataCommunicator.fetch(offset, limit)
 }
 
+/**
+ * Returns items in given range from this data communicator. Uses current Grid sorting.
+ * Any ConfigurableFilterDataProvider will automatically apply its filters.
+ *
+ * This is an internal stuff, most probably you wish to call [_fetch].
+ */
 fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)
     m.isAccessible = true

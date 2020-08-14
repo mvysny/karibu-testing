@@ -2,7 +2,6 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
 import com.vaadin.flow.component.ComponentUtil
-import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.function.DeploymentConfiguration

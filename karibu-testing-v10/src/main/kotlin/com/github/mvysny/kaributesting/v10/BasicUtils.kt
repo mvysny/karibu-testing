@@ -16,6 +16,7 @@ import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.internal.nodefeature.ElementListenerMap
+import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
 import org.jsoup.nodes.Document
@@ -34,7 +35,7 @@ fun Component._fireEvent(event: ComponentEvent<*>) {
 }
 
 /**
- * Fires a DOM [event] on this component.
+ * Fires a DOM [event] on this element.
  */
 fun Element._fireDomEvent(event: DomEvent) {
     node.getFeature(ElementListenerMap::class.java).fireEvent(event)
@@ -45,6 +46,7 @@ fun Element._fireDomEvent(event: DomEvent) {
  * @param eventType the event type, e.g. "click"
  * @param eventData optional event data, defaults to an empty object.
  */
+@JvmOverloads
 fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
@@ -244,4 +246,15 @@ fun <T> T._focus() where T : Focusable<*>, T : Component {
 fun <T> T._blur() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
+}
+
+/**
+ * Closes the UI and simulates the end of the request. The [UI.close] is called,
+ * but also the session is set to null which fires the detach listeners and makes
+ * the UI and all of its components detached.
+ */
+fun UI._close() {
+    close()
+    // Mock closing of UI after request handled.
+    VaadinSession.getCurrent().removeUI(this)
 }

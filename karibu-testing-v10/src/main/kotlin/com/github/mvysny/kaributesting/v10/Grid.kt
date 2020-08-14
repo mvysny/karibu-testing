@@ -80,7 +80,12 @@ fun <T : Any> Grid<T>._get(rowIndex: Int): T {
 }
 
 /**
+ * Returns items in given range from Grid's data provider. Uses current Grid sorting.
+ *
  * For [TreeGrid] this walks the [_rowSequence].
+ *
+ * The Grid never sets any filters into the data provider, however any
+ * ConfigurableFilterDataProvider will automatically apply its filters.
  *
  * WARNING: Very slow operation for [TreeGrid].
  */
@@ -89,6 +94,12 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
     else -> dataCommunicator.fetch(offset, limit)
 }
 
+/**
+ * Returns items in given range from this data communicator. Uses current Grid sorting.
+ * Any ConfigurableFilterDataProvider will automatically apply its filters.
+ *
+ * This is an internal stuff, most probably you wish to call [_fetch].
+ */
 fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     if (VaadinMeta.version >= 17) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
@@ -106,6 +117,9 @@ fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
  * Returns all items in given data provider. Uses current Grid sorting.
  *
  * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
+ *
+ * The Grid never sets any filters into the data provider, however any
+ * ConfigurableFilterDataProvider will automatically apply its filters.
  *
  * @return the list of items.
  */

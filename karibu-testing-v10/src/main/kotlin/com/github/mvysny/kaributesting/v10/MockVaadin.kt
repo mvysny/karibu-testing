@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
+import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
@@ -13,6 +14,7 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import java.io.File
+import java.lang.reflect.Field
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
@@ -60,9 +62,11 @@ private class MockVaadinSession(service: VaadinService,
         // Spring doesn't know that (since we haven't told Spring that the Session scope is gone) and provides
         // the previous UI instance which is still attached to the session. And it blows.
 
-        MockVaadin.clearVaadinInstances()
-        httpSession.destroy()
-        MockVaadin.createSession(httpSession.servletContext, uiFactory)
+        if (!MockVaadin.currentlyClosingSession.get()) {
+            MockVaadin.clearVaadinInstances()
+            httpSession.destroy()
+            MockVaadin.createSession(httpSession.servletContext, uiFactory)
+        }
     }
 }
 
@@ -162,11 +166,16 @@ object MockVaadin {
         MockService(servlet, dc)
     }
 
-    internal fun closeCurrentUI() {
+    /**
+     * Properly closes the current UI and
+     */
+    fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
         lastNavigation.set(ui.internals.activeViewLocation)
-        ui.close()
-        ui._fireEvent(DetachEvent(ui))
+        if (ui.isClosing && ui.internals.session != null) {
+            ui._close()
+        }
+        ComponentUtil.onComponentDetach(ui)
         UI.setCurrent(null)
         strongRefUI.remove()
     }
@@ -181,7 +190,11 @@ object MockVaadin {
     @JvmStatic
     fun tearDown() {
         clearVaadinInstances()
-        VaadinService.setCurrent(null)
+        val service: VaadinService? = VaadinService.getCurrent()
+        if (service != null) {
+            service.fireServiceDestroyListeners(ServiceDestroyEvent(service))
+            VaadinService.setCurrent(null)
+        }
         lastNavigation.remove()
     }
 
@@ -195,8 +208,21 @@ object MockVaadin {
     }
 
     private fun closeCurrentSession() {
-        VaadinSession.setCurrent(null)
+        val session: VaadinSession? = VaadinSession.getCurrent()
+        if (session != null) {
+            val service: VaadinService = VaadinService.getCurrent()
+            service.fireSessionDestroy(session)
+            VaadinSession.setCurrent(null)
+            // service destroys session via session.access(); we need to run that action now.
+            currentlyClosingSession.set(true)
+            runUIQueue(session = session)
+            currentlyClosingSession.set(false)
+        }
         strongRefSession.remove()
+    }
+
+    internal val currentlyClosingSession = object : ThreadLocal<Boolean>() {
+        override fun initialValue(): Boolean = false
     }
 
     /**
@@ -230,6 +256,9 @@ object MockVaadin {
         val response = VaadinServletResponse(MockResponse(httpSession), service)
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
+
+        // fire session init listeners
+        (service as MockService).fireSessionInitListeners(SessionInitEvent(service, session, request))
 
         // create UI
         createUI(uiFactory, session)
@@ -309,37 +338,34 @@ object MockVaadin {
      * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
-    fun runUIQueue(propagateExceptionToHandler: Boolean = false) {
-        checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
-        VaadinSession.getCurrent()!!.apply {
-            // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
-            // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
-            val errors: MutableList<Throwable> = mutableListOf<Throwable>()
-            val oldErrorHandler: ErrorHandler? = errorHandler
-            if (oldErrorHandler == null || oldErrorHandler is DefaultErrorHandler || !propagateExceptionToHandler) {
-                errorHandler = ErrorHandler {
-                    var t: Throwable = it.throwable
-                    if (t !is ExecutionException) {
-                        // for some weird reason t may not be ExecutionException when it originates from a coroutine :confused:
-                        // the stacktrace would point someplace random. Wrap it in ExecutionException whose stacktrace will point to the test
-                        t = ExecutionException(t.message, t)
-                    }
-                    errors.add(t)
+    fun runUIQueue(propagateExceptionToHandler: Boolean = false, session: VaadinSession = VaadinSession.getCurrent()) {
+        // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
+        // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
+        val errors: MutableList<Throwable> = mutableListOf<Throwable>()
+        val oldErrorHandler: ErrorHandler? = session.errorHandler
+        if (oldErrorHandler == null || oldErrorHandler is DefaultErrorHandler || !propagateExceptionToHandler) {
+            session.errorHandler = ErrorHandler {
+                var t: Throwable = it.throwable
+                if (t !is ExecutionException) {
+                    // for some weird reason t may not be ExecutionException when it originates from a coroutine :confused:
+                    // the stacktrace would point someplace random. Wrap it in ExecutionException whose stacktrace will point to the test
+                    t = ExecutionException(t.message, t)
                 }
+                errors.add(t)
             }
+        }
 
-            try {
-                unlock()  // this will process all Runnables registered via ui.access()
-                // lock the session back, so that the test can continue running as-if in the UI thread.
-                lock()
-            } finally {
-                errorHandler = oldErrorHandler
-            }
+        try {
+            session.unlock()  // this will process all Runnables registered via ui.access()
+            // lock the session back, so that the test can continue running as-if in the UI thread.
+            session.lock()
+        } finally {
+            session.errorHandler = oldErrorHandler
+        }
 
-            if (errors.isNotEmpty()) {
-                errors.drop(1).forEach { errors[0].addSuppressed(it) }
-                throw errors[0]
-            }
+        if (errors.isNotEmpty()) {
+            errors.drop(1).forEach { errors[0].addSuppressed(it) }
+            throw errors[0]
         }
     }
 }
@@ -366,6 +392,24 @@ open class MockService(servlet: VaadinServlet, deploymentConfiguration: Deployme
  */
 open class MockInstantiator(val delegate: Instantiator) : Instantiator by delegate {
     override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
+}
+
+internal fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
+    val listenerField: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
+    listenerField.isAccessible = true
+    val sessionInitListeners: Collection<SessionInitListener> = listenerField.get(this) as Collection<SessionInitListener>
+    for (sessionInitListener in sessionInitListeners) {
+        sessionInitListener.sessionInit(event)
+    }
+}
+
+internal fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent) {
+    val listenerField: Field = VaadinService::class.java.getDeclaredField("serviceDestroyListeners")
+    listenerField.isAccessible = true
+    val listeners: Collection<ServiceDestroyListener> = listenerField.get(this) as Collection<ServiceDestroyListener>
+    for (listener in listeners) {
+        listener.serviceDestroy(event)
+    }
 }
 
 val currentRequest: VaadinRequest

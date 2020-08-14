@@ -270,7 +270,7 @@ object MockVaadin {
         CurrentInstance.set(VaadinResponse::class.java, response)
 
         // fire session init listeners
-        (service as MockService).fireSessionInitListeners(SessionInitEvent(service, session, request))
+        service.fireSessionInitListeners(SessionInitEvent(service, session, request))
 
         // create UI
         createUI(uiFactory, session)

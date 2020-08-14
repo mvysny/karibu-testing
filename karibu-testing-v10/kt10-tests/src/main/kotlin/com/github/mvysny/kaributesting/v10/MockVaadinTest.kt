@@ -17,6 +17,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import java.util.concurrent.ExecutionException
@@ -541,29 +542,39 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    test("VaadinService listeners should be invoked") {
-        MockVaadin.tearDown()
-        var sessionInitListenerInvocationCount = 0
-        var uiInitListenerInvocationCount = 0
-        var sessionDestroyListenerInvocationCount = 0
-        var serviceDestroyListenerInvocationCount = 0
-        MockVaadin.setup(serviceFactory = { servlet, dc ->
-            val service = MockService(servlet, dc)
-            service.addSessionInitListener { sessionInitListenerInvocationCount++ }
-            service.addUIInitListener { uiInitListenerInvocationCount++ }
-            service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }
-            service.addServiceDestroyListener { serviceDestroyListenerInvocationCount++ }
-            service
-        })
-        expect(1) { sessionInitListenerInvocationCount }
-        expect(1) { uiInitListenerInvocationCount }
-        expect(0) { sessionDestroyListenerInvocationCount }
-        expect(0) { serviceDestroyListenerInvocationCount }
-        MockVaadin.tearDown()
-        expect(1) { sessionInitListenerInvocationCount }
-        expect(1) { uiInitListenerInvocationCount }
-        expect(1) { sessionDestroyListenerInvocationCount }
-        expect(1) { serviceDestroyListenerInvocationCount }
+    group("VaadinService") {
+        test("Registering custom VaadinService is possible") {
+            open class MyMockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
+                override fun isAtmosphereAvailable(): Boolean = false
+                override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
+            }
+            MockVaadin.tearDown()
+            MockVaadin.setup(serviceFactory = { servlet, dc -> MyMockService(servlet, dc) })
+        }
+        test("VaadinService listeners should be invoked") {
+            MockVaadin.tearDown()
+            var sessionInitListenerInvocationCount = 0
+            var uiInitListenerInvocationCount = 0
+            var sessionDestroyListenerInvocationCount = 0
+            var serviceDestroyListenerInvocationCount = 0
+            MockVaadin.setup(serviceFactory = { servlet, dc ->
+                val service = MockService(servlet, dc)
+                service.addSessionInitListener { sessionInitListenerInvocationCount++ }
+                service.addUIInitListener { uiInitListenerInvocationCount++ }
+                service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }
+                service.addServiceDestroyListener { serviceDestroyListenerInvocationCount++ }
+                service
+            })
+            expect(1) { sessionInitListenerInvocationCount }
+            expect(1) { uiInitListenerInvocationCount }
+            expect(0) { sessionDestroyListenerInvocationCount }
+            expect(0) { serviceDestroyListenerInvocationCount }
+            MockVaadin.tearDown()
+            expect(1) { sessionInitListenerInvocationCount }
+            expect(1) { uiInitListenerInvocationCount }
+            expect(1) { sessionDestroyListenerInvocationCount }
+            expect(1) { serviceDestroyListenerInvocationCount }
+        }
     }
 }
 

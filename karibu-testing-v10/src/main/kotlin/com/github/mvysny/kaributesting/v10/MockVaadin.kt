@@ -10,6 +10,7 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import com.vaadin.flow.shared.Registration
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
@@ -244,6 +245,8 @@ object MockVaadin {
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 
+        (service as MockService).fireSessionInitListeners(SessionInitEvent(service, session, request))
+
         // create UI
         createUI(uiFactory, session)
     }
@@ -371,6 +374,18 @@ open class MockedUI : UI()
 open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
+    var sessionInitListeners = listOf<SessionInitListener?>()
+    override fun addSessionInitListener(listener: SessionInitListener?): Registration {
+        sessionInitListeners += listener
+        return super.addSessionInitListener(listener)
+
+    }
+
+    fun fireSessionInitListeners(event: SessionInitEvent) {
+        for (it in sessionInitListeners) {
+            it?.sessionInit(event)
+        }
+    }
 }
 
 val currentRequest: VaadinRequest

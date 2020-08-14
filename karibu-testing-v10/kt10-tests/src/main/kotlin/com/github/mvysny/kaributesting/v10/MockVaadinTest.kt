@@ -318,7 +318,9 @@ internal fun DynaNodeGroup.mockVaadinTest() {
     group("async") {
         group("from UI thread") {
             test("calling access() won't throw exception but the block won't be called immediately") {
-                UI.getCurrent().access { fail("Shouldn't be called now") }
+                var checkAccess = true
+                UI.getCurrent().access { if (checkAccess) fail("Shouldn't be called now") }
+                checkAccess = false
             }
 
             test("calling accessSynchronously() calls the block immediately because the tests hold UI lock") {
@@ -385,7 +387,11 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             }
 
             test("calling access() won't throw exception but the block won't be called immediately because the tests hold UI lock") {
-                runInBgSyncOnUI { access { fail("Shouldn't be called now") } }
+                runInBgSyncOnUI {
+                    var checkAccess = true
+                    access { if (checkAccess) fail("Shouldn't be called now") }
+                    checkAccess = false
+                }
             }
 
             test("clientRoundtrip() processes all access() calls") {
@@ -533,6 +539,31 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             // make sure that every thread called the service
             expect(4) { service.getCount() }
         }
+    }
+
+    test("VaadinService listeners should be invoked") {
+        MockVaadin.tearDown()
+        var sessionInitListenerInvocationCount = 0
+        var uiInitListenerInvocationCount = 0
+        var sessionDestroyListenerInvocationCount = 0
+        var serviceDestroyListenerInvocationCount = 0
+        MockVaadin.setup(serviceFactory = { servlet, dc ->
+            val service = MockService(servlet, dc)
+            service.addSessionInitListener { sessionInitListenerInvocationCount++ }
+            service.addUIInitListener { uiInitListenerInvocationCount++ }
+            service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }
+            service.addServiceDestroyListener { serviceDestroyListenerInvocationCount++ }
+            service
+        })
+        expect(1) { sessionInitListenerInvocationCount }
+        expect(1) { uiInitListenerInvocationCount }
+        expect(0) { sessionDestroyListenerInvocationCount }
+        expect(0) { serviceDestroyListenerInvocationCount }
+        MockVaadin.tearDown()
+        expect(1) { sessionInitListenerInvocationCount }
+        expect(1) { uiInitListenerInvocationCount }
+        expect(1) { sessionDestroyListenerInvocationCount }
+        expect(1) { serviceDestroyListenerInvocationCount }
     }
 }
 

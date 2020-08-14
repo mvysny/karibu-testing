@@ -16,6 +16,7 @@ import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
 import com.vaadin.flow.dom.ElementUtil
 import com.vaadin.flow.internal.nodefeature.ElementListenerMap
+import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
 import org.jsoup.nodes.Document
@@ -254,6 +255,6 @@ fun <T> T._blur() where T : Focusable<*>, T : Component {
  */
 fun UI._close() {
     close()
-    // Mock closing of UI after request handled
-    UI.getCurrent().internals.session = null
+    // Mock closing of UI after request handled.
+    VaadinSession.getCurrent().removeUI(this)
 }

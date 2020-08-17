@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession
  * A live map of all attributes in this session. Modifications to the map will be
  * reflected to the session and vice versa.
  */
-val HttpSession.attributes: MutableMap<String, Any>
+public val HttpSession.attributes: MutableMap<String, Any>
     get() = SessionAttributeMap(this)
 
 private class SessionAttributeEntrySetIterator(val session: HttpSession) : MutableIterator<MutableMap.MutableEntry<String, Any>> {

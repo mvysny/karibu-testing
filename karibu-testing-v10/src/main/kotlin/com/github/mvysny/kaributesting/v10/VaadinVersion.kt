@@ -5,23 +5,23 @@ import com.vaadin.flow.server.Version
 import elemental.json.JsonObject
 import java.net.URL
 
-data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {
+public data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {
     override fun compareTo(other: SemanticVersion): Int =
             compareValuesBy(this, other, { it.major }, { it.minor }, { it.bugfix })
 
-    override fun toString() = "$major.$minor.$bugfix"
+    override fun toString(): String = "$major.$minor.$bugfix"
 }
 
-object VaadinMeta {
+public object VaadinMeta {
     /**
      * Vaadin Flow `flow-server.jar` version: for example 1.2.0 for Vaadin 12
      */
-    val flowVersion: SemanticVersion get() = SemanticVersion(Version.getMajorVersion(), Version.getMinorVersion(), Version.getRevision())
+    public val flowVersion: SemanticVersion get() = SemanticVersion(Version.getMajorVersion(), Version.getMinorVersion(), Version.getRevision())
 
     /**
      * Guesses Vaadin version from [flowVersion]. Returns one of 11, 12, 13, 14 or 15.
      */
-    val version: Int by lazy {
+    public val version: Int by lazy {
         try {
             // for Vaadin 14+ the version can be detected from the VaadinCoreShrinkWrap class.
             // This is more accurate but doesn't work for Vaadin 13 or lower.
@@ -39,7 +39,7 @@ object VaadinMeta {
         }
     }
 
-    val flowBuildInfo: JsonObject? get() = Thread.currentThread().contextClassLoader
+    public val flowBuildInfo: JsonObject? get() = Thread.currentThread().contextClassLoader
             .getResource("META-INF/VAADIN/config/flow-build-info.json")
             ?.readJson()
 
@@ -51,7 +51,7 @@ object VaadinMeta {
      *
      * This value is also applied to Vaadin's DeploymentConfiguration.
      */
-    val isCompatibilityMode: Boolean get() {
+    public val isCompatibilityMode: Boolean get() {
         // allow overriding this via a system property
         if (System.getProperty("vaadin.compatibilityMode") != null) {
             return System.getProperty("vaadin.compatibilityMode").toBoolean()

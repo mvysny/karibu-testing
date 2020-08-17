@@ -28,5 +28,9 @@ dependencies {
     implementation("io.github.classgraph:classgraph:4.6.23")
 }
 
+kotlin {
+    explicitApi()
+}
+
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit
 configureBintray("karibu-testing-v10")

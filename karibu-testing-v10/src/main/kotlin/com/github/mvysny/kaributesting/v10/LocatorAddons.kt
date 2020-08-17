@@ -10,7 +10,7 @@ import java.util.function.Predicate
 /**
  * Makes sure that the component's [Component.caption] contains given [substring].
  */
-fun <T : Component> SearchSpec<T>.captionContains(substring: String) {
+public fun <T : Component> SearchSpec<T>.captionContains(substring: String) {
     predicates.add(CaptionContainsPredicate(substring))
 }
 
@@ -22,7 +22,7 @@ private data class CaptionContainsPredicate<T : Component>(val substring: String
 /**
  * Makes sure that the component's [HasText.getText] contains given [substring].
  */
-fun <T> SearchSpec<T>.textContains(substring: String) where T : HasText, T : Component {
+public fun <T> SearchSpec<T>.textContains(substring: String) where T : HasText, T : Component {
     predicates.add(TextContainsPredicate(substring))
 }
 
@@ -34,14 +34,14 @@ private data class TextContainsPredicate<T : HasText>(val substring: String) : P
 /**
  * Makes sure that [Button.getIcon] is of given [collection] and matches the [iconName].
  */
-fun <T: Button> SearchSpec<T>.buttonIconIs(collection: String, iconName: String) {
+public fun <T: Button> SearchSpec<T>.buttonIconIs(collection: String, iconName: String) {
     predicates.add(ButtonIconIsPredicate(IconName(collection, iconName)))
 }
 
 /**
  * Makes sure that [Button.getIcon] is given [vaadinIcon].
  */
-fun <T: Button> SearchSpec<T>.buttonIconIs(vaadinIcon: VaadinIcon) {
+public fun <T: Button> SearchSpec<T>.buttonIconIs(vaadinIcon: VaadinIcon) {
     predicates.add(ButtonIconIsPredicate(IconName.of(vaadinIcon)))
 }
 

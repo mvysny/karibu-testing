@@ -5,12 +5,12 @@ import java.util.*
 import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 
-open class MockServletConfig(val context: ServletContext) : ServletConfig {
+public open class MockServletConfig(public val context: ServletContext) : ServletConfig {
 
     /**
      * Per-servlet init parameters.
      */
-    var servletInitParams = mutableMapOf<String, String>()
+    public var servletInitParams: MutableMap<String, String> = mutableMapOf<String, String>()
 
     override fun getInitParameter(name: String): String? = servletInitParams[name]
 
@@ -25,24 +25,24 @@ internal fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
     if (value == null) remove(key) else set(key, value)
 }
 
-object MockHttpEnvironment {
+public object MockHttpEnvironment {
     /**
      * [HttpServletRequest.getLocalPort]
      */
-    var localPort: Int = 8080
+    public var localPort: Int = 8080
 
     /**
      * [HttpServletRequest.getServerPort]
      */
-    var serverPort: Int = 8080
+    public var serverPort: Int = 8080
 
     /**
      * [HttpServletRequest.getUserPrincipal]
      */
-    var userPrincipal: Principal? = null
+    public var userPrincipal: Principal? = null
 
     /**
      * [HttpServletRequest.getRemotePort]
      */
-    var remotePort: Int = 8080
+    public var remotePort: Int = 8080
 }

@@ -10,14 +10,14 @@ import kotlin.test.fail
 /**
  * Returns the browser's current path. Returns null if there is no current UI.
  */
-val currentPath: String? get() {
+public val currentPath: String? get() {
     return UI.getCurrent()?.internals?.activeViewLocation?.pathWithQueryParameters
 }
 
 /**
  * Returns the current view
  */
-val currentView: Class<out Component>? get() {
+public val currentView: Class<out Component>? get() {
     val path: String = (currentPath ?: return null).trim('/')
     val registry: RouteRegistry = UI.getCurrent().router.registry
     val segments: List<String> = path.split('/')
@@ -35,7 +35,7 @@ val currentView: Class<out Component>? get() {
 /**
  * Expects that given [view] is the currently displayed view.
  */
-fun <V: Component> expectView(view: Class<V>) {
+public fun <V: Component> expectView(view: Class<V>) {
     @Suppress("UNCHECKED_CAST")
     expect(view) { currentView }
 }
@@ -43,4 +43,6 @@ fun <V: Component> expectView(view: Class<V>) {
 /**
  * Expects that given view is the currently displayed view.
  */
-inline fun <reified V: Component> expectView() = expectView(V::class.java)
+public inline fun <reified V: Component> expectView() {
+    expectView(V::class.java)
+}

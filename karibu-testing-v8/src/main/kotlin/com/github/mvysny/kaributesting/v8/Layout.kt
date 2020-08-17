@@ -18,7 +18,7 @@ import kotlin.test.fail
  * @throws IllegalStateException if either the layout or the [clickedComponent] is not visible or not enabled.
  */
 @JvmOverloads
-fun LayoutEvents.LayoutClickNotifier._click(clickedComponent: Component,
+public fun LayoutEvents.LayoutClickNotifier._click(clickedComponent: Component,
                                             mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
     _checkClickable()
     clickedComponent.checkEditableByUser()
@@ -34,7 +34,7 @@ fun LayoutEvents.LayoutClickNotifier._click(clickedComponent: Component,
  * Alias for [checkEditableByUser].
  * @throws IllegalStateException if the button was not visible or not enabled.
  */
-fun LayoutEvents.LayoutClickNotifier._checkClickable() {
+public fun LayoutEvents.LayoutClickNotifier._checkClickable() {
     (this as Component).checkEditableByUser()
 }
 
@@ -42,7 +42,7 @@ fun LayoutEvents.LayoutClickNotifier._checkClickable() {
  * Fails if the button is clickable.
  * @throws AssertionError if the button is clickable.
  */
-fun LayoutEvents.LayoutClickNotifier._expectNotClickable() {
+public fun LayoutEvents.LayoutClickNotifier._expectNotClickable() {
     try {
         _checkClickable()
         fail("The ${(this as Component).toPrettyString()} is clickable")

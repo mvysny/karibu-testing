@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * * a local filesystem (`frontend/`)
  * * from classpath `META-INF/resources/frontend/`
  */
-class MockNpmTemplateParser : NpmTemplateParserCopy() {
+public class MockNpmTemplateParser : NpmTemplateParserCopy() {
 
     /**
      * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`
@@ -64,8 +64,8 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
  2. as a workaround, introduce your own CustomNpmTemplateLoader to MockNpmTemplateParser.customLoaders which is able to load the template""")
     }
 
-    companion object {
-        fun install() {
+    public companion object {
+        public fun install() {
             // okay this is ugly as hell, but there is no other way:
             // https://github.com/vaadin/flow/issues/6537
             val instanceField: Field = NpmTemplateParser::class.java.getDeclaredField("INSTANCE").apply {
@@ -81,16 +81,16 @@ class MockNpmTemplateParser : NpmTemplateParserCopy() {
         /**
          * Register custom template loaders here if the default algorithm doesn't work for your app for some reason.
          */
-        val customLoaders = CopyOnWriteArrayList<CustomNpmTemplateLoader>()
+        public val customLoaders: CopyOnWriteArrayList<CustomNpmTemplateLoader> = CopyOnWriteArrayList<CustomNpmTemplateLoader>()
     }
 }
 
-interface CustomNpmTemplateLoader {
+public interface CustomNpmTemplateLoader {
     /**
      * Try to load sources for given Polymer Template.
      * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`
      * @param url the URL resolved according to the [com.vaadin.flow.component.dependency.JsModule] spec, for example `./view/my-view.js` or `@vaadin/vaadin-button.js`.
      * @return the contents of the JavaScript file or null if the JavaScript file could not be resolved.
      */
-    fun getSourcesFromTemplate(tag: String, url: String): String?
+    public fun getSourcesFromTemplate(tag: String, url: String): String?
 }

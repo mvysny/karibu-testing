@@ -17,14 +17,14 @@ import com.vaadin.server.VaadinSession
  * roundtrip before every component lookup
  * via the [_get]/[_find]/[_expectNone]/[_expectOne] call. Therefore, [MockVaadin.clientRoundtrip] is called from [awaitBeforeLookup] by default.
  */
-interface TestingLifecycleHook {
+public interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      *
      * The default implementation calls the [MockVaadin.clientRoundtrip] method. When implementing this method, you should
      * also call [MockVaadin.clientRoundtrip] (or simply call super).
      */
-    fun awaitBeforeLookup() {
+    public fun awaitBeforeLookup() {
         // this function needs to work properly in unmocked env as well
         if (VaadinSession.getCurrent() != null) {
             MockVaadin.clientRoundtrip()
@@ -37,13 +37,13 @@ interface TestingLifecycleHook {
      *
      * The default implementation does nothing.
      */
-    fun awaitAfterLookup() {}
+    public fun awaitAfterLookup() {}
 
-    companion object {
+    public companion object {
         /**
          * A default lifecycle hook that simply runs default implementations of the hook functions.
          */
-        val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
+        public val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
     }
 }
 
@@ -52,4 +52,4 @@ interface TestingLifecycleHook {
  * set your custom implementation here. See [TestingLifecycleHook] for more info on
  * where exactly you can hook into. Defaults to [TestingLifecycleHook.default].
  */
-var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
+public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default

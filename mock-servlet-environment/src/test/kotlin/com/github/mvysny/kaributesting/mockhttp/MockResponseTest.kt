@@ -8,7 +8,7 @@ import kotlin.test.expect
 
 class MockResponseTest : DynaTest({
     lateinit var request: MockResponse
-    beforeEach { request = MockResponse(MockHttpSession.create(MockContext())) }
+    beforeEach { request = MockResponse() }
 
     test("headers") {
         expect(null) { request.getHeader("foo") }

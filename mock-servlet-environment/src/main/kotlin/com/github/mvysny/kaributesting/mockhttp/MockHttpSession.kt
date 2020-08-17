@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSessionContext
 /**
  * A standalone implementation of the [HttpSession] interface.
  */
-open class MockHttpSession(
+public open class MockHttpSession(
         private val sessionId: String,
         private val servletContext: ServletContext,
         private val creationTime: Long,
@@ -23,11 +23,11 @@ open class MockHttpSession(
     private val attributes = ConcurrentHashMap<String, Any>()
     private val valid = AtomicBoolean(true)
 
-    constructor(session: HttpSession) : this(session.id, session.servletContext, session.lastAccessedTime, session.maxInactiveInterval) {
+    public constructor(session: HttpSession) : this(session.id, session.servletContext, session.lastAccessedTime, session.maxInactiveInterval) {
         copyAttributes(session)
     }
 
-    fun destroy() {
+    public fun destroy() {
         attributes.clear()
     }
 
@@ -88,7 +88,7 @@ open class MockHttpSession(
         removeAttribute(name)
     }
 
-    fun copyAttributes(httpSession: HttpSession): MockHttpSession {
+    public fun copyAttributes(httpSession: HttpSession): MockHttpSession {
         httpSession.attributeNames.toList().forEach {
             attributes[it] = httpSession.getAttribute(it)
         }
@@ -109,7 +109,7 @@ open class MockHttpSession(
         if (!valid.get()) throw IllegalStateException()
     }
 
-    companion object {
-        fun create(ctx: ServletContext): MockHttpSession = MockHttpSession("1", ctx, System.currentTimeMillis(), 30)
+    public companion object {
+        public fun create(ctx: ServletContext): MockHttpSession = MockHttpSession("1", ctx, System.currentTimeMillis(), 30)
     }
 }

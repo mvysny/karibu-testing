@@ -9,7 +9,7 @@ import com.vaadin.flow.component.HasValue
  * If the component is read-only or disabled, an exception is thrown.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
+public var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
     get() = value
     set(v) {
         (this as Component).checkEditableByUser()
@@ -24,7 +24,7 @@ var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
  * @param fromClient defaults to true
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-fun <C: AbstractField<C, V>, V> C._fireValueChange(fromClient: Boolean = true) {
+public fun <C: AbstractField<C, V>, V> C._fireValueChange(fromClient: Boolean = true) {
     checkEditableByUser()
     _fireEvent(AbstractField.ComponentValueChangeEvent<C, V>(this, this, value, fromClient))
 }

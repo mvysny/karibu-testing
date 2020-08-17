@@ -11,7 +11,7 @@ import kotlin.streams.toList
  * components placed in the `label` slot (see [FormLayout.FormItem.addToLabel]
  * for more details).
  */
-val FormLayout.FormItem.field: Component get() {
+public val FormLayout.FormItem.field: Component get() {
     val fields: List<Component> = children.toList().filter { it.element.getAttribute("slot") != "label" }
     if (fields.size != 1) {
         throw IllegalStateException("FormItem: Expected 1 field but got ${fields.size}. Component tree:\n${toPrettyTree()}")
@@ -23,7 +23,7 @@ val FormLayout.FormItem.field: Component get() {
  * Concatenates texts from all elements placed in the `label` slot. This effectively
  * returns whatever was provided in the String label via [FormLayout.addFormItem].
  */
-val FormLayout.FormItem.caption: String get() {
+public val FormLayout.FormItem.caption: String get() {
     val captions: List<Component> = children.toList().filter { it.element.getAttribute("slot") == "label" }
     return captions.joinToString("") { it._text ?: "" }
 }

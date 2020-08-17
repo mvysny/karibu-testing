@@ -10,7 +10,7 @@ import com.vaadin.flow.router.RouterLink
  * @throws IllegalStateException if the link was not visible, not enabled. See [checkEditableByUser] for
  * more details.
  */
-fun RouterLink._click() {
+public fun RouterLink._click() {
     checkEditableByUser()
     click()
 }
@@ -19,6 +19,6 @@ fun RouterLink._click() {
  * Navigates to where this router link points to. The difference to [_click] is that this one doesn't check whether
  * the link is actually visible and enabled.
  */
-fun RouterLink.click() {
+public fun RouterLink.click() {
     UI.getCurrent().navigate(href)
 }

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
 import javax.servlet.http.*
 
-open class MockRequest(private val session: HttpSession) : HttpServletRequest {
+public open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getInputStream(): ServletInputStream {
         throw UnsupportedOperationException("not implemented")
@@ -25,13 +25,13 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getRequestURL(): StringBuffer = StringBuffer("http://localhost:8080/")
 
-    var characterEncodingInt: String? = null
+    public var characterEncodingInt: String? = null
 
     override fun setCharacterEncoding(env: String) {
         characterEncodingInt = env
     }
 
-    val parameters = mutableMapOf<String, Array<String>>()
+    public val parameters: MutableMap<String, Array<String>> = mutableMapOf<String, Array<String>>()
 
     override fun getParameterValues(name: String): Array<String>? = parameters[name]
 
@@ -71,7 +71,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun isRequestedSessionIdFromCookie(): Boolean = false
 
-    var partsInt: MutableList<Part>? = null
+    public var partsInt: MutableList<Part>? = null
 
     override fun getPart(name: String): Part? {
         if (partsInt == null) throw IllegalStateException("Unable to process parts as no multi-part configuration has been provided")
@@ -138,9 +138,9 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getRemoteUser(): String? = null
 
-    var cookiesInt: Array<Cookie>? = null
+    public var cookiesInt: Array<Cookie>? = null
 
-    fun addCookie(cookie: Cookie) {
+    public fun addCookie(cookie: Cookie) {
         if (cookiesInt == null) {
             cookiesInt = arrayOf()
         }
@@ -149,7 +149,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getCookies(): Array<Cookie>? = cookiesInt
 
-    var localeInt: Locale = Locale.US
+    public var localeInt: Locale = Locale.US
 
     override fun getLocale(): Locale = localeInt
 
@@ -184,9 +184,9 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun getContentLength(): Int = -1
 
-    val headers = ConcurrentHashMap<String, List<String>>()
+    public val headers: ConcurrentHashMap<String, List<String>> = ConcurrentHashMap<String, List<String>>()
     init {
-        headers.put("user-agent", listOf("IntelliJ IDEA/182.4892.20"))
+        headers["user-agent"] = listOf("IntelliJ IDEA/182.4892.20")
     }
 
     override fun getHeader(headerName: String): String? = headers[headerName]?.get(0)
@@ -215,7 +215,7 @@ open class MockRequest(private val session: HttpSession) : HttpServletRequest {
 
     override fun isSecure(): Boolean = false
 
-    fun setParameter(name: String, vararg values: String) {
+    public fun setParameter(name: String, vararg values: String) {
         parameters[name] = arrayOf(*values)
     }
 }

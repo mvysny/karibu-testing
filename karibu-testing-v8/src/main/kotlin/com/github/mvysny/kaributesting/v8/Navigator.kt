@@ -9,12 +9,12 @@ import kotlin.test.fail
  * Returns the current view (last view that was navigated to). Returns null if there is no current UI, or there is no
  * navigator, or the navigator's current view is null.
  */
-val currentView: View? get() = UI.getCurrent()?.navigator?.currentView
+public val currentView: View? get() = UI.getCurrent()?.navigator?.currentView
 
 /**
  * Expects that given [view] is the currently displayed view.
  */
-fun <V: View> expectView(view: Class<V>) {
+public fun <V: View> expectView(view: Class<V>) {
     @Suppress("UNCHECKED_CAST")
     expect(view as Class<View>) { currentView?.javaClass }
 }
@@ -22,4 +22,6 @@ fun <V: View> expectView(view: Class<V>) {
 /**
  * Expects that given view is the currently displayed view.
  */
-inline fun <reified V: View> expectView() = expectView(V::class.java)
+public inline fun <reified V: View> expectView() {
+    expectView(V::class.java)
+}

@@ -10,5 +10,9 @@ dependencies {
     testImplementation("com.vaadin:vaadin-client-compiled:${properties["vaadin8_version"]}")
 }
 
+kotlin {
+    explicitApi()
+}
+
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit
 configureBintray("karibu-testing-v8")

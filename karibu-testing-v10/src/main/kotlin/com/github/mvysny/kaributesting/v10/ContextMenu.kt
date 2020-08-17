@@ -17,7 +17,7 @@ import kotlin.test.fail
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun HasMenuItems._clickItemWithCaption(caption: String) {
+public fun HasMenuItems._clickItemWithCaption(caption: String) {
     // fires ContextMenuOpenedListener to simulate menu opening
     (this as Component).element.setProperty("opened", true)
 
@@ -37,7 +37,7 @@ fun HasMenuItems._clickItemWithCaption(caption: String) {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun HasMenuItems._click(item: MenuItem) {
+public fun HasMenuItems._click(item: MenuItem) {
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     if (!parentMap.keys.contains(item)) {
         fail("${item.toPrettyString()} is not contained in this menu:\n${(this as Component).toPrettyTree()}")
@@ -68,7 +68,7 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
+public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
     // fires ContextMenuOpenedListener to simulate menu opening
     _setContextMenuTargetItemKey(gridItem)
     element.setProperty("opened", true)
@@ -113,7 +113,7 @@ private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun MenuItem._click() {
+public fun MenuItem._click() {
     val contextMenu: ContextMenu = contextMenu ?: fail("This function doesn't work on menu items attached to MenuBars. Use either menuBar._clickItemWithCaption(\"foo\") or menuBar._click(menuItem). See https://github.com/mvysny/karibu-testing/issues/33 for more details")
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = contextMenu.getParentMap()
     _click(parentMap)
@@ -135,7 +135,7 @@ private fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-fun <T> GridMenuItem<T>._click(gridItem: T?) {
+public fun <T> GridMenuItem<T>._click(gridItem: T?) {
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = contextMenu.getParentMap()
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)

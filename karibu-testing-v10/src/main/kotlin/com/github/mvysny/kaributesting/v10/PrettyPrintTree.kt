@@ -15,7 +15,7 @@ import kotlin.streams.toList
 /**
  * If true, [PrettyPrintTree] will use `\--` instead of `└──` which tend to render on some terminals as `???`.
  */
-var prettyPrintUseAscii: Boolean = false
+public var prettyPrintUseAscii: Boolean = false
 
 /**
  * Utility class to create a pretty-printed ASCII tree of arbitrary nodes that can be printed to the console.
@@ -23,13 +23,13 @@ var prettyPrintUseAscii: Boolean = false
  *
  * To create a pretty tree dump of a Vaadin component, just use [ofVaadin].
  */
-class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTree>) {
+public class PrettyPrintTree(public val name: String, public val children: MutableList<PrettyPrintTree>) {
 
     private val pipe = if (!prettyPrintUseAscii) '│' else '|'
     private val branchTail = if (!prettyPrintUseAscii) "└── " else "\\-- "
     private val branch = if (!prettyPrintUseAscii) "├── " else "|-- "
 
-    fun print(): String {
+    public fun print(): String {
         val sb = StringBuilder()
         print(sb, "", true)
         return sb.toString()
@@ -46,9 +46,9 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
         }
     }
 
-    companion object {
+    public companion object {
 
-        fun ofVaadin(root: Component): PrettyPrintTree {
+        public fun ofVaadin(root: Component): PrettyPrintTree {
             val result = PrettyPrintTree(root.toPrettyString(), mutableListOf())
             for (child: Component in testingLifecycleHook.getAllChildren(root)) {
                 result.children.add(ofVaadin(child))
@@ -58,7 +58,7 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
     }
 }
 
-fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
+public fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
 
 /**
  * Returns the most basic properties of the component, formatted as a concise string:
@@ -71,7 +71,7 @@ fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
  * * The [HasValue.getValue]
  */
 @Suppress("UNCHECKED_CAST")
-fun Component.toPrettyString(): String {
+public fun Component.toPrettyString(): String {
     val list = LinkedList<String>()
     val slot: String? = element.getAttribute("slot")
     if (!slot.isNullOrBlank()) {
@@ -151,4 +151,4 @@ fun Component.toPrettyString(): String {
  *
  * By default does nothing.
  */
-var prettyStringHook: (component: Component, list: LinkedList<String>) -> Unit = { _, _ -> }
+public var prettyStringHook: (component: Component, list: LinkedList<String>) -> Unit = { _, _ -> }

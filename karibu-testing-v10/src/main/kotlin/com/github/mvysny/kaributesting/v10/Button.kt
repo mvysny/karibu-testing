@@ -13,7 +13,7 @@ import kotlin.test.fail
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
  * more details.
  */
-fun Button._click() {
+public fun Button._click() {
     _checkClickable()
     click()
 }
@@ -24,7 +24,7 @@ fun Button._click() {
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
  * more details.
  */
-fun <T: ClickNotifier<*>> T._click() {
+public fun <T: ClickNotifier<*>> T._click() {
     _checkClickable()
     click()
 }
@@ -42,14 +42,14 @@ internal fun <T: ClickNotifier<*>> T.click() {
 /**
  * Alias for [checkEditableByUser].
  */
-fun Button._checkClickable() {
+public fun Button._checkClickable() {
     checkEditableByUser()
 }
 
 /**
  * Alias for [checkEditableByUser].
  */
-fun <T: ClickNotifier<*>> T._checkClickable() {
+public fun <T: ClickNotifier<*>> T._checkClickable() {
     (this as Component).checkEditableByUser()
 }
 
@@ -57,7 +57,7 @@ fun <T: ClickNotifier<*>> T._checkClickable() {
  * Fails if the button is clickable.
  * @throws AssertionError if the button is clickable.
  */
-fun Button._expectNotClickable() {
+public fun Button._expectNotClickable() {
     try {
         _checkClickable()
         fail("The ${toPrettyString()} is clickable")
@@ -70,7 +70,7 @@ fun Button._expectNotClickable() {
  * Fails if the button is clickable.
  * @throws AssertionError if the button is clickable.
  */
-fun ClickNotifier<*>._expectNotClickable() {
+public fun ClickNotifier<*>._expectNotClickable() {
     try {
         _checkClickable()
         fail("The ${(this as Component).toPrettyString()} is clickable")

@@ -18,7 +18,7 @@ import java.net.URLConnection
  * * The upload "runs" in the UI thread, so there is no way to test thread safety.
  */
 @JvmOverloads
-fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName), file: ByteArray) {
+public fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName), file: ByteArray) {
     checkEditableByUser()
     _fireEvent(Upload.StartedEvent(this, fileName, mimeType, file.size.toLong()))
     val failure: Exception? = try {
@@ -45,17 +45,17 @@ fun Upload._upload(fileName: String, mimeType: String = URLConnection.guessConte
  * Currently the implememtation simply calls [_uploadFail].
  */
 @JvmOverloads
-fun Upload._uploadInterrupt(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
+public fun Upload._uploadInterrupt(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
     _uploadFail(fileName, mimeType)
 }
 
 /**
- * Tests the "upload failed" scenario. First invokes [StartedEvent], then polls
+ * Tests the "upload failed" scenario. First invokes [Upload.StartedEvent], then polls
  * [Upload.receiver] and closes it immediately without writing anything, then
- * fires [FailedEvent] and [FinishedEvent].
+ * fires [Upload.FailedEvent] and [Upload.FinishedEvent].
  */
 @JvmOverloads
-fun Upload._uploadFail(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
+public fun Upload._uploadFail(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
     checkEditableByUser()
     _fireEvent(Upload.StartedEvent(this, fileName, mimeType, 100L))
     receiver.receiveUpload(fileName, mimeType).use {  }

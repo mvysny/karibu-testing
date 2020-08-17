@@ -6,7 +6,7 @@ import java.util.function.Predicate
 /**
  * Makes sure that the component's [Component.getCaption] contains given [substring].
  */
-fun <T : Component> SearchSpec<T>.captionContains(substring: String) {
+public fun <T : Component> SearchSpec<T>.captionContains(substring: String) {
     predicates.add(CaptionContainsPredicate(substring))
 }
 

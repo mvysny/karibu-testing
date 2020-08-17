@@ -19,7 +19,7 @@ import kotlin.test.expect
  * @throws IllegalStateException if the link was not visible, not enabled. See [checkEditableByUser] for
  * more details.
  */
-fun Anchor._download(): ByteArray {
+public fun Anchor._download(): ByteArray {
     checkEditableByUser()
     return download()
 }
@@ -28,7 +28,7 @@ fun Anchor._download(): ByteArray {
  * Downloads contents of this link. Only works with [StreamResource]; all other resources
  * are rejected with [AssertionError].
  */
-fun Anchor.download(): ByteArray {
+public fun Anchor.download(): ByteArray {
     val uri = href
     expect(false, "href hasn't been set for ${this.toPrettyString()}") { uri.isNullOrBlank() }
     return downloadResource(uri)
@@ -38,7 +38,7 @@ fun Anchor.download(): ByteArray {
  * Downloads contents of this image. Only works with [StreamResource]; all other resources
  * are rejected with [AssertionError].
  */
-fun Image.download(): ByteArray {
+public fun Image.download(): ByteArray {
     val uri = src
     expect(false, "src hasn't been set for ${this.toPrettyString()}") { uri.isNullOrBlank() }
     return downloadResource(uri)
@@ -48,7 +48,7 @@ fun Image.download(): ByteArray {
  * Downloads [StreamResource] with given [uri] and returns it as a [ByteArray]. Only works with [StreamResource]; all other resources
  * are rejected with [AssertionError].
  */
-fun downloadResource(uri: String): ByteArray {
+public fun downloadResource(uri: String): ByteArray {
     require(!uri.isBlank()) { "uri is blank" }
     val s: AbstractStreamResource? = VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)
     expect(true, "No such StreamResource registered: '$uri'. Available resources: ${VaadinSession.getCurrent().resourceRegistry.resources.keys}") {
@@ -66,4 +66,5 @@ private val resField: Field = StreamResourceRegistry::class.java.getDeclaredFiel
  * Retrieves current list of resources mappings from this registry.
  */
 @Suppress("UNCHECKED_CAST")
-val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource> get() = resField.get(this) as Map<URI, AbstractStreamResource>
+public val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource> get() =
+    resField.get(this) as Map<URI, AbstractStreamResource>

@@ -57,14 +57,14 @@ private class MockVaadinSession(val httpSession: MockHttpSession,
     }
 }
 
-object MockVaadin {
+public object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
     private var strongRefSession: VaadinSession? = null
     private var strongRefUI: UI? = null
     private var strongRefRequest: VaadinRequest? = null
     private var strongRefResponse: VaadinResponse? = null
     private var lastLocation: String? = null
-    val log: Logger = LoggerFactory.getLogger(MockVaadin::class.java)
+    internal val log: Logger = LoggerFactory.getLogger(MockVaadin::class.java)
     /**
      * Creates new mock session and UI for a test. Just call this before all and every of your UI tests are ran.
      *
@@ -80,7 +80,7 @@ object MockVaadin {
      */
     @JvmStatic
     @JvmOverloads
-    fun setup(uiFactory: () -> UI = { MockUI() },
+    public fun setup(uiFactory: () -> UI = { MockUI() },
               httpSession: MockHttpSession? = null,
               servletContext: ServletContext = MockContext()) {
 
@@ -128,7 +128,7 @@ object MockVaadin {
      * You don't have to call this function though; [setup] will overwrite any current UI/Session instances with a fresh ones.
      */
     @JvmStatic
-    fun tearDown() {
+    public fun tearDown() {
         clearVaadinObjects()
         VaadinService.setCurrent(null)
         lastLocation = null
@@ -165,7 +165,7 @@ object MockVaadin {
         CurrentInstance.set(VaadinRequest::class.java, strongRefRequest)
 
         // response
-        strongRefResponse = VaadinServletResponse(MockResponse(httpSession), service)
+        strongRefResponse = VaadinServletResponse(MockResponse(), service)
         CurrentInstance.set(VaadinResponse::class.java, strongRefResponse)
 
         // UI
@@ -250,7 +250,7 @@ object MockVaadin {
      * Calls [runUIQueue].
      * @throws IllegalStateException if the environment is not mocked
      */
-    fun clientRoundtrip() {
+    public fun clientRoundtrip() {
         runUIQueue()
     }
 
@@ -273,7 +273,7 @@ object MockVaadin {
      * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
-    fun runUIQueue(propagateExceptionToHandler: Boolean = false) {
+    public fun runUIQueue(propagateExceptionToHandler: Boolean = false) {
         checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
         VaadinSession.getCurrent()!!.apply {
             // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
@@ -317,10 +317,10 @@ internal class MockUI : UI() {
 }
 
 
-val currentRequest: VaadinRequest
+public val currentRequest: VaadinRequest
     get() = VaadinService.getCurrentRequest()
             ?: throw IllegalStateException("No current request")
-val currentResponse: VaadinResponse
+public val currentResponse: VaadinResponse
     get() = VaadinService.getCurrentResponse()
             ?: throw IllegalStateException("No current response")
 
@@ -330,7 +330,7 @@ val currentResponse: VaadinResponse
  * currentRequest.mock.addCookie(Cookie("foo", "bar"))
  * ```
  */
-val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
 
 /**
  * Retrieves the mock request which backs up [VaadinResponse].
@@ -338,7 +338,7 @@ val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).reque
  * currentResponse.mock.getCookie("foo").value
  * ```
  */
-val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
 
 /**
  * Retrieves the mock session which backs up [VaadinSession].
@@ -346,4 +346,4 @@ val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).re
  * VaadinSession.getCurrent().mock
  * ```
  */
-val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
+public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession

@@ -23,14 +23,14 @@ import kotlin.streams.toList
  * roundtrip before every component lookup
  * via the [_get]/[_find]/[_expectNone]/[_expectOne] call. Therefore, [MockVaadin.clientRoundtrip] is called from [awaitBeforeLookup] by default.
  */
-interface TestingLifecycleHook {
+public interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      *
      * The default implementation calls the [MockVaadin.clientRoundtrip] method. When implementing this method, you should
      * also call [MockVaadin.clientRoundtrip] (or simply call super).
      */
-    fun awaitBeforeLookup() {
+    public fun awaitBeforeLookup() {
         if (UI.getCurrent() != null) {
             MockVaadin.clientRoundtrip()
         }
@@ -40,14 +40,14 @@ interface TestingLifecycleHook {
      * Invoked after every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      * Invoked even if the `_get()`/`_find()`/`_expectNone()` function fails.
      */
-    fun awaitAfterLookup() {}
+    public fun awaitAfterLookup() {}
 
     /**
      * Provides all children of given component. Provides workarounds for certain components:
      * * For [Grid.Column] the function will also return cell components nested in all headers and footers for that particular column.
      * * For [MenuItemBase] the function returns all items of a sub-menu.
      */
-    fun getAllChildren(component: Component): List<Component> = when(component) {
+    public fun getAllChildren(component: Component): List<Component> = when(component) {
         is Grid.Column<*> -> {
             val grid: Grid<*> = component.grid
             val headerComponents: List<Component> = grid.headerRows.mapNotNull { it.getCell(component).component }
@@ -60,11 +60,11 @@ interface TestingLifecycleHook {
         else -> component.children.toList()
     }
 
-    companion object {
+    public companion object {
         /**
          * A default lifecycle hook that simply runs default implementations of the hook functions.
          */
-        val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
+        public val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
     }
 }
 
@@ -73,7 +73,7 @@ interface TestingLifecycleHook {
  * set your custom implementation here. See [TestingLifecycleHook] for more info on
  * where exactly you can hook into.
  */
-var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
+public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 
 /**
  * Flow Server does not close the dialog when [Dialog.close] is called; instead it tells client-side dialog to close,
@@ -82,7 +82,7 @@ var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
  *
  * Also see [MockedUI] for more details
  */
-fun cleanupDialogs() {
+public fun cleanupDialogs() {
     UI.getCurrent().children.forEach {
         if (it is Dialog && !it.isOpened) {
             it.element.removeFromParent()

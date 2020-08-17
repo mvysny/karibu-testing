@@ -38,7 +38,7 @@ import kotlin.test.fail
  * @return the item at given row.
  * @throws AssertionError if the row index is out of bounds.
  */
-fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
+public fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val fetched: Stream<T> = fetch(Query(rowIndex, 1, sortOrders, inMemorySorting, filter))
     return fetched.toList().firstOrNull()
@@ -50,7 +50,7 @@ fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrde
  * to given [filter] (null by default).
  * @return the list of items.
  */
-fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
+public fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
     val fetched: Stream<T> = fetch(Query(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
     return fetched.toList()
 }
@@ -65,7 +65,7 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T : Any> Grid<T>._get(rowIndex: Int): T {
+public fun <T : Any> Grid<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     if (this !is TreeGrid) {
         // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
@@ -89,7 +89,7 @@ fun <T : Any> Grid<T>._get(rowIndex: Int): T {
  *
  * WARNING: Very slow operation for [TreeGrid].
  */
-fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
+public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
     is TreeGrid<T> -> this._rowSequence().drop(offset).take(limit).toList()
     else -> dataCommunicator.fetch(offset, limit)
 }
@@ -100,7 +100,7 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
  *
  * This is an internal stuff, most probably you wish to call [_fetch].
  */
-fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
+public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     if (VaadinMeta.version >= 17) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
         // https://github.com/vaadin/flow/issues/8828
@@ -123,7 +123,7 @@ fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
  *
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> {
+public fun <T> Grid<T>._findAll(): List<T> {
     if (VaadinMeta.version >= 17) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
         // https://github.com/vaadin/flow/issues/8828
@@ -139,7 +139,7 @@ fun <T> Grid<T>._findAll(): List<T> {
  * In case of [HierarchicalDataProvider]
  * this returns the number of ALL items including all leafs.
  */
-fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
+public fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
     if (this is HierarchicalDataProvider<T, F>) {
         return this._size(null, filter)
     }
@@ -160,7 +160,7 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  * @param filter filter to pass to [HierarchicalQuery]
  */
 @JvmOverloads
-fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
+public fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
     _rowSequence(root, filter = filter).count()
 
 /**
@@ -171,7 +171,7 @@ fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = nu
  *
  * A very slow operation for [TreeGrid] since it walks through all items returned by [_rowSequence].
  */
-fun Grid<*>._size(): Int {
+public fun Grid<*>._size(): Int {
     if (this is TreeGrid<*>) {
         return this._size()
     }
@@ -183,7 +183,7 @@ fun Grid<*>._size(): Int {
  * Gets a [Grid.Column] of this grid by its [columnKey].
  * @throws AssertionError if no such column exists.
  */
-fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnByKey(columnKey)
+public fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnByKey(columnKey)
         ?: throw AssertionError("${toPrettyString()}: No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}")
 
 /**
@@ -197,7 +197,7 @@ fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getColumnBy
  * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
 @JvmOverloads
-fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
+public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
                                      click: (Component) -> Unit = { component: Component ->
                                          fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
@@ -229,7 +229,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
  * @param columnKey the column ID.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
+public fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
     val rowObject: T = _get(rowIndex)
     val column: Grid.Column<T> = _getColumnByKey(columnKey)
     return column._getFormatted(rowObject)
@@ -241,13 +241,13 @@ fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): String {
  * @param rowObject the bean
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
+public fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
         getPresentationValue(rowObject).toString()
 
-fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
+public fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
         columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
 
-fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
+public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
     return _getFormattedRow(rowObject)
 }
@@ -257,7 +257,7 @@ fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
  * to the client-side output.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
+public fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val renderer: Renderer<T> = this.renderer
     if (renderer is ColumnPathRenderer) {
         val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
@@ -288,7 +288,7 @@ private fun Any.gridAbstractHeaderGetHeader(): String {
  * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String).
  * The result value is undefined if a component has been set as the header.
  */
-var <T> Grid.Column<T>.header2: String
+public var <T> Grid.Column<T>.header2: String
     get() {
         // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
         var result: String = gridAbstractHeaderGetHeader()
@@ -324,7 +324,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
  * ```
  */
 @JvmOverloads
-fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
+public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
     val dsIndices: IntRange
@@ -350,14 +350,22 @@ fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     }
 }
 
-fun Grid<*>.expectRows(count: Int) {
+/**
+ * Asserts that this grid's provider returns given [count] of items. If not,
+ * an [AssertionError] is thrown with the Grid [_dump].
+ */
+public fun Grid<*>.expectRows(count: Int) {
     val actual = _size()
     if (actual != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows but got $actual\n${_dump()}")
     }
 }
 
-fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
+/**
+ * Asserts that this grid's [rowIndex] row is formatted as expected.
+ * @param row the expected row formatting.
+ */
+public fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
     val expected: List<String> = row.toList()
     val actual: List<String> = _getFormattedRow(rowIndex)
     if (expected != actual) {
@@ -393,7 +401,7 @@ private val FooterRow.FooterCell.column: Any
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell =
+public fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell =
         getCell(property.name)
 
 /**
@@ -401,7 +409,7 @@ fun HeaderRow.getCell(property: KProperty1<*, *>): HeaderRow.HeaderCell =
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
+public fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
     val cell: HeaderRow.HeaderCell? = cells.firstOrNull { (it.column as Grid.Column<*>).key == key }
     require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
@@ -425,7 +433,7 @@ private val Any.columnKey: String?
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell =
+public fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell =
         getCell(property.name)
 
 /**
@@ -433,13 +441,13 @@ fun FooterRow.getCell(property: KProperty1<*, *>): FooterRow.FooterCell =
  * @return the corresponding cell
  * @throws IllegalArgumentException if no such column exists.
  */
-fun FooterRow.getCell(key: String): FooterRow.FooterCell {
+public fun FooterRow.getCell(key: String): FooterRow.FooterCell {
     val cell: FooterRow.FooterCell? = cells.firstOrNull { it.column.columnKey == key }
     require(cell != null) { "This grid has no property named ${key}: $cells" }
     return cell
 }
 
-val HeaderRow.HeaderCell.renderer: Renderer<*>?
+public val HeaderRow.HeaderCell.renderer: Renderer<*>?
     get() {
         val method: Method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
         method.isAccessible = true
@@ -447,7 +455,7 @@ val HeaderRow.HeaderCell.renderer: Renderer<*>?
         return renderer as Renderer<*>?
     }
 
-val FooterRow.FooterCell.renderer: Renderer<*>?
+public val FooterRow.FooterCell.renderer: Renderer<*>?
     get() {
         val method: Method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
         method.isAccessible = true
@@ -458,7 +466,7 @@ val FooterRow.FooterCell.renderer: Renderer<*>?
 /**
  * Returns or sets the component in grid's footer cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
  */
-var FooterRow.FooterCell.component: Component?
+public var FooterRow.FooterCell.component: Component?
     get() {
         val cr: ComponentRenderer<*, *> = (renderer as? ComponentRenderer<*, *>) ?: return null
         return cr.createComponent(null)
@@ -472,7 +480,7 @@ private val gridSorterComponentRendererClass = Class.forName("com.vaadin.flow.co
 /**
  * Returns or sets the component in grid's header cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
  */
-var HeaderRow.HeaderCell.component: Component?
+public var HeaderRow.HeaderCell.component: Component?
     get() {
         val r: Renderer<*>? = renderer
         if (!gridSorterComponentRendererClass.isInstance(r)) return null
@@ -484,12 +492,12 @@ var HeaderRow.HeaderCell.component: Component?
         setComponent(value)
     }
 
-val KProperty1<*, *>.asc get() = QuerySortOrder(name, SortDirection.ASCENDING)
-val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
+public val KProperty1<*, *>.asc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.ASCENDING)
+public val KProperty1<*, *>.desc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.DESCENDING)
 /**
  * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
-fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
+public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     sort(sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) })
 }
 
@@ -503,7 +511,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
  */
 @JvmOverloads
-fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
+public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
     val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
@@ -521,7 +529,7 @@ fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolea
  *
  * Honors current grid ordering.
  */
-fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null): Sequence<T> {
+public fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null): Sequence<T> {
     val isExpanded: (T) -> Boolean = { item: T -> isExpanded(item) }
     return dataProvider._rowSequence(null, isExpanded, filter)
 }
@@ -539,7 +547,7 @@ fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null): Sequ
  * @param filter filter to pass to [HierarchicalQuery]
  */
 @JvmOverloads
-fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
+public fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
                                                        isExpanded: (T)->Boolean = { true },
                                                        filter: F? = null): Sequence<T> {
 
@@ -562,7 +570,7 @@ fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
  *
  * A very slow operation since it walks through all items returned by [_rowSequence].
  */
-fun TreeGrid<*>._size(): Int = _rowSequence().count()
+public fun TreeGrid<*>._size(): Int = _rowSequence().count()
 
 private fun <T, F> HierarchicalDataProvider<T, F>.checkedSize(query: HierarchicalQuery<T, F>): Int {
     if (query.parent != null && !hasChildren(query.parent)) return 0
@@ -575,7 +583,7 @@ private fun <T, F> HierarchicalDataProvider<T, F>.checkedFetch(query: Hierarchic
     else -> fetchChildren(query).toList()
 }
 
-fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+public fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
     fun getChildrenOf(item: T?): List<T> =
             if (item == null || isExpanded(item)) {
                 dataProvider.checkedFetch(HierarchicalQuery<T, SerializablePredicate<T>?>(null, item))
@@ -594,20 +602,20 @@ fun <T : Any> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T> TreeGrid<T>._getRootItems(): List<T> =
+public fun <T> TreeGrid<T>._getRootItems(): List<T> =
         dataProvider.fetch(HierarchicalQuery(null, null)).toList()
 
 /**
  * Expands all nodes. May invoke massive data loading.
  */
-fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
+public fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
     expandRecursively(_getRootItems(), depth)
 }
 
 /**
  * Returns the column's Internal ID.
  */
-val Grid.Column<*>._internalId: String get() {
+public val Grid.Column<*>._internalId: String get() {
     val getInternalIdMethod: Method = Grid.Column::class.java.getDeclaredMethod("getInternalId")
     getInternalIdMethod.isAccessible = true
     return getInternalIdMethod.invoke(this) as String
@@ -616,7 +624,7 @@ val Grid.Column<*>._internalId: String get() {
 /**
  * Returns the data provider currently set to this [HasItems].
  */
-val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
+public val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
     // until https://github.com/vaadin/flow/issues/6296 is resolved
     is Grid<T> -> this.dataProvider
     is IronList<T> -> this.dataProvider
@@ -633,7 +641,7 @@ val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
  *
  * Works both with Vaadin 16 and Vaadin 17: Vaadin 17 components no longer implement HasItems.
  */
-val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
+public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
     // until https://github.com/vaadin/flow/issues/6296 is resolved
     is Grid<*> -> this.dataProvider
     is IronList<*> -> this.dataProvider

@@ -14,7 +14,7 @@ import java.lang.reflect.Method
  * Returns the output of this renderer for given [rowObject] formatted as close as possible
  * to the client-side output.
  */
-fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
+public fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
     is TemplateRenderer<T> -> {
         val renderedTemplateHtml: String = this.renderTemplate(rowObject)
         Jsoup.parse(renderedTemplateHtml).textRecursively
@@ -36,7 +36,7 @@ fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this
 /**
  * Renders the template for given [item]
  */
-fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
+public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     var template: String = this.template
     this.valueProviders.forEach { (k: String, v: ValueProvider<T, *>) ->
         if (template.contains("[[item.$k]]")) {
@@ -50,7 +50,7 @@ fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
  * Returns the [ValueProvider] set to [BasicRenderer].
  */
 @Suppress("UNCHECKED_CAST")
-val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
+public val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
     get() {
         val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
         javaField.isAccessible = true
@@ -60,7 +60,7 @@ val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
 /**
  * Returns the Polymer Template set to the [Renderer].
  */
-val Renderer<*>.template: String
+public val Renderer<*>.template: String
     get() {
         val templateF: Field = Renderer::class.java.getDeclaredField("template")
         templateF.isAccessible = true

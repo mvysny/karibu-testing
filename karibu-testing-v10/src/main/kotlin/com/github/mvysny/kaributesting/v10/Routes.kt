@@ -23,7 +23,7 @@ import kotlin.test.expect
  * @property skipPwaInit if true, the PWA initialization code is skipped in Vaadin, which dramatically speeds up
  * the [MockVaadin.setup] from 2 seconds to 50ms. Since that's usually what you want to do, this defaults to true.
  */
-data class Routes(
+public data class Routes(
         val routes: MutableSet<Class<out Component>> = mutableSetOf(),
         val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf(),
         var skipPwaInit: Boolean = true
@@ -33,7 +33,7 @@ data class Routes(
      * Manually register error routes. No longer needed since [autoDiscoverViews] can now detect error routes.
      */
     @Deprecated("No longer needed, error routes are now auto-detected with autoDiscoverViews()", ReplaceWith(""))
-    fun addErrorRoutes(vararg routes: Class<out HasErrorParameter<*>>): Routes = apply {
+    public fun addErrorRoutes(vararg routes: Class<out HasErrorParameter<*>>): Routes = apply {
         errorRoutes.addAll(routes.toSet())
     }
 
@@ -41,7 +41,7 @@ data class Routes(
      * Registers all routes to Vaadin 15 registry. Automatically called from [MockVaadin.setup].
      */
     @Suppress("UNCHECKED_CAST")
-    fun register(sc: VaadinServletContext) {
+    public fun register(sc: VaadinServletContext) {
         RouteRegistryInitializer().onStartup(routes.toSet(), sc.context)
         val registry: ApplicationRouteRegistry = ApplicationRouteRegistry.getInstance(sc)
         registry.setErrorNavigationTargets(errorRoutes.map { it as Class<out Component> }.toSet())
@@ -60,7 +60,7 @@ data class Routes(
      * @return this
      */
     @JvmOverloads
-    fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
+    public fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
         val scan: ScanResult = ClassGraph().enableClassInfo()
                 .enableAnnotationInfo()
                 .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName))).scan()
@@ -86,7 +86,7 @@ data class Routes(
  * Clears the PWA class config from this registry.
  */
 @Suppress("UNCHECKED_CAST")
-fun ApplicationRouteRegistry.clearPwaClass() {
+public fun ApplicationRouteRegistry.clearPwaClass() {
     val pwaClassField: Field = ApplicationRouteRegistry::class.java.getDeclaredField("pwaConfigurationClass").apply { isAccessible = true }
     val ref: AtomicReference<Class<*>> = pwaClassField.get(this) as AtomicReference<Class<*>>
     ref.set(null)

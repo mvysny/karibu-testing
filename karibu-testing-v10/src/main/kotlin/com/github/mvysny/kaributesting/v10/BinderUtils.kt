@@ -6,7 +6,7 @@ import com.vaadin.flow.data.binder.ValidationException
 /**
  * Workaround for https://github.com/vaadin/flow/issues/7081
  */
-val ValidationException.verboseMessage: String get() {
+public val ValidationException.verboseMessage: String get() {
     val fieldValidationErrors: String = fieldValidationErrors.joinToString(", ") {
         val componentCaption: String = (it.field as Component).caption
         "$componentCaption: ${it.status} ${it.message.orElse("")}, value='${it.field.getValue()}'"

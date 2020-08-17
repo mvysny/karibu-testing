@@ -11,15 +11,15 @@ import java.util.ArrayList
 /**
  * If true, [PrettyPrintTree] will use `\--` instead of `└──` which tend to render on some terminals as `???`.
  */
-var prettyPrintUseAscii: Boolean = false
+public var prettyPrintUseAscii: Boolean = false
 
-class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTree>) {
+public class PrettyPrintTree(public val name: String, public val children: MutableList<PrettyPrintTree>) {
 
     private val pipe = if (!prettyPrintUseAscii) '│' else '|'
     private val branchTail = if (!prettyPrintUseAscii) "└── " else "\\-- "
     private val branch = if (!prettyPrintUseAscii) "├── " else "|-- "
 
-    fun print(): String {
+    public fun print(): String {
         val sb = StringBuilder()
         print(sb, "", true)
         return sb.toString()
@@ -36,9 +36,9 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
         }
     }
 
-    companion object {
+    public companion object {
 
-        fun ofVaadin(root: Component): PrettyPrintTree {
+        public fun ofVaadin(root: Component): PrettyPrintTree {
             val result = PrettyPrintTree(root.toPrettyString(), mutableListOf())
             if (root is HasComponents) {
                 for (child in root) {
@@ -50,9 +50,9 @@ class PrettyPrintTree(val name: String, val children: MutableList<PrettyPrintTre
     }
 }
 
-fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
+public fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
 
-fun Component.toPrettyString(): String {
+public fun Component.toPrettyString(): String {
     val list = ArrayList<String>()
     if (id != null) {
         list.add("#$id")
@@ -103,7 +103,7 @@ fun Component.toPrettyString(): String {
     return name + list
 }
 
-fun Resource.toPrettyString(): String = when(this) {
+public fun Resource.toPrettyString(): String = when(this) {
     is ExternalResource -> this.url
     is ClassResource -> this.toPrettyString()
     is GenericFontIcon -> "${javaClass.simpleName}[${this.fontFamily}/0x${this.codepoint.toString(16)}]"
@@ -112,7 +112,7 @@ fun Resource.toPrettyString(): String = when(this) {
     else -> "${javaClass.simpleName}[$this]"
 }
 
-fun ClassResource.toPrettyString(): String {
+public fun ClassResource.toPrettyString(): String {
     val getAssociatedClassMethod: Method = ClassResource::class.java.getDeclaredMethod("getAssociatedClass").apply { isAccessible = true }
     val associatedClass: Class<*> = getAssociatedClassMethod.invoke(this) as Class<*>
     val resourceNameField: Field = ClassResource::class.java.getDeclaredField("resourceName").apply { isAccessible = true }

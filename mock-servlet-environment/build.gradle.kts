@@ -7,5 +7,9 @@ dependencies {
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 }
 
+kotlin {
+    explicitApi()
+}
+
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit
 configureBintray("mock-servlet-environment")

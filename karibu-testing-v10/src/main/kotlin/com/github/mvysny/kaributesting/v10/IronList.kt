@@ -18,7 +18,7 @@ import kotlin.streams.toList
  * @return the item at given row, not null.
  * @throws AssertionError if the row index is out of bounds.
  */
-fun <T : Any> IronList<T>._get(rowIndex: Int): T {
+public fun <T : Any> IronList<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val size: Int = _size()
     if (rowIndex >= size) {
@@ -32,7 +32,7 @@ fun <T : Any> IronList<T>._get(rowIndex: Int): T {
 /**
  * Fetches items from [IronList]'s data provider.
  */
-fun <T> IronList<T>._fetch(offset: Int, limit: Int): List<T> {
+public fun <T> IronList<T>._fetch(offset: Int, limit: Int): List<T> {
     @Suppress("UNCHECKED_CAST")
     val stream: Stream<T> = (dataProvider as DataProvider<T, Any?>)
             .fetch(Query<T, Any?>(offset, limit, listOf(), null, null))
@@ -43,14 +43,14 @@ fun <T> IronList<T>._fetch(offset: Int, limit: Int): List<T> {
  * Returns all items in given data provider.
  * @return the list of items.
  */
-fun <T> IronList<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
+public fun <T> IronList<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this IronList.
  */
-fun IronList<*>._size(): Int = dataProvider._size()
+public fun IronList<*>._size(): Int = dataProvider._size()
 
-val <T> IronList<T>._renderer: Renderer<T>
+public val <T> IronList<T>._renderer: Renderer<T>
     get() {
         val f: Field = IronList::class.java.getDeclaredField("renderer")
         f.isAccessible = true
@@ -64,7 +64,7 @@ val <T> IronList<T>._renderer: Renderer<T>
  * @param columnId the column ID.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> IronList<T>._getFormattedRow(rowIndex: Int): String {
+public fun <T : Any> IronList<T>._getFormattedRow(rowIndex: Int): String {
     val rowObject: T = _get(rowIndex)
     return _renderer._getPresentationValue(rowObject).toString()
 }
@@ -79,7 +79,7 @@ fun <T : Any> IronList<T>._getFormattedRow(rowIndex: Int): String {
  * ```
  */
 @JvmOverloads
-fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
+public fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
     append("----------------------\n")
     val dsIndices: IntRange = 0 until _size()
     val displayIndices: Set<Int> = rows.intersect(dsIndices)
@@ -95,14 +95,14 @@ fun <T : Any> IronList<T>._dump(rows: IntRange = 0..10): String = buildString {
     }
 }
 
-fun IronList<*>.expectRows(count: Int) {
+public fun IronList<*>.expectRows(count: Int) {
     val actual: Int = _size()
     if (actual != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows but got $actual\n${_dump()}")
     }
 }
 
-fun IronList<*>.expectRow(rowIndex: Int, expected: String) {
+public fun IronList<*>.expectRow(rowIndex: Int, expected: String) {
     val actual: String = _getFormattedRow(rowIndex)
     if (expected != actual) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")

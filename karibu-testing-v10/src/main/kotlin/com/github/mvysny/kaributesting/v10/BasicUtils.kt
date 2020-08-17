@@ -30,14 +30,14 @@ import kotlin.test.fail
  * @receiver the component, not null.
  * @param event the event, not null.
  */
-fun Component._fireEvent(event: ComponentEvent<*>) {
+public fun Component._fireEvent(event: ComponentEvent<*>) {
     ComponentUtil.fireEvent(this, event)
 }
 
 /**
  * Fires a DOM [event] on this element.
  */
-fun Element._fireDomEvent(event: DomEvent) {
+public fun Element._fireDomEvent(event: DomEvent) {
     node.getFeature(ElementListenerMap::class.java).fireEvent(event)
 }
 
@@ -47,7 +47,7 @@ fun Element._fireDomEvent(event: DomEvent) {
  * @param eventData optional event data, defaults to an empty object.
  */
 @JvmOverloads
-fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
+public fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
 
@@ -55,7 +55,7 @@ fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.crea
  * Determines the component's `label` (usually it's the HTML element's `label` property, but it's [Checkbox.getLabel] for checkbox).
  * Intended to be used for fields such as [TextField].
  */
-var Component.label: String
+public var Component.label: String
     get() = when (this) {
         is Checkbox -> label
         else -> element.getProperty("label") ?: ""
@@ -73,7 +73,7 @@ var Component.label: String
  * For FormItem: Concatenates texts from all elements placed in the `label` slot. This effectively
  * returns whatever was provided in the String label via [FormLayout.addFormItem].
  */
-var Component.caption: String
+public var Component.caption: String
     get() = when (this) {
         is Button -> text
         is FormLayout.FormItem -> this.caption
@@ -91,7 +91,7 @@ var Component.caption: String
  *
  * Workaround for https://github.com/vaadin/flow/issues/664
  */
-var Component.id_: String?
+public var Component.id_: String?
     get() = id.orElse(null)
     set(value) {
         setId(value)
@@ -102,7 +102,7 @@ var Component.id_: String?
  *
  * Returns true for attached components even if the UI itself is closed.
  */
-val Component.isAttached: Boolean
+public val Component.isAttached: Boolean
     // see https://github.com/vaadin/flow/issues/7911
     get() = element.node.isAttached
 
@@ -110,7 +110,7 @@ val Component.isAttached: Boolean
  * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
  * the text must be non-empty).
  */
-val Component._isVisible: Boolean
+public val Component._isVisible: Boolean
     get() = when (this) {
         is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
         else -> isVisible
@@ -119,7 +119,7 @@ val Component._isVisible: Boolean
 /**
  * Returns direct text contents (it doesn't peek into the child elements).
  */
-val Component._text: String?
+public val Component._text: String?
     get() = when (this) {
         is HasText -> text
         is Text -> text   // workaround for https://github.com/vaadin/flow/issues/3606
@@ -135,7 +135,7 @@ val Component._text: String?
  * * If the component is [HasValue], it must not be [HasValue.isReadOnly].
  * @throws IllegalStateException if any of the above doesn't hold.
  */
-fun Component.checkEditableByUser() {
+public fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     val parentNullOrEnabled = !parent.isPresent || parent.get().isEffectivelyEnabled()
     if (parentNullOrEnabled) {
@@ -153,7 +153,7 @@ fun Component.checkEditableByUser() {
  * Fails if the component is editable. See [checkEditableByUser] for more details.
  * @throws AssertionError if the component is editable.
  */
-fun Component.expectNotEditableByUser() {
+public fun Component.expectNotEditableByUser() {
     try {
         checkEditableByUser()
         fail("The ${toPrettyString()} is editable")
@@ -167,14 +167,14 @@ internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.
 /**
  * This function actually works, as opposed to [Element.getTextRecursively].
  */
-val Element.textRecursively2: String
+public val Element.textRecursively2: String
     get() {
         // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
         val node = ElementUtil.toJsoup(Document(""), this)
         return node.textRecursively
     }
 
-val Node.textRecursively: String
+public val Node.textRecursively: String
     get() = when (this) {
         is TextNode -> this.text()
         else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
@@ -184,19 +184,19 @@ val Node.textRecursively: String
  * Computes that this component and all of its parents are enabled.
  * @return false if this component or any of its parent is disabled.
  */
-fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
+public fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
 
 /**
  * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.
  */
-val Component.isEnabled: Boolean
+public val Component.isEnabled: Boolean
     get() = when (this) {
         is HasEnabled -> isEnabled
         else -> true
     }
 
 // modify when this is fixed: https://github.com/vaadin/flow/issues/4068
-var Component.placeholder: String?
+public var Component.placeholder: String?
     get() = when (this) {
         is TextField -> placeholder
         is TextArea -> placeholder
@@ -221,7 +221,7 @@ var Component.placeholder: String?
 /**
  * Removes the component from its parent. Does nothing if the component does not have a parent.
  */
-fun Component.removeFromParent() {
+public fun Component.removeFromParent() {
     (parent.orElse(null) as? HasComponents)?.remove(this)
 }
 
@@ -229,13 +229,13 @@ fun Component.removeFromParent() {
  * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
  * rules are matched against given component only (not against its children).
  */
-fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
+public fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
         SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
 
 /**
  * Fires [FocusNotifier.FocusEvent] on the component, but only if it's editable.
  */
-fun <T> T._focus() where T : Focusable<*>, T : Component {
+public fun <T> T._focus() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
 }
@@ -243,7 +243,7 @@ fun <T> T._focus() where T : Focusable<*>, T : Component {
 /**
  * Fires [BlurNotifier.BlurEvent] on the component, but only if it's editable.
  */
-fun <T> T._blur() where T : Focusable<*>, T : Component {
+public fun <T> T._blur() where T : Focusable<*>, T : Component {
     checkEditableByUser()
     _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
 }
@@ -253,7 +253,7 @@ fun <T> T._blur() where T : Focusable<*>, T : Component {
  * but also the session is set to null which fires the detach listeners and makes
  * the UI and all of its components detached.
  */
-fun UI._close() {
+public fun UI._close() {
     close()
     // Mock closing of UI after request handled.
     VaadinSession.getCurrent().removeUI(this)

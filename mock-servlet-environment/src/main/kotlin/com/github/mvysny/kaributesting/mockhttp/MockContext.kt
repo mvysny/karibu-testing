@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
 import javax.servlet.descriptor.JspConfigDescriptor
 
-open class MockContext : ServletContext, Serializable {
+public open class MockContext : ServletContext, Serializable {
     override fun getServlet(name: String?): Servlet? = null
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
@@ -136,7 +136,7 @@ open class MockContext : ServletContext, Serializable {
     /**
      * [getRealPath] will only resolve `path` in these folders.
      */
-    var realPathRoots: List<String> = listOf("src/main/webapp/frontend", "src/main/webapp")
+    public var realPathRoots: List<String> = listOf("src/main/webapp/frontend", "src/main/webapp")
 
     override fun getRealPath(path: String): String? {
         for (realPathRoot in realPathRoots) {
@@ -148,7 +148,7 @@ open class MockContext : ServletContext, Serializable {
         return null
     }
 
-    val initParameters: MutableMap<String, String> = mutableMapOf<String, String>()
+    public val initParameters: MutableMap<String, String> = mutableMapOf<String, String>()
 
     override fun getInitParameter(name: String): String? = initParameters[name]
 
@@ -238,7 +238,7 @@ open class MockContext : ServletContext, Serializable {
 
     override fun getEffectiveSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
 
-    companion object {
+    public companion object {
         @JvmStatic
         private val log = LoggerFactory.getLogger(MockContext::class.java)
     }

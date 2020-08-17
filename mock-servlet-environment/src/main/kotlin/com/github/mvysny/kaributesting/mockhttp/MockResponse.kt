@@ -8,30 +8,29 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
-import javax.servlet.http.HttpSession
 
-open class MockResponse(private val session: HttpSession) : HttpServletResponse {
+public open class MockResponse : HttpServletResponse {
     override fun encodeURL(url: String): String = url
 
     override fun encodeUrl(url: String): String = encodeURL(url)
 
-    val headers = ConcurrentHashMap<String, Array<String>>()
+    public val headers: ConcurrentHashMap<String, Array<String>> = ConcurrentHashMap<String, Array<String>>()
 
     override fun addIntHeader(name: String, value: Int) {
         addHeader(name, value.toString())
     }
 
-    val cookies = CopyOnWriteArrayList<Cookie>()
+    public val cookies: CopyOnWriteArrayList<Cookie> = CopyOnWriteArrayList<Cookie>()
 
     override fun addCookie(cookie: Cookie) {
         cookies.add(cookie)
     }
 
-    fun getCookie(name: String): Cookie = checkNotNull(findCookie(name)) {
+    public fun getCookie(name: String): Cookie = checkNotNull(findCookie(name)) {
         "no such cookie with name $name. Available cookies: ${cookies.joinToString { "${it.name}=${it.value}" }}"
     }
 
-    fun findCookie(name: String): Cookie? = cookies.firstOrNull { it.name == name }
+    public fun findCookie(name: String): Cookie? = cookies.firstOrNull { it.name == name }
 
     override fun encodeRedirectUrl(url: String): String = encodeRedirectURL(url)
 
@@ -44,13 +43,13 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
         throw UnsupportedOperationException("not implemented")
     }
 
-    var _bufferSize = 4096
+    public var _bufferSize: Int = 4096
 
     override fun setBufferSize(size: Int) {
         _bufferSize = size
     }
 
-    var _locale: Locale = Locale.US
+    public var _locale: Locale = Locale.US
 
     override fun getLocale(): Locale = _locale
 
@@ -65,7 +64,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
     override fun setContentLengthLong(len: Long) {
     }
 
-    var _characterEncoding: String = "ISO-8859-1"
+    public var _characterEncoding: String = "ISO-8859-1"
 
     override fun setCharacterEncoding(charset: String) {
         _characterEncoding = charset
@@ -102,7 +101,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
         setHeader(name, date.toString())
     }
 
-    var _status = 200
+    public var _status: Int = 200
 
     override fun getStatus(): Int = _status
 
@@ -122,7 +121,7 @@ open class MockResponse(private val session: HttpSession) : HttpServletResponse 
 
     override fun getHeader(name: String): String? = headers[name]?.get(0)
 
-    var _contentType: String? = null
+    public var _contentType: String? = null
 
     override fun getContentType(): String? = _contentType
 

@@ -11,16 +11,18 @@ import java.io.Serializable
 import java.net.URL
 import kotlin.test.expect
 
-fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
-inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
-inline fun <reified T: Serializable> T.serializeDeserialize() = serializeToBytes().deserialize<T>()
+public fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { it -> ObjectOutputStream(it).writeObject(this); it }.toByteArray()
+public inline fun <reified T: Serializable> ByteArray.deserialize(): T = ObjectInputStream(inputStream()).readObject() as T
+public inline fun <reified T: Serializable> T.serializeDeserialize(): T = serializeToBytes().deserialize<T>()
 
-val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
+public val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0)
 
 /**
  * Expects that [actual] list of objects matches [expected] list of objects. Fails otherwise.
  */
-fun <T> expectList(vararg expected: T, actual: ()->List<T>) = expect(expected.toList(), actual)
+public fun <T> expectList(vararg expected: T, actual: ()->List<T>) {
+    expect(expected.toList(), actual)
+}
 
 /**
  * Parses the contents of given URL as a Json.
@@ -30,14 +32,14 @@ internal fun URL.readJson(): JsonObject = Json.parse(readText())
 /**
  * Adds a [value] at the end of the array.
  */
-fun JsonArray.add(value: JsonValue) {
+public fun JsonArray.add(value: JsonValue) {
     set(length(), value)
 }
 
 /**
  * Returns the major JVM version, e.g. 6 for Java 1.6, 8 for Java 8, 11 for Java 11 etc.
  */
-val jvmVersion: Int get() = System.getProperty("java.version").parseJvmVersion()
+public val jvmVersion: Int get() = System.getProperty("java.version").parseJvmVersion()
 
 /**
  * Returns the major JVM version, 1 for 1.1, 2 for 1.2, 3 for 1.3, 4 for 1.4, 5

@@ -12,7 +12,7 @@ import com.vaadin.ui.UI
  * @throws IllegalStateException if the link was not visible, not enabled. See [checkEditableByUser] for
  * more details.
  */
-fun Link._click() {
+public fun Link._click() {
     checkEditableByUser()
     click()
 }
@@ -23,7 +23,7 @@ fun Link._click() {
  *
  * This only works for links with the [Link.getResource] containing [ExternalResource] which points to a View.
  */
-fun Link.click() {
+public fun Link.click() {
     val res: Resource = resource ?: throw AssertionError("${toPrettyString()}: resource is null")
     if (res !is ExternalResource) throw AssertionError("${toPrettyString()}: resource $res is not ExternalResource")
     val url = res.url

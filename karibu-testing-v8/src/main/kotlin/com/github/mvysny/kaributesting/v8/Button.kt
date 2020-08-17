@@ -12,7 +12,7 @@ import kotlin.test.fail
  * See [_checkClickable] for more details.
  * @throws IllegalStateException if the button was not visible or not enabled.
  */
-fun Button._click() {
+public fun Button._click() {
     _checkClickable()
     click()
 }
@@ -21,7 +21,7 @@ fun Button._click() {
  * Alias for [checkEditableByUser].
  * @throws IllegalStateException if the button was not visible or not enabled.
  */
-fun Button._checkClickable() {
+public fun Button._checkClickable() {
     checkEditableByUser()
 }
 
@@ -29,7 +29,7 @@ fun Button._checkClickable() {
  * Fails if the button is clickable.
  * @throws AssertionError if the button is clickable.
  */
-fun Button._expectNotClickable() {
+public fun Button._expectNotClickable() {
     try {
         _checkClickable()
         fail("The ${toPrettyString()} is clickable")

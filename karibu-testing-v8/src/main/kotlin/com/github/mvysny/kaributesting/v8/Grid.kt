@@ -24,7 +24,7 @@ import kotlin.test.fail
  * @return the item at given row.
  * @throws AssertionError if the row index is out of bounds.
  */
-fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
+public fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
     val fetched = fetch(Query<T, F>(rowIndex, 1, sortOrders, inMemorySorting, filter))
     return fetched.toList().firstOrNull() ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size(filter)} rows matching filter $filter")
@@ -35,7 +35,7 @@ fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QuerySortOrde
  * to given [filter] (null by default).
  * @return the list of items.
  */
-fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
+public fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
     val fetched = fetch(Query<T, F>(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
     return fetched.toList()
 }
@@ -45,7 +45,7 @@ fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf
  * @param rowIndex the row, 0..size - 1
  * @return the item at given row, not null.
  */
-fun <T> Grid<T>._get(rowIndex: Int): T {
+public fun <T> Grid<T>._get(rowIndex: Int): T {
     if (this !is TreeGrid) {
         // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
         val size: Int = _size()
@@ -63,7 +63,7 @@ fun <T> Grid<T>._get(rowIndex: Int): T {
  *
  * WARNING: Very slow operation for [TreeGrid].
  */
-fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
+public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
     is TreeGrid<T> -> this._rowSequence().drop(offset).take(limit).toList()
     else -> dataCommunicator.fetchItemsWithRange(offset, limit)
 }
@@ -74,7 +74,7 @@ fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
  * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
  * @return the list of items.
  */
-fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
+public fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
 
 /**
  * Returns the number of items in this data provider.
@@ -82,7 +82,7 @@ fun <T> Grid<T>._findAll(): List<T> = _fetch(0, Int.MAX_VALUE)
  * In case of [HierarchicalDataProvider]
  * this returns the number of ALL items including all leafs.
  */
-fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
+public fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
     if (this is HierarchicalDataProvider<T, F>) {
         return this._size(null, filter)
     }
@@ -103,7 +103,7 @@ fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
  * @param filter filter to pass to [HierarchicalQuery]
  */
 @JvmOverloads
-fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
+public fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
         _rowSequence(root, filter = filter).count()
 
 /**
@@ -114,7 +114,7 @@ fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = nu
  *
  * A very slow operation for [TreeGrid] since it walks through all items returned by [_rowSequence].
  */
-fun Grid<*>._size(): Int = when(this) {
+public fun Grid<*>._size(): Int = when(this) {
     is TreeGrid<*> -> this._size()
     else -> dataCommunicator.dataProviderSize
 }
@@ -126,7 +126,7 @@ fun Grid<*>._size(): Int = when(this) {
  * @param columnId the column ID.
  */
 @JvmOverloads
-fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails(),
+public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEventDetails: MouseEventDetails = MouseEventDetails(),
                                      click: (Component)->Unit = { component ->
                                          fail("${this.toPrettyString()} column $columnId: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
                                      }) {
@@ -156,7 +156,7 @@ fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnId: String, mouseEvent
  * @param columnId the column ID.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
+public fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
     val rowObject: T = dataProvider._get(rowIndex)
     val column: Grid.Column<T, *> = getColumnById(columnId)
     return column._getFormatted(rowObject)
@@ -171,17 +171,17 @@ fun <T: Any> Grid<T>._getFormatted(rowIndex: Int, columnId: String): String {
  * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
+public fun <T> Grid.Column<T, *>._getFormatted(rowObject: T): String = "${getPresentationValue(rowObject)}"
 
 /**
  * Returns the formatted value of a Grid row as a list of strings, one for every visible column. Calls [_getFormatted] to
  * obtain the formatted cell value.
  * @param rowIndex the row index, 0 or higher.
  */
-fun <T> Grid<T>._getFormattedRow(rowObject: T): List<String> =
+public fun <T> Grid<T>._getFormattedRow(rowObject: T): List<String> =
         columns.filterNot { it.isHidden }.map { it._getFormatted(rowObject) }
 
-fun <T> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
+public fun <T> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
     return _getFormattedRow(rowObject)
 }
@@ -190,7 +190,7 @@ fun <T> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
  * Returns the [Grid.Column]'s presentation provider. Never null, may be [ValueProvider.identity].
  */
 @Suppress("UNCHECKED_CAST")
-val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
+public val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
     get() =
         javaClass.getDeclaredField("presentationProvider").run {
             isAccessible = true
@@ -202,7 +202,7 @@ val <V> Grid.Column<*, V>.presentationProvider: ValueProvider<V, *>
  * - it only calls the [value provider][com.vaadin.ui.Grid.Column.getValueProvider] and [presentation provider][com.vaadin.ui.Grid.Column.presentationProvider].
  * @param rowObject the row object. The object doesn't even have to be present in the Grid itself.
  */
-fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
+public fun <T, V> Grid.Column<T, V>.getPresentationValue(rowObject: T): Any? = presentationProvider.apply(valueProvider.apply(rowObject))
 
 private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
     val so = sortOrder.firstOrNull { it.sorted == column }
@@ -223,7 +223,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T, *>): String {
  * ```
  */
 @JvmOverloads
-fun <T> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
+public fun <T> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
     val visibleColumns: List<Grid.Column<T, *>> = columns.filterNot { it.isHidden }
     visibleColumns.joinTo(this, prefix = "--", separator = "-", postfix = "--\n") { "[${it.caption}]${getSortIndicator(it)}" }
     val dsIndices: IntRange
@@ -253,7 +253,7 @@ fun <T> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
  * Expects that [Grid.getDataProvider] currently contains exactly expected [count] of items. Fails if not; [_dump]s
  * first 10 rows of the Grid on failure.
  */
-fun Grid<*>.expectRows(count: Int) {
+public fun Grid<*>.expectRows(count: Int) {
     if (_size() != count) {
         throw AssertionError("${this.toPrettyString()}: expected $count rows\n${_dump()}")
     }
@@ -263,7 +263,7 @@ fun Grid<*>.expectRows(count: Int) {
  * Expects that the row at [rowIndex] looks exactly as [expected].
  */
 @Suppress("NAME_SHADOWING")
-fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
+public fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
     val expected: List<String> = expected.toList()
     val actual: List<String> = _getFormattedRow(rowIndex)
     if (expected != actual) {
@@ -279,7 +279,7 @@ fun Grid<*>.expectRow(rowIndex: Int, vararg expected: String) {
  * @param mouseEventDetails optionally mock mouse buttons and/or keyboard modifiers here.
  */
 @JvmOverloads
-fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ,
+public fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.first { !it.isHidden } ,
                            mouseEventDetails: MouseEventDetails = MouseEventDetails()) {
     checkEditableByUser()
     _fireEvent(Grid.ItemClick(this, column, _get(rowIndex), mouseEventDetails, rowIndex))
@@ -290,12 +290,12 @@ fun <T> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<T, *> = columns.fi
  * @throws IllegalArgumentException if no such column exists.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> Grid<T>.getColumnById(columnId: String): Grid.Column<T, *> =
+public fun <T> Grid<T>.getColumnById(columnId: String): Grid.Column<T, *> =
         getColumn(columnId) as Grid.Column<T, *>?
                 ?: throw IllegalArgumentException("${this.toPrettyString()}: No column with ID '$columnId'; available column IDs: ${columns.mapNotNull { it.id }}")
 
 @Deprecated("replaced by getColumnById()", replaceWith = ReplaceWith("getColumnById(columnId)"))
-fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById(columnId)
+public fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById(columnId)
 
 /**
  * Returns the component in given grid cell at [rowIndex]/[columnId]. Fails if there is something else in the cell (e.g. a String or other
@@ -304,7 +304,7 @@ fun <T> Grid<T>.getColumnBy(columnId: String): Grid.Column<T, *> = getColumnById
  * **WARNING**: This function doesn't return the button produced by [com.vaadin.ui.renderers.ButtonRenderer]! There must be an actual component
  * produced by [Grid.Column.getValueProvider], possibly fed to [com.vaadin.ui.renderers.ComponentRenderer].
  */
-fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
+public fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
     val item = _get(rowIndex)
     val column = getColumnById(columnId)
     val possibleComponent = column.getPresentationValue(item)
@@ -314,13 +314,13 @@ fun <T> Grid<T>._getComponentAt(rowIndex: Int, columnId: String): Component {
     return possibleComponent
 }
 
-val KProperty1<*, *>.asc get() = QuerySortOrder(name, SortDirection.ASCENDING)
-val KProperty1<*, *>.desc get() = QuerySortOrder(name, SortDirection.DESCENDING)
+public val KProperty1<*, *>.asc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.ASCENDING)
+public val KProperty1<*, *>.desc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.DESCENDING)
 
 /**
  * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
-fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
+public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
     setSortOrder(sortOrder.map { GridSortOrder(getColumnById(it.sorted), it.direction) })
 }
 
@@ -335,7 +335,7 @@ fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
  */
 @JvmOverloads
 @Suppress("UNCHECKED_CAST")
-fun <T> TreeGrid<T>._rowSequence(filter: Any? = null): Sequence<T> {
+public fun <T> TreeGrid<T>._rowSequence(filter: Any? = null): Sequence<T> {
     val isExpanded: (T) -> Boolean = { item: T -> isExpanded(item) }
     return (dataProvider as HierarchicalDataProvider<T, Any?>)._rowSequence(null, isExpanded, filter)
 }
@@ -353,7 +353,7 @@ fun <T> TreeGrid<T>._rowSequence(filter: Any? = null): Sequence<T> {
  * @param filter filter to pass to [HierarchicalQuery]
  */
 @JvmOverloads
-fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
+public fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
                                                        isExpanded: (T)->Boolean = { true },
                                                        filter: F? = null): Sequence<T> {
 
@@ -376,7 +376,7 @@ fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
  *
  * A very slow operation since it walks through all items returned by [_rowSequence].
  */
-fun TreeGrid<*>._size(): Int = _rowSequence().count()
+public fun TreeGrid<*>._size(): Int = _rowSequence().count()
 
 private fun <T, F> HierarchicalDataProvider<T, F>.checkedSize(query: HierarchicalQuery<T, F>): Int {
     if (query.parent != null && !hasChildren(query.parent)) return 0
@@ -389,7 +389,7 @@ private fun <T, F> HierarchicalDataProvider<T, F>.checkedFetch(query: Hierarchic
     else -> fetchChildren(query).toList()
 }
 
-fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
+public fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
     @Suppress("UNCHECKED_CAST")
     fun getChildrenOf(item: T?): List<T> =
             if (item == null || isExpanded(item)) {
@@ -410,13 +410,13 @@ fun <T> TreeGrid<T>._dataSourceToPrettyTree(): PrettyPrintTree {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T> TreeGrid<T>._getRootItems(): List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
+public fun <T> TreeGrid<T>._getRootItems(): List<T> = (dataProvider as HierarchicalDataProvider<T, Nothing?>)
             .fetch(HierarchicalQuery(null, null))
             .toList()
 
 /**
  * Expands all nodes. May invoke massive data loading.
  */
-fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
+public fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
     expandRecursively(_getRootItems(), depth)
 }

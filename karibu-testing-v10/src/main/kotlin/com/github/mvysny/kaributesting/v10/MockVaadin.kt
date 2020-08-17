@@ -93,7 +93,7 @@ private class MockVaadinServlet(val routes: Routes,
     }
 }
 
-object MockVaadin {
+public object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
     // use ThreadLocals so that multiple threads may initialize fresh Vaadin instances at the same time.
     private val strongRefSession = ThreadLocal<VaadinSession>()
@@ -120,7 +120,7 @@ object MockVaadin {
      */
     @JvmStatic
     @JvmOverloads
-    fun setup(routes: Routes = Routes(),
+    public fun setup(routes: Routes = Routes(),
               uiFactory: () -> UI = { MockedUI() },
               serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService =
                       { servlet, dc -> MockService(servlet, dc) }) {
@@ -142,7 +142,7 @@ object MockVaadin {
      * and construct a custom service which overrides important methods. Please consult [MockService] on what methods you must override in your custom service.
      */
     @JvmStatic
-    fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
+    public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
         check(VaadinMeta.version >= 15) { "Karibu-Testing only works with Vaadin 15+ but you're using ${VaadinMeta.version}" }
 
         val ctx = MockContext()
@@ -157,9 +157,10 @@ object MockVaadin {
      * One more overloaded setup() for use in Java and Groovy
      */
     @JvmStatic
-    fun setup(routes: Routes = Routes(),
-              serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService = defaultServiceFactory()) =
-            setup(routes = routes, uiFactory = { MockedUI() }, serviceFactory = serviceFactory)
+    public fun setup(routes: Routes = Routes(),
+              serviceFactory: (VaadinServlet, DeploymentConfiguration) -> VaadinServletService = defaultServiceFactory()) {
+        setup(routes = routes, uiFactory = { MockedUI() }, serviceFactory = serviceFactory)
+    }
 
     private fun defaultServiceFactory() = { servlet: VaadinServlet, dc: DeploymentConfiguration ->
         MockService(servlet, dc)
@@ -168,7 +169,7 @@ object MockVaadin {
     /**
      * Properly closes the current UI and
      */
-    fun closeCurrentUI() {
+    public fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return
         lastNavigation.set(ui.internals.activeViewLocation)
         if (ui.isClosing && ui.internals.session != null) {
@@ -187,7 +188,7 @@ object MockVaadin {
      * You don't have to call this function though; [setup] will overwrite any current UI/Session instances with a fresh ones.
      */
     @JvmStatic
-    fun tearDown() {
+    public fun tearDown() {
         clearVaadinInstances()
         val service: VaadinService? = VaadinService.getCurrent()
         if (service != null) {
@@ -229,7 +230,7 @@ object MockVaadin {
      *
      * The default is Firefox 71 on Ubuntu Linux.
      */
-    var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0"
+    public var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0"
 
     internal fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
@@ -252,7 +253,7 @@ object MockVaadin {
         CurrentInstance.set(VaadinRequest::class.java, request)
 
         // init Vaadin Response
-        val response = VaadinServletResponse(MockResponse(httpSession), service)
+        val response = VaadinServletResponse(MockResponse(), service)
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 
@@ -311,7 +312,7 @@ object MockVaadin {
      * * [cleanupDialogs]
      * @throws IllegalStateException if the environment is not mocked
      */
-    fun clientRoundtrip() {
+    public fun clientRoundtrip() {
         checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
         runUIQueue()
         UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
@@ -337,7 +338,7 @@ object MockVaadin {
      * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
-    fun runUIQueue(propagateExceptionToHandler: Boolean = false, session: VaadinSession = VaadinSession.getCurrent()) {
+    public fun runUIQueue(propagateExceptionToHandler: Boolean = false, session: VaadinSession = VaadinSession.getCurrent()) {
         // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
         // otherwise the exceptions would simply be logged but unlock() wouldn't fail.
         val errors: MutableList<Throwable> = mutableListOf<Throwable>()
@@ -372,7 +373,7 @@ object MockVaadin {
 /**
  * A simple no-op UI used by default by [MockVaadin.setup]. The class is open, in order to be extensible in user's library
  */
-open class MockedUI : UI()
+public open class MockedUI : UI()
 
 /**
  * A mocking service that performs three very important tasks:
@@ -380,7 +381,7 @@ open class MockedUI : UI()
  * * Provides some dummy value as a root ID via [getMainDivId] (otherwise the mocked servlet env will crash).
  * The class is intentionally opened, to be extensible in user's library.
  */
-open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
+public open class MockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
     override fun getInstantiator(): Instantiator = MockInstantiator(super.getInstantiator())
@@ -389,7 +390,7 @@ open class MockService(servlet: VaadinServlet, deploymentConfiguration: Deployme
 /**
  * Makes sure to load [MockNpmTemplateParser].
  */
-open class MockInstantiator(val delegate: Instantiator) : Instantiator by delegate {
+public open class MockInstantiator(public val delegate: Instantiator) : Instantiator by delegate {
     override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
 }
 
@@ -411,10 +412,10 @@ internal fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEven
     }
 }
 
-val currentRequest: VaadinRequest
+public val currentRequest: VaadinRequest
     get() = VaadinService.getCurrentRequest()
             ?: throw IllegalStateException("No current request")
-val currentResponse: VaadinResponse
+public val currentResponse: VaadinResponse
     get() = VaadinService.getCurrentResponse()
             ?: throw IllegalStateException("No current response")
 
@@ -424,7 +425,7 @@ val currentResponse: VaadinResponse
  * currentRequest.mock.addCookie(Cookie("foo", "bar"))
  * ```
  */
-val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
 
 /**
  * Retrieves the mock request which backs up [VaadinResponse].
@@ -432,7 +433,7 @@ val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).reque
  * currentResponse.mock.getCookie("foo").value
  * ```
  */
-val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
 
 /**
  * Retrieves the mock session which backs up [VaadinSession].
@@ -440,4 +441,4 @@ val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).re
  * VaadinSession.getCurrent().mock
  * ```
  */
-val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
+public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession

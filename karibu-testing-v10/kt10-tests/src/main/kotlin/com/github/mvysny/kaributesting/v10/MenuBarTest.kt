@@ -17,7 +17,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
         test("_clickItemWithCaption") {
             var clicked = 0
             val menuBar: MenuBar = UI.getCurrent().menuBar {
-                item("foo", { e -> clicked++ }) {}
+                item("foo", { _ -> clicked++ }) {}
             }
             menuBar._clickItemWithCaption("foo")
             expect(1) { clicked }
@@ -27,7 +27,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
             var clicked = 0
             lateinit var mi: MenuItem
             val menuBar: MenuBar = UI.getCurrent().menuBar {
-                mi = item("foo", { e -> clicked++ }) {}
+                mi = item("foo", { _ -> clicked++ }) {}
             }
             menuBar._click(mi)
             expect(1) { clicked }

@@ -17,7 +17,10 @@ fun DynaNodeGroup.routesTestBatch() {
         val routes: Routes = Routes().autoDiscoverViews("com.github")
         val ctx = VaadinServletContext(MockContext())
         routes.register(ctx)
-        expect(null) { ApplicationRouteRegistry.getInstance(ctx).pwaConfigurationClass }
+        expect(null) {
+            @Suppress("DEPRECATION")
+            ApplicationRouteRegistry.getInstance(ctx).pwaConfigurationClass
+        }
     }
 
     test("PWA is discovered properly if need be") {
@@ -25,6 +28,9 @@ fun DynaNodeGroup.routesTestBatch() {
         routes.skipPwaInit = false
         val ctx = VaadinServletContext(MockContext())
         routes.register(ctx)
-        expect(WelcomeView::class.java) { ApplicationRouteRegistry.getInstance(ctx).pwaConfigurationClass }
+        expect(WelcomeView::class.java) {
+            @Suppress("DEPRECATION")
+            ApplicationRouteRegistry.getInstance(ctx).pwaConfigurationClass
+        }
     }
 }

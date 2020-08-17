@@ -327,7 +327,9 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 }
 
-data class TestPerson(var name: String, var age: Int)
+data class TestPerson(var name: String, var age: Int): Comparable<TestPerson> {
+    override fun compareTo(other: TestPerson): Int = compareValuesBy(this, other, { it.name }, { it.age })
+}
 
 fun <T> Grid<T>.setItems2(items: Collection<T>) {
     dataProvider = ListDataProvider2(items)

@@ -296,7 +296,7 @@ class LocatorTest : DynaTest({
         test("incorrectly mocked env") {
             val ui = MockUI()
             UI.setCurrent(ui)
-            expectThrows(NullPointerException::class) {
+            expectThrows(IllegalStateException::class) {
                 Page.getCurrent().location
             }
             // the Page has been mocked improperly, but _get should still fail with a proper error message.

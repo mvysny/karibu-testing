@@ -552,7 +552,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
             }
             MockVaadin.tearDown()
-            MockVaadin.setup(serviceFactory = { servlet, dc -> MyMockService(servlet, dc) })
+            MockVaadin.setup(servlet = object : MockVaadinServlet() {
+                override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService =
+                        MyMockService(this, deploymentConfiguration)
+            })
         }
         test("VaadinService listeners should be invoked") {
             MockVaadin.tearDown()
@@ -560,13 +563,15 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             var uiInitListenerInvocationCount = 0
             var sessionDestroyListenerInvocationCount = 0
             var serviceDestroyListenerInvocationCount = 0
-            MockVaadin.setup(serviceFactory = { servlet, dc ->
-                val service = MockService(servlet, dc)
-                service.addSessionInitListener { sessionInitListenerInvocationCount++ }
-                service.addUIInitListener { uiInitListenerInvocationCount++ }
-                service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }
-                service.addServiceDestroyListener { serviceDestroyListenerInvocationCount++ }
-                service
+            MockVaadin.setup(servlet = object : MockVaadinServlet() {
+                override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+                    val service = MockService(this, deploymentConfiguration)
+                    service.addSessionInitListener { sessionInitListenerInvocationCount++ }
+                    service.addUIInitListener { uiInitListenerInvocationCount++ }
+                    service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }
+                    service.addServiceDestroyListener { serviceDestroyListenerInvocationCount++ }
+                    return service
+                }
             })
             expect(1) { sessionInitListenerInvocationCount }
             expect(1) { uiInitListenerInvocationCount }

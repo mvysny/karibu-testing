@@ -1,30 +1,26 @@
 package com.github.mvysny.kaributesting.v10.spring
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10.MockVaadinHelper
 import com.github.mvysny.kaributesting.v10.Routes
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
-import com.vaadin.flow.server.ServiceException
-import com.vaadin.flow.server.VaadinRequest
-import com.vaadin.flow.server.VaadinServletService
-import com.vaadin.flow.server.VaadinSession
+import com.vaadin.flow.server.*
 import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
 import com.vaadin.flow.spring.SpringVaadinSession
 import org.springframework.context.ApplicationContext
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import javax.servlet.ServletConfig
-import javax.servlet.ServletException
 
 /**
  * @author mavi
  */
 internal class MockSpringServlet(val routes: Routes, val ctx: ApplicationContext, val uiFactory: () -> UI) : SpringServlet(ctx, false) {
-    @Throws(ServletException::class)
-    override fun init(servletConfig: ServletConfig) {
-        routes.register(servletConfig.servletContext)
-        super.init(servletConfig)
+
+    override fun createDeploymentConfiguration(): DeploymentConfiguration {
+        MockVaadinHelper.mockFlowBuildInfo(this)
+        return super.createDeploymentConfiguration()
     }
 
     @Throws(ServiceException::class)
@@ -43,6 +39,7 @@ internal class MockSpringServlet(val routes: Routes, val ctx: ApplicationContext
             }
         }
         service.init()
+        routes.register(service.context as VaadinServletContext)
         return service
     }
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletConfig
 import javax.servlet.ServletContext
+import kotlin.test.expect
 
 private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
     override fun reload() {
@@ -40,8 +41,9 @@ private class MockPage(ui: UI, private val uiFactory: () -> UI, private val sess
  *   In order to do that, simply override [close], call `super.close()` then call
  *   [MockVaadin.afterSessionClose].
  */
-private class MockVaadinSession(service: VaadinService,
-                                val uiFactory: () -> UI) : VaadinSession(service) {
+public open class MockVaadinSession(service: VaadinService,
+                                    public val uiFactory: () -> UI
+) : VaadinSession(service) {
     /**
      * We need to pretend that we have the UI lock during the duration of the test method, otherwise
      * Vaadin would complain that there is no session lock.
@@ -138,7 +140,11 @@ public object MockVaadin {
 
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))
-        VaadinService.setCurrent(servlet.service!!)
+        val service: VaadinServletService = checkNotNull(servlet.service)
+        expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {
+            service.router != null
+        }
+        VaadinService.setCurrent(service)
 
         // init Vaadin Session
         createSession(ctx, uiFactory)
@@ -230,6 +236,8 @@ public object MockVaadin {
         val mcreateVaadinSession: Method = VaadinService::class.java.getDeclaredMethod("createVaadinSession", VaadinRequest::class.java)
         mcreateVaadinSession.isAccessible = true
         val session: VaadinSession = mcreateVaadinSession.invoke(service, checkNotNull(VaadinRequest.getCurrent())) as VaadinSession
+        expect(true, "$session created from $service has null lock. See the MockSession class on how to mock locks properly") { session.lockInstance != null }
+        expect(true, "$session created from $service: lock must be locked!") { (session.lockInstance as ReentrantLock).isLocked }
 
         httpSession.setAttribute(service.serviceName + ".lock", session.lockInstance)
         session.configuration = service.deploymentConfiguration

@@ -422,18 +422,20 @@ public open class MockService(servlet: VaadinServlet,
     override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, uiFactory)
 }
 
-internal fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
+private fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
     val listenerField: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
     listenerField.isAccessible = true
+    @Suppress("UNCHECKED_CAST")
     val sessionInitListeners: Collection<SessionInitListener> = listenerField.get(this) as Collection<SessionInitListener>
     for (sessionInitListener in sessionInitListeners) {
         sessionInitListener.sessionInit(event)
     }
 }
 
-internal fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent) {
+private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent) {
     val listenerField: Field = VaadinService::class.java.getDeclaredField("serviceDestroyListeners")
     listenerField.isAccessible = true
+    @Suppress("UNCHECKED_CAST")
     val listeners: Collection<ServiceDestroyListener> = listenerField.get(this) as Collection<ServiceDestroyListener>
     for (listener in listeners) {
         listener.serviceDestroy(event)

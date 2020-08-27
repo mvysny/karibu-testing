@@ -546,13 +546,18 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         test("Registering custom VaadinService is possible") {
             open class MyMockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
                 override fun isAtmosphereAvailable(): Boolean = false
-                override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
+                override fun getMainDivId(session: VaadinSession, request: VaadinRequest): String = "ROOT-1"
+                override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, { MockedUI() })
             }
             MockVaadin.tearDown()
-            MockVaadin.setup(servlet = object : MockVaadinServlet() {
-                override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService =
-                        MyMockService(this, deploymentConfiguration)
+            MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {
+                override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+                    val service = MyMockService(this, deploymentConfiguration)
+                    service.init()
+                    return service
+                }
             })
+            expect(MyMockService::class.java) { VaadinService.getCurrent().javaClass }
         }
         test("VaadinService listeners should be invoked") {
             MockVaadin.tearDown()
@@ -560,9 +565,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             var uiInitListenerInvocationCount = 0
             var sessionDestroyListenerInvocationCount = 0
             var serviceDestroyListenerInvocationCount = 0
-            MockVaadin.setup(servlet = object : MockVaadinServlet() {
+            MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {
                 override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
                     val service = MockService(this, deploymentConfiguration)
+                    service.init()
                     service.addSessionInitListener { sessionInitListenerInvocationCount++ }
                     service.addUIInitListener { uiInitListenerInvocationCount++ }
                     service.addSessionDestroyListener { sessionDestroyListenerInvocationCount++ }

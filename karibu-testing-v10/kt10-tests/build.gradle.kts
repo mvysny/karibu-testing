@@ -12,4 +12,12 @@ dependencies {
                 "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents")
                 .forEach { exclude(group = it) }
     }
+
+    api("org.springframework.boot:spring-boot-starter-test:2.3.0.RELEASE") {
+        exclude(group = "ch.qos.logback")
+    }
+    api("org.springframework.boot:spring-boot-starter-web:2.3.0.RELEASE") {
+        exclude(group = "ch.qos.logback")
+    }
+    api("com.vaadin:vaadin-spring:12.2.0")
 }

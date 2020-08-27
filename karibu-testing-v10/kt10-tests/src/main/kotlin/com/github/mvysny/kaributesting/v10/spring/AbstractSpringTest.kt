@@ -1,16 +1,16 @@
 package com.github.mvysny.kaributesting.v10.spring
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10.MockVaadin.setup
 import com.github.mvysny.kaributesting.v10.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
+import com.github.mvysny.kaributesting.v10.jvmVersion
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
 import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
 import com.vaadin.flow.spring.SpringVaadinSession
+import org.junit.AssumptionViolatedException
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,7 +26,7 @@ import kotlin.test.expect
 @SpringBootTest
 @WebAppConfiguration
 @DirtiesContext
-abstract class AbstractSpringTest {
+abstract class AbstractSpringTest(val isNpmVaadin14: Boolean = false) {
 
     private val routes: Routes = Routes()
 
@@ -34,11 +34,13 @@ abstract class AbstractSpringTest {
     private lateinit var ctx: ApplicationContext
 
     @BeforeEach
-    @Throws(Exception::class)
     fun setup() {
+        if (isNpmVaadin14 && jvmVersion >= 12) {
+            throw AssumptionViolatedException("Karibu-Testing doesn't support Vaadin14 in NPM mode on JVM 12+: $jvmVersion")
+        }
         val uiFactory = { MockedUI() }
         val servlet: SpringServlet = MockSpringServlet(routes, ctx, uiFactory)
-        setup(uiFactory, servlet)
+        MockVaadin.setup(uiFactory, servlet)
     }
 
     @Test

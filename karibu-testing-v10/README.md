@@ -706,13 +706,14 @@ java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching Text
   it's better to use `_expectOne()` (Java: `LocatorJ._assertOne()`) to express this intent explicitly, instead of
   simply calling `_get()` without doing anything with the result component.
 
-### Customizing dump for custom components
+### Customizing dump for your components
 
-the `dump()` function uses the `toPrettyString()` function to print as much information
-as possible about a Vaadin component. See the above dump for an example for a
+The `dump()` function uses the `toPrettyString()` function to print all basic information
+about a Vaadin component: the visibility, read-only-ness, value, whether the component is enabled or not, etc.
+See the above dump for an example for a
 `TextField` and a `Button`.
 
-However, `toPrettyString()` will not print any custom state which is vital for debugging of your custom components.
+However, `toPrettyString()` will not print any custom state your component may have, which may be vital for debugging purposes.
 That's where the `prettyStringHook` will come handy.
 Since Karibu-Testing 1.1.29/1.2.2 you can assign a function to
 `prettyStringHook` in Kotlin (`PrettyPrintTreeKt.setPrettyStringHook()` in Java/Groovy).

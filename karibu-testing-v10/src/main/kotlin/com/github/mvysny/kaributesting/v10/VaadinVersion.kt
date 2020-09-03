@@ -68,19 +68,21 @@ public object VaadinMeta {
             "Karibu-Testing 1.2.x is only compatible with Vaadin ${SemanticVersion.VAADIN_14_3} and above, but got $version"
         }
         if (version == 14) {
-            check(!isVaadin14CompatMode) {
-                "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead"
-            }
+            checkNotVaadin14CompatMode()
         }
         return false
     }
 
-    private val isVaadin14CompatMode: Boolean get() {
+    private fun checkNotVaadin14CompatMode() {
+        val error = "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead"
+
         // The WAR project should package the flow-build-info.json config file which
         // clearly states the Vaadin configuration including the compatibility mode setting
         val fbi: JsonObject? = flowBuildInfo
         if (fbi != null) {
-            return fbi.getBoolean("compatibilityMode")
+            check(!fbi.getBoolean("compatibilityMode")) {
+                "flow-build-info.json is set to compatibility mode: $fbi. $error"
+            }
         }
         // The `flow-build-info.json` may be missing - that happens when we're in a Bower mode,
         // but that also happens when we're not testing a WAR
@@ -91,6 +93,8 @@ public object VaadinMeta {
         // whether the polymer.jar is on the classpath. If it is, then we're using
         // Bower mode and thus the compat mode.
         val polymerHtml: URL? = Thread.currentThread().contextClassLoader.getResource("META-INF/resources/webjars/polymer/polymer.html")
-        return polymerHtml != null
+        check(polymerHtml == null) {
+            "Polymer 3 webjar is on the classpath, indicating compatibility mode: $polymerHtml. $error"
+        }
     }
 }

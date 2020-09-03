@@ -10,6 +10,10 @@ Compatibility chart:
 | 1.0.x | Vaadin 10, Vaadin 11, Vaadin 12 |
 | 1.1.x | Vaadin 13, Vaadin 14 |
 | 1.2.x | Vaadin 15+ |
+| 1.2.3+ | Vaadin 14.3 and higher in (p)npm mode; Vaadin 15+ |
+
+Since Karibu-Testing 1.1.x doesn't work on Java 12+ and is no longer maintained,
+it's recommended to use Karibu-Testing 1.2.3 and higher.
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

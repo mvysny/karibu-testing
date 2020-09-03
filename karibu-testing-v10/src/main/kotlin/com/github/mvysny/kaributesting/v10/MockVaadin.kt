@@ -128,7 +128,9 @@ public object MockVaadin {
      */
     @JvmStatic
     public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinMeta.version >= 15) { "Karibu-Testing only works with Vaadin 15+ but you're using ${VaadinMeta.version}" }
+        check(VaadinMeta.fullVersion >= SemanticVersion.VAADIN_14_3) {
+            "Karibu-Testing only works with Vaadin ${SemanticVersion.VAADIN_14_3} but you're using ${VaadinMeta.fullVersion}"
+        }
 
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))

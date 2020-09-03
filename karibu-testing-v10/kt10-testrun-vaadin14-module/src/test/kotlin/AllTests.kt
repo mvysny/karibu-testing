@@ -18,7 +18,7 @@ class AllTests : DynaTest({
         afterEach { MockVaadin.tearDown() }
 
         test("Vaadin version") {
-            expect(15) { VaadinMeta.version }
+            expect(14) { VaadinMeta.version }
             expect(false) { VaadinMeta.isCompatibilityMode }
         }
     }

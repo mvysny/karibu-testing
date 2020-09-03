@@ -65,6 +65,11 @@ public open class MockVaadinServlet @JvmOverloads constructor(
 
     override fun createDeploymentConfiguration(): DeploymentConfiguration {
         MockVaadinHelper.mockFlowBuildInfo(this)
+        // make sure that Vaadin 14+ starts in npm mode even with `frontend/` and `flow-build-info.json` missing.
+        // this check is required for testing a jar module with Vaadin 14 components.
+        if (VaadinMeta.version == 14) {
+            initParameters.remove(DeploymentConfigurationFactory.DEV_MODE_ENABLE_STRATEGY)
+        }
         return super.createDeploymentConfiguration()
     }
 
@@ -131,6 +136,7 @@ public object MockVaadin {
         check(VaadinMeta.fullVersion >= SemanticVersion.VAADIN_14_3) {
             "Karibu-Testing only works with Vaadin ${SemanticVersion.VAADIN_14_3} but you're using ${VaadinMeta.fullVersion}"
         }
+        check(!VaadinMeta.isCompatibilityMode)
 
         val ctx = MockContext()
         servlet.init(MockServletConfig(ctx))

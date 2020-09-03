@@ -46,7 +46,6 @@ internal fun DynaNodeGroup.mockVaadinTest() {
     }
     afterEach { MockVaadin.tearDown() }
 
-
     group("setup/teardown tests") {
         test("smoke test that everything is mocked") {
             expect(true) { UI.getCurrent() != null }

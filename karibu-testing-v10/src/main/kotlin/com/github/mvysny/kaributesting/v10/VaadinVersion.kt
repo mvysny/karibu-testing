@@ -7,6 +7,7 @@ import com.vaadin.shrinkwrap.VaadinCoreShrinkWrap
 import elemental.json.Json
 import elemental.json.JsonObject
 import java.lang.reflect.Method
+import java.net.URL
 
 public data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {
     override fun compareTo(other: SemanticVersion): Int =
@@ -67,8 +68,29 @@ public object VaadinMeta {
             "Karibu-Testing 1.2.x is only compatible with Vaadin ${SemanticVersion.VAADIN_14_3} and above, but got $version"
         }
         if (version == 14) {
-            // todo assert that the compatibility mode is not used
+            check(!isVaadin14CompatMode) {
+                "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead"
+            }
         }
         return false
+    }
+
+    private val isVaadin14CompatMode: Boolean get() {
+        // The WAR project should package the flow-build-info.json config file which
+        // clearly states the Vaadin configuration including the compatibility mode setting
+        val fbi: JsonObject? = flowBuildInfo
+        if (fbi != null) {
+            return fbi.getBoolean("compatibilityMode")
+        }
+        // The `flow-build-info.json` may be missing - that happens when we're in a Bower mode,
+        // but that also happens when we're not testing a WAR
+        // project but a module jar with additional components.
+        //
+        // The compat mode is pretty much a configuration of the Vaadin Maven Plugin
+        // and it's impossible to figure that out. Instead, let's simply check
+        // whether the polymer.jar is on the classpath. If it is, then we're using
+        // Bower mode and thus the compat mode.
+        val polymerHtml: URL? = Thread.currentThread().contextClassLoader.getResource("META-INF/resources/webjars/polymer/polymer.html")
+        return polymerHtml != null
     }
 }

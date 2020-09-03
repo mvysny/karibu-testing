@@ -7,6 +7,11 @@ import com.vaadin.flow.component.HasValue
 /**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
+ *
+ * Modification of this property fires the value change event; the [HasValue.ValueChangeEvent.isFromClient] will
+ * return `false` indicating that the event came from the server. If this is not desired,
+ * depending on your code, it may be
+ * possible to call [_fireValueChange] with `fromClient=true` instead.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 public var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?

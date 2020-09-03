@@ -374,6 +374,7 @@ public object MockVaadin {
      * Only usable when you are providing your own implementation of [VaadinSession].
      * See [MockVaadinSession] on how to call this properly.
      */
+    @JvmStatic
     public fun afterSessionClose(session: VaadinSession, uiFactory: () -> UI) {
         // We need to simulate the actual browser + servlet container behavior here.
         // Imagine that we want a test scenario where the user logs out, and we want to check that a login prompt appears.

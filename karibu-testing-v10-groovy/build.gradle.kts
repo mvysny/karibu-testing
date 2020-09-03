@@ -10,13 +10,13 @@ dependencies {
     // don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
-    compileOnly("com.vaadin:vaadin-core:${properties["vaadin15_version"]}")
-    testImplementation("com.vaadin:vaadin-core:${properties["vaadin15_version"]}")
+    compileOnly("com.vaadin:vaadin-core:${properties["vaadin17_version"]}")
+    testImplementation("com.vaadin:vaadin-core:${properties["vaadin17_version"]}")
 
     api(project(":karibu-testing-v10"))
 
-    implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
+    implementation("org.junit.jupiter:junit-jupiter-api:${properties["junit5_version"]}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${properties["junit5_version"]}")
     api(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 }

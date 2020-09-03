@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+import java.util.stream.Stream
+
 /**
  * Merely a test of the API. No need to test the implementation, it is thoroughly tested elsewhere.
  * @author mavi
@@ -34,10 +36,10 @@ class ComboBoxUtilsTest {
         comboWithObjects.setItems([new Object()])
         items = comboWithObjects.getSuggestions()
         def selectWithStrings = new Select<String>()
-        selectWithStrings.setItems([])
+        selectWithStrings.setItems([].stream() as Stream<String>)
         items = selectWithStrings.getSuggestionItems()
         def selectWithObjects = new Select<Object>()
-        selectWithObjects.setItems([])
+        selectWithObjects.setItems([].stream() as Stream<Object>)
         items = selectWithObjects.getSuggestions()
     }
 }

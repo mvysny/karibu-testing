@@ -481,6 +481,7 @@ public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletRespo
 public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
 
 public object MockVaadinHelper {
+    @JvmStatic
     public fun mockFlowBuildInfo(servlet: VaadinServlet) {
         // we need to skip the test at DeploymentConfigurationFactory.verifyMode otherwise
         // testing a Vaadin 15 component module in npm mode without webpack.config.js nor flow-build-info.json would fail.

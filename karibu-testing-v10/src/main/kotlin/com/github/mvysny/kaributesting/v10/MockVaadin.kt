@@ -59,6 +59,10 @@ public open class MockVaadinSession(service: VaadinService,
     }
 }
 
+/**
+ * Makes sure that [routes] are properly registered, and that [MockService]
+ * is used instead of vanilla [VaadinServletService].
+ */
 public open class MockVaadinServlet @JvmOverloads constructor(
         public val routes: Routes = Routes(),
         public val uiFactory: () -> UI = { MockedUI() }

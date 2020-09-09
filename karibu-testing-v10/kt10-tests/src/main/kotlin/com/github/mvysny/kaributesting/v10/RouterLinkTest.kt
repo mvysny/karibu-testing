@@ -37,7 +37,7 @@ internal fun DynaNodeGroup.routerLinkBatch() {
         }
         test("navigation to non-existing route blows immediately") {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
-Available routes: [testing TestingView]
+Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes""") {
                 UI.getCurrent().apply {
                     routerLink(null, "testing") {
@@ -71,7 +71,7 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
         }
         test("navigation to non-existing route blows immediately") {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
-Available routes: [testing TestingView]
+Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes""") {
                 UI.getCurrent().apply {
                     anchor("nonexisting") {

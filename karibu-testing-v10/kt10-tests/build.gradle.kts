@@ -20,4 +20,5 @@ dependencies {
         exclude(group = "ch.qos.logback")
     }
     api("com.vaadin:vaadin-spring:12.2.0")
+    api(project(":karibu-testing-v10-spring"))
 }

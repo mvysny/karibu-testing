@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.router.RouterLink
 
 /**
@@ -20,5 +21,22 @@ public fun RouterLink._click() {
  * the link is actually visible and enabled.
  */
 public fun RouterLink.click() {
+    UI.getCurrent().navigate(href)
+}
+
+/**
+ * Navigates to where this router link points to. The difference to [_click] is that this one doesn't check whether
+ * the link is actually visible and enabled.
+ */
+public fun Anchor._click() {
+    checkEditableByUser()
+    click()
+}
+
+/**
+ * Navigates to where this router link points to. The difference to [_click] is that this one doesn't check whether
+ * the link is actually visible and enabled.
+ */
+public fun Anchor.click() {
     UI.getCurrent().navigate(href)
 }

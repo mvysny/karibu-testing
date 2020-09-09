@@ -10,7 +10,7 @@ fun DynaNodeGroup.routesTestBatch() {
     test("All views discovered") {
         val routes: Routes = Routes().autoDiscoverViews("com.github")
         expect(allViews) { routes.routes.toSet() }
-        expect(setOf(ErrorView::class.java)) { routes.errorRoutes.toSet() }
+        expect(allErrorRoutes) { routes.errorRoutes.toSet() }
     }
 
     test("PWA is ignored by default") {

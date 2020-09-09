@@ -17,10 +17,9 @@ import kotlin.test.expect
 val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
         TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java,
         ParametrizedView::class.java, ChildView::class.java, NavigationPostponeView::class.java)
+val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
 
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
-
-    val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java)
 
     test("AutoViewDiscovery") {
         expect(allViews) { Routes().autoDiscoverViews("com.github").routes }

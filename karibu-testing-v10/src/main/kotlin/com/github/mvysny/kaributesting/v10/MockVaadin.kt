@@ -295,7 +295,9 @@ public object MockVaadin {
             UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation.get()!!, NavigationTrigger.PROGRAMMATIC)
             lastNavigation.remove()
         } else {
-            UI.getCurrent().navigate("")
+            if (UI.getCurrent().router.registry.getNavigationTarget("").isPresent) {
+                UI.getCurrent().navigate("")
+            }
         }
     }
 

@@ -1,8 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
-import com.vaadin.flow.router.HasErrorParameter
-import com.vaadin.flow.router.Route
+import com.vaadin.flow.component.Tag
+import com.vaadin.flow.router.*
 import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
@@ -25,7 +25,7 @@ import kotlin.test.expect
  */
 public data class Routes(
         val routes: MutableSet<Class<out Component>> = mutableSetOf(),
-        val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf(),
+        val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf(MockRouteNotFoundError::class.java),
         var skipPwaInit: Boolean = true
 ) : Serializable {
 
@@ -91,4 +91,31 @@ public fun ApplicationRouteRegistry.clearPwaClass() {
     val ref: AtomicReference<Class<*>> = pwaClassField.get(this) as AtomicReference<Class<*>>
     ref.set(null)
     expect(null) { pwaConfigurationClass }
+}
+
+/**
+ * This route gets registered by default in [Routes], so that Karibu-Testing can catch
+ * any navigation to a missing route and can respond with an informative exception.
+ */
+@Tag(Tag.DIV)
+public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoundException> {
+    override fun setErrorParameter(event: BeforeEnterEvent, parameter: ErrorParameter<NotFoundException>): Int {
+        val message: String = buildString {
+            val path: String = event.location.path
+            append("No route found for '").append(path).append("'")
+            if (parameter.hasCustomMessage()) {
+                append(": ").append(parameter.customMessage)
+            }
+            append("\nAvailable routes: ")
+            val routes: List<RouteData> = event.source.registry.registeredRoutes
+            append(routes.map { it.toPrettyString() })
+            append("\nIf you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes")
+        }
+        throw NotFoundException(message).apply { initCause(parameter.caughtException) }
+    }
+
+    private fun RouteData.toPrettyString(): String {
+        val path: String = if (url.isNullOrBlank()) "<root>" else url
+        return "$path ${navigationTarget.simpleName}"
+    }
 }

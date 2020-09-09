@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.component.HasValue
+import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
@@ -129,6 +130,10 @@ public fun Component.toPrettyString(): String {
     }
     if (this is Button && icon is Icon) {
         list.add("icon='${(icon as Icon).iconName}'")
+    }
+    if (this is Html) {
+        val outerHtml: String = this.element.outerHTML.trim().replace(Regex("\\s+"), " ")
+        list.add(outerHtml.ellipsize(100))
     }
     if (this is Grid<*> && this.beanType != null) {
         list.add("<${this.beanType.simpleName}>")

@@ -50,3 +50,8 @@ internal fun String.parseJvmVersion(): Int {
     val version: String = removePrefix("1.").takeWhile { it.isDigit() }
     return version.toInt()
 }
+
+internal fun String.ellipsize(maxLength: Int, ellipsize: String = "..."): String = when {
+    (length <= maxLength) || (length <= ellipsize.length) -> this
+    else -> take(length - ellipsize.length) + ellipsize
+}

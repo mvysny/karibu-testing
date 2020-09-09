@@ -8,7 +8,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java: [1.8, 11, 12, 13]
+# Only test on supported JDKs: https://adoptopenjdk.net/support.html
+        java: [1.8, 11, 14]
 
     runs-on: ${{ matrix.os }}
 

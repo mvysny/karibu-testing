@@ -15,7 +15,7 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "1.2.5"
+    version = "1.2.6-SNAPSHOT"
     repositories {
         jcenter()
         mavenCentral()

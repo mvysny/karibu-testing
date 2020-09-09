@@ -19,7 +19,7 @@ import javax.servlet.ServletException;
  * and that {@link MockSpringServletService} is used instead of vanilla {@link com.vaadin.flow.spring.SpringVaadinServletService}.
  * @author mavi
  */
-class MockSpringServlet extends SpringServlet {
+public class MockSpringServlet extends SpringServlet {
     @NotNull
     public final Routes routes;
     @NotNull

@@ -1124,9 +1124,7 @@ simply set `Routes.skipPwaInit` to `false`.
 
 ## Using Karibu-Testing with Spring
 
-Karibu-Testing doesn't officially support Spring. However, there are couple of very
-simple example projects that might help you get started.
-
+Karibu-Testing offers basic support for Spring.
 Please see [t-shirt shop example](https://github.com/mvysny/t-shirt-shop-example) on
 an example on how to use Karibu-Testing with a Spring app.
 

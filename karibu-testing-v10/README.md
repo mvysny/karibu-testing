@@ -1133,7 +1133,8 @@ an example on how to use Karibu-Testing with a Spring app.
 Note that Spring Security is not supported: Spring Security uses Servlet Filter
 which requires Servlet Container to be up and running, yet Karibu-Testing doesn't
 start any Servlet Container. See [Issue #47](https://github.com/mvysny/karibu-testing/issues/47)
-for more details.
+for more details. The workaround is to [Manually Authenticate User with Spring Security](https://www.baeldung.com/manually-set-user-authentication-spring-security),
+before navigating to a view. 
 
 ## Plugging into the testing lifecycle
 

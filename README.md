@@ -28,11 +28,12 @@ For the Getting Started documentation and for the full API documentation:
 
 ### Vaadin 8
 
-Head to [Testing with Vaadin 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
+Head to [Testing with Vaadin Framework 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
 
-### Vaadin 10+
+### Vaadin 14+
 
-Head to [Testing with Vaadin 10](karibu-testing-v10). Karibu-Testing is compatible with any Vaadin 10+ version (10, 11, 12, 13, 14 etc).
+Head to [Testing with Vaadin](karibu-testing-v10).
+Karibu-Testing is compatible with any Vaadin 14+ version (14, 15, 16, 17 etc).
 
 > *Note:* Starting with version 1.0.0, Karibu-Testing changed the Java package and the Maven group ID in order to be allowed to be present in Maven Central. Be sure
 to change the `groupId` to `com.github.mvysny.kaributesting` in your projects.

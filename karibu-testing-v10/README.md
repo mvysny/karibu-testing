@@ -587,6 +587,13 @@ Populating `node_modules/` requires the `node` and `npm` programs to be present.
 However Vaadin 14.2.0 Maven plugin (Gradle plugin 0.7.0) will
 install those for you automatically, there's no need for you to do anything.
 
+### Lit Templates
+
+Karibu-Testing contains preliminary support for Lit Templates (Vaadin 17+). The support
+is limited - nothing except the basic instantiation of `LitTemplate` has been tested.
+If you're using LitTemplates and they don't work correctly with Karibu-Testing,
+please open a bug report.
+
 ## API
 
 ### Looking up components

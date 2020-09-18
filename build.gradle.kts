@@ -8,7 +8,7 @@ plugins {
     kotlin("jvm") version "1.4.10"
     id("com.jfrog.bintray") version "1.8.3"
     `maven-publish`
-    id("org.jetbrains.dokka") version "1.4.0-rc"
+    id("org.jetbrains.dokka") version "1.4.0"
 }
 
 defaultTasks("clean", "build")

@@ -127,7 +127,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     test("header2 with joined columns") {
         lateinit var col1: Grid.Column<String>
         lateinit var col2: Grid.Column<String>
-        val grid: Grid<String> = UI.getCurrent().grid<String> {
+        UI.getCurrent().grid<String> {
             col1 = addColumn(karibuDslI18n).setHeader("foo")
             col2 = addColumn(karibuDslI18n).setHeader("bar")
             appendHeaderRow()

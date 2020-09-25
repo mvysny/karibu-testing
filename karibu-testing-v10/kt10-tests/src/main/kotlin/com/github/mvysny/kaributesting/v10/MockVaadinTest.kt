@@ -319,114 +319,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
     }
 
     group("async") {
-        group("from UI thread") {
-            test("calling access() won't throw exception but the block won't be called immediately") {
-                var checkAccess = true
-                UI.getCurrent().access { if (checkAccess) fail("Shouldn't be called now") }
-                checkAccess = false
-            }
-
-            test("calling accessSynchronously() calls the block immediately because the tests hold UI lock") {
-                var called = false
-                UI.getCurrent().accessSynchronously { called = true }
-                expect(true) { called }
-            }
-
-            test("_get() processes access()") {
-                var called = false
-                UI.getCurrent().access(object : Command {
-                    override fun execute() {
-                        called = true
-                    }
-                })
-                expect(false) { called }
-                _get<UI>()
-                expect(true) { called }
-            }
-
-            test("clientRoundtrip() processes all access() calls") {
-                var calledCount = 0
-                UI.getCurrent().access(object : Command {
-                    override fun execute() {
-                        if (calledCount < 4) {
-                            calledCount++
-                            UI.getCurrent().access(this)
-                        }
-                    }
-                })
-                expect(0) { calledCount }
-                MockVaadin.clientRoundtrip()
-                expect(4) { calledCount }
-            }
-
-            test("clientRoundtrip() propagates failures") {
-                UI.getCurrent().access { throw RuntimeException("simulated") }
-                expectThrows(ExecutionException::class, "simulated") {
-                    MockVaadin.clientRoundtrip()
-                }
-            }
-
-            test("access() has properly mocked instances") {
-                UI.getCurrent().access {
-                    expect(true) { VaadinSession.getCurrent() != null }
-                    expect(true) { VaadinService.getCurrent() != null }
-                    expect(true) { VaadinRequest.getCurrent() != null }
-                    expect(true) { UI.getCurrent() != null }
-                    expect(true) { VaadinResponse.getCurrent() != null }
-                }
-                MockVaadin.clientRoundtrip()
-            }
-        }
-        group("from bg thread") {
-            lateinit var executor: ExecutorService
-            beforeEach { executor = Executors.newCachedThreadPool() }
-            afterEach {
-                executor.shutdown()
-                executor.awaitTermination(4, TimeUnit.SECONDS)
-            }
-            fun runInBgSyncOnUI(block: UI.() -> Unit) {
-                val ui = UI.getCurrent()
-                executor.submit { block(ui) }.get()
-            }
-
-            test("calling access() won't throw exception but the block won't be called immediately because the tests hold UI lock") {
-                runInBgSyncOnUI {
-                    var checkAccess = true
-                    access { if (checkAccess) fail("Shouldn't be called now") }
-                    checkAccess = false
-                }
-            }
-
-            test("clientRoundtrip() processes all access() calls") {
-                var calledCount = 0
-                runInBgSyncOnUI {
-                    access(object : Command {
-                        override fun execute() {
-                            if (calledCount < 4) {
-                                calledCount++
-                                UI.getCurrent().access(this)
-                            }
-                        }
-                    })
-                }
-                expect(0) { calledCount }
-                MockVaadin.clientRoundtrip()
-                expect(4) { calledCount }
-            }
-
-            test("access() has properly mocked instances") {
-                runInBgSyncOnUI {
-                    access {
-                        expect(true) { VaadinSession.getCurrent() != null }
-                        expect(true) { VaadinService.getCurrent() != null }
-                        expect(true) { VaadinRequest.getCurrent() != null }
-                        expect(true) { UI.getCurrent() != null }
-                        expect(true) { VaadinResponse.getCurrent() != null }
-                    }
-                }
-                MockVaadin.clientRoundtrip()
-            }
-        }
+        asyncTestbatch()
     }
 
     group("init listener") {
@@ -479,69 +372,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
     }
 
     group("multiple threads") {
-        test("UIs/Sessions not reused between threads") {
-            fun newVaadinThread(): Pair<UI, VaadinSession> {
-                val uiref = AtomicReference<UI>()
-                val sessionref = AtomicReference<VaadinSession>()
-                thread {
-                    MockVaadin.setup()
-                    uiref.set(UI.getCurrent())
-                    sessionref.set(VaadinSession.getCurrent())
-                } .join()
-                return uiref.get()!! to sessionref.get()!!
-            }
-
-            val pair1 = newVaadinThread()
-            val pair2 = newVaadinThread()
-            expect(false) { pair1.first == pair2.first }
-            expect(false) { pair1.second == pair2.second }
-        }
-
-        test("executor example") {
-            // a simple service which only counts the number of calls
-            class MyService {
-                private var count = 0
-                private val lock = ReentrantReadWriteLock()
-
-                fun callService() {
-                    lock.write { Thread.sleep(10); count++ }
-                }
-                fun getCount(): Int = lock.read { count }
-            }
-            val service = MyService()
-
-            // an ExecutorService which configures Vaadin for every thread created.
-            val e: ExecutorService = Executors.newFixedThreadPool(4) { runnable ->
-                Thread {
-                    MockVaadin.setup(routes)
-                    runnable.run()
-                    MockVaadin.tearDown()
-                }
-            }
-
-            try {
-                // submit a task to all threads
-                repeat(4) {
-                    e.submit {
-                        try {
-                            UI.getCurrent().navigate("helloworld")
-                            _get<Button> { caption = "Hello, World!" }.onLeftClick {
-                                service.callService()
-                            }
-                            _get<Button> { caption = "Hello, World!" }._click()
-                        } catch (e: Throwable) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            } finally {
-                e.shutdown()
-                e.awaitTermination(10, TimeUnit.SECONDS)
-            }
-
-            // make sure that every thread called the service
-            expect(4) { service.getCount() }
-        }
+        multipleThreadsTestbatch(routes)
     }
 
     group("VaadinService") {
@@ -549,7 +380,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             open class MyMockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
                 override fun isAtmosphereAvailable(): Boolean = false
                 override fun getMainDivId(session: VaadinSession, request: VaadinRequest): String = "ROOT-1"
-                override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, { MockedUI() })
+                override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this) { MockedUI() }
             }
             MockVaadin.tearDown()
             MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {
@@ -559,7 +390,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                     return service
                 }
             })
-            expect(MyMockService::class.java) { VaadinService.getCurrent().javaClass }
+            expect<Class<*>>(MyMockService::class.java) { VaadinService.getCurrent().javaClass }
         }
         test("VaadinService listeners should be invoked") {
             MockVaadin.tearDown()
@@ -588,6 +419,185 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(1) { sessionDestroyListenerInvocationCount }
             expect(1) { serviceDestroyListenerInvocationCount }
         }
+    }
+}
+
+private fun DynaNodeGroup.asyncTestbatch() {
+    group("from UI thread") {
+        test("calling access() won't throw exception but the block won't be called immediately") {
+            var checkAccess = true
+            UI.getCurrent().access { if (checkAccess) fail("Shouldn't be called now") }
+            checkAccess = false
+        }
+
+        test("calling accessSynchronously() calls the block immediately because the tests hold UI lock") {
+            var called = false
+            UI.getCurrent().accessSynchronously { called = true }
+            expect(true) { called }
+        }
+
+        test("_get() processes access()") {
+            var called = false
+            UI.getCurrent().access(object : Command {
+                override fun execute() {
+                    called = true
+                }
+            })
+            expect(false) { called }
+            _get<UI>()
+            expect(true) { called }
+        }
+
+        test("clientRoundtrip() processes all access() calls") {
+            var calledCount = 0
+            UI.getCurrent().access(object : Command {
+                override fun execute() {
+                    if (calledCount < 4) {
+                        calledCount++
+                        UI.getCurrent().access(this)
+                    }
+                }
+            })
+            expect(0) { calledCount }
+            MockVaadin.clientRoundtrip()
+            expect(4) { calledCount }
+        }
+
+        test("clientRoundtrip() propagates failures") {
+            UI.getCurrent().access { throw RuntimeException("simulated") }
+            expectThrows(ExecutionException::class, "simulated") {
+                MockVaadin.clientRoundtrip()
+            }
+        }
+
+        test("access() has properly mocked instances") {
+            UI.getCurrent().access {
+                expect(true) { VaadinSession.getCurrent() != null }
+                expect(true) { VaadinService.getCurrent() != null }
+                expect(true) { VaadinRequest.getCurrent() != null }
+                expect(true) { UI.getCurrent() != null }
+                expect(true) { VaadinResponse.getCurrent() != null }
+            }
+            MockVaadin.clientRoundtrip()
+        }
+    }
+    group("from bg thread") {
+        lateinit var executor: ExecutorService
+        beforeEach { executor = Executors.newCachedThreadPool() }
+        afterEach {
+            executor.shutdown()
+            executor.awaitTermination(4, TimeUnit.SECONDS)
+        }
+        fun runInBgSyncOnUI(block: UI.() -> Unit) {
+            val ui = UI.getCurrent()
+            executor.submit { block(ui) }.get()
+        }
+
+        test("calling access() won't throw exception but the block won't be called immediately because the tests hold UI lock") {
+            runInBgSyncOnUI {
+                var checkAccess = true
+                access { if (checkAccess) fail("Shouldn't be called now") }
+                checkAccess = false
+            }
+        }
+
+        test("clientRoundtrip() processes all access() calls") {
+            var calledCount = 0
+            runInBgSyncOnUI {
+                access(object : Command {
+                    override fun execute() {
+                        if (calledCount < 4) {
+                            calledCount++
+                            UI.getCurrent().access(this)
+                        }
+                    }
+                })
+            }
+            expect(0) { calledCount }
+            MockVaadin.clientRoundtrip()
+            expect(4) { calledCount }
+        }
+
+        test("access() has properly mocked instances") {
+            runInBgSyncOnUI {
+                access {
+                    expect(true) { VaadinSession.getCurrent() != null }
+                    expect(true) { VaadinService.getCurrent() != null }
+                    expect(true) { VaadinRequest.getCurrent() != null }
+                    expect(true) { UI.getCurrent() != null }
+                    expect(true) { VaadinResponse.getCurrent() != null }
+                }
+            }
+            MockVaadin.clientRoundtrip()
+        }
+    }
+}
+
+private fun DynaNodeGroup.multipleThreadsTestbatch(routes: Routes) {
+    test("UIs/Sessions not reused between threads") {
+        fun newVaadinThread(): Pair<UI, VaadinSession> {
+            val uiref = AtomicReference<UI>()
+            val sessionref = AtomicReference<VaadinSession>()
+            thread {
+                MockVaadin.setup()
+                uiref.set(UI.getCurrent())
+                sessionref.set(VaadinSession.getCurrent())
+            }.join()
+            return uiref.get()!! to sessionref.get()!!
+        }
+
+        val pair1 = newVaadinThread()
+        val pair2 = newVaadinThread()
+        expect(false) { pair1.first == pair2.first }
+        expect(false) { pair1.second == pair2.second }
+    }
+
+    test("executor example") {
+        // a simple service which only counts the number of calls
+        class MyService {
+            private var count = 0
+            private val lock = ReentrantReadWriteLock()
+
+            fun callService() {
+                lock.write { Thread.sleep(10); count++ }
+            }
+
+            fun getCount(): Int = lock.read { count }
+        }
+
+        val service = MyService()
+
+        // an ExecutorService which configures Vaadin for every thread created.
+        val e: ExecutorService = Executors.newFixedThreadPool(4) { runnable ->
+            Thread {
+                MockVaadin.setup(routes)
+                runnable.run()
+                MockVaadin.tearDown()
+            }
+        }
+
+        try {
+            // submit a task to all threads
+            repeat(4) {
+                e.submit {
+                    try {
+                        UI.getCurrent().navigate("helloworld")
+                        _get<Button> { caption = "Hello, World!" }.onLeftClick {
+                            service.callService()
+                        }
+                        _get<Button> { caption = "Hello, World!" }._click()
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        } finally {
+            e.shutdown()
+            e.awaitTermination(10, TimeUnit.SECONDS)
+        }
+
+        // make sure that every thread called the service
+        expect(4) { service.getCount() }
     }
 }
 

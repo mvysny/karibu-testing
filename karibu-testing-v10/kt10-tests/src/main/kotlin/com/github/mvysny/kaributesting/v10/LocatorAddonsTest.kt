@@ -10,6 +10,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.IronIcon
 import com.vaadin.flow.component.icon.VaadinIcon
 import kotlin.test.expect
 
@@ -71,8 +72,11 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
     }
     group("IconName") {
         test("smoke") {
+            expect(IconName("vaadin", "bar")) {
+                Icon("bar").iconName
+            }
             expect(IconName("foo", "bar")) {
-                Icon("foo", "bar").iconName
+                IronIcon("foo", "bar").iconName
             }
         }
 

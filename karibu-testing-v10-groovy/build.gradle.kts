@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compile("org.codehaus.groovy:groovy:2.5.10")
+    compile("org.codehaus.groovy:groovy:3.0.5")
     // IDEA language injections
     compile("com.intellij:annotations:12.0")
 

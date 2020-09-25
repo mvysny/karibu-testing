@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.IronIcon
 import com.vaadin.flow.component.icon.VaadinIcon
 import java.io.Serializable
 
@@ -14,9 +16,12 @@ public data class IconName(val collection: String, val name: String) : Serializa
     }
 
     /**
-     * Creates a new [Icon] component for this icon.
+     * Creates a new component for this icon - either [Icon] or [IronIcon].
      */
-    public fun toIcon(): Icon = Icon(collection, name)
+    public fun createComponent(): Component = when {
+        isVaadinIcon -> Icon(name)
+        else -> IronIcon(collection, name)
+    }
 
     /**
      * Checks whether this icon represents a [VaadinIcon]. Use [asVaadinIcon] to obtain

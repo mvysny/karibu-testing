@@ -54,6 +54,7 @@ public val <T> IronList<T>._renderer: Renderer<T>
     get() {
         val f: Field = IronList::class.java.getDeclaredField("renderer")
         f.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
         return f.get(this) as Renderer<T>
     }
 

@@ -42,7 +42,7 @@ public fun HasMenuItems._click(item: MenuItem) {
     if (!parentMap.keys.contains(item)) {
         fail("${item.toPrettyString()} is not contained in this menu:\n${(this as Component).toPrettyTree()}")
     }
-    (item as MenuItem)._click(parentMap)
+    item._click(parentMap)
 }
 
 /**

@@ -1,5 +1,6 @@
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10._isVisible
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
@@ -14,7 +15,7 @@ class LitTemplateTest : DynaTest({
 
     test("test loading of stuff from node_modules") {
         val f = LitColorPickerField()
-        expect(true) { f.foo != null }
+        expect(true) { f.foo._isVisible }
     }
 
     test("proper error message on unloadable component") {

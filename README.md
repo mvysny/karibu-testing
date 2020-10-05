@@ -85,9 +85,9 @@ A list of a very simple example projects that employ Karibu Testing:
 * Vaadin 14 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
 * Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
 * Vaadin 14 + Spring Boot + Java + Maven + JUnit 5: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
-* Vaadin 13 + Vaadin-on-Kotlin + Gradle: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
-* Vaadin 14 + Vaadin-on-Kotlin + Gradle: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
-* Vaadin 14 + Vaadin-on-Kotlin + Gradle: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
+* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
+* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
+* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
 
 ## Integrating Karibu-Testing With Your App
 

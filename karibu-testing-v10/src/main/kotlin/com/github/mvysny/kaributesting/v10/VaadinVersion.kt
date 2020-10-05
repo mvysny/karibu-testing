@@ -9,19 +9,41 @@ import elemental.json.JsonObject
 import java.lang.reflect.Method
 import java.net.URL
 
-public data class SemanticVersion(val major: Int, val minor: Int, val bugfix: Int) : Comparable<SemanticVersion> {
-    override fun compareTo(other: SemanticVersion): Int =
-            compareValuesBy(this, other, { it.major }, { it.minor }, { it.bugfix })
+/**
+ * See https://semver.org/ for more details.
+ */
+public data class SemanticVersion(
+        val major: Int,
+        val minor: Int,
+        val bugfix: Int,
+        val prerelease: String? = null
+) : Comparable<SemanticVersion> {
 
-    override fun toString(): String = "$major.$minor.$bugfix"
+    init {
+        if (prerelease != null) {
+            require(prerelease.isNotBlank()) { "$prerelease is blank" }
+            require(!prerelease.startsWith('-')) { "$prerelease starts with a dash" }
+        }
+    }
+
+    override fun compareTo(other: SemanticVersion): Int =
+            // use the unicode character \ufffd when prerelease is null. That places the final version after any -beta versions or such.
+            compareValuesBy(this, other, { it.major }, { it.minor }, { it.bugfix }, { it.prerelease ?: "\ufffd" })
+
+    override fun toString(): String = "$major.$minor.$bugfix${if (prerelease != null) "-$prerelease" else ""}"
 
     public companion object {
-        private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)")
+        private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?")
 
         public fun fromString(version: String): SemanticVersion {
-            val match = requireNotNull(VERSION_REGEX.matchEntire(version),
-                    { "The version must be in the form of major.minor.bugfix" })
-            return SemanticVersion(match.groupValues[1].toInt(), match.groupValues[2].toInt(), match.groupValues[3].toInt())
+            val match: MatchResult = requireNotNull(VERSION_REGEX.matchEntire(version),
+                    { "The version must be in the form of major.minor.bugfix but is $version" })
+            return SemanticVersion(
+                    match.groupValues[1].toInt(),
+                    match.groupValues[2].toInt(),
+                    match.groupValues[3].toInt(),
+                    match.groupValues[5].takeIf { it.isNotBlank() }
+            )
         }
 
         public val VAADIN_14_3: SemanticVersion = SemanticVersion(14, 3, 0)

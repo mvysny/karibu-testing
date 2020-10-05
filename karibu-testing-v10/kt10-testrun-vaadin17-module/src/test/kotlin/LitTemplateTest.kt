@@ -29,7 +29,7 @@ class LitTemplateTest : DynaTest({
 @JsModule("@appreciated/color-picker-field/src/color-picker-field.js")
 class LitColorPickerField : LitTemplate() {
     @Id
-    lateinit var foo: TextField
+    var foo: TextField? = null
 }
 
 @Tag("non-existent")

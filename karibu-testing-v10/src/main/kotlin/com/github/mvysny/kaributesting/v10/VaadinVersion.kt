@@ -26,9 +26,14 @@ public data class SemanticVersion(
         }
     }
 
-    override fun compareTo(other: SemanticVersion): Int =
-            // use the unicode character \ufffd when prerelease is null. That places the final version after any -beta versions or such.
-            compareValuesBy(this, other, { it.major }, { it.minor }, { it.bugfix }, { it.prerelease ?: "\ufffd" })
+    override fun compareTo(other: SemanticVersion): Int {
+        return compareValuesBy(this, other,
+                { it.major },
+                { it.minor },
+                { it.bugfix },
+                // use the unicode character \ufffd when prerelease is null. That places the final version after any -beta versions or such.
+                { it.prerelease ?: "\ufffd" })
+    }
 
     override fun toString(): String = "$major.$minor.$bugfix${if (prerelease != null) "-$prerelease" else ""}"
 

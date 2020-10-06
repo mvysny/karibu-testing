@@ -1,8 +1,9 @@
 dependencies {
-    // don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
-    // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
-    // npm mode and exclude all webjars.
-    // depend on vaadin instead of vaadin-core, to bring in Grid Pro.
+    // - don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
+    //   using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
+    //   npm mode and exclude all webjars.
+    // - depend on vaadin instead of vaadin-core, to bring in Grid Pro.
+    // - depend on Vaadin 16 instead of Vaadin 14 (TODO why)
     compileOnly("com.vaadin:vaadin:${properties["vaadin16_version"]}")
     testImplementation("com.vaadin:vaadin:${properties["vaadin16_version"]}")
 
@@ -12,7 +13,7 @@ dependencies {
     api(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 
-    // to have class autodiscovery functionality
+    // to have the class autodiscovery functionality
     implementation("io.github.classgraph:classgraph:4.6.23")
 }
 

@@ -246,9 +246,9 @@ public open class MockContext : ServletContext, Serializable {
 
 internal val moduleDir: File get() {
     var dir = File("").absoluteFile
-    // workaround for https://youtrack.jetbrains.com/issue/IDEA-188466
-    // the thing is that when using $MODULE_DIR$, IDEA will set CWD to, say, karibu-testing/.idea/modules/karibu-testing-v8
-    // we need to revert that back to karibu-testing/karibu-testing-v8
+    // Workaround for https://youtrack.jetbrains.com/issue/IDEA-188466
+    // When using $MODULE_DIR$, IDEA will set CWD to, say, karibu-testing/.idea/modules/karibu-testing-v8
+    // We need to revert that back to karibu-testing/karibu-testing-v8
     if (dir.absolutePath.contains("/.idea/modules")) {
         dir = File(dir.absolutePath.replace("/.idea/modules", ""))
     }

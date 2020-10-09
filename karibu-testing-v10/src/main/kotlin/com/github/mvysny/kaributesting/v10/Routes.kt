@@ -7,6 +7,7 @@ import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
+import io.github.classgraph.ClassInfo
 import io.github.classgraph.ScanResult
 import java.io.Serializable
 import java.lang.reflect.Field
@@ -61,15 +62,15 @@ public data class Routes(
      */
     @JvmOverloads
     public fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
-        val scan: ScanResult = ClassGraph().enableClassInfo()
+        val classGraph: ClassGraph = ClassGraph().enableClassInfo()
                 .enableAnnotationInfo()
-                .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName))).scan()
-        scan.use { scanResult ->
-            scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info ->
+                .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName)))
+        classGraph.scan().use { scanResult: ScanResult ->
+            scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info: ClassInfo ->
                 Class.forName(info.name).asSubclass(Component::class.java)
             }
             if (autoDetectErrorRoutes) {
-                scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info ->
+                scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info: ClassInfo ->
                     Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
                 }
             }

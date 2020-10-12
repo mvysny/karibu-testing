@@ -25,6 +25,7 @@ class UtilsTest : DynaTest({
         expect(false) { Any().javaClass.isRouteNotFound }
         expect(false) { InternalServerError::class.java.isRouteNotFound }
         expect(true) { RouteNotFoundError::class.java.isRouteNotFound }
+        expect(true) { MockRouteNotFoundError::class.java.isRouteNotFound }
 
         class Foo : Serializable, Callable<Unit>, HasErrorParameter<NotFoundException>, Runnable {
             override fun setErrorParameter(event: BeforeEnterEvent?, parameter: ErrorParameter<NotFoundException>?): Int = 0

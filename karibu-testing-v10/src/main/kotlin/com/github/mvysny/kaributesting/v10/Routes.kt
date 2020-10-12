@@ -74,6 +74,12 @@ public data class Routes(
             }
         }
 
+        // https://github.com/mvysny/karibu-testing/issues/50
+        // if the app defines its own NotFoundException handler, remove MockRouteNotFoundError
+        if (errorRoutes.any { it != MockRouteNotFoundError::class.java && it.isRouteNotFound }) {
+            errorRoutes.remove(MockRouteNotFoundError::class.java)
+        }
+
         println("Auto-discovered views: $this")
     }
 

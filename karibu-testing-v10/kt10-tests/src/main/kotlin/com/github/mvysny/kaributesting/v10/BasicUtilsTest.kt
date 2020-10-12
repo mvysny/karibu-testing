@@ -14,22 +14,7 @@ import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
 
-val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
-        TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java,
-        ParametrizedView::class.java, ChildView::class.java, NavigationPostponeView::class.java)
-val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
-
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
-
-    test("AutoViewDiscovery") {
-        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
-        expect(allErrorRoutes) { Routes().autoDiscoverViews("com.github").errorRoutes }
-    }
-
-    test("calling autoDiscoverViews() multiple times won't fail") {
-        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
-        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
-    }
 
     group("checkEditableByUser") {
         test("disabled textfield fails") {

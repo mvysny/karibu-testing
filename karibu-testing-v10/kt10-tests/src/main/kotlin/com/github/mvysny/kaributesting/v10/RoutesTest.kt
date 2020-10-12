@@ -2,15 +2,41 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.kaributesting.mockhttp.MockContext
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.router.HasErrorParameter
+import com.vaadin.flow.router.InternalServerError
+import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
+import test.app.MyRouteNotFoundError
 import kotlin.test.expect
 
+val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
+        TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java,
+        ParametrizedView::class.java, ChildView::class.java, NavigationPostponeView::class.java)
+val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
+
 fun DynaNodeGroup.routesTestBatch() {
+    afterEach { MockVaadin.tearDown() }
+
     test("All views discovered") {
         val routes: Routes = Routes().autoDiscoverViews("com.github")
         expect(allViews) { routes.routes.toSet() }
         expect(allErrorRoutes) { routes.errorRoutes.toSet() }
+    }
+
+    test("calling autoDiscoverViews() multiple times won't fail") {
+        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+    }
+
+    // https://github.com/mvysny/karibu-testing/issues/50
+    test("app-specific NotFoundException handler removes MockRouteNotFoundError") {
+        val routes: Routes = Routes().autoDiscoverViews()
+        expect(allViews) { routes.routes.toSet() }
+        expect(setOf(ErrorView::class.java, InternalServerError::class.java, MyRouteNotFoundError::class.java, RouteNotFoundError::class.java)) { routes.errorRoutes.toSet() }
+        // make sure that Vaadin initializes properly with this set of views
+        MockVaadin.setup(routes)
     }
 
     test("PWA is ignored by default") {

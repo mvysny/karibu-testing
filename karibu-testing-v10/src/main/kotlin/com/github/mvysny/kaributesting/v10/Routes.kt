@@ -53,15 +53,15 @@ public data class Routes(
 
     /**
      * Auto-discovers everything, registers it into `this` and returns `this`.
-     * * [Route]-annotated views
-     * * [HasErrorParameter] error views
+     * * [Route]-annotated views go into [routes]
+     * * [HasErrorParameter] error views go into [errorRoutes]
+     * After this function finishes, you can still modify the [routes] and [errorRoutes] sets,
+     * for example you can clear the [errorRoutes] if there is some kind of misdetection.
      * @param packageName set the package name for the detector to be faster; or provide null to scan the whole classpath, but this is quite slow.
-     * @param autoDetectErrorRoutes if false then [HasErrorParameter] error views are not auto-detected. This emulates
-     * the old behavior of this method.
      * @return this
      */
     @JvmOverloads
-    public fun autoDiscoverViews(packageName: String? = null, autoDetectErrorRoutes: Boolean = true): Routes = apply {
+    public fun autoDiscoverViews(packageName: String? = null): Routes = apply {
         val classGraph: ClassGraph = ClassGraph().enableClassInfo()
                 .enableAnnotationInfo()
                 .whitelistPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName)))
@@ -69,10 +69,8 @@ public data class Routes(
             scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info: ClassInfo ->
                 Class.forName(info.name).asSubclass(Component::class.java)
             }
-            if (autoDetectErrorRoutes) {
-                scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info: ClassInfo ->
-                    Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
-                }
+            scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info: ClassInfo ->
+                Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
             }
         }
 

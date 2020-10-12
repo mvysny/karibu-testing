@@ -1,5 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.internal.ReflectTools
+import com.vaadin.flow.router.HasErrorParameter
+import com.vaadin.flow.router.NotFoundException
 import elemental.json.Json
 import elemental.json.JsonArray
 import elemental.json.JsonObject
@@ -55,3 +58,14 @@ internal fun String.ellipsize(maxLength: Int, ellipsize: String = "..."): String
     (length <= maxLength) || (length <= ellipsize.length) -> this
     else -> take(length - ellipsize.length) + ellipsize
 }
+
+/**
+ * For a class implementing the [HasErrorParameter] interface, determines the type of
+ * the exception handled (the type of `T`). Returns null if the Class doesn't implement the
+ * [HasErrorParameter] interface.
+ */
+internal fun Class<*>.getErrorParameterType(): Class<*>? =
+        ReflectTools.getGenericInterfaceType(this, HasErrorParameter::class.java)
+
+internal val Class<*>.isRouteNotFound: Boolean
+    get() = getErrorParameterType() == NotFoundException::class.java

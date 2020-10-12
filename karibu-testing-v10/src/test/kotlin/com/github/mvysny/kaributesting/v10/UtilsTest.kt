@@ -1,6 +1,9 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaTest
+import com.vaadin.flow.router.*
+import java.io.Serializable
+import java.util.concurrent.Callable
 import kotlin.test.expect
 
 /**
@@ -16,5 +19,19 @@ class UtilsTest : DynaTest({
         expect(11) { "11.0.4".parseJvmVersion() }
         expect(12) { "12".parseJvmVersion() }
         expect(12) { "12.0.1".parseJvmVersion() }
+    }
+
+    test("isRouteNotFound") {
+        expect(false) { Any().javaClass.isRouteNotFound }
+        expect(false) { InternalServerError::class.java.isRouteNotFound }
+        expect(true) { RouteNotFoundError::class.java.isRouteNotFound }
+
+        class Foo : Serializable, Callable<Unit>, HasErrorParameter<NotFoundException>, Runnable {
+            override fun setErrorParameter(event: BeforeEnterEvent?, parameter: ErrorParameter<NotFoundException>?): Int = 0
+            override fun call() {}
+            override fun run() {}
+        }
+
+        expect(true) { Foo::class.java.isRouteNotFound }
     }
 })

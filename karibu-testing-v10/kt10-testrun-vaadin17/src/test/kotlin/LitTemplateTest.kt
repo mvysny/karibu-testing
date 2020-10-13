@@ -6,7 +6,10 @@ import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.polymertemplate.Id
+import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.binder.BeanValidationBinder
+import com.vaadin.flow.data.binder.Binder
 import kotlin.test.expect
 
 class LitTemplateTest : DynaTest({
@@ -22,6 +25,10 @@ class LitTemplateTest : DynaTest({
         // this actually works?!? okay...
         LitUnloadableComponent()
         LitUnloadableComponent2()
+    }
+
+    test("form") {
+        MyForm()
     }
 })
 
@@ -40,3 +47,25 @@ class LitUnloadableComponent : LitTemplate()
 @Tag("non-existent3")
 @JsModule("@foo/non-existent.js")
 class LitUnloadableComponent2 : LitTemplate()
+
+data class Employee(var firstName: String? = null, var lastName: String? = null, var email: String? = null)
+
+@Tag("my-form")
+@JsModule("./src/my-form.ts")
+class MyForm : LitTemplate() {
+    @Id
+    private lateinit var firstNameField: TextField
+
+    @Id
+    private lateinit var lastNameField: TextField
+
+    @Id
+    private lateinit var emailField: EmailField
+    val binder: Binder<Employee> = BeanValidationBinder(Employee::class.java)
+
+    init {
+        binder.forField(firstNameField).bind("firstName")
+        binder.forField(lastNameField).bind("lastName")
+        binder.forField(emailField).bind("email")
+    }
+}

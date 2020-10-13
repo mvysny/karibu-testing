@@ -1,8 +1,7 @@
 package com.vaadin.flow.component.littemplate;
 
-import com.github.mvysny.kaributesting.v10.MockInstantiator
+import com.github.mvysny.kaributesting.v10.mock.MockInstantiator
 import com.github.mvysny.kaributesting.v10.MockNpmTemplateParser
-import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
 

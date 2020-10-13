@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10.spring;
 
-import com.github.mvysny.kaributesting.v10.MockVaadinHelper;
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper;
 import com.github.mvysny.kaributesting.v10.Routes;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.function.DeploymentConfiguration;

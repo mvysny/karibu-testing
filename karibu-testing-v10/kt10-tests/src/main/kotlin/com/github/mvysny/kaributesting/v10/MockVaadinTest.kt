@@ -9,6 +9,10 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
 import com.github.mvysny.karibudsl.v10.verticalLayout
+import com.github.mvysny.kaributesting.v10.mock.MockService
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
+import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text

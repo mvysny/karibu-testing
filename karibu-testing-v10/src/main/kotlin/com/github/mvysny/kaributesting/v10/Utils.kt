@@ -3,6 +3,9 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.NotFoundException
+import com.vaadin.flow.server.VaadinRequest
+import com.vaadin.flow.server.VaadinResponse
+import com.vaadin.flow.server.VaadinService
 import elemental.json.Json
 import elemental.json.JsonArray
 import elemental.json.JsonObject
@@ -69,3 +72,10 @@ internal fun Class<*>.getErrorParameterType(): Class<*>? =
 
 internal val Class<*>.isRouteNotFound: Boolean
     get() = getErrorParameterType() == NotFoundException::class.java
+
+public val currentRequest: VaadinRequest
+    get() = VaadinService.getCurrentRequest()
+            ?: throw IllegalStateException("No current request")
+public val currentResponse: VaadinResponse
+    get() = VaadinService.getCurrentResponse()
+            ?: throw IllegalStateException("No current response")

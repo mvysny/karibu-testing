@@ -459,13 +459,6 @@ private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent
     }
 }
 
-public val currentRequest: VaadinRequest
-    get() = VaadinService.getCurrentRequest()
-            ?: throw IllegalStateException("No current request")
-public val currentResponse: VaadinResponse
-    get() = VaadinService.getCurrentResponse()
-            ?: throw IllegalStateException("No current response")
-
 /**
  * Retrieves the mock request which backs up [VaadinRequest].
  * ```

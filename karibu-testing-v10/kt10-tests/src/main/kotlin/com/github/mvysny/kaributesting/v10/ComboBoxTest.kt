@@ -2,12 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectList
-import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.combobox.ComboBox
-import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.select.Select
-import java.lang.IllegalStateException
-import kotlin.test.expect
 
 internal fun DynaNodeGroup.comboBoxTestbatch() {
     beforeEach { MockVaadin.setup() }
@@ -16,14 +12,14 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
     group("ComboBox.getSuggestionItems()") {
         test("by default shows all items") {
             val cb = ComboBox<String>().apply {
-                setItems(listOf("aaa", "bbb", "ccc"))
+                setItems2(listOf("aaa", "bbb", "ccc"))
             }
             expectList("aaa", "bbb", "ccc") { cb.getSuggestionItems() }
         }
 
         test("setting user input filters out stuff") {
             val cb = ComboBox<String>().apply {
-                setItems(listOf("aaa", "bbb", "ccc"))
+                setItems2(listOf("aaa", "bbb", "ccc"))
             }
             cb.setUserInput("a")
             expectList("aaa") { cb.getSuggestionItems() }
@@ -31,7 +27,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
 
         test("full-blown example") {
             val cb = ComboBox<TestPerson>().apply {
-                setItems((0..10).map { TestPerson("foo $it", it) })
+                setItems2((0..10).map { TestPerson("foo $it", it) })
                 setItemLabelGenerator { it.name }
             }
             cb.setUserInput("foo 1")
@@ -56,6 +52,11 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
             expectList("foo 0", "foo 1", "foo 2", "foo 3", "foo 4", "foo 5") { cb.getSuggestions() }
         }
     }
+}
+
+fun <T> ComboBox<T>.setItems2(items: Collection<T>) {
+    // this way it's also compatible with Vaadin 18.
+    setDataProvider(ListDataProvider2(items))
 }
 
 fun <T> Select<T>.setItems2(items: Collection<T>) {

@@ -63,7 +63,7 @@ class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(delegate) {
          * The `LitTemplateParserImpl` class.
          */
         private val classLitTemplateParserImpl: Class<*> =
-                Class.forName("com.vaadin.flow.component.littemplate.MyLitTemplateParserImpl")
+                Class.forName("com.vaadin.flow.component.littemplate.LitTemplateParserImpl")
 
         /**
          * The `MockLitTemplateParserImpl` class loading templates via

@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MockVaadinJApiTest {
 
     public MockVaadinJApiTest() {
-        MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
-        assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
+        UtilsKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+        assertEquals("bar", UtilsKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
 
         MockVaadin.setup(new Routes(), () -> {
-            MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+            UtilsKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
             return new LocatorJApiTest.MyUI();
         });
     }

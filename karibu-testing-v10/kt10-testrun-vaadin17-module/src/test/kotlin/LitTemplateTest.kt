@@ -1,6 +1,9 @@
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10._isVisible
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
@@ -17,7 +20,12 @@ class LitTemplateTest : DynaTest({
 
     test("test loading of stuff from node_modules") {
         val f = LitColorPickerField()
-        expect(true) { f.foo != null }
+        expect(true) { f.foo._isVisible }
+        UI.getCurrent().add(f)
+    }
+
+    test("loading from frontend/") {
+        UI.getCurrent().add(MyTest())
     }
 
     test("proper error message on unloadable component") {
@@ -27,7 +35,7 @@ class LitTemplateTest : DynaTest({
     }
 
     test("form") {
-        MyForm()
+        UI.getCurrent().add(MyForm())
     }
 })
 
@@ -36,7 +44,7 @@ class LitTemplateTest : DynaTest({
 @JsModule("@appreciated/color-picker-field/src/color-picker-field.js")
 class LitColorPickerField : LitTemplate() {
     @Id
-    var foo: TextField? = null
+    lateinit var foo: TextField
 }
 
 @Tag("non-existent")
@@ -66,5 +74,13 @@ class MyForm : LitTemplate() {
         binder.forField(firstNameField).bind("firstName")
         binder.forField(lastNameField).bind("lastName")
         binder.forField(emailField).bind("email")
+    }
+}
+
+@Tag("my-test-element")
+@JsModule("./src/my-test-element.js")
+class MyTest(prop1: String = "") : Component() {
+    init {
+        element.setProperty("prop1", prop1)
     }
 }

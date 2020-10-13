@@ -1,6 +1,6 @@
-package com.github.mvysny.kaributesting.v10
+package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.v10.MockNpmTemplateParser.Companion.customLoaders
+import com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser.Companion.customLoaders
 import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
 import java.io.File
 import java.lang.RuntimeException

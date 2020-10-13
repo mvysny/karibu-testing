@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.v10.MockNpmTemplateParser
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
 

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows

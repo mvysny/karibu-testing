@@ -9,7 +9,6 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
-import com.vaadin.flow.component.littemplate.MockInstantiatorV18
 import com.vaadin.flow.component.template.Id
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
@@ -18,10 +17,6 @@ import com.vaadin.flow.data.binder.Binder
 import kotlin.test.expect
 
 class LitTemplateTest : DynaTest({
-    beforeEach {
-        MockVaadinHelper.instantiatorFactory = { MockInstantiatorV18(it) }
-    }
-
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 

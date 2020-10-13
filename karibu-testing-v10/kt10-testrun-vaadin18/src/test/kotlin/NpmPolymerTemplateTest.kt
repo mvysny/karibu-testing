@@ -4,21 +4,15 @@ import com.github.appreciated.app.layout.component.applayout.LeftLayouts
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
-import com.vaadin.flow.component.littemplate.MockInstantiatorV18
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.templatemodel.TemplateModel
 import java.lang.RuntimeException
 
 class NpmPolymerTemplateTest : DynaTest({
-    beforeEach {
-        MockVaadinHelper.instantiatorFactory = { MockInstantiatorV18(it) }
-    }
-
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 

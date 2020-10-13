@@ -18,6 +18,4 @@ public object MockVaadinHelper {
             servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
         }
     }
-
-    public var instantiatorFactory: (Instantiator) -> Instantiator = { MockInstantiator(it) }
 }

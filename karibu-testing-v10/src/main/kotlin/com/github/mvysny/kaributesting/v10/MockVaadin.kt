@@ -19,7 +19,6 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import javax.servlet.ServletConfig
 import javax.servlet.ServletContext
 import kotlin.test.expect
 
@@ -62,6 +61,8 @@ public open class MockVaadinSession(service: VaadinService,
 /**
  * Makes sure that [routes] are properly registered, and that [MockService]
  * is used instead of vanilla [VaadinServletService].
+ *
+ * To use a custom servlet instead of this one, just pass it to [MockVaadin.setup].
  */
 public open class MockVaadinServlet @JvmOverloads constructor(
         public val routes: Routes = Routes(),
@@ -418,6 +419,8 @@ public open class MockedUI : UI()
  * * Provides some dummy value as a root ID via [getMainDivId] (otherwise the mocked servlet env will crash).
  * * Provides a [MockVaadinSession].
  * The class is intentionally opened, to be extensible in user's library.
+ *
+ * To register your custom `MockService` instance, override [MockVaadinServlet.createServletService].
  */
 public open class MockService(servlet: VaadinServlet,
                               deploymentConfiguration: DeploymentConfiguration,
@@ -426,7 +429,7 @@ public open class MockService(servlet: VaadinServlet,
     override fun isAtmosphereAvailable(): Boolean = false
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
     override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, uiFactory)
-    override fun getInstantiator(): Instantiator = MockInstantiator(super.getInstantiator())
+    override fun getInstantiator(): Instantiator = MockVaadinHelper.instantiatorFactory(super.getInstantiator())
 }
 
 /**
@@ -500,4 +503,6 @@ public object MockVaadinHelper {
             servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
         }
     }
+
+    public var instantiatorFactory: (Instantiator) -> Instantiator = { MockInstantiator(it) }
 }

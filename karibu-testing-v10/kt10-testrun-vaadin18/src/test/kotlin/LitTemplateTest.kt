@@ -1,5 +1,7 @@
 import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10.MockVaadinHelper
 import com.github.mvysny.kaributesting.v10._isVisible
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
@@ -7,7 +9,8 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
-import com.vaadin.flow.component.polymertemplate.Id
+import com.vaadin.flow.component.littemplate.MockInstantiatorV18
+import com.vaadin.flow.component.template.Id
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
@@ -15,6 +18,10 @@ import com.vaadin.flow.data.binder.Binder
 import kotlin.test.expect
 
 class LitTemplateTest : DynaTest({
+    beforeEach {
+        MockVaadinHelper.instantiatorFactory = { MockInstantiatorV18(it) }
+    }
+
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
@@ -34,6 +41,15 @@ class LitTemplateTest : DynaTest({
         LitUnloadableComponent2()
     }
 
+    test("proper error message on unloadable template") {
+        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
+            LitUnloadableTemplate()
+        }
+        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent4> @foo/non-existent.js. Please:") {
+            LitUnloadableTemplate2()
+        }
+    }
+
     test("form") {
         UI.getCurrent().add(MyForm())
     }
@@ -49,11 +65,19 @@ class LitColorPickerField : LitTemplate() {
 
 @Tag("non-existent")
 @JsModule("./non-existent.js")
-class LitUnloadableComponent : LitTemplate()
+class LitUnloadableComponent : Component()
+
+@Tag("non-existent2")
+@JsModule("@foo/non-existent.js")
+class LitUnloadableComponent2 : Component()
 
 @Tag("non-existent3")
+@JsModule("./non-existent.js")
+class LitUnloadableTemplate : LitTemplate()
+
+@Tag("non-existent4")
 @JsModule("@foo/non-existent.js")
-class LitUnloadableComponent2 : LitTemplate()
+class LitUnloadableTemplate2 : LitTemplate()
 
 data class Employee(var firstName: String? = null, var lastName: String? = null, var email: String? = null)
 

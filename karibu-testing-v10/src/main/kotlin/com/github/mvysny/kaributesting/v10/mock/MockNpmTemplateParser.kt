@@ -33,6 +33,7 @@ public class MockNpmTemplateParser : NpmTemplateParser() {
          * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`
          * @param url the URL resolved according to the [com.vaadin.flow.component.dependency.JsModule] spec, for example `./view/my-view.js` or `@vaadin/vaadin-button.js`.
          */
+        @JvmStatic
         public fun mockGetSourcesFromTemplate(tag: String, url: String): String {
             for (customLoader: CustomNpmTemplateLoader in customLoaders) {
                 val template: String? = customLoader.getSourcesFromTemplate(tag, url)

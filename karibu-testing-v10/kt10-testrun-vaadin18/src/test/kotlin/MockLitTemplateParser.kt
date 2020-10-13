@@ -1,5 +1,3 @@
-package com.vaadin.flow.component.littemplate;
-
 import com.github.mvysny.kaributesting.v10.mock.MockInstantiator
 import com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser
 import com.vaadin.flow.di.Instantiator
@@ -8,16 +6,6 @@ import net.bytebuddy.implementation.MethodCall
 import net.bytebuddy.implementation.bytecode.assign.Assigner
 import net.bytebuddy.matcher.ElementMatchers
 import java.lang.reflect.Method
-
-private class MockLitTemplateParser : LitTemplateParserImpl() {
-    /**
-     * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`
-     * @param url the URL resolved according to the [com.vaadin.flow.component.dependency.JsModule] spec, for example `./view/my-view.js` or `@vaadin/vaadin-button.js`.
-     */
-    override fun getSourcesFromTemplate(tag: String, url: String): String? {
-        return MockNpmTemplateParser.mockGetSourcesFromTemplate(tag, url)
-    }
-}
 
 object ByteBuddyUtils {
     /**
@@ -38,7 +26,9 @@ object ByteBuddyUtils {
     fun overrideMethod(baseClass: Class<*>, methodName: String, delegate: Method): Class<*> {
         return ByteBuddy().subclass(baseClass)
                 .method(ElementMatchers.named(methodName))
-                .intercept(MethodCall.invoke(delegate).withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC))
+                .intercept(MethodCall.invoke(delegate)
+                        .withAllArguments()
+                        .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC))
                 .make()
                 .load(ByteBuddyUtils::class.java.classLoader)
                 .loaded
@@ -58,17 +48,6 @@ class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(delegate) {
 
     companion object {
         /**
-         * The `LitTemplateParser.LitTemplateParserFactory` class.
-         */
-        private val classLitTemplateParserFactory: Class<*> =
-                Class.forName("com.vaadin.flow.component.littemplate.LitTemplateParser${'$'}LitTemplateParserFactory")
-        /**
-         * The `LitTemplateParser.LitTemplateParserFactory` class returning `MockLitTemplateParser`.
-         */
-        private val classMockLitTemplateParserFactory: Class<*> =
-                ByteBuddyUtils.overrideMethod(classLitTemplateParserFactory, "createParser") { MockLitTemplateParser() }
-
-        /**
          * The `TemplateParser.TemplateParserFactory` class.
          */
         private val classNpmTemplateParserFactory: Class<*> =
@@ -79,5 +58,32 @@ class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(delegate) {
          */
         private val classMockNpmTemplateParserFactory: Class<*> =
                 ByteBuddyUtils.overrideMethod(classNpmTemplateParserFactory, "createParser") { MockNpmTemplateParser() }
+
+        /**
+         * The `LitTemplateParserImpl` class.
+         */
+        private val classLitTemplateParserImpl: Class<*> =
+                Class.forName("com.vaadin.flow.component.littemplate.MyLitTemplateParserImpl")
+
+        /**
+         * The `MockLitTemplateParserImpl` class loading templates via
+         * [MockNpmTemplateParser.mockGetSourcesFromTemplate].
+         */
+        private val classMockLitTemplateParserImpl: Class<*> =
+                ByteBuddyUtils.overrideMethod(classLitTemplateParserImpl, "getSourcesFromTemplate",
+                        MockNpmTemplateParser::class.java.getDeclaredMethod("mockGetSourcesFromTemplate", String::class.java, String::class.java))
+
+        /**
+         * The `LitTemplateParser.LitTemplateParserFactory` class.
+         */
+        private val classLitTemplateParserFactory: Class<*> =
+                Class.forName("com.vaadin.flow.component.littemplate.LitTemplateParser${'$'}LitTemplateParserFactory")
+        /**
+         * The `LitTemplateParser.LitTemplateParserFactory` class returning `MockLitTemplateParser`.
+         */
+        private val classMockLitTemplateParserFactory: Class<*> =
+                ByteBuddyUtils.overrideMethod(classLitTemplateParserFactory, "createParser") {
+                    classMockLitTemplateParserImpl.newInstance()
+                }
     }
 }

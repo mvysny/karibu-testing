@@ -30,7 +30,7 @@ class LitTemplateTest : DynaTest({
         expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
             LitUnloadableTemplate()
         }
-        expectThrows(RuntimeException::class, "/node_modules folder doesn't exist, cannot load template sources for <non-existent4> @foo/non-existent.js. Please") {
+        expectThrows(RuntimeException::class, "node_modules folder doesn't exist, cannot load template sources for <non-existent4> @foo/non-existent.js. Please") {
             LitUnloadableTemplate2()
         }
     }

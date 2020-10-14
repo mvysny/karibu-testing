@@ -1,19 +1,16 @@
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10._isVisible
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
-import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.template.Id
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.binder.Binder
-import kotlin.test.expect
 
 class LitTemplateTest : DynaTest({
     beforeEach { MockVaadin.setup() }

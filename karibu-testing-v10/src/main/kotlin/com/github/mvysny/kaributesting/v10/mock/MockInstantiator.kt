@@ -42,14 +42,14 @@ private object ByteBuddyUtils {
     /**
      * Subclasses [baseClass] and overrides [methodName] which will now return the outcome of [delegate].
      */
-    fun overrideMethod(baseClass: Class<*>, methodName: String, delegate: Method): Class<*> {
+    fun overrideMethod(baseClass: Class<*>, subClassName: String, methodName: String, delegate: Method): Class<*> {
         // we're extending a non-public class; we need to use special hacks.
         // workaround 1: place the new class into the same package
         // workaround 2: use ClassLoadingStrategy.Default.INJECTION
         // remove when https://github.com/vaadin/flow/issues/9169 is fixed
 
         return ByteBuddy().subclass(baseClass)
-                .name("com.vaadin.flow.component.littemplate.MyLitTemplateParserImpl")
+                .name(subClassName)
                 .method(ElementMatchers.named(methodName))
                 .intercept(MethodCall.invoke(delegate)
                         .withAllArguments()
@@ -73,9 +73,9 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any?> getOrCreate(type: Class<T>): T = when (type) {
         classLitTemplateParserFactory ->
-            classMockLitTemplateParserFactory.newInstance() as T
+            classMockLitTemplateParserFactory.getConstructor().newInstance() as T
         classNpmTemplateParserFactory ->
-            classMockNpmTemplateParserFactory.newInstance() as T
+            classMockNpmTemplateParserFactory.getConstructor().newInstance() as T
         else -> super.getOrCreate(type)
     }
 
@@ -103,7 +103,9 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
          * [MockNpmTemplateParser.mockGetSourcesFromTemplate].
          */
         private val classMockLitTemplateParserImpl: Class<*> =
-                ByteBuddyUtils.overrideMethod(classLitTemplateParserImpl, "getSourcesFromTemplate",
+                ByteBuddyUtils.overrideMethod(classLitTemplateParserImpl,
+                        subClassName = "com.vaadin.flow.component.littemplate.MyLitTemplateParserImpl",
+                        methodName = "getSourcesFromTemplate",
                         MockNpmTemplateParser::class.java.getDeclaredMethod("mockGetSourcesFromTemplate", String::class.java, String::class.java))
 
         /**
@@ -116,7 +118,7 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
          */
         private val classMockLitTemplateParserFactory: Class<*> =
                 ByteBuddyUtils.overrideMethod(classLitTemplateParserFactory, "createParser") {
-                    classMockLitTemplateParserImpl.newInstance()
+                    classMockLitTemplateParserImpl.getConstructor().newInstance()
                 }
     }
 }

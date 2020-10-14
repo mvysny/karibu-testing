@@ -8,7 +8,9 @@ import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent
 import com.vaadin.flow.component.grid.dnd.GridDropEvent
@@ -159,10 +161,10 @@ internal fun DynaNodeGroup.gridTestbatch() {
     // tests https://github.com/mvysny/karibu-testing/issues/52
     test("lookup finds components in merged header cells") {
         UI.getCurrent().grid<String> {
-            val c1 = addColumn { it }
-            val c2 = addColumn { it }
+            val c1: Grid.Column<String> = addColumn { it }
+            val c2: Grid.Column<String> = addColumn { it }
             appendHeaderRow()
-            val row1 = prependHeaderRow()
+            val row1: HeaderRow = prependHeaderRow()
             row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
         }
         _expectOne<TextField> { caption = "Bar" }
@@ -171,10 +173,10 @@ internal fun DynaNodeGroup.gridTestbatch() {
     // tests https://github.com/mvysny/karibu-testing/issues/52
     test("lookup finds components in merged footer cells") {
         UI.getCurrent().grid<String> {
-            val c1 = addColumn { it }
-            val c2 = addColumn { it }
-            val row = appendFooterRow()
-            val row1 = appendFooterRow()
+            val c1: Grid.Column<String> = addColumn { it }
+            val c2: Grid.Column<String> = addColumn { it }
+            appendFooterRow()
+            val row1: FooterRow = appendFooterRow()
             row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
         }
         _expectOne<TextField> { caption = "Bar" }

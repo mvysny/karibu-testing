@@ -107,8 +107,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
 
         test("row out-of-bounds contains table dump") {
-            val dp = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })
-            val grid = UI.getCurrent().grid<TestPerson>(dp) {
+            val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
+            val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
             }
@@ -119,7 +119,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     test("header2") {
-        val grid = Grid<TestPerson>(TestPerson::class.java)
+        val grid: Grid<TestPerson> = Grid(TestPerson::class.java)
         expect("") { grid.addColumn({ it }).header2 }
         expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo") }.header2 }
         expect("") { grid.addColumn({ it }).apply { setHeader(Text("Foo")) }.header2 }
@@ -199,7 +199,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     group("click renderer") {
         test("ClickableRenderer") {
             var called = false
-            val grid = Grid<TestPerson>().apply {
+            val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
                     called = true
                     expect("name 8") { person.name }

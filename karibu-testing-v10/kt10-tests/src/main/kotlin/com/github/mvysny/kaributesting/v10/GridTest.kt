@@ -156,6 +156,30 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Foo!") { grid._get<TextField>().caption }
     }
 
+    // tests https://github.com/mvysny/karibu-testing/issues/52
+    test("lookup finds components in merged header cells") {
+        UI.getCurrent().grid<String> {
+            val c1 = addColumn { it }
+            val c2 = addColumn { it }
+            appendHeaderRow()
+            val row1 = prependHeaderRow()
+            row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
+        }
+        _expectOne<TextField> { caption = "Bar" }
+    }
+
+    // tests https://github.com/mvysny/karibu-testing/issues/52
+    test("lookup finds components in merged footer cells") {
+        UI.getCurrent().grid<String> {
+            val c1 = addColumn { it }
+            val c2 = addColumn { it }
+            val row = appendFooterRow()
+            val row1 = appendFooterRow()
+            row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
+        }
+        _expectOne<TextField> { caption = "Bar" }
+    }
+
     test("lookup finds components in footer") {
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.appendFooterRow().cells[0].setComponent(TextField("Foo!"))

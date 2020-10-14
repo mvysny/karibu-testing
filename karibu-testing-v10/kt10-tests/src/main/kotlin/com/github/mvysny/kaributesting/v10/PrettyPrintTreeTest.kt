@@ -120,8 +120,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
-    └── Column[]
-        └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+    ├── TextField[label='Filter:', value='']
+    └── Column[]""".trim()) { grid.toPrettyTree().trim() }
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/37
@@ -135,13 +135,12 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
+    ├── TextField[label='Filter:', value='']
     └── ColumnGroup[]
         ├── ColumnGroup[]
         │   └── Column[header='foo']
-        │       └── TextField[label='Filter:', value='']
         └── ColumnGroup[]
-            └── Column[header='bar']
-                └── TextField[label='Filter:', value='']""".trim()) { grid.toPrettyTree().trim() }
+            └── Column[header='bar']""".trim()) { grid.toPrettyTree().trim() }
         }
     }
 }

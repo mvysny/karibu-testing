@@ -48,11 +48,17 @@ public interface TestingLifecycleHook {
      * * For [MenuItemBase] the function returns all items of a sub-menu.
      */
     public fun getAllChildren(component: Component): List<Component> = when(component) {
-        is Grid.Column<*> -> {
-            val grid: Grid<*> = component.grid
-            val headerComponents: List<Component> = grid.headerRows.mapNotNull { it.getCell(component).component }
-            val footerComponents: List<Component> = grid.footerRows.mapNotNull { it.getCell(component).component }
-            headerComponents + footerComponents
+        is Grid<*> -> {
+            // don't attach the header/footer components as a child of the Column component:
+            // that would make components in merged cells appear more than once.
+            // see https://github.com/mvysny/karibu-testing/issues/52
+            val headerComponents: List<Component> = component.headerRows
+                    .flatMap { it.cells.map { it.component } }
+                    .filterNotNull()
+            val footerComponents: List<Component> = component.footerRows
+                    .flatMap { it.cells.map { it.component } }
+                    .filterNotNull()
+            headerComponents + footerComponents + component.children.toList()
         }
         is MenuItemBase<*, *, *> -> {
             component.getSubMenu().getItems()

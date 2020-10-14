@@ -8,7 +8,6 @@ import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.templatemodel.TemplateModel
-import java.lang.RuntimeException
 
 class NpmPolymerTemplateTest : DynaTest({
     beforeEach { MockVaadin.setup() }

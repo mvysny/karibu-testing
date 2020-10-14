@@ -1,8 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributesting.mockhttp.MockHttpSession
+import com.github.mvysny.kaributesting.mockhttp.MockRequest
+import com.github.mvysny.kaributesting.mockhttp.MockResponse
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.NotFoundException
+import com.vaadin.flow.server.*
 import elemental.json.Json
 import elemental.json.JsonArray
 import elemental.json.JsonObject
@@ -69,3 +73,34 @@ internal fun Class<*>.getErrorParameterType(): Class<*>? =
 
 internal val Class<*>.isRouteNotFound: Boolean
     get() = getErrorParameterType() == NotFoundException::class.java
+
+public val currentRequest: VaadinRequest
+    get() = VaadinService.getCurrentRequest()
+            ?: throw IllegalStateException("No current request")
+public val currentResponse: VaadinResponse
+    get() = VaadinService.getCurrentResponse()
+            ?: throw IllegalStateException("No current response")
+
+/**
+ * Retrieves the mock request which backs up [VaadinRequest].
+ * ```
+ * currentRequest.mock.addCookie(Cookie("foo", "bar"))
+ * ```
+ */
+public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+
+/**
+ * Retrieves the mock request which backs up [VaadinResponse].
+ * ```
+ * currentResponse.mock.getCookie("foo").value
+ * ```
+ */
+public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+
+/**
+ * Retrieves the mock session which backs up [VaadinSession].
+ * ```
+ * VaadinSession.getCurrent().mock
+ * ```
+ */
+public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession

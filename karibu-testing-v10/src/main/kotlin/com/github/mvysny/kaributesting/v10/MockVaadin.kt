@@ -1,94 +1,23 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
+import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
-import com.vaadin.flow.component.polymertemplate.TemplateParser
-import com.vaadin.flow.di.Instantiator
-import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
-import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.util.*
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import javax.servlet.ServletConfig
 import javax.servlet.ServletContext
 import kotlin.test.expect
-
-private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
-    override fun reload() {
-        // recreate the UI on reload(), to simulate browser's F5
-        super.reload()
-        MockVaadin.closeCurrentUI()
-        MockVaadin.createUI(uiFactory, session)
-    }
-}
-
-/**
- * A Vaadin Session with two important differences:
- *
- * * Provides a lock that's always held. This is needed order for the test methods to able to
- *   talk to Vaadin components directly, since you can only do that with a session lock held.
- * * Creates a new session when this one is closed. This is used to simulate a logout
- *   which closes the session - we need to have a new fresh session to be able to continue testing.
- *   In order to do that, simply override [close], call `super.close()` then call
- *   [MockVaadin.afterSessionClose].
- */
-public open class MockVaadinSession(service: VaadinService,
-                                    public val uiFactory: () -> UI
-) : VaadinSession(service) {
-    /**
-     * We need to pretend that we have the UI lock during the duration of the test method, otherwise
-     * Vaadin would complain that there is no session lock.
-     * The easiest way is to simply always provide a locked lock :)
-     */
-    private val lock: ReentrantLock = ReentrantLock().apply { lock() }
-
-    override fun getLockInstance(): Lock = lock
-    override fun close() {
-        super.close()
-        MockVaadin.afterSessionClose(this, uiFactory)
-    }
-}
-
-/**
- * Makes sure that [routes] are properly registered, and that [MockService]
- * is used instead of vanilla [VaadinServletService].
- */
-public open class MockVaadinServlet @JvmOverloads constructor(
-        public val routes: Routes = Routes(),
-        public val uiFactory: () -> UI = { MockedUI() }
-) : VaadinServlet() {
-
-    override fun createDeploymentConfiguration(): DeploymentConfiguration {
-        MockVaadinHelper.mockFlowBuildInfo(this)
-        return super.createDeploymentConfiguration()
-    }
-
-    override fun createDeploymentConfiguration(initParameters: Properties): DeploymentConfiguration {
-        // make sure that Vaadin 14+ starts in npm mode even with `frontend/` and `flow-build-info.json` missing.
-        // this check is required for testing a jar module with Vaadin 14 components.
-        if (VaadinMeta.version == 14) {
-            initParameters.remove(DeploymentConfigurationFactory::class.java.getDeclaredField("DEV_MODE_ENABLE_STRATEGY").get(null))
-        }
-        return super.createDeploymentConfiguration(initParameters)
-    }
-
-    override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
-        val service: VaadinServletService = MockService(this, deploymentConfiguration, uiFactory)
-        service.init()
-        routes.register(service.context as VaadinServletContext)
-        return service
-    }
-}
 
 public object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -407,35 +336,6 @@ public object MockVaadin {
     }
 }
 
-/**
- * A simple no-op UI used by default by [MockVaadin.setup]. The class is open, in order to be extensible in user's library
- */
-public open class MockedUI : UI()
-
-/**
- * A mocking service that performs three very important tasks:
- * * Overrides [isAtmosphereAvailable] to tell Vaadin that we don't have Atmosphere (otherwise Vaadin will crash)
- * * Provides some dummy value as a root ID via [getMainDivId] (otherwise the mocked servlet env will crash).
- * * Provides a [MockVaadinSession].
- * The class is intentionally opened, to be extensible in user's library.
- */
-public open class MockService(servlet: VaadinServlet,
-                              deploymentConfiguration: DeploymentConfiguration,
-                              public val uiFactory: () -> UI = { MockedUI() }
-) : VaadinServletService(servlet, deploymentConfiguration) {
-    override fun isAtmosphereAvailable(): Boolean = false
-    override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
-    override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, uiFactory)
-    override fun getInstantiator(): Instantiator = MockInstantiator(super.getInstantiator())
-}
-
-/**
- * Makes sure to load [MockNpmTemplateParser].
- */
-public open class MockInstantiator(public val delegate: Instantiator) : Instantiator by delegate {
-    override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
-}
-
 private fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
     val listenerField: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
     listenerField.isAccessible = true
@@ -456,48 +356,11 @@ private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent
     }
 }
 
-public val currentRequest: VaadinRequest
-    get() = VaadinService.getCurrentRequest()
-            ?: throw IllegalStateException("No current request")
-public val currentResponse: VaadinResponse
-    get() = VaadinService.getCurrentResponse()
-            ?: throw IllegalStateException("No current response")
-
-/**
- * Retrieves the mock request which backs up [VaadinRequest].
- * ```
- * currentRequest.mock.addCookie(Cookie("foo", "bar"))
- * ```
- */
-public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
-
-/**
- * Retrieves the mock request which backs up [VaadinResponse].
- * ```
- * currentResponse.mock.getCookie("foo").value
- * ```
- */
-public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
-
-/**
- * Retrieves the mock session which backs up [VaadinSession].
- * ```
- * VaadinSession.getCurrent().mock
- * ```
- */
-public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
-
-public object MockVaadinHelper {
-    @JvmStatic
-    public fun mockFlowBuildInfo(servlet: VaadinServlet) {
-        // we need to skip the test at DeploymentConfigurationFactory.verifyMode otherwise
-        // testing a Vaadin 15 component module in npm mode without webpack.config.js nor flow-build-info.json would fail.
-        if (VaadinMeta.flowBuildInfo == null) {
-            // probably inside a Vaadin 15 component module. create a dummy token file so that
-            // DeploymentConfigurationFactory.verifyMode() is happy.
-            val tokenFile: File = File.createTempFile("flow-build-info", "json")
-            tokenFile.writeText("{}")
-            servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
-        }
+private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
+    override fun reload() {
+        // recreate the UI on reload(), to simulate browser's F5
+        super.reload()
+        MockVaadin.closeCurrentUI()
+        MockVaadin.createUI(uiFactory, session)
     }
 }

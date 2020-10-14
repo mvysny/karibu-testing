@@ -3,16 +3,13 @@ package com.github.mvysny.kaributesting.v10.groovy
 import com.github.mvysny.kaributesting.mockhttp.MockHttpSession
 import com.github.mvysny.kaributesting.mockhttp.MockRequest
 import com.github.mvysny.kaributesting.mockhttp.MockResponse
-import com.github.mvysny.kaributesting.v10.MockVaadinKt
+import com.github.mvysny.kaributesting.v10.UtilsKt
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.VaadinResponse
 import com.vaadin.flow.server.VaadinSession
 import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 
-/**
- * @author mavi
- */
 @CompileStatic
 class MockVaadinExtensionMethods {
     /**
@@ -23,7 +20,7 @@ class MockVaadinExtensionMethods {
      */
     @NotNull
     static MockRequest getMock(@NotNull VaadinRequest self) {
-        MockVaadinKt.getMock(self)
+        UtilsKt.getMock(self)
     }
 
     /**
@@ -34,7 +31,7 @@ class MockVaadinExtensionMethods {
      */
     @NotNull
     static MockResponse getMock(@NotNull VaadinResponse self) {
-        MockVaadinKt.getMock(self)
+        UtilsKt.getMock(self)
     }
 
     /**
@@ -45,6 +42,6 @@ class MockVaadinExtensionMethods {
      */
     @NotNull
     static MockHttpSession getMock(@NotNull VaadinSession self) {
-        MockVaadinKt.getMock(self)
+        UtilsKt.getMock(self)
     }
 }

@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10.spring
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10.MockedUI
+import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession

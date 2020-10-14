@@ -183,7 +183,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     test("lookup finds components in footer") {
-        val grid = Grid<TestPerson>(TestPerson::class.java)
+        val grid = Grid(TestPerson::class.java)
         grid.appendFooterRow().cells[0].setComponent(TextField("Foo!"))
         expect("Foo!") { grid._get<TextField>().caption }
     }

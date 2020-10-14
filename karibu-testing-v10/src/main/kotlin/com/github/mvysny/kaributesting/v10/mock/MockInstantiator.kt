@@ -61,7 +61,9 @@ private object ByteBuddyUtils {
 }
 
 /**
- * Used for Vaadin 18+.
+ * Used for Vaadin 18+. In order to load [MockNpmTemplateParser] and also hook into the
+ * LitTemplateParser, we need to provide custom implementations of the `TemplateParserFactory`
+ * class and the `LitTemplateParserFactory` class.
  *
  * Nasty class manipulation ahead, simply because this project compiles against Vaadin 14,
  * in order to keep Vaadin 14 compatibility.

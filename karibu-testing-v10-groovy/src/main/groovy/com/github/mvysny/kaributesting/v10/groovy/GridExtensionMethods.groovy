@@ -192,8 +192,9 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
-     * and converts the result to string (even if the result is a [Component]).
+     * Returns the formatted value as a String. Does not use renderer to render
+     * the value - simply calls value provider and presentation provider
+     * and converts the result to string (even if the result is a {@link Component}).
      * @param rowIndex the row index, 0 or higher.
      */
     @NotNull
@@ -222,7 +223,7 @@ class GridExtensionMethods {
     }
 
     /**
-     * Renders the template for given [item]
+     * Renders the template for given <code>item</code>.
      */
     @NotNull
     static <T> String renderTemplate(@NotNull TemplateRenderer<T> self, @NotNull T item) {
@@ -243,7 +244,7 @@ class GridExtensionMethods {
     }
 
     /**
-     * Dumps given range of [rows] of the Grid, formatting the values using the [_getFormatted] function. The output example:
+     * Dumps given range of <code>rows</code> of the Grid, formatting the values using the {@link #_getFormatted(com.vaadin.flow.component.grid.Grid.Column, java.lang.Object)} function. The output example:
      * <pre>
      * --[Name]--[Age]--[Occupation]--
      * 0: John, 25, Service Worker
@@ -265,6 +266,7 @@ class GridExtensionMethods {
 
     /**
      * Retrieves the cell for given [Grid.Column.getKey].
+     * @param key matched against {@link Grid.Column#getKey}.
      * @return the corresponding cell
      * @throws IllegalArgumentException if no such column exists.
      */
@@ -274,7 +276,8 @@ class GridExtensionMethods {
     }
 
     /**
-     * Retrieves the cell for given [property]; it matches [Grid.Column.getKey] to [KProperty1.name].
+     * Retrieves the cell for given {@link Grid.Column#getKey}.
+     * @param key matched against {@link Grid.Column#getKey}.
      * @return the corresponding cell
      * @throws IllegalArgumentException if no such column exists.
      */
@@ -294,7 +297,8 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns or sets the component in grid's footer cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
+     * Returns or sets the component in grid's footer cell.
+     * Returns <code>null</code> if the cell contains String, something else than a component or nothing at all.
      */
     @Nullable
     static Component getComponent(@NotNull FooterRow.FooterCell self) {
@@ -302,7 +306,8 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns or sets the component in grid's header cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
+     * Returns or sets the component in grid's header cell.
+     * Returns <code>null</code> if the cell contains String, something else than a component or nothing at all.
      */
     @Nullable
     static Component getComponent(@NotNull HeaderRow.HeaderCell self) {
@@ -319,20 +324,21 @@ class GridExtensionMethods {
     }
 
     /**
-     * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+     * Sorts given grid. Affects {@link #_findAll}, {@link #_get} and other data-fetching functions.
      */
     static <T> void sort(@NotNull Grid<T> self, QuerySortOrder... sortOrder) {
         GridKt.sort(self, sortOrder)
     }
 
     /**
-     * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listeners registered via
-     * [Grid.addItemClickListener].
+     * Fires the {@link com.vaadin.flow.component.grid.ItemClickEvent} event for
+     * given <code>rowIndex</code> which invokes all item click listeners registered via
+     * {@link Grid#addItemClickListener(com.vaadin.flow.component.ComponentEventListener)}.
      * @param button the id of the pressed mouse button
-     * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
-     * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
-     * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
-     * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
+     * @param ctrlKey <code>true</code> if the control key was down when the event was fired, <code>false</code> otherwise
+     * @param shiftKey <code>true</code> if the shift key was down when the event was fired, <code>false</code> otherwise
+     * @param altKey <code>true</code> if the alt key was down when the event was fired, <code>false</code> otherwise
+     * @param metaKey <code>true</code> if the meta key was down when the event was fired, <code>false</code> otherwise
      */
     static <T> void _clickItem(@NotNull Grid<T> self, int rowIndex, int button = 1, boolean ctrlKey = false,
             boolean shiftKey = false, boolean altKey = false, boolean metaKey = false) {
@@ -340,11 +346,26 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.
+     * Fires the {@link com.vaadin.flow.component.grid.ItemDoubleClickEvent} event for
+     * given <code>rowIndex</code> which invokes all item click listeners registered via
+     * {@link Grid#addItemDoubleClickListener(com.vaadin.flow.component.ComponentEventListener)}.
+     * @param button the id of the pressed mouse button
+     * @param ctrlKey <code>true</code> if the control key was down when the event was fired, <code>false</code> otherwise
+     * @param shiftKey <code>true</code> if the shift key was down when the event was fired, <code>false</code> otherwise
+     * @param altKey <code>true</code> if the alt key was down when the event was fired, <code>false</code> otherwise
+     * @param metaKey <code>true</code> if the meta key was down when the event was fired, <code>false</code> otherwise
+     */
+    static <T> void _doubleClickItem(@NotNull Grid<T> self, int rowIndex, int button = 1, boolean ctrlKey = false,
+                               boolean shiftKey = false, boolean altKey = false, boolean metaKey = false) {
+        GridKt._doubleClickItem(self, rowIndex, button, ctrlKey, shiftKey, altKey, metaKey)
+    }
+
+    /**
+     * Returns a sequence which walks over all rows the {@link TreeGrid} is actually showing.
      * The sequence will *skip* children of collapsed nodes.
      * <p></p>
      * Iterating the entire sequence is a very slow operation since it will repeatedly
-     * poll [HierarchicalDataProvider] for list of children.
+     * poll {@link HierarchicalDataProvider} for list of children.
      * <p></p>
      * Honors current grid ordering.
      */
@@ -361,10 +382,10 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns the number of items the [TreeGrid] is actually showing. For example
+     * Returns the number of items the {@link TreeGrid} is actually showing. For example
      * it doesn't count in children of collapsed nodes.
      *
-     * A very slow operation since it walks through all items returned by [_rowSequence].
+     * A very slow operation since it walks through all items returned by {@link #_rowSequence}.
      */
     static int _size(@NotNull TreeGrid<?> self) {
         GridKt._size(self)

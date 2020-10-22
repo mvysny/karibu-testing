@@ -2,8 +2,11 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.github.mvysny.karibudsl.v10.component
+import com.github.mvysny.karibudsl.v10.grid
+import com.github.mvysny.karibudsl.v10.karibuDslI18n
+import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -12,19 +15,12 @@ import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
-import com.vaadin.flow.component.grid.dnd.GridDragStartEvent
-import com.vaadin.flow.component.grid.dnd.GridDropEvent
-import com.vaadin.flow.component.grid.dnd.GridDropLocation
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.textfield.TextField
-import com.vaadin.flow.data.binder.HasDataProvider
-import com.vaadin.flow.data.binder.HasItems
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -320,7 +316,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
         test("simple") {
-            var event: ItemClickEvent<TestPerson>? = null
+            lateinit var event: ItemClickEvent<TestPerson>
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -328,26 +324,56 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addItemClickListener { e -> event = e }
             }
             grid._clickItem(2)
-            expect(true) { event != null }
-            expect("name 2") { event!!.item.name }
-            expect(true) { event!!.isFromClient }
-            expect(1) { event!!.button }
-            expect(false) { event!!.isAltKey }
-            expect(false) { event!!.isCtrlKey }
-            expect(false) { event!!.isMetaKey }
-            expect(false) { event!!.isShiftKey }
+            expect("name 2") { event.item.name }
+            expect(true) { event.isFromClient }
+            expect(1) { event.button }
+            expect(false) { event.isAltKey }
+            expect(false) { event.isCtrlKey }
+            expect(false) { event.isMetaKey }
+            expect(false) { event.isShiftKey }
         }
     }
-    if (VaadinMeta.version >= 14) {
-        group("drag n drop") {
-            test("smoke") {
-                UI.getCurrent().grid<String> {
-                    val grid: Grid<String> = this
-                    grid.dropMode = GridDropMode.ON_TOP
-                    grid.isRowsDraggable = true
-                    grid.addDragStartListener { }
-                    grid.addDropListener { }
-                }
+
+    group("_doubleClickItem") {
+        test("fails on disabled grid") {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemDoubleClickListener { fail("Shouldn't be called") }
+                isEnabled = false
+            }
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, <TestPerson>, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
+                grid._doubleClickItem(2)
+            }
+        }
+        test("simple") {
+            lateinit var event: ItemClickEvent<TestPerson>
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemDoubleClickListener { e -> event = e }
+            }
+            grid._doubleClickItem(2)
+            expect("name 2") { event.item.name }
+            expect(true) { event.isFromClient }
+            expect(1) { event.button }
+            expect(false) { event.isAltKey }
+            expect(false) { event.isCtrlKey }
+            expect(false) { event.isMetaKey }
+            expect(false) { event.isShiftKey }
+        }
+    }
+
+    group("drag n drop") {
+        test("smoke") {
+            UI.getCurrent().grid<String> {
+                val grid: Grid<String> = this
+                grid.dropMode = GridDropMode.ON_TOP
+                grid.isRowsDraggable = true
+                grid.addDragStartListener { }
+                grid.addDropListener { }
             }
         }
     }

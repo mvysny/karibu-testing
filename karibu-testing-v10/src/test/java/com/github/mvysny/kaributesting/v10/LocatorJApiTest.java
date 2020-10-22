@@ -70,6 +70,7 @@ public class LocatorJApiTest {
         expectRows(new Grid<>(), 0);
         expectRow(new Grid<>(), 0, "John Doe", "25");
         _clickItem(new Grid<>(), 0);
+        _doubleClickItem(new Grid<>(), 0);
         _clickRenderer(new Grid<>(), 0, "edit");
     }
 

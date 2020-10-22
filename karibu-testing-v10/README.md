@@ -815,8 +815,13 @@ contents of the Grid.
   In Java: `expectRows(grid, 25)`
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
-* You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
-  or a `Button`/`ClickNotifier` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
+* Use `grid._clickItem(rowIndex)`/`GridKt._clickItem(grid, rowIndex)` to fire a listener added via `addItemClickListener()`.
+* Use `grid._doubleClickItem(rowIndex)`/`GridKt._doubleClickItem(grid, rowIndex)` to fire a listener added via `addItemDoubleClickListener()`.
+
+#### Clicking Renderers
+
+You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
+or a `Button`/`ClickNotifier` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
 If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`, you will need to
 tell Karibu-Testing how to click on such a component:

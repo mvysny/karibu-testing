@@ -515,8 +515,25 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey:
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
     val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
-    @Suppress("DEPRECATION") // Vaadin 13 doesn't have the constructor with the "internalColumnId"
-    val event = ItemClickEvent<T>(this, true, itemKey, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
+    val event = ItemClickEvent<T>(this, true, itemKey, null, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
+    _fireEvent(event)
+}
+
+/**
+ * Fires the [ItemDoubleClickEvent] event for given [rowIndex] which invokes all item click listeners registered via
+ * [Grid.addItemDoubleClickListener].
+ * @param button the id of the pressed mouse button
+ * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
+ * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
+ * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
+ * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
+ */
+@JvmOverloads
+public fun <T : Any> Grid<T>._doubleClickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
+                                        shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
+    checkEditableByUser()
+    val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
+    val event = ItemDoubleClickEvent<T>(this, true, itemKey, null, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
     _fireEvent(event)
 }
 

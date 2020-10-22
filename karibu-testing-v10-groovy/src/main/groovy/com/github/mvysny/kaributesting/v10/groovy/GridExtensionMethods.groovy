@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.fail
 class GridExtensionMethods {
     /**
      * Returns the item on given row. Fails if the row index is invalid. The data provider is
-     * sorted according to given [sortOrders] (empty by default) and filtered according
-     * to given [filter] (null by default) first.
+     * sorted according to given <code>sortOrders</code> (empty by default) and filtered according
+     * to given <code>filter</code> (null by default) first.
      * @param rowIndex the row, 0..size - 1
      * @return the item at given row.
      * @throws AssertionError if the row index is out of bounds.
@@ -52,8 +52,8 @@ class GridExtensionMethods {
     }
 
     /**
-     * Returns all items in given data provider, sorted according to given [sortOrders] (empty by default) and filtered according
-     * to given [filter] (null by default).
+     * Returns all items in given data provider, sorted according to given <code>sortOrders</code> (empty by default) and filtered according
+     * to given <code>filter</code> (null by default).
      * @return the list of items.
      */
     @NotNull
@@ -67,8 +67,8 @@ class GridExtensionMethods {
     /**
      * Returns the item on given row. Fails if the row index is invalid. Uses current Grid sorting.
      * <p></p>
-     * For [TreeGrid] this returns the x-th displayed row; skips children of collapsed nodes.
-     * Uses [_rowSequence].
+     * For {@link TreeGrid} this returns the x-th displayed row; skips children of collapsed nodes.
+     * Uses {@link #_rowSequence(com.vaadin.flow.component.treegrid.TreeGrid)}.
      * <p></p>
      * WARNING: Very slow operation for [TreeGrid].
      * @param rowIndex the row, 0..size - 1
@@ -80,9 +80,9 @@ class GridExtensionMethods {
     }
 
     /**
-     * For [TreeGrid] this walks the [_rowSequence].
+     * For {@link TreeGrid} this walks the {@link #_rowSequence(com.vaadin.flow.component.treegrid.TreeGrid)}.
      * <p></p>
-     * WARNING: Very slow operation for [TreeGrid].
+     * WARNING: Very slow operation for {@link TreeGrid}.
      */
     @NotNull
     static <T> List<T> _fetch(@NotNull Grid<T> self, int offset, int limit) {
@@ -97,7 +97,7 @@ class GridExtensionMethods {
     /**
      * Returns all items in given data provider. Uses current Grid sorting.
      * <p></p>
-     * For [TreeGrid] this returns all displayed rows; skips children of collapsed nodes.
+     * For {@link TreeGrid} this returns all displayed rows; skips children of collapsed nodes.
      * @return the list of items.
      */
     @NotNull
@@ -108,7 +108,7 @@ class GridExtensionMethods {
     /**
      * Returns the number of items in this data provider.
      * <p></p>
-     * In case of [HierarchicalDataProvider]
+     * In case of {@link HierarchicalDataProvider}
      * this returns the number of ALL items including all leafs.
      */
     static <T, F> int _size(@NotNull DataProvider<T, F> self, @Nullable F filter = null) {
@@ -118,12 +118,12 @@ class GridExtensionMethods {
     /**
      * Returns the number of items in this data provider, including child items.
      * The function traverses recursively until all children are found; then a total size
-     * is returned. The function uses [HierarchicalDataProvider.size] mostly, but
-     * also uses [HierarchicalDataProvider.fetchChildren] to discover children.
-     * Only children matching [filter] are considered for recursive computation of
+     * is returned. The function uses {@link HierarchicalDataProvider#size(com.vaadin.flow.data.provider.Query)} mostly, but
+     * also uses {@link HierarchicalDataProvider#fetchChildren(com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery)} to discover children.
+     * Only children matching <code>filter</code> are considered for recursive computation of
      * the size.
      * <p></p>
-     * Note that this can differ to `Grid._size()` since `Grid._size()` ignores children
+     * Note that this can differ to {@link #_size(com.vaadin.flow.component.grid.Grid)} since <code>Grid._size()</code> ignores children
      * of collapsed tree nodes.
      * @param root start with this item; defaults to null to iterate all items
      * @param filter filter to pass to [HierarchicalQuery]
@@ -147,7 +147,7 @@ class GridExtensionMethods {
     }
 
     /**
-     * Gets a [Grid.Column] of this grid by its [columnKey].
+     * Gets a {@link Grid.Column} of this grid by its <code>columnKey</code>.
      * @throws AssertionError if no such column exists.
      */
     @NotNull
@@ -156,10 +156,11 @@ class GridExtensionMethods {
     }
 
     /**
-     * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
-     * * [ClickableRenderer]
-     * * [ComponentRenderer] which renders a [Button]
-     * * [ComponentRenderer] which renders something else than a [Button]; then you need to provide the [click] closure which can click on such a component.
+     * Performs a click on a {@link com.vaadin.flow.data.renderer.ClickableRenderer} in given {@link Grid} cell. Only supports the following scenarios:
+     * * {@link com.vaadin.flow.data.renderer.ClickableRenderer}
+     * * {@link com.vaadin.flow.data.renderer.ComponentRenderer} which renders a {@link com.vaadin.flow.component.button.Button}
+     * * {@link com.vaadin.flow.data.renderer.ComponentRenderer} which renders
+     *   something else than a {@link com.vaadin.flow.component.button.Button}; then you need to provide the <code>click</code> closure which can click on such a component.
      * @param rowIndex the row index, 0 or higher.
      * @param columnKey the column key [Grid.Column.getKey]
      * @param click if [ComponentRenderer] doesn't produce a button, this is called, to click the component returned by the [ComponentRenderer]
@@ -182,7 +183,7 @@ class GridExtensionMethods {
 
     /**
      * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
-     * and converts the result to string (even if the result is a [Component]).
+     * and converts the result to string (even if the result is a {@link Component}).
      * @param rowIndex the row index, 0 or higher.
      * @param columnId the column ID.
      */
@@ -236,7 +237,8 @@ class GridExtensionMethods {
     }
 
     /**
-     * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String). The result value is undefined if a component has been set as the header.
+     * Sets and retrieves the column header as set by {@link Grid.Column#setHeader(java.lang.String)}.
+     * The result value is undefined if a component has been set as the header.
      */
     @NotNull
     static <T> String getHeader2(@NotNull Grid.Column<T> self) {
@@ -265,7 +267,7 @@ class GridExtensionMethods {
     }
 
     /**
-     * Retrieves the cell for given [Grid.Column.getKey].
+     * Retrieves the cell for given <code>key</code>.
      * @param key matched against {@link Grid.Column#getKey}.
      * @return the corresponding cell
      * @throws IllegalArgumentException if no such column exists.

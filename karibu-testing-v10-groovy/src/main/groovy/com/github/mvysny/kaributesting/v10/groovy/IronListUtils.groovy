@@ -27,7 +27,7 @@ class IronListUtils {
     }
 
     /**
-     * Fetches items from [IronList]'s data provider.
+     * Fetches items from {@link IronList}'s data provider.
      */
     @NotNull
     static <T> List<T> _fetch(@NotNull IronList<T> self, int offset, int limit) {
@@ -44,7 +44,7 @@ class IronListUtils {
     }
 
     /**
-     * Returns the number of items in this IronList.
+     * Returns the number of items in this {@link IronList}.
      */
     static int _size(@NotNull IronList<?> self) {
         return IronListKt._size(self)
@@ -57,7 +57,7 @@ class IronListUtils {
 
     /**
      * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
-     * and converts the result to string (even if the result is a [Component]).
+     * and converts the result to string (even if the result is a {@link com.vaadin.flow.component.Component}).
      * @param rowIndex the row index, 0 or higher.
      * @param columnId the column ID.
      */
@@ -67,7 +67,8 @@ class IronListUtils {
     }
 
     /**
-     * Dumps given range of [rows] of the IronList, formatting the values using the [_getFormattedRow] function. The output example:
+     * Dumps given range of <code>rows</code> of the IronList, formatting the values
+     * using the {@link #_getFormattedRow(com.vaadin.flow.component.ironlist.IronList, int)} function. The output example:
      * ```
      * ----------------------
      * 0: John

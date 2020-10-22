@@ -78,6 +78,7 @@ class GridExtensionMethodsTest {
 
         grid.sort("length".asc)
         grid._clickItem(0)
+        grid._doubleClickItem(0)
 
         new TreeGrid<String>()._rowSequence().toList()
         new TreeGrid<String>()._rowSequence { true }.toList()

@@ -4,7 +4,6 @@ import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
 import net.bytebuddy.ByteBuddy
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import net.bytebuddy.implementation.MethodCall
 import net.bytebuddy.implementation.bytecode.assign.Assigner
 import net.bytebuddy.matcher.ElementMatchers
@@ -42,20 +41,14 @@ private object ByteBuddyUtils {
     /**
      * Subclasses [baseClass] and overrides [methodName] which will now return the outcome of [delegate].
      */
-    fun overrideMethod(baseClass: Class<*>, subClassName: String, methodName: String, delegate: Method): Class<*> {
-        // we're extending a non-public class; we need to use special hacks.
-        // workaround 1: place the new class into the same package
-        // workaround 2: use ClassLoadingStrategy.Default.INJECTION
-        // remove when https://github.com/vaadin/flow/issues/9169 is fixed
-
+    fun overrideMethod(baseClass: Class<*>, methodName: String, delegate: Method): Class<*> {
         return ByteBuddy().subclass(baseClass)
-                .name(subClassName)
                 .method(ElementMatchers.named(methodName))
                 .intercept(MethodCall.invoke(delegate)
                         .withAllArguments()
                         .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC))
                 .make()
-                .load(ByteBuddyUtils::class.java.classLoader, ClassLoadingStrategy.Default.INJECTION)
+                .load(ByteBuddyUtils::class.java.classLoader)
                 .loaded
     }
 }
@@ -96,7 +89,7 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
          * The `LitTemplateParserImpl` class.
          */
         private val classLitTemplateParserImpl: Class<*> =
-                Class.forName("com.vaadin.flow.component.littemplate.LitTemplateParserImpl")
+                Class.forName("com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl")
 
         /**
          * The `MockLitTemplateParserImpl` class loading templates via
@@ -104,7 +97,6 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
          */
         private val classMockLitTemplateParserImpl: Class<*> =
                 ByteBuddyUtils.overrideMethod(classLitTemplateParserImpl,
-                        subClassName = "com.vaadin.flow.component.littemplate.MyLitTemplateParserImpl",
                         methodName = "getSourcesFromTemplate",
                         MockNpmTemplateParser::class.java.getDeclaredMethod("mockGetSourcesFromTemplate", String::class.java, String::class.java))
 

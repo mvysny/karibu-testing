@@ -319,10 +319,17 @@ internal class MockUI : UI() {
 
 public val currentRequest: VaadinRequest
     get() = VaadinService.getCurrentRequest()
-            ?: throw IllegalStateException("No current request")
+            ?: throw IllegalStateException("No current request. Have you called MockVaadin.setup()?")
 public val currentResponse: VaadinResponse
     get() = VaadinService.getCurrentResponse()
-            ?: throw IllegalStateException("No current response")
+            ?: throw IllegalStateException("No current response. Have you called MockVaadin.setup()?")
+
+/**
+ * Returns the [UI.getCurrent]; fails with informative error message if the UI.getCurrent() is null.
+ */
+public val currentUI: UI
+    get() = UI.getCurrent()
+            ?: throw IllegalStateException("UI.getCurrent() is null. Have you called MockVaadin.setup()?")
 
 /**
  * Retrieves the mock request which backs up [VaadinRequest].

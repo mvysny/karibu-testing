@@ -115,7 +115,7 @@ public fun <T: Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.(
 }
 
 /**
- * Finds a VISIBLE component in the current UI of given type which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a VISIBLE component in the current UI of given type which matches given [block]. The [currentUI] and all of its descendants are searched.
  * @return the only matching component, never null.
  * @throws IllegalArgumentException if no component matched, or if more than one component matches.
  */
@@ -123,13 +123,13 @@ public inline fun <reified T: Component> _get(noinline block: SearchSpec<T>.()->
     _get(T::class.java, block)
 
 /**
- * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [currentUI] and all of its descendants are searched.
  * @param clazz the component must be of this class.
  * @param block the search specification
  * @return the only matching component, never null.
  * @throws IllegalArgumentException if no component matched, or if more than one component matches.
  */
-public fun <T: Component> _get(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): T = UI.getCurrent()._get(clazz, block)
+public fun <T: Component> _get(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): T = currentUI._get(clazz, block)
 
 /**
  * Finds a list of VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
@@ -182,7 +182,7 @@ public inline fun <reified T: Component> _find(noinline block: SearchSpec<T>.()-
  * @return the list of matching components, may be empty.
  */
 public fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}): List<T> =
-        UI.getCurrent()._find(clazz, block)
+        currentUI._find(clazz, block)
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitBeforeLookup()
@@ -190,7 +190,7 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) {
-        throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error.element.text}\n${UI.getCurrent().toPrettyTree()}")
+        throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error.element.text}\n${currentUI.toPrettyTree()}")
     }
     return descendants.filter { it.isEffectivelyVisible() && predicate(it) }
 }
@@ -242,7 +242,7 @@ public fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSp
 }
 
 /**
- * Expects that there are no VISIBLE components in the current UI of given type which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Expects that there are no VISIBLE components in the current UI of given type which matches [block]. The [currentUI] and all of its descendants are searched.
  * @throws IllegalArgumentException if one or more components matched.
  */
 public inline fun <reified T: Component> _expectNone(noinline block: SearchSpec<T>.()->Unit = {}) {
@@ -250,11 +250,11 @@ public inline fun <reified T: Component> _expectNone(noinline block: SearchSpec<
 }
 
 /**
- * Expects that there are no VISIBLE components in the current UI of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Expects that there are no VISIBLE components in the current UI of given [clazz] which matches [block]. The [currentUI] and all of its descendants are searched.
  * @throws IllegalArgumentException if one or more components matched.
  */
 public fun <T: Component> _expectNone(clazz: Class<T>, block: SearchSpec<T>.()->Unit = {}) {
-    UI.getCurrent()._expectNone(clazz, block)
+    currentUI._expectNone(clazz, block)
 }
 
 /**
@@ -276,7 +276,7 @@ public fun <T : Component> Component._expectOne(clazz: Class<T>, block: SearchSp
 }
 
 /**
- * Expects that there is exactly one VISIBLE components in the current UI of given type which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Expects that there is exactly one VISIBLE components in the current UI of given type which matches [block]. The [currentUI] and all of its descendants are searched.
  * @throws AssertionError if none, or more than one components matched.
  */
 public inline fun <reified T : Component> _expectOne(noinline block: SearchSpec<T>.() -> Unit = {}) {
@@ -284,11 +284,11 @@ public inline fun <reified T : Component> _expectOne(noinline block: SearchSpec<
 }
 
 /**
- * Expects that there is exactly one VISIBLE components in the current UI of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Expects that there is exactly one VISIBLE components in the current UI of given [clazz] which matches [block]. The [currentUI] and all of its descendants are searched.
  * @throws AssertionError if none, or more than one components matched.
  */
 public fun <T : Component> _expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}) {
-    UI.getCurrent()._expectOne(clazz, block)
+    currentUI._expectOne(clazz, block)
 }
 
 /**
@@ -327,7 +327,7 @@ public fun <T : Component> Component._expect(clazz: Class<T>, count: Int = 1, bl
 }
 
 /**
- * Expects that there are exactly [count] VISIBLE components in the current UI match [block]. The [UI.getCurrent] and all of its descendants are searched. Examples:
+ * Expects that there are exactly [count] VISIBLE components in the current UI match [block]. The [currentUI] and all of its descendants are searched. Examples:
  * ```
  * // check that there are 5 buttons in a button bar
  * buttonBar._expect<Button>(5..5)
@@ -342,7 +342,7 @@ public inline fun <reified T : Component> _expect(count: Int = 1, noinline block
 }
 
 /**
- * Expects that there are exactly [count] VISIBLE components in the current UI with given [clazz] match [block]. The [UI.getCurrent] and all of its descendants are searched. Examples:
+ * Expects that there are exactly [count] VISIBLE components in the current UI with given [clazz] match [block]. The [currentUI] and all of its descendants are searched. Examples:
  * ```
  * // check that there are 5 buttons in a button bar
  * buttonBar._expect<Button>(5..5)
@@ -353,5 +353,5 @@ public inline fun <reified T : Component> _expect(count: Int = 1, noinline block
  * @throws AssertionError if incorrect count of component matched.
  */
 public fun <T : Component> _expect(clazz: Class<T>, count: Int = 1, block: SearchSpec<T>.() -> Unit = {}) {
-    UI.getCurrent()._expect(clazz, count, block)
+    currentUI._expect(clazz, count, block)
 }

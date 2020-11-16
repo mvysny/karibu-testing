@@ -108,20 +108,21 @@ public fun <T : Component> Component._get(clazz: Class<T>, block: SearchSpec<T>.
 }
 
 /**
- * Finds a VISIBLE component in the current UI of given type which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a VISIBLE component in the current UI of given type which matches given [block]. The [currentUI] and all of its descendants are searched.
  * @return the only matching component, never null.
  * @throws AssertionError if no component matched, or if more than one component matches.
  */
 public inline fun <reified T : Component> _get(noinline block: SearchSpec<T>.() -> Unit = {}): T = _get(T::class.java, block)
 
 /**
- * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a VISIBLE component in the current UI of given [clazz] which matches given [block]. The [currentUI] and all of its descendants are searched.
  * @param clazz the component must be of this class.
  * @param block the search specification
  * @return the only matching component, never null.
  * @throws AssertionError if no component matched, or if more than one component matches.
  */
-public fun <T : Component> _get(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): T = UI.getCurrent()._get(clazz, block)
+public fun <T : Component> _get(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): T =
+        currentUI._get(clazz, block)
 
 /**
  * Finds a list of VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
@@ -161,7 +162,7 @@ public inline fun <reified T : Component> Component._find(noinline block: Search
         this._find(T::class.java, block)
 
 /**
- * Finds a list of VISIBLE components in the current UI of given type which matches given [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a list of VISIBLE components in the current UI of given type which matches given [block]. The [currentUI] and all of its descendants are searched.
  * @param block the search specification
  * @return the list of matching components, may be empty.
  */
@@ -169,11 +170,11 @@ public inline fun <reified T : Component> _find(noinline block: SearchSpec<T>.()
         _find(T::class.java, block)
 
 /**
- * Finds a list of VISIBLE components of given [clazz] which matches [block]. The [UI.getCurrent] and all of its descendants are searched.
+ * Finds a list of VISIBLE components of given [clazz] which matches [block]. The [currentUI] and all of its descendants are searched.
  * @return the list of matching components, may be empty.
  */
 public fun <T : Component> _find(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}): List<T> =
-        UI.getCurrent()._find(clazz, block)
+        currentUI._find(clazz, block)
 
 internal fun Component.isEffectivelyVisible(): Boolean = isVisible && (parent == null || parent.isEffectivelyVisible())
 
@@ -241,7 +242,7 @@ public inline fun <reified T : Component> _expectNone(noinline block: SearchSpec
  * @throws AssertionError if one or more components matched.
  */
 public fun <T : Component> _expectNone(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}) {
-    UI.getCurrent()._expectNone(clazz, block)
+    currentUI._expectNone(clazz, block)
 }
 
 /**
@@ -275,7 +276,7 @@ public inline fun <reified T : Component> _expectOne(noinline block: SearchSpec<
  * @throws AssertionError if none, or more than one components matched.
  */
 public fun <T : Component> _expectOne(clazz: Class<T>, block: SearchSpec<T>.() -> Unit = {}) {
-    UI.getCurrent()._expectOne(clazz, block)
+    currentUI._expectOne(clazz, block)
 }
 
 /**
@@ -340,5 +341,5 @@ public inline fun <reified T : Component> _expect(count: Int = 1, noinline block
  * @throws AssertionError if incorrect count of component matched.
  */
 public fun <T : Component> _expect(clazz: Class<T>, count: Int = 1, block: SearchSpec<T>.() -> Unit = {}) {
-    UI.getCurrent()._expect(clazz, count, block)
+    currentUI._expect(clazz, count, block)
 }

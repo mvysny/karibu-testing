@@ -6,12 +6,10 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate
-import kotlin.streams.toList
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.

@@ -5,12 +5,12 @@
 
 Compatibility chart:
 
-| Karibu-Testing version | Supports |
+| Karibu-Testing version | Supported Java | Supported Vaadin version |
 |------------------------|----------|
-| 1.0.x | Vaadin 10, Vaadin 11, Vaadin 12 |
-| 1.1.x | Vaadin 13, Vaadin 14 |
-| 1.2.x | Vaadin 16+ |
-| 1.2.3+ (recommended) | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16+ |
+| 1.0.x | Java 1.8+ | Vaadin 10, Vaadin 11, Vaadin 12 |
+| 1.1.x | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 |
+| 1.2.x | Java 1.8+ | Vaadin 16+ |
+| 1.2.3+ (recommended) | Java 1.8+ | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16+ |
 
 Since Karibu-Testing 1.1.x doesn't work on Java 12+ and is no longer maintained,
 it's recommended to use Karibu-Testing 1.2.3 and higher.

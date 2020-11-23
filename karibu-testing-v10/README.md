@@ -6,7 +6,7 @@
 Compatibility chart:
 
 | Karibu-Testing version | Supported Java | Supported Vaadin version |
-|------------------------|----------|
+|------------------------|----------------|--------------------------|
 | 1.0.x | Java 1.8+ | Vaadin 10, Vaadin 11, Vaadin 12 |
 | 1.1.x | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 |
 | 1.2.x | Java 1.8+ | Vaadin 16+ |

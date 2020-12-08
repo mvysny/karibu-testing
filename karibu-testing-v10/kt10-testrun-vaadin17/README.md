@@ -1,4 +1,4 @@
-# Test Runner For Vaadin 16 tests
+# Test Runner For Vaadin 17 tests
 
 Vaadin 17 only supports NPM+WebPack mode - it doesn't support Bower mode.
 

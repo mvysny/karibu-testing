@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
+import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.server.DeploymentConfigurationFactory
 import com.vaadin.flow.server.VaadinContext
@@ -87,7 +88,7 @@ public object VaadinMeta {
             // Vaadin 19 uses getTokenFileFromClassloader()
             val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
             m.isAccessible = true
-            val ctx = MockVaadin19.createVaadinContext()
+            val ctx = MockVaadinHelper.createMockVaadinContext()
             MockVaadin19.verifyHasLookup(ctx)
             val json: String = m.invoke(null, ctx) as String? ?: return null
             return Json.parse(json)

@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
-import com.github.mvysny.kaributesting.v10.mock.MockLoader
+import com.github.mvysny.kaributesting.v10.mock.MockLookup
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
@@ -82,7 +82,7 @@ public object MockVaadin {
         check(!VaadinMeta.isCompatibilityMode)
 
         val ctx = MockContext()
-        MockLoader.init(ctx)
+        MockLookup.init(ctx)
         servlet.init(MockServletConfig(ctx))
         val service: VaadinServletService = checkNotNull(servlet.service)
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {

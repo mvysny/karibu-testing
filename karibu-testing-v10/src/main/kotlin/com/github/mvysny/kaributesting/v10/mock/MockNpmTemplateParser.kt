@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser.Companion.customLoaders
 import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
+import com.vaadin.flow.server.VaadinService
 import java.io.File
 import java.lang.RuntimeException
 import java.net.URL
@@ -20,6 +21,14 @@ public class MockNpmTemplateParser : NpmTemplateParser() {
      * @param url the URL resolved according to the [com.vaadin.flow.component.dependency.JsModule] spec, for example `./view/my-view.js` or `@vaadin/vaadin-button.js`.
      */
     override fun getSourcesFromTemplate(tag: String, url: String): String? {
+        return mockGetSourcesFromTemplate(tag, url)
+    }
+
+    /**
+     * Vaadin 19 modified the getSourcesFromTemplate() function by adding the "service" parameter.
+     * So much for backwards compatibility.
+     */
+    protected open fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String? {
         return mockGetSourcesFromTemplate(tag, url)
     }
 

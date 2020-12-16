@@ -87,7 +87,8 @@ public object VaadinMeta {
             // Vaadin 19 uses getTokenFileFromClassloader()
             val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
             m.isAccessible = true
-            val ctx = MockVaadin19.createContextWithLookup()
+            val ctx = MockVaadin19.createVaadinContext()
+            MockVaadin19.verifyHasLookup(ctx)
             val json: String = m.invoke(null, ctx) as String? ?: return null
             return Json.parse(json)
         }

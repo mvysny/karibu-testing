@@ -20,15 +20,18 @@ public class MockNpmTemplateParser : NpmTemplateParser() {
      * @param tag the value of the [com.vaadin.flow.component.Tag] annotation, e.g. `my-component`
      * @param url the URL resolved according to the [com.vaadin.flow.component.dependency.JsModule] spec, for example `./view/my-view.js` or `@vaadin/vaadin-button.js`.
      */
-    override fun getSourcesFromTemplate(tag: String, url: String): String? {
+    override fun getSourcesFromTemplate(tag: String, url: String): String {
         return mockGetSourcesFromTemplate(tag, url)
     }
 
     /**
      * Vaadin 19 modified the getSourcesFromTemplate() function by adding the "service" parameter.
      * So much for backwards compatibility.
+     *
+     * Must be open in order to override the fun from Vaadin 19.
      */
-    protected open fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String? {
+    @Suppress("NON_FINAL_MEMBER_IN_FINAL_CLASS", "UNUSED_PARAMETER")
+    protected open fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String {
         return mockGetSourcesFromTemplate(tag, url)
     }
 

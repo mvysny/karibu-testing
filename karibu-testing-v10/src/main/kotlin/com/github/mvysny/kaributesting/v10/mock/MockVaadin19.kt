@@ -35,13 +35,16 @@ public object MockVaadin19 {
         )
 
         // verify that the Lookup has been set
-        val lookup: Any? = ctx.getAttribute("com.vaadin.flow.di.Lookup")
-        checkNotNull(lookup)
+        verifyHasLookup(ctx)
     }
 
-    internal fun createContextWithLookup(): VaadinContext {
-        val ctx = MockContext()
-        init(ctx)
-        return VaadinServletContext(ctx)
+    public fun verifyHasLookup(ctx: ServletContext) {
+        val lookup: Any? = ctx.getAttribute("com.vaadin.flow.di.Lookup")
+        checkNotNull(lookup) {
+            "The context doesn't contain the Vaadin 19 Lookup class. Available attributes: " + ctx.attributeNames.toList()
+        }
+    }
+    public fun verifyHasLookup(ctx: VaadinContext) {
+        verifyHasLookup((ctx as VaadinServletContext).context)
     }
 }

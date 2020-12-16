@@ -1,9 +1,10 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.router.*
-import com.vaadin.flow.server.VaadinServletContext
+import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
@@ -42,7 +43,12 @@ public data class Routes(
      * Registers all routes to Vaadin 15 registry. Automatically called from [MockVaadin.setup].
      */
     @Suppress("UNCHECKED_CAST")
-    public fun register(sc: VaadinServletContext) {
+    public fun register(sc: VaadinContext) {
+        if (VaadinMeta.version >= 19) {
+            // otherwise RouteRegistryInitializer will not perform the initialization but
+            // will defer it until the Lookup is available.
+            MockVaadin19.verifyHasLookup(sc)
+        }
         RouteRegistryInitializer().onStartup(routes.toSet(), sc.context)
         checkNotNull(sc.context.getAttribute("com.vaadin.flow.server.startup.ApplicationRouteRegistry${'$'}ApplicationRouteRegistryWrapper")) {
             "RouteRegistryInitializer did not register the ApplicationRouteRegistry!"

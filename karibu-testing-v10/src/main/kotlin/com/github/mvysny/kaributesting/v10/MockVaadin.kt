@@ -1,10 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
-import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
-import com.github.mvysny.kaributesting.v10.mock.MockedUI
+import com.github.mvysny.kaributesting.v10.mock.*
 import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
@@ -81,8 +78,7 @@ public object MockVaadin {
         }
         check(!VaadinMeta.isCompatibilityMode)
 
-        val ctx = MockContext()
-        MockVaadin19.init(ctx)
+        val ctx = MockVaadinHelper.createMockContext()
         servlet.init(MockServletConfig(ctx))
         val service: VaadinServletService = checkNotNull(servlet.service)
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {

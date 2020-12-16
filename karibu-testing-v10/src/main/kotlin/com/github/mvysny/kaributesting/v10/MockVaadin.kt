@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
+import com.github.mvysny.kaributesting.v10.mock.MockLoader
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
@@ -65,9 +66,13 @@ public object MockVaadin {
      * tests start from a pre-known state. If you're using Spring and you're getting UI
      * from the injector, you must reconfigure Spring to use prototype scope,
      * otherwise an old UI from the UI scope or Session Scope will be provided.
-     * @param uiFactory produces [UI] instances and sets them as current, by default simply instantiates [MockedUI] class.
-     * @param servlet allows you to provide your own implementation of [VaadinServlet]. You MUST override [VaadinServlet.createServletService]
-     * and construct a custom service which overrides important methods. Please consult [MockService] on what methods you must override in your custom service.
+     * @param uiFactory produces [UI] instances and sets them as current, by default
+     * simply instantiates [MockedUI] class.
+     * @param servlet allows you to provide your own implementation of [VaadinServlet].
+     * You MUST override [VaadinServlet.createServletService]
+     * and construct a custom service which overrides important methods.
+     * Please consult [com.github.mvysny.kaributesting.v10.mock.MockService]
+     * on what methods you must override in your custom service.
      */
     @JvmStatic
     public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
@@ -77,6 +82,7 @@ public object MockVaadin {
         check(!VaadinMeta.isCompatibilityMode)
 
         val ctx = MockContext()
+        MockLoader.init(ctx)
         servlet.init(MockServletConfig(ctx))
         val service: VaadinServletService = checkNotNull(servlet.service)
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {

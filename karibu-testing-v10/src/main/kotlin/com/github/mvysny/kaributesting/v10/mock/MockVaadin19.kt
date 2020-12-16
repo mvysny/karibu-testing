@@ -11,7 +11,7 @@ import javax.servlet.ServletContext
  * Makes sure to call LookupInitializer (present in Vaadin 19+).
  * @author Martin Vysny <mavi@vaadin.com>
  */
-public object MockLookup {
+public object MockVaadin19 {
 
     public fun init(ctx: ServletContext) {
         if (VaadinMeta.version < 19) {
@@ -39,7 +39,7 @@ public object MockLookup {
         checkNotNull(lookup)
     }
 
-    internal fun vaadin19CreateContextWithLookup(): VaadinContext {
+    internal fun createContextWithLookup(): VaadinContext {
         val ctx = MockContext()
         init(ctx)
         return VaadinServletContext(ctx)

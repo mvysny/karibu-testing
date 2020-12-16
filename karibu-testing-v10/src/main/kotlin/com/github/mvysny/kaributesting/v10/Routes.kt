@@ -44,6 +44,9 @@ public data class Routes(
     @Suppress("UNCHECKED_CAST")
     public fun register(sc: VaadinServletContext) {
         RouteRegistryInitializer().onStartup(routes.toSet(), sc.context)
+        checkNotNull(sc.context.getAttribute("com.vaadin.flow.server.startup.ApplicationRouteRegistry${'$'}ApplicationRouteRegistryWrapper")) {
+            "RouteRegistryInitializer did not register the ApplicationRouteRegistry!"
+        }
         val registry: ApplicationRouteRegistry = ApplicationRouteRegistry.getInstance(sc)
         registry.setErrorNavigationTargets(errorRoutes.map { it as Class<out Component> }.toSet())
         if (skipPwaInit) {

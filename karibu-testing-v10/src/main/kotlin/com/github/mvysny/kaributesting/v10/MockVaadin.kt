@@ -188,7 +188,14 @@ public object MockVaadin {
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
-        session.browser.updateRequestDetails(request)
+        if (VaadinMeta.version < 19) {
+            session.browser.updateRequestDetails(request)
+        } else {
+            val m = VaadinSession::class.java.getDeclaredMethod("setBrowser", WebBrowser::class.java)
+            val b = WebBrowser::class.java.getDeclaredConstructor(VaadinRequest::class.java).apply { isAccessible = true } .newInstance(request)
+            m.invoke(session, b)
+        }
+        checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }
 
         // init Vaadin Response
         val response = VaadinServletResponse(MockResponse(), service)

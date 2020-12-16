@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10.mock
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
+import com.vaadin.flow.i18n.I18NProvider
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.implementation.MethodCall
 import net.bytebuddy.implementation.bytecode.assign.Assigner
@@ -71,6 +72,8 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
             classMockNpmTemplateParserFactory.getConstructor().newInstance() as T
         else -> super.getOrCreate(type)
     }
+
+    override fun getI18NProvider(): I18NProvider? = delegate.i18NProvider
 
     private companion object {
         /**

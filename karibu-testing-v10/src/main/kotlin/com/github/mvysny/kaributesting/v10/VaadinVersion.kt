@@ -2,6 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.server.DeploymentConfigurationFactory
+import com.vaadin.flow.server.VaadinContext
+import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.Version
 import com.vaadin.shrinkwrap.VaadinCoreShrinkWrap
 import elemental.json.Json
@@ -81,6 +83,14 @@ public object VaadinMeta {
     public val flowBuildInfo: JsonObject? get() {
         // Use DeploymentConfigurationFactory.getResourceFromClassloader() to make sure to read
         // the same flow-build-info.json that Vaadin reads.
+        if (version >= 19) {
+            // Vaadin 19 uses getTokenFileFromClassloader()
+            val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
+            m.isAccessible = true
+            val json: String = m.invoke(null, VaadinService.getCurrent().context) as String? ?: return null
+            return Json.parse(json)
+        }
+
         val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getResourceFromClassloader")
         m.isAccessible = true
         val json: String = m.invoke(null) as String? ?: return null

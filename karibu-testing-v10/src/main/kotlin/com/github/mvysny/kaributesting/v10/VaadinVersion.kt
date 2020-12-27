@@ -41,7 +41,7 @@ public data class SemanticVersion(
     override fun toString(): String = "$major.$minor.$bugfix${if (prerelease != null) "-$prerelease" else ""}"
 
     public companion object {
-        private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?")
+        private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)([-.](.*))?")
 
         public fun fromString(version: String): SemanticVersion {
             val match: MatchResult = requireNotNull(VERSION_REGEX.matchEntire(version),

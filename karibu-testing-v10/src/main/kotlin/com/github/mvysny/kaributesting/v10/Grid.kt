@@ -469,6 +469,7 @@ public val FooterRow.FooterCell.renderer: Renderer<*>?
 public var FooterRow.FooterCell.component: Component?
     get() {
         val cr: ComponentRenderer<*, *> = (renderer as? ComponentRenderer<*, *>) ?: return null
+        // this is fine - the ComponentRenderer set via `setComponent()` always returns the same component.
         return cr.createComponent(null)
     }
     set(value) {
@@ -494,6 +495,8 @@ public var HeaderRow.HeaderCell.component: Component?
             return componentField.get(r) as Component?
         }
         if (r is ComponentRenderer<*, *>) {
+            // this is fine - the ComponentRenderer set via `setComponent()` always returns the same component.
+            @Suppress("UNCHECKED_CAST")
             return (r as ComponentRenderer<*, Any?>).createComponent(null)
         }
         return null

@@ -1,15 +1,10 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.dependency.NpmPackage
-import com.vaadin.flow.server.DeploymentConfigurationFactory
-import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.Version
 import com.vaadin.shrinkwrap.VaadinCoreShrinkWrap
-import elemental.json.Json
 import elemental.json.JsonObject
-import java.lang.reflect.Method
 import java.net.URL
 
 /**
@@ -81,24 +76,8 @@ public object VaadinMeta {
         return SemanticVersion.fromString(version)
     }
 
-    public val flowBuildInfo: JsonObject? get() {
-        // Use DeploymentConfigurationFactory.getResourceFromClassloader() to make sure to read
-        // the same flow-build-info.json that Vaadin reads.
-        if (version >= 19) {
-            // Vaadin 19 uses getTokenFileFromClassloader()
-            val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
-            m.isAccessible = true
-            val ctx = MockVaadinHelper.createMockVaadinContext()
-            MockVaadin19.verifyHasLookup(ctx)
-            val json: String = m.invoke(null, ctx) as String? ?: return null
-            return Json.parse(json)
-        }
-
-        val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getResourceFromClassloader")
-        m.isAccessible = true
-        val json: String = m.invoke(null) as String? ?: return null
-        return Json.parse(json)
-    }
+    public val flowBuildInfo: JsonObject?
+        get() = MockVaadinHelper.getTokenFileFromClassloader()
 
     /**
      * Always false.
@@ -114,7 +93,7 @@ public object VaadinMeta {
     }
 
     private fun checkNotVaadin14CompatMode() {
-        val error = "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead"
+        val error = "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead. Alternatively, if you're not using compatibility mode, please exclude all webjars from your vaadin/vaadin-core dependency; please see the Skeleton Starter or Karibu10-helloworld-app on how to do that."
 
         // The WAR project should package the flow-build-info.json config file which
         // clearly states the Vaadin configuration including the compatibility mode setting

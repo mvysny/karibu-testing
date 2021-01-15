@@ -465,7 +465,7 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
 
 Testing PolymerTemplates with Karibu is a bit tricky.
 The purpose of PolymerTemplates is to move as much code as possible to the
-client-side, while Karibu is designed to test server-side code. The child components are either
+client-side, while Karibu is designed to test server-side code only. The child components are either
 not accessible from the server-side altogether, or they are only
 "shallow shells" of components constructed server-side - almost none of their properties
 are transferred to the server-side.

@@ -5,8 +5,18 @@
 
 # Karibu-Testing: The Vaadin Unit Testing
 
-The Unit Testing library for [Vaadin](https://vaadin.com/). Karibu-Testing removes the necessity to run
-both the browser and the servlet container in order to test your Vaadin-based apps.
+The Unit Testing library for [Vaadin](https://vaadin.com/).
+
+Karibu-Testing gives you the ability to call `UI.getCurrent()` straight from your JUnit
+test methods, and receive a
+meaningful result in the process. You can call `UI.navigate()` to navigate around in your app;
+you can instantiate your components and views directly from your JUnit test methods.
+In order to do so, Karibu-Testing mocks `CurrentRequest`, `VaadinSession` and others in your
+currently running JVM (in which your JUnit tests run).
+
+Karibu-Testing removes the necessity to run
+both the browser and the servlet container, in order to test your Vaadin-based apps
+insanely fast.
 
 1. *containerless testing*: You don't need to launch the servlet container.
 Karibu-Testing creates Vaadin Session, the UI and other necessary Vaadin classes
@@ -64,13 +74,16 @@ you can just add the server jars onto testing classpath and call Vaadin server A
 
 A 15-minute [video](https://www.youtube.com/watch?v=XOhv3y2GXIE) explains everything behind the browserless testing technique.
 
-## The Karibu-Testing library is Standalone and Fully Supports Java and Groovy
+## Kotlin, Java and Groovy support
+
+The Karibu-Testing library is Standalone and Fully Supports Java and Groovy.
 
 Even though the Karibu-Testing is endorsed by [Vaadin-on-Kotlin](http://vaadinonkotlin.eu), the Karibu-Testing
 does not really depend on any other technology than Vaadin. You don't have to use Vaadin-on-Kotlin nor Karibu-DSL to use Karibu-Testing.
 You don't even need to write your app nor your tests in Kotlin, since the library provides native API
 for Kotlin, Java and Groovy.
-You can thus plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
+
+You can therefore plug this library in into your Java+Vaadin-based project as a test dependency, and write the test code
 in Java, Kotlin or Groovy, whichever suits you more.
 
 Karibu-Testing is published on Maven Central, so it's very easy to add as a Maven dependency.
@@ -89,16 +102,19 @@ A list of a very simple example projects that employ Karibu Testing:
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
 
-## Integrating Karibu-Testing With Your App
+## Limitations
 
-Absolute requirement in order for the Karibu-Testing library to work with your app is:
+Karibu-Testing is designed to bypass browser and the servlet container. It's a double-edged
+sword: while this provides insane speed, it also sets limits what you can do with Karibu-Testing:
 
-**You must be able to "start" your app in the same JVM which runs the tests.**
+* There is no browser: **It's not possible to test nor call JavaScript code**. That also limits
+  testability of your Polymer Templates; see [Testing with Vaadin](karibu-testing-v10) for more details.
+  If you need to test JavaScript code, you need to use Selenium or [TestBench](https://vaadin.com/testbench) in
+  addition to Karibu-Testing.
+* Since your JUnit methods access views which in turn access your business logic beans
+  and your database directly, **You must be able to "start" your app in the same JVM which runs the tests.**.
 
-This is because Karibu-Testing uses Vaadin server-side API directly to assert the application state; it uses `UI.getCurrent()` to locate
-any components you test on. Your tests therefore need to have access to `UI.getCurrent()` populated by your app.
-
-Here are a few tips for typical apps on how to achieve that:
+Here are a few tips on how to "start" your app in the JUnit JVM:
 
 * For simple apps with just the UI and no database that's very easy: simply call `MockVaadin.setup { MyUI() }` before every test, and `MockVaadin.tearDown()` after every test. That will
 instantiate your UI along with all necessary Vaadin environment.

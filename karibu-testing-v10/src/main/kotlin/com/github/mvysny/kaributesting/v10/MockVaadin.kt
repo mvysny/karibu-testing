@@ -14,6 +14,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.ServletContext
 import kotlin.test.expect
 
@@ -176,12 +177,12 @@ public object MockVaadin {
         val mcreateVaadinSession: Method = VaadinService::class.java.getDeclaredMethod("createVaadinSession", VaadinRequest::class.java)
         mcreateVaadinSession.isAccessible = true
         val session: VaadinSession = mcreateVaadinSession.invoke(service, checkNotNull(VaadinRequest.getCurrent())) as VaadinSession
+        httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
+        session.refreshTransients(WrappedHttpSession(httpSession), service)
         expect(true, "$session created from $service has null lock. See the MockSession class on how to mock locks properly") { session.lockInstance != null }
         expect(true, "$session created from $service: lock must be locked!") { (session.lockInstance as ReentrantLock).isLocked }
-
-        httpSession.setAttribute(service.serviceName + ".lock", session.lockInstance)
         session.configuration = service.deploymentConfiguration
-        session.refreshTransients(WrappedHttpSession(httpSession), service)
+
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
         if (VaadinMeta.version < 19) {

@@ -148,7 +148,7 @@ A: Alternatively it could be that Spring is instantiating Vaadin component eager
    when the ApplicationContext is constructed. One workaround is to mark
    Vaadin components with `@Lazy` so that they are instantiated lazily.
 
-Q: I'm getting `RouteNotFoundError` instead of my views (Vaadin 14+)
+Q: I'm getting `RouteNotFoundError`/`NotFoundException` instead of my views (Vaadin 14+)
 
 A: The `@Route`-annotated view classes have not been discovered and registered.
    Please discover the routes via `new Routes().autoDiscoverViews("com.example.yourpackage")`

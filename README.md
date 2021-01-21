@@ -144,7 +144,7 @@ Q: I'm getting `java.lang.IllegalStateException: UI.getCurrent() must not be nul
 A: You probably forgot to call `MockVaadin.setup()` before the test. Just call `MockVaadin.setup()`
    e.g. from your `@Before`-annotated method if you're using JUnit.
    
-Alternatively it could be that Spring is instantiating Vaadin component eagerly
+A: Alternatively it could be that Spring is instantiating Vaadin component eagerly
    when the ApplicationContext is constructed. One workaround is to mark
    Vaadin components with `@Lazy` so that they are instantiated lazily.
 
@@ -154,10 +154,7 @@ A: The `@Route`-annotated view classes have not been discovered and registered.
    Please discover the routes via `new Routes().autoDiscoverViews("com.example.yourpackage")`
    (make sure to use the correct Java package where all of your views are placed)
    then call `MockVaadin.setup(routes)`.
-
-Also when migrating from Karibu-Testing 1.1 to 1.2.x and you're using a custom `VaadinServlet`,
-please make sure to call `routes.register(service.context as VaadinServletContext)` from the
-`createServletService()` method, as shown in [Issue #60](https://github.com/mvysny/karibu-testing/issues/60).
+   If you recently migrated to 1.2, check [this](https://github.com/mvysny/karibu-testing/issues/60).
    
 Q: Performance speed-up tips?
 
@@ -174,6 +171,10 @@ Q: Performance speed-up tips?
 5. The first test is usually slower since all Vaadin-related classes need to be loaded
    (could take 1-2 seconds to run); however any subsequent tests should be much faster
    (~5-60 milliseconds).
+   
+Q: Can I integrate CDI (e.g. weld?)
+
+A: You can get inspiration [here](https://github.com/mvysny/karibu-testing/issues/60).
 
 # License
 

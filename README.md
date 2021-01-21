@@ -154,6 +154,10 @@ A: The `@Route`-annotated view classes have not been discovered and registered.
    Please discover the routes via `new Routes().autoDiscoverViews("com.example.yourpackage")`
    (make sure to use the correct Java package where all of your views are placed)
    then call `MockVaadin.setup(routes)`.
+
+Also when migrating from Karibu-Testing 1.1 to 1.2.x and you're using a custom `VaadinServlet`,
+please make sure to call `routes.register(service.context as VaadinServletContext)` from the
+`createServletService()` method, as shown in [Issue #60](https://github.com/mvysny/karibu-testing/issues/60).
    
 Q: Performance speed-up tips?
 

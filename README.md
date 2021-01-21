@@ -158,7 +158,11 @@ A: The `@Route`-annotated view classes have not been discovered and registered.
 Also when migrating from Karibu-Testing 1.1 to 1.2.x and you're using a custom `VaadinServlet`,
 please make sure to call `routes.register(service.context as VaadinServletContext)` from the
 `createServletService()` method, as shown in [Issue #60](https://github.com/mvysny/karibu-testing/issues/60).
-   
+
+Q: Can I integrate CDI (e.g. weld?)
+
+A: You can get inspiration [here](https://github.com/mvysny/karibu-testing/issues/60).
+
 Q: Performance speed-up tips?
 
 1. (Vaadin 14+): the view auto-discovery is rather slow: you can discover the routes

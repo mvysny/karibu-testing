@@ -13,6 +13,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
 import javax.servlet.descriptor.JspConfigDescriptor
+import kotlin.collections.HashMap
 
 public open class MockContext : ServletContext, Serializable {
     override fun getServlet(name: String?): Servlet? = null
@@ -202,9 +203,7 @@ public open class MockContext : ServletContext, Serializable {
         attributes.putOrRemove(name, value)
     }
 
-    override fun getServletRegistration(servletName: String?): ServletRegistration {
-        throw UnsupportedOperationException("not implemented")
-    }
+    override fun getServletRegistration(servletName: String): ServletRegistration? = null
 
     override fun <T : EventListener?> createListener(clazz: Class<T>?): T {
         throw UnsupportedOperationException("not implemented")
@@ -226,9 +225,7 @@ public open class MockContext : ServletContext, Serializable {
 
     override fun getEffectiveMinorVersion(): Int = 0
 
-    override fun getServletRegistrations(): MutableMap<String, out ServletRegistration> {
-        throw UnsupportedOperationException("not implemented")
-    }
+    override fun getServletRegistrations(): MutableMap<String, out ServletRegistration> = HashMap()
 
     override fun getResourcePaths(path: String?): MutableSet<String> = mutableSetOf()
 
@@ -236,7 +233,8 @@ public open class MockContext : ServletContext, Serializable {
 
     override fun getServerInfo(): String = "Mock"
 
-    override fun getEffectiveSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
+    override fun getEffectiveSessionTrackingModes(): Set<SessionTrackingMode> =
+        setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
 
     public companion object {
         @JvmStatic

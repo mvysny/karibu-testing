@@ -49,7 +49,7 @@ public data class SemanticVersion(
             )
         }
 
-        public val VAADIN_14_3: SemanticVersion = SemanticVersion(14, 3, 0)
+        public val VAADIN_14_3_0: SemanticVersion = SemanticVersion(14, 3, 0)
     }
 }
 
@@ -83,8 +83,8 @@ public object VaadinMeta {
      * Always false.
      */
     public val isCompatibilityMode: Boolean get() {
-        check(fullVersion >= SemanticVersion.VAADIN_14_3) {
-            "Karibu-Testing 1.2.x is only compatible with Vaadin ${SemanticVersion.VAADIN_14_3} and above, but got $version"
+        check(fullVersion >= SemanticVersion.VAADIN_14_3_0) {
+            "Karibu-Testing 1.2.x is only compatible with Vaadin ${SemanticVersion.VAADIN_14_3_0} and above, but got $version"
         }
         if (version == 14) {
             checkNotVaadin14CompatMode()

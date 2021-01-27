@@ -17,6 +17,7 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.URL
+import javax.servlet.Servlet
 import javax.servlet.ServletContext
 import kotlin.test.expect
 
@@ -115,3 +116,5 @@ public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletRespo
 public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
 
 public val VaadinContext.context: ServletContext get() = (this as VaadinServletContext).context
+
+public val Servlet.isInitialized: Boolean get() = servletConfig != null

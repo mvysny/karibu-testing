@@ -14,7 +14,6 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.ServletContext
 import kotlin.test.expect
 
@@ -79,20 +78,24 @@ public object MockVaadin {
         }
         check(!VaadinMeta.isCompatibilityMode)
 
-        val ctx = MockVaadinHelper.createMockContext()
-        servlet.init(MockServletConfig(ctx))
+        if (!servlet.isInitialized) {
+            val ctx: ServletContext = MockVaadinHelper.createMockContext()
+            servlet.init(MockServletConfig(ctx))
+        }
         val service: VaadinServletService = checkNotNull(servlet.service)
+        service.setAtmosphereAvailable(false) // Atmosphere is not used since there's no connection to the browser
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {
             service.router != null
         }
         VaadinService.setCurrent(service)
 
         // init Vaadin Session
-        createSession(ctx, uiFactory)
+        createSession(servlet.servletContext, uiFactory)
     }
 
     /**
-     * Properly closes the current UI and
+     * Properly closes the current UI and fire the detach event on it.
+     * Does nothing if there is no current UI.
      */
     public fun closeCurrentUI() {
         val ui: UI = UI.getCurrent() ?: return

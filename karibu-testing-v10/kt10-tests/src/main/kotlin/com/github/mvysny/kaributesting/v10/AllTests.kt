@@ -92,4 +92,7 @@ fun DynaNodeGroup.allTests() {
     group("menu bar") {
         menuBarTestbatch()
     }
+    group("shortcuts") {
+        shortcutsTestBatch()
+    }
 }

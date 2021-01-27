@@ -1317,6 +1317,20 @@ Karibu-Testing supports both modes.
 
 The `VaadinMeta.version: Int` provides the current Vaadin version, e.g. `13` for Vaadin 13, `14` for Vaadin 14 or later.
 
+## Firing Keyboard Shortcuts
+
+(since Karibu-Testing 1.2.9): You can call
+
+```kotlin
+fireShortcut(Key.SPACE, KeyModifier.CONTROL, KeyModifier.ALT)
+```
+
+to fire a shortcut action registered under the key modifier of "Ctrl+Alt+Space".
+
+Usually the app will use the shortcut to perform a click or focus, but you can also use `Shortcuts.addShortcutListener()`
+or Karibu-DSL's `currentUI.addShortcut(Ctrl + Alt + SPACE) {}` to run an arbitrary
+block of code.
+
 # Support for Vaadin Pro Components
 
 ## Grid Pro

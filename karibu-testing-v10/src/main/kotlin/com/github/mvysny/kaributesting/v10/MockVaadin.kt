@@ -83,7 +83,6 @@ public object MockVaadin {
             servlet.init(MockServletConfig(ctx))
         }
         val service: VaadinServletService = checkNotNull(servlet.service)
-        service.setAtmosphereAvailable(false) // Atmosphere is not used since there's no connection to the browser
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {
             service.router != null
         }

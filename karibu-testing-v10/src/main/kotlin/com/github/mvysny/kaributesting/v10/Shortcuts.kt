@@ -29,7 +29,8 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
             return super.getBoolean(key)
         }
         val probeFilter = key.removeSuffix(" && (event.stopPropagation() || true)")
-        return filter == probeFilter
+            .removeSuffix(" && (event.preventDefault() || true)")
+        return probeFilter.startsWith(filter)
     }
 }
 

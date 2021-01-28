@@ -1326,6 +1326,7 @@ fireShortcut(Key.SPACE, KeyModifier.CONTROL, KeyModifier.ALT)
 ```
 
 to fire a shortcut action registered under the key modifier of "Ctrl+Alt+Space".
+For Java/Groovy it's `ShortcutsKt.fireShortcut(Key.SPACE, KeyModifier.CONTROL, KeyModifier.ALT)`.
 
 Usually the app will use the shortcut to perform a click or focus, but you can also use `Shortcuts.addShortcutListener()`
 or Karibu-DSL's `currentUI.addShortcut(Ctrl + Alt + SPACE) {}` to run an arbitrary

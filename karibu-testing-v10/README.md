@@ -1336,7 +1336,7 @@ block of code.
 
 Karibu-Testing has been designed to fail fast and pass the exception thrown by event handlers
 directly to JUnit. This is the easiest way you can learn about errors in your code.
-This also makes testing of the ErrorHandler harder. However, there is a way.
+Unfortunately this also makes testing of the ErrorHandler harder. However, there is a way.
 
 In order to test your custom ErrorHandler, you can simply throw an exception in `UI.access()`,
 then call `MockVaadin.runUIQueue(true)`. The `runUIQueue()` method runs all outstanding

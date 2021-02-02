@@ -1342,7 +1342,15 @@ In order to test your custom ErrorHandler, you can simply throw an exception in 
 then call `MockVaadin.runUIQueue(true)`. The `runUIQueue()` method runs all outstanding
 blocks scheduled via `UI.access()`; setting the `propagateExceptionToHandler` parameter to true
 causes the `runUIQueue()` method to pass all exceptions to the current ErrorHandler
-(set to current VaadinSession).
+(set to current VaadinSession):
+
+```kotlin
+UI.getCurrent().access { throw RuntimeException("Simulated") }
+MockVaadin.runUIQueue(true)
+// say that your custom ErrorHandler shows a notification in case of exception...
+// test that.
+expectNotifications("An application error #6 occurred, please see application logs for details")
+```
 
 # Support for Vaadin Pro Components
 

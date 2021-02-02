@@ -284,6 +284,7 @@ public object MockVaadin {
      * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
+    @JvmOverloads
     public fun runUIQueue(propagateExceptionToHandler: Boolean = false, session: VaadinSession = VaadinSession.getCurrent()) {
         // we need to set up UI error handler which will be notified for every exception thrown out of the acccess{} block
         // otherwise the exceptions would simply be logged but unlock() wouldn't fail.

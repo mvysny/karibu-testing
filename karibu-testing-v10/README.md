@@ -1332,6 +1332,18 @@ Usually the app will use the shortcut to perform a click or focus, but you can a
 or Karibu-DSL's `currentUI.addShortcut(Ctrl + Alt + SPACE) {}` to run an arbitrary
 block of code.
 
+## Using custom ErrorHandler
+
+Karibu-Testing has been designed to fail fast and pass the exception thrown by event handlers
+directly to JUnit. This is the easiest way you can learn about errors in your code.
+This also makes testing of the ErrorHandler harder. However, there is a way.
+
+In order to test your custom ErrorHandler, you can simply throw an exception in `UI.access()`,
+then call `MockVaadin.runUIQueue(true)`. The `runUIQueue()` method runs all outstanding
+blocks scheduled via `UI.access()`; setting the `propagateExceptionToHandler` parameter to true
+causes the `runUIQueue()` method to pass all exceptions to the current ErrorHandler
+(set to current VaadinSession).
+
 # Support for Vaadin Pro Components
 
 ## Grid Pro

@@ -101,6 +101,7 @@ A list of a very simple example projects that employ Karibu Testing:
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
+* Vaadin 14 + Java + Quarkus + Maven: [vaadin-quarkus](https://github.com/mvysny/vaadin-quarkus) (also check the `v19` branch for Vaadin 19).
 
 ## Limitations
 

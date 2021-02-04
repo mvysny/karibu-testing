@@ -8,7 +8,6 @@ To start, just add the following lines into your Gradle `build.gradle` file:
 ```groovy
 repositories {
     mavenCentral()
-    // jcenter()   // Karibu-Testing is published both on Maven Central and on JCenter
 }
 dependencies {
     testCompile "com.github.mvysny.kaributesting:karibu-testing-v8:x.y.z"

@@ -26,7 +26,7 @@ subprojects {
         plugin("org.gradle.signing")
     }
 
-    // creates a reusable function which configures proper deployment to Bintray
+    // creates a reusable function which configures proper deployment to Maven Central
     ext["configureBintray"] = { artifactId: String ->
 
         java {
@@ -93,7 +93,7 @@ subprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
         testLogging {
-            // to see the exceptions of failed tests in Travis-CI console.
+            // to see the exceptions of failed tests in CI console.
             exceptionFormat = TestExceptionFormat.FULL
         }
     }

@@ -129,7 +129,7 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
     }
 
     private fun RouteData.toPrettyString(): String {
-        val path: String = if (url.isNullOrBlank()) "<root>" else "/$url"
+        val path: String = if (template.isNullOrBlank()) "<root>" else "/$template"
         return "${navigationTarget.simpleName} at '$path'"
     }
 }

@@ -19,7 +19,7 @@ public val currentPath: String? get() {
  */
 public val currentView: Class<out Component>? get() {
     val path: String = (currentPath ?: return null).trim('/')
-    val registry: RouteRegistry = UI.getCurrent().router.registry
+    val registry: RouteRegistry = UI.getCurrent().internals.router.registry
     val segments: List<String> = path.split('/')
     for (prefix: Int in segments.size downTo 1) {
         val p: String = segments.subList(0, prefix).joinToString("/")

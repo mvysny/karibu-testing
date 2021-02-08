@@ -233,10 +233,10 @@ public object MockVaadin {
 
         // navigate to the initial page
         if (lastNavigation.get() != null) {
-            UI.getCurrent().router.navigate(UI.getCurrent(), lastNavigation.get()!!, NavigationTrigger.PROGRAMMATIC)
+            UI.getCurrent().internals.router.navigate(UI.getCurrent(), lastNavigation.get()!!, NavigationTrigger.PROGRAMMATIC)
             lastNavigation.remove()
         } else {
-            if (UI.getCurrent().router.registry.getNavigationTarget("").isPresent) {
+            if (UI.getCurrent().internals.router.registry.getNavigationTarget("").isPresent) {
                 UI.getCurrent().navigate("")
             }
         }

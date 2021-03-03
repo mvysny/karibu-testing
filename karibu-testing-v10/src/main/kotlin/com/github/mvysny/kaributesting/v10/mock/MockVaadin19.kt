@@ -28,6 +28,7 @@ public object MockVaadin19 {
 
         loaderInitializer.onStartup(
             setOf(
+                Class.forName("com.vaadin.flow.di.LookupInitializer"),
                 Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"),
                 Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl"),
                 Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")

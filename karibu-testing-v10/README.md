@@ -794,6 +794,18 @@ Java:
 BasicUtilsKt._fireDomEvent(new Div(), "click");
 ```
 
+#### Notifying `@DomEvent` listeners
+
+Using the above technique it's possible to also fire higher-level events annotated
+with `@DomEvent`. For example, we will fire the `ClickEvent` which is annotated with `@DomEvent("click")`
+and receives `screenX` as `@EventData("event.screenX")`:
+
+```kotlin
+val div = Div()
+div._fireDomEvent("click", Json.createObject().apply { put("event.screenX", 20.0) })
+div.addClickListener { e -> print(e.screenX) }
+```
+
 ### Focus/Blur
 
 Server-side can only track focus by listening on `FocusEvent` and `BlurEvent`. To simulate focus:

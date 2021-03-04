@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.textField
+import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -12,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.router.ErrorParameter
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
+import elemental.json.Json
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
@@ -70,6 +72,13 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             div.element.addEventListener("click") { e -> event = e }
             div._fireDomEvent("click")
             expect("click") { event.type }
+        }
+        test("higher-level listeners are called") {
+            val div = Div()
+            lateinit var event: ClickEvent<Div>
+            div.addClickListener { e -> event = e }
+            div._fireDomEvent("click", Json.createObject().apply { put("event.screenX", 20.0) })
+            expect(20) { event.screenX }
         }
     }
 

@@ -10,6 +10,8 @@ include("karibu-testing-v8",
         "karibu-testing-v10:kt10-testrun-vaadin18",
         "karibu-testing-v10:kt10-testrun-vaadin18-module",
         "karibu-testing-v10:kt10-testrun-vaadin19",
-        "karibu-testing-v10:kt10-testrun-vaadin19-module"
+        "karibu-testing-v10:kt10-testrun-vaadin19-module",
+        "karibu-testing-v10:kt10-testrun-vaadin20",
+        "karibu-testing-v10:kt10-testrun-vaadin20-module"
 )
 

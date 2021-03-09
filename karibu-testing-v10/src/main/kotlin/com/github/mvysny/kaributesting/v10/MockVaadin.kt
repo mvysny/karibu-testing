@@ -82,7 +82,7 @@ public object MockVaadin {
             val ctx: ServletContext = MockVaadinHelper.createMockContext()
             servlet.init(MockServletConfig(ctx))
         }
-        val service: VaadinServletService = checkNotNull(servlet.service)
+        val service: VaadinServletService = checkNotNull(servlet.serviceSafe)
         expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {
             service.router != null
         }
@@ -167,7 +167,7 @@ public object MockVaadin {
         val mockRequest = MockRequest(httpSession)
         // so that session.browser.updateRequestDetails() also creates browserDetails
         mockRequest.headers["User-Agent"] = listOf(userAgent)
-        val request = VaadinServletRequest(mockRequest, service)
+        val request = createVaadinServletRequest(mockRequest, service)
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 
@@ -197,7 +197,7 @@ public object MockVaadin {
         checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }
 
         // init Vaadin Response
-        val response = VaadinServletResponse(MockResponse(), service)
+        val response = createVaadinServletResponse(MockResponse(), service)
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 

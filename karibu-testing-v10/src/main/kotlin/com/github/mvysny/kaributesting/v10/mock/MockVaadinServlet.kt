@@ -3,11 +3,11 @@ package com.github.mvysny.kaributesting.v10.mock
 import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
-import com.vaadin.flow.server.DeploymentConfigurationFactory
-import com.vaadin.flow.server.VaadinServlet
-import com.vaadin.flow.server.VaadinServletContext
-import com.vaadin.flow.server.VaadinServletService
+import com.vaadin.flow.server.*
+import java.lang.reflect.Constructor
 import java.util.*
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 /**
  * Makes sure that [routes] are properly registered, and that [MockService]
@@ -40,4 +40,30 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         routes.register(service.context as VaadinServletContext)
         return service
     }
+}
+
+/**
+ * Workaround for https://github.com/mvysny/karibu-testing/issues/66
+ */
+internal val VaadinServlet.serviceSafe: VaadinServletService? get() {
+    val m = VaadinServlet::class.java.getDeclaredMethod("getService")
+    return m.invoke(this) as VaadinServletService?
+}
+
+/**
+ * Workaround for https://github.com/mvysny/karibu-testing/issues/66
+ */
+internal fun createVaadinServletRequest(request: HttpServletRequest, service: VaadinService): VaadinServletRequest {
+    val constructor: Constructor<*> =
+        VaadinServletRequest::class.java.declaredConstructors.first { it.parameterCount == 2 }
+    return constructor.newInstance(request, service) as VaadinServletRequest
+}
+
+/**
+ * Workaround for https://github.com/mvysny/karibu-testing/issues/66
+ */
+internal fun createVaadinServletResponse(response: HttpServletResponse, service: VaadinService): VaadinServletResponse {
+    val constructor: Constructor<*> =
+        VaadinServletResponse::class.java.declaredConstructors.first { it.parameterCount == 2 }
+    return constructor.newInstance(response, service) as VaadinServletResponse
 }

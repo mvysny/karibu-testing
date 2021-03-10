@@ -18,6 +18,7 @@ public open class MockInstantiator(public val delegate: Instantiator) : Instanti
     override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
 
     public companion object {
+        @JvmStatic
         public fun create(delegate: Instantiator): Instantiator {
             // starting from 14.5.0.alpha2 the LitTemplateParser machinery is supported
             if (VaadinMeta.fullVersion >= SemanticVersion(14, 5, 0, "a")

@@ -837,7 +837,7 @@ You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
 or a `Button`/`ClickNotifier` component produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
 If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`,
-please use the `grid._getCellComponent()` function instead:
+please use the `grid._getCellComponent()` function instead (since Karibu-Testing 1.2.12):
 
 Java:
 ```java

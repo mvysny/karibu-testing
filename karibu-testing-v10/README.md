@@ -834,22 +834,19 @@ contents of the Grid.
 #### Clicking Renderers
 
 You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
-or a `Button`/`ClickNotifier` produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
+or a `Button`/`ClickNotifier` component produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
-If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`, you will need to
-tell Karibu-Testing how to click on such a component:
+If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`,
+please use the `grid._getCellComponent()` function instead:
 
 Java:
 ```java
-GridKt._clickRenderer(grid, 0, "foo", component -> {
-    ((Checkbox) component).setValue(true);
-    return null;
-});
+((Checkbox) GridKt._getCellComponent(grid, 0, "foo")).setValue(true);
 ```
 
 Kotlin:
 ```kotlin
-grid._clickRenderer(0, "foo", { (it as Checkbox).value = true })
+(grid._getCellComponent(0, "foo") as Checkbox)._value = true
 ```
 
 Please see the `GridKt` class for more details.

@@ -189,18 +189,14 @@ public fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getC
 /**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
  * * [ClickableRenderer]
- * * [ComponentRenderer] which renders a [Button]
- * * [ComponentRenderer] which renders something else than a [Button]; then you need to provide the [click] closure which can click on such a component.
+ * * [ComponentRenderer] which renders a [Button] or a [ClickNotifier].
+ *
+ * The `click` closure is no longer supported - please see https://github.com/mvysny/karibu-testing/issues/67 for more details.
  * @param rowIndex the row index, 0 or higher.
  * @param columnKey the column key [Grid.Column.getKey]
- * @param click if [ComponentRenderer] doesn't produce a button, this is called, to click the component returned by the [ComponentRenderer]
- * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
+ * @throws AssertionError if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
-@JvmOverloads
-public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
-                                     click: (Component) -> Unit = { component: Component ->
-                                         fail("${this.toPrettyString()} column $columnKey: ClickableRenderer produced ${component.toPrettyString()} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
-                                     }) {
+public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String) {
     checkEditableByUser()
     val column: Grid.Column<T> = _getColumnByKey(columnKey)
     val renderer: Renderer<T>? = column.renderer
@@ -215,11 +211,37 @@ public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String,
         } else if (component is ClickNotifier<*>) {
             component._click()
         } else {
-            click(component)
+            // don't try to do anything smart here since things will break silently for the customer as they upgrade Vaadin version
+            // https://github.com/mvysny/karibu-testing/issues/67
+            fail("${this.toPrettyString()} column $columnKey: ComponentRenderer produced ${component.toPrettyString()} which is not a button nor a ClickNotifier - please use _getCellComponent() instead")
         }
     } else {
         fail("${this.toPrettyString()} column $columnKey has renderer $renderer which is not supported by this method")
     }
+}
+
+/**
+ * Retrieves a component produced by [ComponentRenderer] in given [Grid] cell. Fails if the
+ * renderer is not a [ComponentRenderer].
+ * @param rowIndex the row index, 0 or higher.
+ * @param columnKey the column key [Grid.Column.getKey]
+ * @throws IllegalStateException if the renderer is not [ComponentRenderer].
+ */
+public fun <T : Any> Grid<T>._getCellComponent(
+    rowIndex: Int,
+    columnKey: String
+): Component {
+    val column: Grid.Column<T> = _getColumnByKey(columnKey)
+    val renderer: Renderer<T>? = column.renderer
+    if (renderer !is ComponentRenderer<*, *>) {
+        fail("${this.toPrettyString()} column $columnKey uses renderer $renderer but we expect a ComponentRenderer here")
+    }
+    if (renderer is NativeButtonRenderer<*>) {
+        fail("${this.toPrettyString()} column $columnKey uses NativeButtonRenderer which is not supported by this function")
+    }
+    val item: T = _get(rowIndex)
+    val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+    return component
 }
 
 /**

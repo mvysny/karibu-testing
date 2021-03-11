@@ -156,29 +156,32 @@ class GridExtensionMethods {
     }
 
     /**
-     * Performs a click on a {@link com.vaadin.flow.data.renderer.ClickableRenderer} in given {@link Grid} cell. Only supports the following scenarios:
-     * * {@link com.vaadin.flow.data.renderer.ClickableRenderer}
-     * * {@link com.vaadin.flow.data.renderer.ComponentRenderer} which renders a {@link com.vaadin.flow.component.button.Button}
-     * * {@link com.vaadin.flow.data.renderer.ComponentRenderer} which renders
-     *   something else than a {@link com.vaadin.flow.component.button.Button}; then you need to provide the <code>click</code> closure which can click on such a component.
+     * Performs a click on a {@link com.vaadin.flow.data.renderer.ClickableRenderer} in given {@link Grid} cell.
+     * Only supports the following scenarios:
+     * <ul>
+     *     <li>{@link com.vaadin.flow.data.renderer.ClickableRenderer}</li>
+     *     <li>{@link com.vaadin.flow.data.renderer.ComponentRenderer} which renders a {@link com.vaadin.flow.component.button.Button}
+     *    or a {@link com.vaadin.flow.component.ClickNotifier}</li>
+     * </ul>
+     * The <code>click</code> closure is no longer supported - please see https://github.com/mvysny/karibu-testing/issues/67 for more details.
      * @param rowIndex the row index, 0 or higher.
      * @param columnKey the column key [Grid.Column.getKey]
-     * @param click if [ComponentRenderer] doesn't produce a button, this is called, to click the component returned by the [ComponentRenderer]
-     * @throws IllegalStateException if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
+     * @throws AssertionError if the renderer is not {@link com.vaadin.flow.data.renderer.ClickableRenderer} nor {@link com.vaadin.flow.data.renderer.ComponentRenderer}
      */
-    static <T> void _clickRenderer(
-            @NotNull Grid<T> self, int rowIndex, @NotNull String columnKey,
-            @NotNull @ClosureParams(value = SimpleType, options = "com.vaadin.flow.component.Component") Closure click = { Component component ->
-                fail("${PrettyPrintTreeUtils.toPrettyString(self)} column $columnKey: ClickableRenderer produced ${PrettyPrintTreeUtils.toPrettyString(component)} which is not a button - you need to provide your own custom 'click' closure which knows how to click this component")
-            }
-    ) {
-        GridKt._clickRenderer(self, rowIndex, columnKey, new Function1<Component, Unit>() {
-            @Override
-            Unit invoke(Component component) {
-                click(component)
-                return Unit.INSTANCE
-            }
-        })
+    static <T> void _clickRenderer(@NotNull Grid<T> self, int rowIndex, @NotNull String columnKey) {
+        GridKt._clickRenderer(self, rowIndex, columnKey)
+    }
+
+    /**
+     * Retrieves a component produced by {@link com.vaadin.flow.data.renderer.ComponentRenderer} in given Grid cell. Fails if the
+     * renderer is not a {@link com.vaadin.flow.data.renderer.ComponentRenderer}.
+     * @param rowIndex the row index, 0 or higher.
+     * @param columnKey the column key [Grid.Column.getKey]
+     * @throws AssertionError if the renderer is not {@link com.vaadin.flow.data.renderer.ComponentRenderer}.
+     */
+    @NotNull
+    static <T> Component _getCellComponent(@NotNull Grid<T> self, int rowIndex, @NotNull String columnKey) {
+        return GridKt._getCellComponent(self, rowIndex, columnKey)
     }
 
     /**

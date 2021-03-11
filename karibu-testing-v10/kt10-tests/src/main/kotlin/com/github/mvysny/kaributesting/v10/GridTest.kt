@@ -7,6 +7,7 @@ import com.github.mvysny.karibudsl.v10.component
 import com.github.mvysny.karibudsl.v10.grid
 import com.github.mvysny.karibudsl.v10.karibuDslI18n
 import com.github.mvysny.karibudsl.v10.onLeftClick
+import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
+import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -219,7 +221,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
-        test("ComponentRenderer with CheckBox") {
+        test("ComponentRenderer with ClickNotifier") {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Checkbox, TestPerson> { person -> Checkbox("View").apply {
@@ -242,6 +244,51 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
                 grid._clickRenderer(2, "name")
             }
+        }
+        test("fails on unsupported component type") {
+            expect(false) { Label() is ClickNotifier<*> }
+            val grid = Grid<TestPerson>().apply {
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addColumn(ComponentRenderer<Label, TestPerson> { person -> Label() }).key = "name"
+            }
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
+                grid._clickRenderer(8, "name")
+            }
+        }
+    }
+
+    group("_getCellComponent") {
+        test("fails with ClickableRenderer") {
+            var called = false
+            val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
+                addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name uses NativeButtonRenderer which is not supported by this function") {
+                grid._getCellComponent(8, "name")
+            }
+        }
+        test("ComponentRenderer with Button") {
+            var called = false
+            val grid = Grid<TestPerson>().apply {
+                addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
+                    onLeftClick {
+                        called = true
+                        expect("name 8") { person.name }
+                    }
+                } }).key = "name"
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            (grid._getCellComponent(8, "name") as Button)._click()
+            expect(true) { called }
+        }
+        test("doesn't fail on disabled grid") {
+            val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
+                addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View") }).key = "name"
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                isEnabled = false
+            }
+            expect(true) { grid._getCellComponent(2, "name") is Button }
         }
     }
 

@@ -38,7 +38,7 @@ internal fun DynaNodeGroup.routerLinkBatch() {
         test("navigation to non-existing route blows immediately") {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
-If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes""") {
+If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {
                 UI.getCurrent().apply {
                     routerLink(null, "testing") {
                         element.setAttribute("href", "nonexisting")
@@ -72,7 +72,7 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
         test("navigation to non-existing route blows immediately") {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
-If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes""") {
+If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {
                 UI.getCurrent().apply {
                     anchor("nonexisting") {
                         _click()

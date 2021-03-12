@@ -1,11 +1,14 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.InternalServerError
+import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
@@ -58,6 +61,14 @@ fun DynaNodeGroup.routesTestBatch() {
         expect(WelcomeView::class.java) {
             @Suppress("DEPRECATION")
             ApplicationRouteRegistry.getInstance(ctx).pwaConfigurationClass
+        }
+    }
+
+    test("MockRouteNotFoundError is called when the route doesn't exist, and it fails immediately with an informative error message") {
+        val routes: Routes = Routes().autoDiscoverViews("com.github")
+        MockVaadin.setup(routes)
+        expectThrows(NotFoundException::class, "No route found for 'A_VIEW_THAT_DOESNT_EXIST': Couldn't find route for 'A_VIEW_THAT_DOESNT_EXIST'\nAvailable routes:") {
+            UI.getCurrent().navigate("A_VIEW_THAT_DOESNT_EXIST")
         }
     }
 }

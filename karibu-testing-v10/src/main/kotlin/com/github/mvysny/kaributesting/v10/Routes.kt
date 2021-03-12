@@ -123,7 +123,7 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
             append("\nAvailable routes: ")
             val routes: List<RouteData> = event.source.registry.registeredRoutes
             append(routes.map { it.toPrettyString() })
-            append("\nIf you'd like to revert back to the original Vaadin RouteNotFoundError, please remove this class from Routes.errorRoutes")
+            append("\nIf you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the ${MockRouteNotFoundError::class.java} from Routes.errorRoutes")
         }
         throw NotFoundException(message).apply { initCause(parameter.caughtException) }
     }

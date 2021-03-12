@@ -50,6 +50,8 @@ public data class SemanticVersion(
         }
 
         public val VAADIN_14_3_0: SemanticVersion = SemanticVersion(14, 3, 0)
+        public val VAADIN_14_4_0: SemanticVersion = SemanticVersion(14, 4, 0)
+        public val VAADIN_14_5_0: SemanticVersion = SemanticVersion(14, 5, 0)
     }
 }
 

@@ -14,4 +14,5 @@ dependencies {
     testImplementation("com.github.appreciated:app-layout-addon:4.0.0.beta5") {
         exclude(group = "com.vaadin")
     }
+    testImplementation("com.vaadin:vaadin-spring:12.2.0")
 }

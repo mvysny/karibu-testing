@@ -9,4 +9,5 @@ dependencies {
     testImplementation(project(":karibu-testing-v10:kt10-tests")) {
     	exclude(group = "com.vaadin")
     }
+    testImplementation("com.vaadin:vaadin-spring:12.2.0")
 }

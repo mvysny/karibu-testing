@@ -24,6 +24,11 @@ public object MockVaadinHelper {
             tokenFile.writeText("{}")
             servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
         }
+
+        if (VaadinMeta.fullVersion.isAtLeast(14, 6) && VaadinMeta.fullVersion.isExactly(14)) {
+            // otherwise DeploymentConfigurationFactory.verifyMode() will fail for Vaadin 14.6+
+            servlet.servletContext.setInitParameter("compatibilityMode", "false")
+        }
     }
 
     public fun createMockContext(): ServletContext {

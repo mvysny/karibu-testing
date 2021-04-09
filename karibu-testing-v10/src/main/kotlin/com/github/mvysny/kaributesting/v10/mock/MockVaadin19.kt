@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10.mock
 
+import com.github.mvysny.kaributesting.v10.SemanticVersion
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServletContext
@@ -15,8 +16,7 @@ import javax.servlet.ServletContext
 public object MockVaadin19 {
 
     public fun init(ctx: ServletContext) {
-        if (VaadinMeta.version < 19) {
-            // Vaadin 18 and lower has no Loader, do nothing
+        if (!VaadinMeta.hasLookup) {
             return
         }
 
@@ -26,15 +26,17 @@ public object MockVaadin19 {
         val loaderInitializer: ServletContainerInitializer =
             loaderInitializerClass.getConstructor().newInstance()
 
-        loaderInitializer.onStartup(
-            setOf(
-                Class.forName("com.vaadin.flow.di.LookupInitializer"),
-                Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"),
-                Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl"),
-                Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")
-            ),
-            ctx
+        val loaders = mutableSetOf<Class<*>>(
+            Class.forName("com.vaadin.flow.di.LookupInitializer"),
+            Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl")
         )
+        if (VaadinMeta.fullVersion.isAtLeast(19)) {
+            loaders.addAll(listOf(
+                Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"),
+                Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")
+            ))
+        }
+        loaderInitializer.onStartup(loaders, ctx)
 
         // verify that the Lookup has been set
         verifyHasLookup(ctx)
@@ -45,7 +47,7 @@ public object MockVaadin19 {
      * @return the instance of `com.vaadin.flow.di.Lookup`.
      */
     public fun verifyHasLookup(ctx: ServletContext): Any {
-        check(VaadinMeta.version >= 19) { "Lookup is only available in Vaadin 19+" }
+        check(VaadinMeta.hasLookup) { "Lookup is only available in Vaadin 19+ and 14.6+" }
         val lookup: Any? = ctx.getAttribute("com.vaadin.flow.di.Lookup")
         checkNotNull(lookup) {
             "The context doesn't contain the Vaadin 19 Lookup class. Available attributes: " + ctx.attributeNames.toList()
@@ -81,3 +83,6 @@ public object MockVaadin19 {
         return null
     }
 }
+
+// only Vaadin 19+ and Vaadin 14.6+ has Lookup; we're on a lower vaadin version, do nothing
+internal val VaadinMeta.hasLookup: Boolean get() = fullVersion.isAtLeast(19) || fullVersion.isAtLeast(14, 6)

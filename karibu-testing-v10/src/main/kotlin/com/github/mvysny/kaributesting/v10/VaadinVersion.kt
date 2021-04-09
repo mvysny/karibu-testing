@@ -35,6 +35,11 @@ public data class SemanticVersion(
 
     override fun toString(): String = "$major.$minor.$bugfix${if (prerelease != null) "-$prerelease" else ""}"
 
+    public fun isExactly(major: Int, minor: Int): Boolean = this.major == major && this.minor == minor
+    public fun isExactly(major: Int): Boolean = this.major == major
+    public fun isAtLeast(major: Int, minor: Int): Boolean = this >= SemanticVersion(major, minor, 0, "\u0001")
+    public fun isAtLeast(major: Int): Boolean = this.major >= major
+
     public companion object {
         private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)([-.](.*))?")
 

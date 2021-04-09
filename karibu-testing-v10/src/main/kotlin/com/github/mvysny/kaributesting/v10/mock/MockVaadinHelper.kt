@@ -40,7 +40,7 @@ public object MockVaadinHelper {
             return MockVaadin19.getTokenFileFromClassloader()
         }
 
-        if (VaadinMeta.fullVersion.isAtLeast(14, 6)) {
+        if (VaadinMeta.fullVersion.isAtLeast(14, 6) && VaadinMeta.fullVersion.isExactly(14)) {
             // Use DeploymentConfigurationFactory.getTokenFileFromClassloader(Class, VaadinContext)
             val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", Class::class.java, VaadinContext::class.java)
             m.isAccessible = true

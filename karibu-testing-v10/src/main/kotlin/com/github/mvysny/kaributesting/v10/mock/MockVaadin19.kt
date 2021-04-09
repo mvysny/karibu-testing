@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.v10.SemanticVersion
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServletContext
@@ -17,6 +16,7 @@ public object MockVaadin19 {
 
     public fun init(ctx: ServletContext) {
         if (!VaadinMeta.hasLookup) {
+            // this Vaadin has no Lookup support, do nothing
             return
         }
 
@@ -84,5 +84,7 @@ public object MockVaadin19 {
     }
 }
 
-// only Vaadin 19+ and Vaadin 14.6+ has Lookup; we're on a lower vaadin version, do nothing
-internal val VaadinMeta.hasLookup: Boolean get() = fullVersion.isAtLeast(19) || fullVersion.isAtLeast(14, 6)
+// only Vaadin 19+ and Vaadin 14.6+ (but not Vaadin 15-18) has Lookup
+internal val VaadinMeta.hasLookup: Boolean
+    get() = fullVersion.isAtLeast(19) ||
+            (fullVersion.isAtLeast(14,6) && fullVersion.isExactly(14))

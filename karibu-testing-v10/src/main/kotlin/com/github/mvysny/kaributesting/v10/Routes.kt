@@ -129,7 +129,7 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
     }
 
     private fun RouteData.toPrettyString(): String {
-        val template = if (VaadinMeta.fullVersion <= SemanticVersion.VAADIN_14_4_0.copy(bugfix = 99999)) url else template
+        val template = template
         val path: String = if (template.isNullOrBlank()) "<root>" else "/$template"
         return "${navigationTarget.simpleName} at '$path'"
     }

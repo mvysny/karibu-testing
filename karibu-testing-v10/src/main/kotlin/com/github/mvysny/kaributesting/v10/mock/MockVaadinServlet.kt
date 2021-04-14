@@ -73,3 +73,10 @@ internal fun createVaadinServletResponse(response: HttpServletResponse, service:
         VaadinServletResponse::class.java.declaredConstructors.first { it.parameterCount == 2 }
     return constructor.newInstance(response, service) as VaadinServletResponse
 }
+
+internal fun createVaadinBrowser(request: VaadinRequest): WebBrowser {
+    val constructor =
+        WebBrowser::class.java.getDeclaredConstructor(VaadinRequest::class.java)
+    constructor.isAccessible = true
+    return constructor.newInstance(request)
+}

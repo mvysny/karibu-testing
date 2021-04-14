@@ -20,9 +20,10 @@ public open class MockInstantiator(public val delegate: Instantiator) : Instanti
     public companion object {
         @JvmStatic
         public fun create(delegate: Instantiator): Instantiator {
+            checkVaadinSupportedByKaribuTesting()
+
             // starting from 14.5.0.alpha2 the LitTemplateParser machinery is supported
-            if (VaadinMeta.fullVersion >= SemanticVersion(14, 5, 0, "a")
-                && VaadinMeta.version == 14) {
+            if (VaadinMeta.fullVersion.isAtLeast(14, 6) && VaadinMeta.version == 14) {
                 return MockInstantiatorV14_5_0(delegate)
             }
             if (VaadinMeta.version >= 18) {

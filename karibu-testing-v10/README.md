@@ -7,15 +7,12 @@ Compatibility chart:
 
 | Karibu-Testing version | Supported Java | Supported Vaadin version |
 |------------------------|----------------|--------------------------|
-| 1.0.x | Java 1.8+ | Vaadin 10, Vaadin 11, Vaadin 12 |
-| 1.1.x | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 (bower mode, deprecated) |
+| 1.0.x (unmaintained) | Java 1.8+ | Vaadin 10, Vaadin 11, Vaadin 12 |
+| 1.1.x (unmaintained) | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 (bower mode, deprecated) |
+| 1.2.0+ | Java 1.8+ | Vaadin 16-18 |
 | 1.2.3+ | Java 1.8+ | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16-18 |
-| 1.2.x | Java 1.8+ | Vaadin 16-18 |
-| 1.2.11+ (recommended) | Java 1.8+ | Vaadin 14.3 and higher in (p)npm mode; Vaadin 18-19+ |
-
-
-Since Karibu-Testing 1.1.x doesn't work on Java 12+ and is no longer maintained,
-it's recommended to use Karibu-Testing 1.2.3 and higher.
+| 1.2.11+ | Java 1.8+ | Vaadin 14 (only 14.3+) in (p)npm mode; Vaadin 18-19+ |
+| 1.3.0+ (recommended) | Java 1.8+ | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19+ |
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

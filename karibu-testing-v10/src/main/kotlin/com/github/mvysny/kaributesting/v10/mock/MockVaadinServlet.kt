@@ -46,6 +46,8 @@ public open class MockVaadinServlet @JvmOverloads constructor(
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
 internal val VaadinServlet.serviceSafe: VaadinServletService? get() {
+    // for some reason a direct invocation of VaadinServlet::getService() FAILS with
+    // Vaadin 20.0.0.alpha7 even though the method is definitely public.
     val m = VaadinServlet::class.java.getDeclaredMethod("getService")
     return m.invoke(this) as VaadinServletService?
 }
@@ -54,6 +56,8 @@ internal val VaadinServlet.serviceSafe: VaadinServletService? get() {
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
 internal fun createVaadinServletRequest(request: HttpServletRequest, service: VaadinService): VaadinServletRequest {
+    // for some reason a direct constructor invocation FAILS with
+    // Vaadin 20.0.0.alpha7 even though the constructor is definitely public.
     val constructor: Constructor<*> =
         VaadinServletRequest::class.java.declaredConstructors.first { it.parameterCount == 2 }
     return constructor.newInstance(request, service) as VaadinServletRequest
@@ -63,6 +67,8 @@ internal fun createVaadinServletRequest(request: HttpServletRequest, service: Va
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
 internal fun createVaadinServletResponse(response: HttpServletResponse, service: VaadinService): VaadinServletResponse {
+    // for some reason a direct constructor invocation FAILS with
+    // Vaadin 20.0.0.alpha7 even though the constructor is definitely public.
     val constructor: Constructor<*> =
         VaadinServletResponse::class.java.declaredConstructors.first { it.parameterCount == 2 }
     return constructor.newInstance(response, service) as VaadinServletResponse

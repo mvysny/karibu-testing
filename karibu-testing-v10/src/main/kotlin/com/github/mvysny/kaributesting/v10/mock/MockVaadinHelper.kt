@@ -41,24 +41,18 @@ public object MockVaadinHelper {
         VaadinServletContext(createMockContext())
 
     public fun getTokenFileFromClassloader(): JsonObject? {
+        checkVaadinSupportedByKaribuTesting()
+
         if (VaadinMeta.fullVersion.isAtLeast(19)) {
             return MockVaadin19.getTokenFileFromClassloader()
         }
 
-        if (VaadinMeta.fullVersion.isAtLeast(14, 6) && VaadinMeta.fullVersion.isExactly(14)) {
-            // Use DeploymentConfigurationFactory.getTokenFileFromClassloader(Class, VaadinContext)
-            val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", Class::class.java, VaadinContext::class.java)
-            m.isAccessible = true
-            val ctx: VaadinContext = createMockVaadinContext()
-            val json: String = m.invoke(null, null, ctx) as String? ?: return null
-            return Json.parse(json)
-        }
-
-        // Use DeploymentConfigurationFactory.getResourceFromClassloader() to make sure to read
-        // the same flow-build-info.json that Vaadin reads.
-        val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getResourceFromClassloader")
+        // Vaadin 14.6+
+        // Use DeploymentConfigurationFactory.getTokenFileFromClassloader(Class, VaadinContext)
+        val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", Class::class.java, VaadinContext::class.java)
         m.isAccessible = true
-        val json: String = m.invoke(null) as String? ?: return null
+        val ctx: VaadinContext = createMockVaadinContext()
+        val json: String = m.invoke(null, null, ctx) as String? ?: return null
         return Json.parse(json)
     }
 }

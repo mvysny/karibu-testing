@@ -87,6 +87,6 @@ internal val VaadinMeta.hasLookup: Boolean
 internal fun checkVaadinSupportedByKaribuTesting() {
     if (!VaadinMeta.hasLookup) {
         // this Vaadin has no Lookup support => unsupported
-        throw RuntimeException("Karibu-Testing 1.3+ only support Vaadin 19+ and Vaadin 14.6+ but the project uses Vaadin ${VaadinMeta.fullVersion}")
+        throw RuntimeException("Karibu-Testing 1.3+ only support Vaadin 19+ and Vaadin 14 (only 14.6+) but the project uses Vaadin ${VaadinMeta.fullVersion}. Please try Karibu-Testing 1.2.x instead.")
     }
 }

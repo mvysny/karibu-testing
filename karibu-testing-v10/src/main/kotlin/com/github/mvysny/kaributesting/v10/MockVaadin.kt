@@ -11,7 +11,6 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import java.lang.reflect.Field
-import java.lang.reflect.Method
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletContext
@@ -176,9 +175,7 @@ public object MockVaadin {
         // you MUST mock certain things in order for Karibu to work.
         // See MockSession for more details. By default the service is a MockService
         // which creates MockSession.
-        val mcreateVaadinSession: Method = VaadinService::class.java.getDeclaredMethod("createVaadinSession", VaadinRequest::class.java)
-        mcreateVaadinSession.isAccessible = true
-        val session: VaadinSession = mcreateVaadinSession.invoke(service, checkNotNull(VaadinRequest.getCurrent())) as VaadinSession
+        val session: VaadinSession = service._createVaadinSession(VaadinRequest.getCurrent())
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         expect(true, "$session created from $service has null lock. See the MockSession class on how to mock locks properly") { session.lockInstance != null }

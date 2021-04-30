@@ -459,9 +459,9 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
 })
 ```
 
-### Polymer Templates
+### Polymer Templates / Lit Templates
 
-Testing PolymerTemplates with Karibu is a bit tricky.
+Testing PolymerTemplates/LitTemplates with Karibu is a bit tricky.
 The purpose of PolymerTemplates is to move as much code as possible to the
 client-side, while Karibu is designed to test server-side code only. The child components are either
 not accessible from the server-side altogether, or they are only
@@ -585,12 +585,10 @@ Populating `node_modules/` requires the `node` and `npm` programs to be present.
 However Vaadin 14.2.0 Maven plugin (Gradle plugin 0.7.0) will
 install those for you automatically, there's no need for you to do anything.
 
-### Lit Templates
+#### LitElement
 
-Karibu-Testing contains preliminary support for Lit Templates (Vaadin 17+). The support
-is limited - nothing except the basic instantiation of `LitTemplate` has been tested.
-If you're using LitTemplates and they don't work correctly with Karibu-Testing,
-please open a bug report.
+`LitElement`-based components are supported. After all, from the server-side perspective
+they're just `Component`s since there's no `LitElement` server class.
 
 ## API
 

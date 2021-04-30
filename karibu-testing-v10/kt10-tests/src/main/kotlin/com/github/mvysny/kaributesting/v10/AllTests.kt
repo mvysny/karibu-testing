@@ -5,7 +5,10 @@ import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 import java.util.*
 
-fun DynaNodeGroup.allTests() {
+/**
+ * @param isModuleTest if true then this test run simulates a jar reusable component.
+ */
+fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     beforeEach {
         // make sure that Validator produces messages in English
         Locale.setDefault(Locale.ENGLISH)
@@ -94,5 +97,8 @@ fun DynaNodeGroup.allTests() {
     }
     group("shortcuts") {
         shortcutsTestBatch()
+    }
+    group("littemplate") {
+        litTemplateTestBatch(isModuleTest)
     }
 }

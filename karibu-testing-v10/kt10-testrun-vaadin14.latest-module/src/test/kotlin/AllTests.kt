@@ -22,5 +22,5 @@ class AllTests : DynaTest({
             expect(false) { VaadinMeta.isCompatibilityMode }
         }
     }
-    allTests()
+    allTests(isModuleTest = true)
 })

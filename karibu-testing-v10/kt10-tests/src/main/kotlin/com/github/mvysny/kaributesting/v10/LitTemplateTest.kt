@@ -1,22 +1,39 @@
+package com.github.mvysny.kaributesting.v10
+
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.github.mvysny.kaributesting.v10._isVisible
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
+import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.template.Id
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.binder.Binder
+import kotlin.test.expect
 
-class LitTemplateTest : DynaTest({
+/**
+ * @param isModuleTest if true then this test run simulates a jar reusable component.
+ */
+fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    test("loading from META-INF/resources/frontend/") {
+    if (!isModuleTest) {
+        test("test loading of stuff from node_modules") {
+            val f = LitColorPickerField()
+            expect(true) { f.foo._isVisible }
+            UI.getCurrent().add(f)
+        }
+    }
+
+    test("loading from frontend/") {
         UI.getCurrent().add(MyTest())
     }
 
@@ -30,7 +47,7 @@ class LitTemplateTest : DynaTest({
         expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
             LitUnloadableTemplate()
         }
-        expectThrows(RuntimeException::class, "node_modules folder doesn't exist, cannot load template sources for <non-existent4> @foo/non-existent.js. Please") {
+        expectThrows(RuntimeException::class, "load template sources for <non-existent4> @foo/non-existent.js. Please") {
             LitUnloadableTemplate2()
         }
     }
@@ -38,7 +55,15 @@ class LitTemplateTest : DynaTest({
     test("form") {
         UI.getCurrent().add(MyForm())
     }
-})
+}
+
+@Tag("color-picker-field")
+@NpmPackage(value = "@appreciated/color-picker-field", version = "2.0.0-beta.5")
+@JsModule("@appreciated/color-picker-field/src/color-picker-field.js")
+class LitColorPickerField : LitTemplate() {
+    @Id
+    lateinit var foo: TextField
+}
 
 @Tag("non-existent")
 @JsModule("./non-existent.js")

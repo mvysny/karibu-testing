@@ -249,7 +249,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(false) { Label() is ClickNotifier<*> }
             val grid = Grid<TestPerson>().apply {
                 setItems2((0..10).map { TestPerson("name $it", it) })
-                addColumn(ComponentRenderer<Label, TestPerson> { person -> Label() }).key = "name"
+                addColumn(ComponentRenderer<Label, TestPerson> { _ -> Label() }).key = "name"
             }
             expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
@@ -259,7 +259,6 @@ internal fun DynaNodeGroup.gridTestbatch() {
 
     group("_getCellComponent") {
         test("fails with ClickableRenderer") {
-            var called = false
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })

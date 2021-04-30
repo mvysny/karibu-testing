@@ -1,5 +1,7 @@
+@file:Suppress("DEPRECATION")
+
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts
-import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.Component
@@ -8,32 +10,44 @@ import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.templatemodel.TemplateModel
+import java.lang.RuntimeException
 
-class NpmPolymerTemplateTest : DynaTest({
+/**
+ * @param isModuleTest if true then this test run simulates a jar reusable component.
+ */
+fun DynaNodeGroup.npmPolymerTemplateTestBatch(isModuleTest: Boolean) {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    test("Instantiate LeftHybrid") {
-        LeftLayouts.LeftHybrid()
-    }
-
-    test("test loading of stuff from node_modules") {
-        ColorPickerField()
-    }
-
-    test("proper error message on unloadable component") {
-        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent> ./non-existent.js. Please:") {
-            UnloadablePTComponent()
+    if (!isModuleTest) {
+        test("Instantiate LeftHybrid") {
+            LeftLayouts.LeftHybrid()
         }
-        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> @foo/non-existent.js. Please:") {
-            UnloadablePTComponent2()
+
+        test("test loading of stuff from node_modules") {
+            ColorPickerField()
+        }
+
+        test("proper error message on unloadable component") {
+            expectThrows(
+                RuntimeException::class,
+                "Can't load template sources for <non-existent> ./non-existent.js. Please:"
+            ) {
+                UnloadablePTComponent()
+            }
+            expectThrows(
+                RuntimeException::class,
+                "Can't load template sources for <non-existent3> @foo/non-existent.js. Please:"
+            ) {
+                UnloadablePTComponent2()
+            }
         }
     }
 
     test("UnloadableComponent works without any mocking") {
         UnloadableComponent()
     }
-})
+}
 
 @Tag("color-picker-field")
 @NpmPackage(value = "@appreciated/color-picker-field", version = "2.0.0-beta.5")

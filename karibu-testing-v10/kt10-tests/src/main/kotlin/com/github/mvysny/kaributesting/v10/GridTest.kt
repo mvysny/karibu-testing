@@ -283,7 +283,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
         test("doesn't fail on disabled grid") {
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
-                addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View") }).key = "name"
+                addColumn(ComponentRenderer<Button, TestPerson> { _ -> Button("View") }).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
             }

@@ -21,4 +21,7 @@ dependencies {
     }
     api("com.vaadin:vaadin-spring:12.2.0")
     api(project(":karibu-testing-v10-spring"))
+
+    // for testing out the NPM template loading from META-INF/resources/frontend/
+    api("com.github.appreciated:app-layout-addon:4.0.0.beta5")
 }

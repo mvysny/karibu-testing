@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
+import npmPolymerTemplateTestBatch
 import java.util.*
 
 /**
@@ -98,7 +99,10 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("shortcuts") {
         shortcutsTestBatch()
     }
-    group("littemplate") {
+    group("lit template") {
         litTemplateTestBatch(isModuleTest)
+    }
+    group("npm PolymerTemplates") {
+        npmPolymerTemplateTestBatch(isModuleTest)
     }
 }

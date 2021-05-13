@@ -1,6 +1,5 @@
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10.*
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import java.net.URL
 import kotlin.test.expect
 
@@ -19,5 +18,5 @@ class AllTests : DynaTest({
             expect(false) { VaadinMeta.isCompatibilityMode }
         }
     }
-    allTests(isModuleTest = false)
+    allTests19(isModuleTest = false)
 })

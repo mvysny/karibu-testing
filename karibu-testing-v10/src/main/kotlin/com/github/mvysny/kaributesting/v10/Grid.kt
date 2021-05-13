@@ -67,16 +67,53 @@ public fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> =
  */
 public fun <T : Any> Grid<T>._get(rowIndex: Int): T {
     require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
-    if (this !is TreeGrid) {
+    if (this !is TreeGrid && _dataProviderSupportsSizeOp) {
         // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
         val size: Int = _size()
         if (rowIndex >= size) {
             throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
         }
     }
+    return _getOrNull(rowIndex)
+        ?: throw AssertionError("Requested to get row $rowIndex but the data provider returned 0 rows\n${_dump()}")
+}
+
+/**
+ * Returns the item on given row, or null if the [rowIndex] is larger than the number
+ * of items the data provider can provide. Uses current Grid sorting.
+ *
+ * For [TreeGrid] this returns the x-th displayed row; skips children of collapsed nodes.
+ * Uses [_rowSequence].
+ *
+ * WARNING: Very slow operation for [TreeGrid].
+ * @param rowIndex the row, 0 or larger.
+ * @return the item at given row or null if the data provider provides less rows.
+ */
+public fun <T : Any> Grid<T>._getOrNull(rowIndex: Int): T? {
+    require(rowIndex >= 0) { "rowIndex must be 0 or greater: $rowIndex" }
+    if (this !is TreeGrid && _dataProviderSupportsSizeOp) {
+        // only perform this check for regular Grid. TreeGrid._fetch()'s Sequence consults size() internally.
+        val size: Int = _size()
+        if (rowIndex >= size) {
+            return null
+        }
+    }
     val fetched: List<T> = _fetch(rowIndex, 1)
     return fetched.firstOrNull()
-            ?: throw AssertionError("Requested to get row $rowIndex but the data provider only has ${_size()} rows\n${_dump()}")
+}
+
+/**
+ * Vaadin 19+ Grids support setting data providers which do not support retrieving
+ * the number of available rows. See `FetchCallback` for more details.
+ * @return true if the current data provider supports [_size] retrieval, false
+ * if not. Returns true for Vaadin 14.
+ */
+public val Grid<*>._dataProviderSupportsSizeOp: Boolean get() {
+    if (VaadinMeta.version < 19) {
+        return true
+    }
+    val m = DataCommunicator::class.java.getDeclaredMethod("isDefinedSize")
+    return m.invoke(dataCommunicator) as Boolean
 }
 
 /**
@@ -274,6 +311,11 @@ public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     return _getFormattedRow(rowObject)
 }
 
+public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>? {
+    val rowObject: T = _getOrNull(rowIndex) ?: return null
+    return _getFormattedRow(rowObject)
+}
+
 /**
  * Returns the output of renderer set for this column for given [rowObject] formatted as close as possible
  * to the client-side output.
@@ -359,16 +401,26 @@ public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString
         for (i in displayIndices) {
             append("$i: ${lines[i]}\n")
         }
-    } else {
+        val andMore = dsIndices.size - displayIndices.size
+        if (andMore > 0) {
+            append("--and $andMore more\n")
+        }
+    } else if (_dataProviderSupportsSizeOp) {
         dsIndices = 0 until _size()
         displayIndices = rows.intersect(dsIndices)
         for (i in displayIndices) {
             _getFormattedRow(i).joinTo(this, prefix = "$i: ", postfix = "\n")
         }
-    }
-    val andMore = dsIndices.size - displayIndices.size
-    if (andMore > 0) {
-        append("--and $andMore more\n")
+        val andMore = dsIndices.size - displayIndices.size
+        if (andMore > 0) {
+            append("--and $andMore more\n")
+        }
+    } else {
+        for (i in rows) {
+            val row = _getFormattedRowOrNull(i) ?: break
+            row.joinTo(this, prefix = "$i: ", postfix = "\n")
+        }
+        append("--and possibly more\n")
     }
 }
 

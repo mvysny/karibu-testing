@@ -139,7 +139,7 @@ public val DataCommunicator<*>._saneFetchLimit: Int get() =
         // failing instantly.
         Int.MAX_VALUE / 1000
     } else {
-        Int.MAX_VALUE - 1
+        Int.MAX_VALUE
     }
 
 public val Grid<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
@@ -157,6 +157,14 @@ public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()
 }
+
+/**
+ * Returns all items from this data communicator. Uses current Grid sorting.
+ * Any ConfigurableFilterDataProvider will automatically apply its filters.
+ *
+ * This is an internal stuff, most probably you wish to call [_fetch].
+ */
+public fun <T> DataCommunicator<T>.fetchAll(): List<T> = fetch(0, _saneFetchLimit)
 
 /**
  * Returns all items in given data provider. Uses current Grid sorting.

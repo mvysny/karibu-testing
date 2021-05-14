@@ -40,13 +40,7 @@ public fun <T> ComboBox<T>.getSuggestionItems(): List<T> {
     val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator").apply { isAccessible = true }
     val dataCommunicator: DataCommunicator<T> = field.get(this) as DataCommunicator<T>?
             ?: fail("${toPrettyString()}: items/dataprovider has not been set")
-    if (VaadinMeta.version <= 16) {
-        return dataCommunicator.fetch(0, Int.MAX_VALUE)
-    }
-    // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
-    // https://github.com/vaadin/flow/issues/8828
-    // don't use Int.MAX_VALUE - 100 otherwise Vaadin 17 will stack-overflow.
-    return dataCommunicator.fetch(0, 1000)
+    return dataCommunicator.fetchAll()
 }
 
 /**

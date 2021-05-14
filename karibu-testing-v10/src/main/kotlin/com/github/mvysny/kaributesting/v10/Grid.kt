@@ -13,8 +13,6 @@ import com.vaadin.flow.component.listbox.ListBoxBase
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.treegrid.TreeGrid
-import com.vaadin.flow.data.binder.HasDataProvider
-import com.vaadin.flow.data.binder.HasFilterableDataProvider
 import com.vaadin.flow.data.binder.HasItems
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
@@ -22,7 +20,6 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
-import org.jsoup.Jsoup
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
@@ -131,6 +128,22 @@ public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
     else -> dataCommunicator.fetch(offset, limit)
 }
 
+public val DataCommunicator<*>._saneFetchLimit: Int get() =
+    if (VaadinMeta.version in 17..18) {
+        // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
+        // https://github.com/vaadin/flow/issues/8828
+        // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
+        1000
+    } else if (VaadinMeta.version >= 19) {
+        // don't use high value otherwise Vaadin 19+ will calculate negative limit and will pass it to SizeVerifier,
+        // failing instantly.
+        Int.MAX_VALUE / 1000
+    } else {
+        Int.MAX_VALUE - 1
+    }
+
+public val Grid<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
+
 /**
  * Returns items in given range from this data communicator. Uses current Grid sorting.
  * Any ConfigurableFilterDataProvider will automatically apply its filters.
@@ -138,16 +151,7 @@ public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
  * This is an internal stuff, most probably you wish to call [_fetch].
  */
 public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
-    if (VaadinMeta.version in 17..18) {
-        // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
-        // https://github.com/vaadin/flow/issues/8828
-        // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
-        require(limit <= 1000) { "Vaadin 17+ doesn't handle fetching of many items very well unfortunately. The sane limit is 1000 but you asked for $limit" }
-    } else if (VaadinMeta.version >= 19) {
-        // don't use high value otherwise Vaadin 19+ will calculate negative limit and will pass it to SizeVerifier,
-        // failing instantly.
-        require(limit <= Int.MAX_VALUE / 1000) { "Vaadin 19+ doesn't handle fetching of many items very well unfortunately. The sane limit is ${Int.MAX_VALUE / 1000} but you asked for $limit" }
-    }
+    require(limit <= _saneFetchLimit) { "Vaadin doesn't handle fetching of many items very well unfortunately. The sane limit is $_saneFetchLimit but you asked for $limit" }
     val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)
     m.isAccessible = true
     @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
@@ -164,15 +168,7 @@ public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
  *
  * @return the list of items.
  */
-public fun <T> Grid<T>._findAll(): List<T> {
-    if (VaadinMeta.version >= 17) {
-        // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
-        // https://github.com/vaadin/flow/issues/8828
-        // don't use Int.MAX_VALUE - 100 otherwise Vaadin 17 will stack-overflow.
-        return _fetch(0, 1000)
-    }
-    return _fetch(0, Int.MAX_VALUE)
-}
+public fun <T> Grid<T>._findAll(): List<T> = _fetch(0, _saneFetchLimit)
 
 /**
  * Returns the number of items in this data provider.
@@ -220,8 +216,7 @@ public fun Grid<*>._size(): Int {
         return this._size()
     }
     if (!_dataProviderSupportsSizeOp) {
-        val rows = _fetch(0, Int.MAX_VALUE / 1000)
-        return rows.size
+        return _findAll().size
     }
     val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
     return m.invoke(dataCommunicator) as Int

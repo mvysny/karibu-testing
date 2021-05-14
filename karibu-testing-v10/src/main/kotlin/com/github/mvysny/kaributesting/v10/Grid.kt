@@ -388,7 +388,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
  * ```
  */
 @JvmOverloads
-public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString {
+public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..9): String = buildString {
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
     val dsIndices: IntRange
@@ -416,11 +416,17 @@ public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..10): String = buildString
             append("--and $andMore more\n")
         }
     } else {
+        var rowsOutputted = 0
         for (i in rows) {
             val row = _getFormattedRowOrNull(i) ?: break
             row.joinTo(this, prefix = "$i: ", postfix = "\n")
+            rowsOutputted++
         }
-        append("--and possibly more\n")
+        if (rowsOutputted == rows.size) {
+            append("--and possibly more\n")
+        } else {
+            append("--\n")
+        }
     }
 }
 

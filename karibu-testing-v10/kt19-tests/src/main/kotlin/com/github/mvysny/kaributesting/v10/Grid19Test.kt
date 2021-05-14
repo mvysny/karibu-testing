@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.grid.Grid
@@ -67,6 +68,20 @@ fun DynaNodeGroup.grid19Testbatch() {
 --and possibly more
 """
                 ) { grid._dump() }
+            }
+        }
+
+        test("_expectRows") {
+            val grid: Grid<String> = UI.getCurrent().grid<String> {
+                setItems(CallbackDataProvider.FetchCallback<String, Void> { query ->
+                    (0..29).map { it.toString() }.stream()
+                        .skip(query.offset.toLong())
+                        .limit(query.limit.toLong())
+                })
+            }
+            grid.expectRows(30) // should succeed
+            expectThrows(AssertionError::class, "expected 29 rows but got 30") {
+                grid.expectRows(29) // should fail
             }
         }
     }

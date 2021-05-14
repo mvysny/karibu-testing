@@ -138,11 +138,15 @@ public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
  * This is an internal stuff, most probably you wish to call [_fetch].
  */
 public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
-    if (VaadinMeta.version >= 17) {
+    if (VaadinMeta.version in 17..18) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
         // https://github.com/vaadin/flow/issues/8828
         // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
         require(limit <= 1000) { "Vaadin 17+ doesn't handle fetching of many items very well unfortunately. The sane limit is 1000 but you asked for $limit" }
+    } else if (VaadinMeta.version >= 19) {
+        // don't use high value otherwise Vaadin 19+ will calculate negative limit and will pass it to SizeVerifier,
+        // failing instantly.
+        require(limit <= Int.MAX_VALUE / 1000) { "Vaadin 19+ doesn't handle fetching of many items very well unfortunately. The sane limit is ${Int.MAX_VALUE / 1000} but you asked for $limit" }
     }
     val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)
     m.isAccessible = true
@@ -207,10 +211,17 @@ public fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: 
  * ignoring children of collapsed nodes.
  *
  * A very slow operation for [TreeGrid] since it walks through all items returned by [_rowSequence].
+ *
+ * If [_dataProviderSupportsSizeOp] is false, this function will fetch all the data
+ * and count the result returned, which is also very slow.
  */
 public fun Grid<*>._size(): Int {
     if (this is TreeGrid<*>) {
         return this._size()
+    }
+    if (!_dataProviderSupportsSizeOp) {
+        val rows = _fetch(0, Int.MAX_VALUE / 1000)
+        return rows.size
     }
     val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
     return m.invoke(dataCommunicator) as Int

@@ -40,7 +40,7 @@ class GridTest : DynaTest({
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.removeColumn("name")
-        grid.addColumn({ it.name }, { it.toUpperCase() }).apply { id = "name"; caption = "The Name" }
+        grid.addColumn({ it.name }, { it.uppercase() }).apply { id = "name"; caption = "The Name" }
         grid.dataProvider = dp
         grid.setColumns("name", "age")
         expect("--[The Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
@@ -60,23 +60,23 @@ class GridTest : DynaTest({
 
     group("expectRow()") {
         test("simple") {
-            val grid = Grid<TestPerson>(TestPerson::class.java)
-            grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+            val grid = Grid(TestPerson::class.java)
+            grid.dataProvider = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             grid.expectRows(7)
             grid.expectRow(0, "name 0", "0")
         }
 
         test("failed expectRow contains table dump") {
-            val grid = Grid<TestPerson>(TestPerson::class.java)
-            grid.dataProvider = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })
+            val grid = Grid(TestPerson::class.java)
+            grid.dataProvider = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
             expectThrows(AssertionError::class, "--[Name]-[Age]--\n0: name 0, 0") {
                 grid.expectRow(0, "name 1", "1")
             }
         }
 
         test("row out-of-bounds contains table dump") {
-            val grid = Grid<TestPerson>(TestPerson::class.java)
-            grid.dataProvider = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })
+            val grid = Grid(TestPerson::class.java)
+            grid.dataProvider = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
             expectThrows(AssertionError::class, "--[Name]-[Age]--\n0: name 0, 0") {
                 grid.expectRow(3, "should fail", "should fail") // should fail
             }

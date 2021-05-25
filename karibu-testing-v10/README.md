@@ -1042,6 +1042,14 @@ Java:
 RouterLinkKt._click(customersLink);
 ```
 
+### Better ValidationException message
+
+When testing a Vaadin Binder-based form, by default Flow Binder will throw a non-informative
+`ValidationException: Validation has failed for some fields` (see&vote for [Flow 7081](https://github.com/vaadin/flow/issues/7081)).
+
+To get more information in your tests, simply catch the `ValidationException` and throw a `RuntimeException`
+with a much more informative message obtained via `ValidationException.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(ex)`).
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

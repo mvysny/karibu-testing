@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
+import com.github.mvysny.kaributesting.v10.mock.checkVaadinSupportedByKaribuTesting
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.server.Version
 import com.vaadin.shrinkwrap.VaadinCoreShrinkWrap
@@ -78,7 +79,7 @@ public object VaadinMeta {
         // for Vaadin 14+ the version can be detected from the VaadinCoreShrinkWrap class.
         // This doesn't work for Vaadin 13 or lower, but nevermind - we only support Vaadin 14+ anyway.
         val annotation: NpmPackage = checkNotNull(VaadinCoreShrinkWrap::class.java.getAnnotation(NpmPackage::class.java),
-                { "Karibu-Testing 1.2.x only supports Vaadin 14 and higher" })
+                { "This version of Karibu-Testing only supports Vaadin 14 and higher" })
         val version: String = annotation.version
         return SemanticVersion.fromString(version)
     }
@@ -90,9 +91,7 @@ public object VaadinMeta {
      * Always false.
      */
     public val isCompatibilityMode: Boolean get() {
-        check(fullVersion >= SemanticVersion.VAADIN_14_3_0) {
-            "Karibu-Testing 1.2.x is only compatible with Vaadin ${SemanticVersion.VAADIN_14_3_0} and above, but got $version"
-        }
+        checkVaadinSupportedByKaribuTesting()
         if (version == 14) {
             checkNotVaadin14CompatMode()
         }
@@ -100,7 +99,7 @@ public object VaadinMeta {
     }
 
     private fun checkNotVaadin14CompatMode() {
-        val error = "Karibu-Testing 1.2.x doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead. Alternatively, if you're not using compatibility mode, please exclude all webjars from your vaadin/vaadin-core dependency; please see the Skeleton Starter or Karibu10-helloworld-app on how to do that."
+        val error = "This version of Karibu-Testing doesn't support Vaadin 14 Compatibility mode; please use Karibu-Testing 1.1.x instead. Alternatively, if you're not using compatibility mode, please exclude all webjars from your vaadin/vaadin-core dependency; please see the Skeleton Starter or Karibu10-helloworld-app on how to do that."
 
         // The WAR project should package the flow-build-info.json config file which
         // clearly states the Vaadin configuration including the compatibility mode setting

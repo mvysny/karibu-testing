@@ -55,8 +55,9 @@ class BasicUtils {
     }
 
     /**
-     * Determines the component's `label` (usually it's the HTML element's `label` property, but it's [Checkbox.getLabel] for checkbox).
-     * Intended to be used for fields such as [TextField].
+     * Determines the component's `label` (usually it's the HTML element's `label` property,
+     * but it's {@link com.vaadin.flow.component.checkbox.Checkbox#getLabel()} for checkbox).
+     * Intended to be used for fields such as a TextField.
      */
     @NotNull
     static String getLabel(@NotNull Component self) {
@@ -67,7 +68,8 @@ class BasicUtils {
     }
 
     /**
-     * The Component's caption: [Button.getText] for [Button], [label] for fields such as [TextField].
+     * The Component's caption: {@link com.vaadin.flow.component.button.Button#getText()} for a Button,
+     * {@link #getLabel(com.vaadin.flow.component.Component)} for fields such as a TextField.
      * <p></p>
      * For FormItem: Concatenates texts from all elements placed in the `label` slot. This effectively
      * returns whatever was provided in the String label via [FormLayout.addFormItem].
@@ -81,8 +83,8 @@ class BasicUtils {
     }
 
     /**
-     * The same as [Component.getId] but without Optional.
-     *
+     * The same as {@link Component#getId()} but without Optional.
+     * <p></p>
      * Workaround for https://github.com/vaadin/flow/issues/664
      */
     @Nullable
@@ -100,7 +102,7 @@ class BasicUtils {
     }
 
     /**
-     * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
+     * Checks whether the component is visible (usually {@link Component#isVisible()} but for {@link com.vaadin.flow.component.Text}
      * the text must be non-empty).
      */
     static boolean get_isVisible(@NotNull Component self) {
@@ -184,8 +186,13 @@ class BasicUtils {
     }
 
     /**
-     * Checks whether this component matches given spec. All rules are matched except the [count] rule. The
+     * Checks whether this component matches given spec. All rules are matched except the {@link SearchSpec#count} rule. The
      * rules are matched against given component only (not against its children).
+     * <p></p>
+     * Example of use:
+     * <pre>
+     * button.matches { caption = "Foo" }
+     * </pre>
      */
     static boolean matches(@NotNull Component self,
                            @NotNull @DelegatesTo(type = "com.github.mvysny.kaributesting.v10.SearchSpec<com.vaadin.flow.component.Component>", strategy = Closure.DELEGATE_FIRST) Closure spec) {

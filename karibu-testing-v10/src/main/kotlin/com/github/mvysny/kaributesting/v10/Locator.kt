@@ -343,11 +343,14 @@ public inline fun <reified T : Component> _expect(count: Int = 1, noinline block
  * Expects that there are exactly [count] VISIBLE components in the current UI with given [clazz] match [block]. The [currentUI] and all of its descendants are searched. Examples:
  * ```
  * // check that there are 5 buttons in a button bar
- * buttonBar._expect<Button>(5..5)
+ * buttonBar._expect<Button>(5)
  * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
  * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
  * ```
  * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+ * They provide
+ * a better error message in case of a failure, and also communicate your intent
+ * as a test writer better in the test code.
  * @throws AssertionError if incorrect count of component matched.
  */
 public fun <T : Component> _expect(clazz: Class<T>, count: Int = 1, block: SearchSpec<T>.() -> Unit = {}) {

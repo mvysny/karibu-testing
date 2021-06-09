@@ -14,7 +14,13 @@ import org.jetbrains.annotations.NotNull
 @CompileStatic
 class LocatorExtensionMethods {
     /**
-     * Finds a VISIBLE component of given type which matches given [block]. This component and all of its descendants are searched.
+     * Finds a VISIBLE component of given type which matches given <code>block</code>.
+     * This component and all of its descendants are searched.
+     * <p></p>
+     * Example of use:
+     * <pre>
+     * layout._get(Button, { caption = "Foo" })._click()
+     * </pre>
      * @param block the search specification
      * @return the only matching component, never null.
      * @throws IllegalArgumentException if no component matched, or if more than one component matches.
@@ -35,7 +41,13 @@ class LocatorExtensionMethods {
     }
 
     /**
-     * Finds a list of VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
+     * Finds a list of VISIBLE components of given <code>clazz</code> which matches <code>block</code>.
+     * This component and all of its descendants are searched.
+     * <p></p>
+     * Example of use:
+     * <pre>
+     * layout._find(Button, { caption = "Foo" })
+     * </pre>
      * @return the list of matching components, may be empty.
      */
     @NotNull
@@ -54,7 +66,13 @@ class LocatorExtensionMethods {
     }
 
     /**
-     * Expects that there are no VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
+     * Expects that there are no VISIBLE components of given <code>clazz</code>
+     * which matches <code>block</code>. This component and all of its descendants are searched.
+     * <p></p>
+     * Example of use:
+     * <pre>
+     * layout._expectNone(Button, { caption = "Foo" })
+     * </pre>
      * @throws IllegalArgumentException if one or more components matched.
      */
     static <C extends Component> void _expectNone(@NotNull Component self,
@@ -72,7 +90,13 @@ class LocatorExtensionMethods {
     }
 
     /**
-     * Expects that there is exactly one VISIBLE components of given [clazz] which matches [block]. This component and all of its descendants are searched.
+     * Expects that there is exactly one VISIBLE components of given <code>clazz</code>
+     * which matches <code>block</code>. This component and all of its descendants are searched.
+     * <p></p>
+     * Example of use:
+     * <pre>
+     * layout._expectOne(Button, { caption = "Foo" })
+     * </pre>
      * @throws AssertionError if none, or more than one components matched.
      */
     static <C extends Component> void _expectOne(@NotNull Component self,
@@ -90,14 +114,18 @@ class LocatorExtensionMethods {
     }
 
     /**
-     * Expects that there are exactly [count] VISIBLE components of given [clazz] match [block]. This component and all of its descendants are searched. Examples:
+     * Expects that there are exactly <code>count</code> VISIBLE components of
+     * given <code>clazz</code> matching <code>block</code>. This component and all of its descendants are searched. Examples:
      * <pre>
      * // check that there are 5 buttons in a button bar
-     * buttonBar._expect<Button>(5)
+     * buttonBar._expect(Button, 5)
      * // check that there are either 3, 4 or 5 vertical layouts in the UI with given class
-     * _expect<VerticalLayout>{ count = 3..5; styles = "menubar" }
+     * _expect(VerticalLayout, { count = 3..5; styles = "menubar" })
      * </pre>
      * Special cases: for asserting one component use [_expectOne]. For asserting no components use [_expectNone].
+     * They provide
+     * a better error message in case of a failure, and also communicate your intent
+     * as a test writer better in the test code.
      * @throws AssertionError if incorrect count of component matched.
      */
     static <C extends Component> void _expect(@NotNull Component self,

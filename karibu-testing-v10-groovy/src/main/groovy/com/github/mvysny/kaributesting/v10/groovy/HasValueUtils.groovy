@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 /**
+ * A set of basic extension methods for {@link HasValue}-based components such as
+ * TextField.
  * @author Martin Vysny <mavi@vaadin.com>
  */
 @CompileStatic

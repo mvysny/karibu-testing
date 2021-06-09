@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable
 import org.jsoup.nodes.Node
 
 /**
+ * A set of basic extension methods for all Vaadin components.
  * @author mavi
  */
 @CompileStatic

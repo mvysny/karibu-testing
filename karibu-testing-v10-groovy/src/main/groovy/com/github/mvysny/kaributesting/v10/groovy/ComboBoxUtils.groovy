@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 /**
+ * A set of basic extension methods for {@link ComboBox}.
  * @author mavi
  */
 @CompileStatic

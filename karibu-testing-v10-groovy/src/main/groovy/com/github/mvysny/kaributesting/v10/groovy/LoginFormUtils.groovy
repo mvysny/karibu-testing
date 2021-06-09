@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 
 /**
+ * A set of basic extension methods for the Vaadin Login Form.
  * @author mavi
  */
 @CompileStatic

@@ -7,6 +7,7 @@ import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 
 /**
+ * Download utilities for {@link Anchor}.
  * @author mavi
  */
 @CompileStatic

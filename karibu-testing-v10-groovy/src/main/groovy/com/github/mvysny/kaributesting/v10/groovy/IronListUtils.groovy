@@ -1,8 +1,6 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
-import com.github.mvysny.kaributesting.v10.GridKt
 import com.github.mvysny.kaributesting.v10.IronListKt
-import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.ironlist.IronList
 import com.vaadin.flow.data.renderer.Renderer
 import groovy.transform.CompileStatic
@@ -10,6 +8,7 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 /**
+ * A set of basic extension methods for {@link IronList}.
  * @author Martin Vysny <mavi@vaadin.com>
  */
 @CompileStatic

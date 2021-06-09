@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable
 import static org.junit.jupiter.api.Assertions.fail
 
 /**
+ * A set of basic extension methods for {@link Grid} and {@link TreeGrid}.
  * @author mavi
  */
 @CompileStatic

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 /**
+ * A set of basic extension methods for {@link GridContextMenu} and {@link com.vaadin.flow.component.contextmenu.ContextMenu}.
  * @author mavi
  */
 @CompileStatic

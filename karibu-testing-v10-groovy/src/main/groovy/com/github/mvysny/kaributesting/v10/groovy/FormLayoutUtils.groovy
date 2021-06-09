@@ -7,6 +7,7 @@ import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
 
 /**
+ * A set of basic extension methods for {@link FormLayout}.
  * @author Martin Vysny <mavi@vaadin.com>
  */
 @CompileStatic

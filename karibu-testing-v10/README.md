@@ -1257,7 +1257,7 @@ currentRequest.mock.addCookie(Cookie("foo", "bar"))
 
 Java:
 ```java
-MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+UtilsKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
 ```
 
 To assert that your code has produced a cookie and written it into the response, simply use the `MockResponse`
@@ -1275,7 +1275,7 @@ expect("bar") { VaadinResponse.current.mock.getCookie("foo").value }
 
 Java:
 ```java
-assertEquals("bar", MockVaadinKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
+assertEquals("bar", UtilsKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
 ```
 
 ## Notifications
@@ -1312,7 +1312,7 @@ MockVaadin.setup(uiFactory = {
 Java:
 ```java
 MockVaadin.setup(new Routes(), () -> {
-    MockVaadinKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
+    UtilsKt.getMock(VaadinRequest.getCurrent()).addCookie(new Cookie("foo", "bar"));
     return new MyUI();
 });
 ```

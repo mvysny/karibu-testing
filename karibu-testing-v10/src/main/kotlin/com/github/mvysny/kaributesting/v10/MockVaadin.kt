@@ -249,6 +249,7 @@ public object MockVaadin {
      * * [cleanupDialogs]
      * @throws IllegalStateException if the environment is not mocked
      */
+    @JvmStatic
     public fun clientRoundtrip() {
         checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
         runUIQueue()

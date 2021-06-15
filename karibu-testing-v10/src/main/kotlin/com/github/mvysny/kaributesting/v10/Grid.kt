@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.grid.*
+import com.vaadin.flow.component.grid.editor.Editor
 import com.vaadin.flow.component.ironlist.IronList
 import com.vaadin.flow.component.listbox.ListBoxBase
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
@@ -25,6 +26,7 @@ import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 import kotlin.streams.toList
+import kotlin.test.expect
 import kotlin.test.fail
 
 /**
@@ -775,4 +777,16 @@ public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
     is CheckboxGroup<*> -> this.dataProvider
     is ComboBox<*> -> this.dataProvider
     else -> null
+}
+
+/**
+ * Call this instead of [Editor.editItem] - this function makes surethat the editor opening is
+ * mocked properly, calls the editor bindings, and fires the editor-open-event.
+ */
+public fun <T> Editor<T>._editItem(item: T) {
+    expect(true, "${grid.toPrettyString()} is not attached, editItem() would do nothing. Make sure the Grid is attached to an UI") {
+        grid.isAttached
+    }
+    editItem(item)
+    MockVaadin.clientRoundtrip()
 }

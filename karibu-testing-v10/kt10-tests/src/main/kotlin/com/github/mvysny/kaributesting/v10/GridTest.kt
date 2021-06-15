@@ -2,11 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.addColumnFor
+import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v10.component
-import com.github.mvysny.karibudsl.v10.grid
-import com.github.mvysny.karibudsl.v10.karibuDslI18n
-import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
@@ -19,6 +16,7 @@ import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
@@ -415,11 +413,59 @@ internal fun DynaNodeGroup.gridTestbatch() {
     group("drag n drop") {
         test("smoke") {
             UI.getCurrent().grid<String> {
-                val grid: Grid<String> = this
-                grid.dropMode = GridDropMode.ON_TOP
-                grid.isRowsDraggable = true
-                grid.addDragStartListener { }
-                grid.addDropListener { }
+                dropMode = GridDropMode.ON_TOP
+                isRowsDraggable = true
+                addDragStartListener { }
+                addDropListener { }
+            }
+        }
+    }
+
+    // https://github.com/mvysny/karibu-testing/issues/75
+    group("editor") {
+        test("smoke") {
+            UI.getCurrent().grid<String> {
+                setItems2(listOf("foo"))
+                editor._editItem("foo")
+            }
+        }
+        test("opening editor populates editor fields and runs openlisteners") {
+            val editorField = TextField()
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                val binder = beanValidationBinder<TestPerson>()
+                editor.binder = binder
+                addColumn("name").apply {
+                    editorField.apply {
+                        bind(binder).bind("name")
+                    }
+                    setEditorComponent(editorField)
+                }
+            }
+
+            // the test itself
+            var ran = false
+            grid.editor.addOpenListener { ran = true }
+            grid.editor._editItem(TestPerson("name 0", 0))
+            expect(true) { ran }
+            expect("name 0") { editorField.value }
+        }
+        test("opening editor fails on incorrect binding") {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                val binder = beanValidationBinder<TestPerson>()
+                editor.binder = binder
+                addColumn("name").apply {
+                    val editor = Checkbox().apply {
+                        bind(binder).bind("name")
+                    }
+                    setEditorComponent(editor)
+                }
+            }
+
+            // the test itself
+            expectThrows(ClassCastException::class, "java.lang.String cannot be cast to") {
+                grid.editor._editItem(TestPerson("name 0", 0))
             }
         }
     }

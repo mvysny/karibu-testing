@@ -218,14 +218,26 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/11
-        test("beforeClientResponse invoked") {
-            var ran = false
-            UI.getCurrent().beforeClientResponse(UI.getCurrent()) {
-                expect(false, "the block was supposed to be run only once") { ran }
-                ran = true
+        group("beforeClientResponse invoked") {
+            test("on an UI") {
+                var ran = false
+                UI.getCurrent().beforeClientResponse(UI.getCurrent()) {
+                    expect(false, "the block was supposed to be run only once") { ran }
+                    ran = true
+                }
+                _get<UI> {} // do the lookup which should trigger the beforeClientResponse run
+                expect(true) { ran }
             }
-            _get<UI> {} // do the lookup which should trigger the beforeClientResponse run
-            expect(true) { ran }
+            test("on a button nested within the UI") {
+                var ran = false
+                val button = UI.getCurrent().button()
+                UI.getCurrent().beforeClientResponse(button) {
+                    expect(false, "the block was supposed to be run only once") { ran }
+                    ran = true
+                }
+                _get<UI> {} // do the lookup which should trigger the beforeClientResponse run
+                expect(true) { ran }
+            }
         }
     }
 

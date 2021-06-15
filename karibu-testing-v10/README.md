@@ -879,6 +879,19 @@ the `DataProvider`'s fetching methods. However, the sorting is
 automatically applied by Karibu-Testing as if by the Grid itself,
 when you call Karibu-Testing's `GridKt` methods.
 
+#### Grid Editors
+
+The grid supports inline editing of one row, via the `Grid.getEditor()` API.
+However, the `grid.editor.editItem(item)` opens the editor lazily, not testing the editor component
+bindings eagerly.
+
+To solve this, Karibu-Testing introduces `grid.editor._editItem(item)`
+(since Karibu-Testing 1.3.1) which makes sure to
+"open" the editor, test the binder and also fire the editor-open-event.
+Java: `GridKt._editItem(grid.getEditor(), item)`.
+
+> Note: for this API to work, the Grid must be attached to an UI.
+
 ### IronList
 
 Similar to Grid, but one column only, no sorting, no filtering, no header,

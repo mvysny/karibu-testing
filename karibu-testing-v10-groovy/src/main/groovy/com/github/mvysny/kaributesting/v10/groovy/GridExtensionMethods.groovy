@@ -7,6 +7,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
+import com.vaadin.flow.component.grid.editor.Editor
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.data.provider.DataProvider
@@ -420,5 +421,13 @@ class GridExtensionMethods {
     @NotNull
     static String get_internalId(@NotNull Grid.Column<?> self) {
         GridKt.get_internalId(self)
+    }
+
+    /**
+     * Call this instead of {@link Editor#editItem(java.lang.Object)} - this function makes surethat the editor opening is
+     * mocked properly, calls the editor bindings, and fires the editor-open-event.
+     */
+    static <T> void _editItem(@NotNull Editor<T> self, T item) {
+        GridKt._editItem(self, item)
     }
 }

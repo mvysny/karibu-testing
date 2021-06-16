@@ -5,7 +5,9 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.anchor
 import com.github.mvysny.karibudsl.v10.routerLink
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.router.NotFoundException
+import kotlin.test.expect
 
 internal fun DynaNodeGroup.routerLinkBatch() {
     beforeEach {
@@ -51,21 +53,25 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
 
     group("anchor") {
         test("simple") {
-            UI.getCurrent().apply {
-                anchor("testing") {
-                    _click()
-                }
+            UI.getCurrent().anchor("testing") {
+                _click()
             }
             // make sure that the navigation has been performed and there is the TestingView in the current UI
             _get<TestingView>()
         }
+        test("toPrettyString") {
+            expect("Anchor[text='testing', href='testing']") {
+                UI.getCurrent().anchor("testing").toPrettyString()
+            }
+            expect("Anchor[DISABLED, text='testing', href='testing']") {
+                UI.getCurrent().anchor("testing") { isEnabled = false }.toPrettyString()
+            }
+        }
         test("disabled link cannot be clicked") {
             expectThrows(IllegalStateException::class, "The Anchor[DISABLED, text='testing', href='testing'] is not enabled") {
-                UI.getCurrent().apply {
-                    anchor("testing") {
-                        isEnabled = false
-                        _click()
-                    }
+                UI.getCurrent().anchor("testing") {
+                    isEnabled = false
+                    _click()
                 }
             }
         }

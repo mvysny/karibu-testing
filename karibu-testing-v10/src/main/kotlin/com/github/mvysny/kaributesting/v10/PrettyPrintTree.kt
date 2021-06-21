@@ -9,7 +9,6 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.icon.Icon
-import com.vaadin.flow.data.binder.HasItems
 import java.util.*
 import kotlin.streams.toList
 
@@ -120,7 +119,7 @@ public fun Component.toPrettyString(): String {
         list.add("placeholder='$placeholder'")
     }
     if (this is Anchor) {
-        list.add("href='$href'")
+        list.add("href='$_href'")
     }
     if (this is Image) {
         list.add("src='$src'")

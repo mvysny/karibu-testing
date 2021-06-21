@@ -5,7 +5,6 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.anchor
 import com.github.mvysny.karibudsl.v10.routerLink
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.router.NotFoundException
 import kotlin.test.expect
 

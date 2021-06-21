@@ -21,20 +21,20 @@ public fun Anchor.click() {
 }
 
 public var Anchor._href: String
-get() {
-    var hr: String = href
-    if (VaadinMeta.version >= 21) {
-        // work around https://github.com/vaadin/flow/issues/10924
-        val disabledHrefField = Anchor::class.java.getDeclaredField("disabledHref")
-        disabledHrefField.isAccessible = true
-        val disabledHref = disabledHrefField.get(this) as String?
-        if (disabledHref != null) {
-            hr = disabledHref
+    get() {
+        var hr: String = href
+        if (VaadinMeta.version >= 21) {
+            // work around https://github.com/vaadin/flow/issues/10924
+            val disabledHrefField =
+                Anchor::class.java.getDeclaredField("disabledHref")
+            disabledHrefField.isAccessible = true
+            val disabledHref = disabledHrefField.get(this) as String?
+            if (disabledHref != null) {
+                hr = disabledHref
+            }
         }
+        return hr
     }
-    return hr
-}
-
-set(value) {
-    href = value
-}
+    set(value) {
+        href = value
+    }

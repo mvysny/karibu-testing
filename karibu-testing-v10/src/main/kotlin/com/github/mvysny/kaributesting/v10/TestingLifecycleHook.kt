@@ -61,7 +61,8 @@ public interface TestingLifecycleHook {
             headerComponents + footerComponents + component.children.toList()
         }
         is MenuItemBase<*, *, *> -> {
-            component.getSubMenu().getItems()
+            // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
+            (component.children.toList() + component.subMenu.items).distinct()
         }
         else -> component.children.toList()
     }

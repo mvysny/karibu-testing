@@ -780,7 +780,7 @@ public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
 }
 
 /**
- * Call this instead of [Editor.editItem] - this function makes surethat the editor opening is
+ * Call this instead of [Editor.editItem] - this function makes sure that the editor opening is
  * mocked properly, calls the editor bindings, and fires the editor-open-event.
  */
 public fun <T> Editor<T>._editItem(item: T) {

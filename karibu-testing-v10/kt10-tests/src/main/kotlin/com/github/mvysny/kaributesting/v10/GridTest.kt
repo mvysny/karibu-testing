@@ -468,6 +468,16 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid.editor._editItem(TestPerson("name 0", 0))
             }
         }
+        test("closing editor fires the event") {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            grid.editor._editItem(TestPerson("name 0", 0))
+            var fired = false
+            grid.editor.addCloseListener { fired = true }
+            grid.editor.closeEditor()
+            expect(true) { fired }
+        }
     }
 }
 

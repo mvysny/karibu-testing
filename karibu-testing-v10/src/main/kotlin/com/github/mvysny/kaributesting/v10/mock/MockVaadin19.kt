@@ -25,11 +25,15 @@ public object MockVaadin19 {
             LookupInitializer::class.java,
             Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl")
         )
-        if (VaadinMeta.fullVersion.isAtLeast(19)) {
-            loaders.addAll(listOf(
-                Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"),
-                Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")
-            ))
+        val vaadinVersion = VaadinMeta.version
+        if (vaadinVersion >= 19) {
+            loaders.add(Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"))
+        }
+        if (vaadinVersion in 19..20) {
+            loaders.add(Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl"))
+        }
+        if (vaadinVersion >= 21) {
+            loaders.add(Class.forName("com.vaadin.fusion.frontend.EndpointGeneratorTaskFactoryImpl"))
         }
         loaderInitializer.onStartup(loaders, ctx)
 

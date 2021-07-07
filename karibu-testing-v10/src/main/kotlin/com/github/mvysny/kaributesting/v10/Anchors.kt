@@ -23,7 +23,7 @@ public fun Anchor.click() {
 public var Anchor._href: String
     get() {
         var hr: String = href
-        if (VaadinMeta.version >= 21) {
+        if (VaadinMeta.fullVersion >= SemanticVersion(20, 0, 4)) {
             // work around https://github.com/vaadin/flow/issues/10924
             val disabledHrefField =
                 Anchor::class.java.getDeclaredField("disabledHref")

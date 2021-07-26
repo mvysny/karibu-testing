@@ -335,9 +335,12 @@ public object MockVaadin {
         // the previous UI instance which is still attached to the session. And it blows.
 
         if (!currentlyClosingSession.get()) {
+            // Vaadin 20.0.5+: closing session also clears the wrapped VaadinSession.getSession().
+            // Acquire the wrapped session beforehand.
+            val mockSession: MockHttpSession = session.mock
             clearVaadinInstances()
-            session.mock.destroy()
-            createSession(session.mock.servletContext, uiFactory)
+            mockSession.destroy()
+            createSession(mockSession.servletContext, uiFactory)
         }
     }
 }

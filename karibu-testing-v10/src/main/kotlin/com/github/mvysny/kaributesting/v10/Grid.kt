@@ -632,7 +632,7 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey:
  * Fires the [ItemClickEvent] event for given [rowIndex] and a [column] which invokes all item click listeners
  * registered via [Grid.addItemClickListener].
  * @param button the id of the pressed mouse button
- * @param column the column that to be clicked
+ * @param column the column to be clicked
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
  * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
  * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
@@ -652,7 +652,7 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<*>, b
  * Fires the [ItemClickEvent] event for given [rowIndex] and a [columnKey] which invokes all item click listeners
  * registered via [Grid.addItemClickListener].
  * @param button the id of the pressed mouse button
- * @param columnKey the key of the column that to be clicked
+ * @param columnKey the key of the column to be clicked
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
  * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
  * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise

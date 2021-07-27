@@ -1208,7 +1208,7 @@ memory until the data is fetched.
 
 The thing is that Karibu Testing runs the test with the UI lock held. That simplifies
 testing very much, but that also prevents async updates by another thread, simply
-because the test is holding the lock!
+because the test function itself is holding the lock!
 
 The solution is to briefly let loose of the UI lock in the testing thread,
 allowing `UI.access()` tasks posted from a background thread to be processed.
@@ -1223,40 +1223,46 @@ the test checks that a dialog has popped up. Here is the source of the test meth
 
 ```kotlin
 _get<Button> { caption = "Buy Ticket" } ._click()
-MockVaadin.runUIQueue()
+MockVaadin.clientRoundtrip()
 Thread.sleep(200)
-MockVaadin.runUIQueue()
+MockVaadin.clientRoundtrip()
 expect("There are 25 available tickets. Would you like to purchase one?") { _get<ConfirmDialog>().message }
 ```
 
 The test clicks the button, sleeps for a 200 millis (the request only takes 50 ms and
-should be done by then), then calls `MockVaadin.runUIQueue()` which releases
-the UI lock, runs the tasks and reacquires the lock. Meanwhile, the data-fetching
+should be done by then), then calls `MockVaadin.clientRoundtrip()` which releases
+the UI lock, runs the tasks and re-acquires the lock. Meanwhile, the data-fetching
 process which runs in the background fetches the data and posts a UI task
 that shows a confirmation dialog. The dialog is then shown because
-`MockVaadin.runUIQueue()` runs all submitted tasks and blocks until all the
+`MockVaadin.clientRoundtrip()` runs all submitted tasks and blocks until all the
 tasks have been processed.
 
 ### Running the UI Queue Automatically
 
-Calling `MockVaadin.runUIQueue()` manually in every test can be tedious. It is
+Calling `MockVaadin.clientRoundtrip()` manually in every test can be tedious. It is
 easy to
 forget to call the method, which results in mysterious test crashes. The easiest
 way is to take advantage of Karibu-Testing hooking mechanism, and simply invoke
-the `MockVaadin.runUIQueue()` before and after every component lookup:
+the `MockVaadin.clientRoundtrip()` before every component lookup:
 
 ```kotlin
 object UIQueueRunnerHook : TestingLifecycleHook {
     override fun awaitBeforeLookup() {
-        MockVaadin.runUIQueue()
-    }
-    override fun awaitAfterLookup() {
-        MockVaadin.runUIQueue()
+        MockVaadin.clientRoundtrip()
     }
 }
 
 beforeGroup { testingLifecycleHook = UIQueueRunnerHook }
 ```
+
+This is what Karibu-Testing does by default.
+
+### Manual `push()`
+
+(Since Karibu-Testing 1.3.1): it's safe to call `UI.getCurrent().push()`. The function
+will do nothing though (since there's no browser and thus nowhere to push the changes to).
+In order for the `ui.access{}` blocks to take effect, call `MockVaadin.clientRoundtrip()`
+as described above.
 
 ## Cookies
 

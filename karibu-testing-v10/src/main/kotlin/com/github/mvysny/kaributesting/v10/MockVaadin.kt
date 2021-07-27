@@ -10,6 +10,7 @@ import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
+import com.vaadin.flow.shared.communication.PushMode
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
@@ -231,6 +232,10 @@ public object MockVaadin {
                 UI.getCurrent().navigate("")
             }
         }
+
+        // make sure that UI.getCurrent().push() can be called.
+        // https://github.com/mvysny/karibu-testing/issues/80
+        ui.pushConfiguration.pushMode = PushMode.AUTOMATIC
     }
 
     /**

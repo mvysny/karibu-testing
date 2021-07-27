@@ -15,6 +15,7 @@ import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.provider.ListDataProvider
@@ -251,6 +252,21 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
             expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
+            }
+        }
+    }
+
+    group("_getRowComponents") {
+        test("_getRowComponents returns row components") {
+            val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
+                addColumn(ComponentRenderer<Span, TestPerson> { person -> Span(person.name) }).key = "name"
+                addColumn(ComponentRenderer<Span, TestPerson> { person -> Span(person.age.toString()) }).key = "age"
+                setItems2((0..2).map { TestPerson("name $it", it) })
+                isEnabled = false
+            }
+            (0..2).forEach {
+                expect(listOf("name $it", it.toString())) { grid._getRowComponents(it).map { it._text } }
+                expect(listOf(true, true)) { grid._getRowComponents(it).map { it is Span } }
             }
         }
     }

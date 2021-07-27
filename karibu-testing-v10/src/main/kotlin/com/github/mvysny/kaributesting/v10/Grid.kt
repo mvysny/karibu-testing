@@ -298,6 +298,16 @@ public fun <T : Any> Grid<T>._getCellComponent(
 }
 
 /**
+ * Retrieves the list of components produced by [ComponentRenderer] in given [Grid] row. Fails if the
+ * renderer is not a [ComponentRenderer] in one of grid columns.
+ *
+ * @param rowIndex the row index, 0 or higher.
+ * @throws IllegalStateException if the renderer of one of the grid columns is not [ComponentRenderer].
+ */
+public fun <T : Any> Grid<T>._getRowComponents(rowIndex: Int): List<Component> =
+        columns.filter { it.isVisible }.map { _getCellComponent(rowIndex, it.key) }
+
+/**
  * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.

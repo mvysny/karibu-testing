@@ -7,7 +7,6 @@ import java.io.Serializable
 import java.lang.Exception
 import java.net.URL
 import java.net.URLConnection
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -16,7 +15,9 @@ import javax.servlet.descriptor.JspConfigDescriptor
 import kotlin.collections.HashMap
 
 public open class MockContext : ServletContext, Serializable {
-    override fun getServlet(name: String?): Servlet? = null
+    override fun getServlet(name: String): Servlet? {
+        throw UnsupportedOperationException("not implemented")
+    }
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
         throw UnsupportedOperationException("not implemented")
@@ -187,7 +188,31 @@ public open class MockContext : ServletContext, Serializable {
 
     override fun getVirtualServerName(): String = "mock/localhost" // Tomcat returns "Catalina/localhost"
 
-    override fun getContext(uripath: String?): ServletContext {
+    private var sessionTimeout: Int = 30
+
+    override fun getSessionTimeout(): Int = sessionTimeout
+
+    override fun setSessionTimeout(sessionTimeout: Int) {
+        this.sessionTimeout = sessionTimeout
+    }
+
+    private var requestCharacterEncoding: String? = null
+
+    override fun getRequestCharacterEncoding(): String? = requestCharacterEncoding
+
+    override fun setRequestCharacterEncoding(encoding: String?) {
+        requestCharacterEncoding = encoding
+    }
+
+    private var responseCharacterEncoding: String? = null
+
+    override fun getResponseCharacterEncoding(): String? = responseCharacterEncoding
+
+    override fun setResponseCharacterEncoding(encoding: String?) {
+        responseCharacterEncoding = encoding
+    }
+
+    override fun getContext(uripath: String): ServletContext {
         throw UnsupportedOperationException("not implemented")
     }
 
@@ -218,6 +243,10 @@ public open class MockContext : ServletContext, Serializable {
     }
 
     override fun addServlet(servletName: String?, servletClass: Class<out Servlet>?): ServletRegistration.Dynamic {
+        throw UnsupportedOperationException("not implemented")
+    }
+
+    override fun addJspFile(servletName: String, jspFile: String): ServletRegistration.Dynamic {
         throw UnsupportedOperationException("not implemented")
     }
 

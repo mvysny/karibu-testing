@@ -58,7 +58,8 @@ public interface TestingLifecycleHook {
             val footerComponents: List<Component> = component.footerRows
                     .flatMap { it.cells.map { it.component } }
                     .filterNotNull()
-            headerComponents + footerComponents + component.children.toList()
+            headerComponents + footerComponents + component.children.toList() +
+                    component.columns.map { it.editorComponent }
         }
         is MenuItemBase<*, *, *> -> {
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76

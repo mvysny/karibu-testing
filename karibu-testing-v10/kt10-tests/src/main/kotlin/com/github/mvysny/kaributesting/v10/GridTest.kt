@@ -478,6 +478,25 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(true) { ran }
             expect("name 0") { editorField.value }
         }
+        test("opening editor then get field to set value") {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                val binder = beanValidationBinder<TestPerson>()
+                editor.binder = binder
+                addColumn("name").apply {
+                    val editorField = TextField()
+                    editorField.apply {
+                        bind(binder).bind("name")
+                    }
+                    setEditorComponent(editorField)
+                }
+            }
+
+            // the test itself
+            grid.editor._editItem(TestPerson("name 0", 0))
+            val editorField = grid._get<TextField>()
+            expect("name 0") { editorField.value }
+        }
         test("opening editor fails on incorrect binding") {
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2((0..10).map { TestPerson("name $it", it) })

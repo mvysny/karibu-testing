@@ -376,6 +376,34 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(false) { event.isMetaKey }
             expect(false) { event.isShiftKey }
         }
+        test("get clicked column") {
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+
+            }
+            grid._clickItem(2, nameColumn)
+            expect(nameColumn) { event.column }
+        }
+        test("get clicked column by columnKey") {
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+
+            }
+            grid._clickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
+        }
     }
 
     group("_doubleClickItem") {

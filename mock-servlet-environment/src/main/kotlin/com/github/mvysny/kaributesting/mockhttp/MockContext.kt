@@ -16,7 +16,9 @@ import kotlin.collections.HashMap
 
 public open class MockContext : ServletContext, Serializable {
     override fun getServlet(name: String): Servlet? {
-        throw UnsupportedOperationException("not implemented")
+        // this method is deprecated since servlet spec 2.1 and should always return null.
+        // see javadoc for more details.
+        return null
     }
 
     override fun <T : Servlet?> createServlet(clazz: Class<T>?): T {
@@ -71,7 +73,7 @@ public open class MockContext : ServletContext, Serializable {
         return null
     }
 
-    override fun addListener(className: String?) {
+    override fun addListener(className: String) {
         throw UnsupportedOperationException("not implemented")
     }
 
@@ -79,7 +81,7 @@ public open class MockContext : ServletContext, Serializable {
         throw UnsupportedOperationException("not implemented")
     }
 
-    override fun addListener(listenerClass: Class<out EventListener>?) {
+    override fun addListener(listenerClass: Class<out EventListener>) {
         throw UnsupportedOperationException("not implemented")
     }
 
@@ -127,11 +129,11 @@ public open class MockContext : ServletContext, Serializable {
 
     override fun getMimeType(file: String): String = URLConnection.guessContentTypeFromName(file) ?: "application/octet-stream"
 
-    override fun declareRoles(vararg roleNames: String?) {
+    override fun declareRoles(vararg roleNames: String) {
         throw UnsupportedOperationException("not implemented")
     }
 
-    override fun <T : Filter?> createFilter(clazz: Class<T>?): T {
+    override fun <T : Filter?> createFilter(clazz: Class<T>): T {
         throw UnsupportedOperationException("not implemented")
     }
 
@@ -150,7 +152,7 @@ public open class MockContext : ServletContext, Serializable {
         return null
     }
 
-    public val initParameters: MutableMap<String, String> = mutableMapOf<String, String>()
+    public val initParameters: MutableMap<String, String> = mutableMapOf()
 
     override fun getInitParameter(name: String): String? = initParameters[name]
 

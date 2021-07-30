@@ -58,7 +58,7 @@ public fun Element.getVirtualChildren(): List<Element> {
 /**
  * Returns all components that are closest to [this] element.
  */
-fun Element._findComponents(): List<Component> {
+public fun Element._findComponents(): List<Component> {
     val components = mutableListOf<Component>()
 
     ComponentUtil.findComponents(this) {

@@ -77,7 +77,7 @@ public interface TestingLifecycleHook {
             // See https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates
             component.children.toList()
         }
-        // Also include virtual children
+        // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
         else -> component.children.toList() + component._getVirtualChildren()
     }

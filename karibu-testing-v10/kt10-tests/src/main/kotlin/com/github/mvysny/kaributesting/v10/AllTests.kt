@@ -21,6 +21,9 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("basic utils") {
         basicUtilsTestbatch()
     }
+    group("element utils") {
+        elementUtilsTestbatch()
+    }
     group("button") {
         buttonTestbatch()
     }

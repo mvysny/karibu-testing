@@ -13,16 +13,9 @@ import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
-import com.vaadin.flow.dom.Element
-import com.vaadin.flow.dom.ElementUtil
-import com.vaadin.flow.internal.nodefeature.ElementListenerMap
 import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
-import java.lang.IllegalArgumentException
 import kotlin.test.fail
 
 /**
@@ -32,13 +25,6 @@ import kotlin.test.fail
  */
 public fun Component._fireEvent(event: ComponentEvent<*>) {
     ComponentUtil.fireEvent(this, event)
-}
-
-/**
- * Fires a DOM [event] on this element.
- */
-public fun Element._fireDomEvent(event: DomEvent) {
-    node.getFeature(ElementListenerMap::class.java).fireEvent(event)
 }
 
 /**
@@ -163,22 +149,6 @@ public fun Component.expectNotEditableByUser() {
 }
 
 internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
-
-/**
- * This function actually works, as opposed to [Element.getTextRecursively].
- */
-public val Element.textRecursively2: String
-    get() {
-        // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
-        val node = ElementUtil.toJsoup(Document(""), this)
-        return node.textRecursively
-    }
-
-public val Node.textRecursively: String
-    get() = when (this) {
-        is TextNode -> this.text()
-        else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
-    }
 
 /**
  * Computes that this component and all of its parents are enabled.

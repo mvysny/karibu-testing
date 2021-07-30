@@ -48,8 +48,11 @@ public data class SemanticVersion(
         private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)([-.](.*))?")
 
         /**
-         * Parses the [version] string. Accepts the following format:
-         * `major.minor.bugfix[-prerelease]`. Always able to parse the output of
+         * Parses the [version] string. Accepts the following formats:
+         * * `major.minor.bugfix[-prerelease]`
+         * * `major.minor.bugfix[.prerelease]`
+         *
+         * Always able to parse the output of
          * [SemanticVersion.toString].
          */
         public fun fromString(version: String): SemanticVersion {

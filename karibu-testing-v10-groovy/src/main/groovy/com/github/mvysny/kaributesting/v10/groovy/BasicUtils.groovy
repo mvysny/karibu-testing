@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
+import com.github.mvysny.kaributesting.v10.ElementUtilsKt
 import com.github.mvysny.kaributesting.v10.HasValueUtilsKt
 import com.github.mvysny.kaributesting.v10.IconKt
 import com.github.mvysny.kaributesting.v10.IconName
@@ -43,7 +44,7 @@ class BasicUtils {
      * Fires a DOM [event] on this component.
      */
     static void _fireDomEvent(@NotNull Element self, @NotNull DomEvent event) {
-        BasicUtilsKt._fireDomEvent(self, event)
+        ElementUtilsKt._fireDomEvent(self, event)
     }
 
     /**
@@ -143,7 +144,7 @@ class BasicUtils {
      */
     @NotNull
     static String getTextRecursively2(@NotNull Element self) {
-        return BasicUtilsKt.getTextRecursively2(self)
+        return ElementUtilsKt.getTextRecursively2(self)
     }
 
     /**
@@ -151,7 +152,7 @@ class BasicUtils {
      */
     @NotNull
     static String getTextRecursively(@NotNull Node self) {
-        return BasicUtilsKt.getTextRecursively(self)
+        return ElementUtilsKt.getTextRecursively(self)
     }
 
     /**

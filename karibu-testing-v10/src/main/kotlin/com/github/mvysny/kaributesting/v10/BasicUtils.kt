@@ -228,3 +228,10 @@ public fun UI._close() {
     // Mock closing of UI after request handled.
     VaadinSession.getCurrent().removeUI(this)
 }
+
+/**
+ * Returns child components which were added to this component via
+ * [com.vaadin.flow.dom.Element.appendVirtualChild].
+ */
+public fun Component._getVirtualChildren(): List<Component> =
+    element.getVirtualChildren().mapNotNull { it.component.orElse(null) }

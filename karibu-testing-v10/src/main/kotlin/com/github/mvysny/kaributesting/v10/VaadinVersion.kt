@@ -34,6 +34,9 @@ public data class SemanticVersion(
                 { it.prerelease ?: "\ufffd" })
     }
 
+    /**
+     * Formats the version in the following format: `major.minor.bugfix[-prerelease]`.
+     */
     override fun toString(): String = "$major.$minor.$bugfix${if (prerelease != null) "-$prerelease" else ""}"
 
     public fun isExactly(major: Int, minor: Int): Boolean = this.major == major && this.minor == minor
@@ -44,6 +47,11 @@ public data class SemanticVersion(
     public companion object {
         private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)([-.](.*))?")
 
+        /**
+         * Parses the [version] string. Accepts the following format:
+         * `major.minor.bugfix[-prerelease]`. Always able to parse the output of
+         * [SemanticVersion.toString].
+         */
         public fun fromString(version: String): SemanticVersion {
             val match: MatchResult = requireNotNull(VERSION_REGEX.matchEntire(version),
                     { "The version must be in the form of major.minor.bugfix but is $version" })

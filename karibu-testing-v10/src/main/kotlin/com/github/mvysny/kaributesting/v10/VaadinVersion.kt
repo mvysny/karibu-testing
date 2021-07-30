@@ -56,8 +56,9 @@ public data class SemanticVersion(
          * [SemanticVersion.toString].
          */
         public fun fromString(version: String): SemanticVersion {
-            val match: MatchResult = requireNotNull(VERSION_REGEX.matchEntire(version),
-                    { "The version must be in the form of major.minor.bugfix but is $version" })
+            val match: MatchResult = requireNotNull(VERSION_REGEX.matchEntire(version)) {
+                "The version must be in the form of major.minor.bugfix but is $version"
+            }
             return SemanticVersion(
                     match.groupValues[1].toInt(),
                     match.groupValues[2].toInt(),

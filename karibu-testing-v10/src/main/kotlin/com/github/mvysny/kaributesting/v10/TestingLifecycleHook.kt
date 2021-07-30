@@ -5,6 +5,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import java.lang.reflect.Method
 import kotlin.streams.toList
 
@@ -66,7 +67,19 @@ public interface TestingLifecycleHook {
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
             (component.children.toList() + component.subMenu.items).distinct()
         }
-        else -> component.children.toList()
+        is PolymerTemplate<*> -> {
+            // Issue: https://github.com/mvysny/karibu-testing/issues/85
+            // don't include virtual children since those will include nested components.
+            // however, those components are only they are only "shallow shells" of components constructed
+            // server-side - almost none of their properties are transferred to the server-side.
+            // Listing those components with null captions and other properties would only be confusing.
+            // Therefore, let's leave the virtual children out for now.
+            // See https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates
+            component.children.toList()
+        }
+        // Also include virtual children
+        // Issue: https://github.com/mvysny/karibu-testing/issues/85
+        else -> component.children.toList() + component._getVirtualChildren()
     }
 
     public companion object {

@@ -79,7 +79,7 @@ public interface TestingLifecycleHook {
         }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
-        else -> component.children.toList() + component._getVirtualChildren()
+        else -> (component.children.toList() + component._getVirtualChildren()).distinct()
     }
 
     public companion object {

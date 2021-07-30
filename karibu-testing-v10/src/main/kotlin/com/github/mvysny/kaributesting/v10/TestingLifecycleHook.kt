@@ -61,14 +61,16 @@ public interface TestingLifecycleHook {
                     .filterNotNull()
             val editorComponents: List<Component> = component.columns
                     .mapNotNull { it.editorComponent }
-            headerComponents + footerComponents + editorComponents + component.children.toList()
+            val children = component.children.toList().map { it._allChildren }.flatten()
+            (headerComponents + footerComponents + editorComponents + children).distinct()
         }
-        is MenuItemBase<*, *, *> -> {
+        // SubMenu items are discovered via virtual children
+        // Issue: https://github.com/mvysny/karibu-testing/issues/85
+        /*is MenuItemBase<*, *, *> -> {
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
             (component.children.toList() + component.subMenu.items).distinct()
-        }
+        }*/
         is PolymerTemplate<*> -> {
-            // Issue: https://github.com/mvysny/karibu-testing/issues/85
             // don't include virtual children since those will include nested components.
             // however, those components are only they are only "shallow shells" of components constructed
             // server-side - almost none of their properties are transferred to the server-side.
@@ -79,8 +81,10 @@ public interface TestingLifecycleHook {
         }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
-        else -> (component.children.toList() + component._getVirtualChildren()).distinct()
+        else -> component._allChildren
     }
+
+    private val Component._allChildren: List<Component> get() = (children.toList() + _getVirtualChildren()).distinct()
 
     public companion object {
         /**

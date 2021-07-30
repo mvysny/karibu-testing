@@ -62,9 +62,7 @@ public fun Element._findComponents(): List<Component> {
     val components = mutableListOf<Component>()
 
     ComponentUtil.findComponents(this) {
-        if(it.element.parent == this) {
-            components.add(it)
-        }
+        components.add(it)
     }
 
     return components

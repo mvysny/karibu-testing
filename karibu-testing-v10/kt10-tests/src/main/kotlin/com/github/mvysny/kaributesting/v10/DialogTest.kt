@@ -12,7 +12,7 @@ internal fun DynaNodeGroup.dialogTestbatch() {
 
     group("enhanced dialog") {
 
-        test("enabled button") {
+        test("enhanced dialog components are discovered") {
             val title = Span("A span added to the enhanced dialog header")
             val field = TextField()
             val close = Button("Close")

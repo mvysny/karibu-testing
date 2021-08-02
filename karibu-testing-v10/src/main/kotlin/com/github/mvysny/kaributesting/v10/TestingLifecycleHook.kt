@@ -5,6 +5,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import java.lang.reflect.Method
 import kotlin.streams.toList
@@ -48,8 +49,8 @@ public interface TestingLifecycleHook {
      * * For [Grid.Column] the function will also return cell components nested in all headers and footers for that particular column.
      * * For [MenuItemBase] the function returns all items of a sub-menu.
      */
-    public fun getAllChildren(component: Component): List<Component> = when(component) {
-        is Grid<*> -> {
+    public fun getAllChildren(component: Component): List<Component> = when {
+        component is Grid<*> -> {
             // don't attach the header/footer components as a child of the Column component:
             // that would make components in merged cells appear more than once.
             // see https://github.com/mvysny/karibu-testing/issues/52
@@ -61,20 +62,34 @@ public interface TestingLifecycleHook {
                     .filterNotNull()
             val editorComponents: List<Component> = component.columns
                     .mapNotNull { it.editorComponent }
-            headerComponents + footerComponents + editorComponents + component.children.toList()
+            val children = component.children.toList()
+            (headerComponents + footerComponents + editorComponents + children).distinct()
         }
-        is MenuItemBase<*, *, *> -> {
+        component is MenuItemBase<*, *, *> -> {
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
             (component.children.toList() + component.subMenu.items).distinct()
         }
-        is PolymerTemplate<*> -> {
-            // Issue: https://github.com/mvysny/karibu-testing/issues/85
+        component is MenuBar -> {
+            // don't include virtual children since that would make the MenuItems appear two times.
+            component.children.toList()
+        }
+        component is PolymerTemplate<*> -> {
             // don't include virtual children since those will include nested components.
             // however, those components are only they are only "shallow shells" of components constructed
             // server-side - almost none of their properties are transferred to the server-side.
             // Listing those components with null captions and other properties would only be confusing.
             // Therefore, let's leave the virtual children out for now.
             // See https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates
+            component.children.toList()
+        }
+        component.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" -> {
+            // don't include virtual children since that would include the header/footer components
+            // which would clash with Grid.Column later on
+            component.children.toList()
+        }
+        component is Grid.Column<*> -> {
+            // don't include virtual children since that would include the header/footer components
+            // which would clash with Grid.Column later on
             component.children.toList()
         }
         // Also include virtual children.

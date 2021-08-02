@@ -24,4 +24,8 @@ dependencies {
 
     // for testing out the NPM template loading from META-INF/resources/frontend/
     api("com.github.appreciated:app-layout-addon:4.0.0.beta5")
+
+    // to test that EnhancedDialog's components are discovered properly
+    // Issue: https://github.com/mvysny/karibu-testing/issues/85
+    implementation("com.vaadin.componentfactory:enhanced-dialog:${properties["enhanceddialog_version"]}")
 }

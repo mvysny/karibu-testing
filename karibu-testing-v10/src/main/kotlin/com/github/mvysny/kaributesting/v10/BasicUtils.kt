@@ -234,4 +234,4 @@ public fun UI._close() {
  * [com.vaadin.flow.dom.Element.appendVirtualChild].
  */
 public fun Component._getVirtualChildren(): List<Component> =
-    element.getVirtualChildren().mapNotNull { it.component.orElse(null) }
+    element.getVirtualChildren().map { it._findComponents() }.flatten()

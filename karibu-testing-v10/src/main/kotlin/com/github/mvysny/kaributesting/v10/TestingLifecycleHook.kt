@@ -117,7 +117,7 @@ public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.def
  * which then fires event back to the server that the dialog was closed, and removes itself from the DOM.
  * Since there's no browser with browserless testing, we need to cleanup closed dialogs manually, hence this method.
  *
- * Also see [MockedUI] for more details
+ * Also see [com.github.mvysny.kaributesting.v10.mock.MockedUI] for more details
  */
 public fun cleanupDialogs() {
     UI.getCurrent().children.forEach {

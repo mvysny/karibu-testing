@@ -151,10 +151,13 @@ public fun Component.expectNotEditableByUser() {
 internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
 
 /**
- * Computes that this component and all of its parents are enabled.
+ * Computes whether this component and all of its parents are enabled.
+ *
+ * Effectively a shortcut for [isEnabled] since it recursively checks that all ancestors
+ * are also enabled (the "implicitly disabled" effect, see [HasEnabled.isEnabled] javadoc for more details).
  * @return false if this component or any of its parent is disabled.
  */
-public fun Component.isEffectivelyEnabled(): Boolean = isEnabled && (!parent.isPresent || parent.get().isEffectivelyEnabled())
+public fun Component.isEffectivelyEnabled(): Boolean = isEnabled
 
 /**
  * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.

@@ -37,6 +37,7 @@ internal fun DynaNodeGroup.buttonTestbatch() {
         test("button with parent disabled") {
             val layout = VerticalLayout().apply { isEnabled = false }
             expect(false) { layout.isEffectivelyEnabled() }
+            expect(false) { layout.button().isEffectivelyEnabled() }
             // click() does not check for parent disabled state
             expectClickCount(layout.button(), 1) { click() }
             // however _click() will properly fail

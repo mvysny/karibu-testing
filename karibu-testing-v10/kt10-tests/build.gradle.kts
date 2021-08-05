@@ -27,5 +27,5 @@ dependencies {
 
     // to test that EnhancedDialog's components are discovered properly
     // Issue: https://github.com/mvysny/karibu-testing/issues/85
-    implementation("com.vaadin.componentfactory:enhanced-dialog:${properties["enhanceddialog_version"]}")
+    implementation("com.vaadin.componentfactory:enhanced-dialog:1.0.4")
 }

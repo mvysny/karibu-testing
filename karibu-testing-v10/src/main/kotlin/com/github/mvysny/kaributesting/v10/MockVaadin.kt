@@ -252,6 +252,8 @@ public object MockVaadin {
      * * [runUIQueue]
      * * [StateTree.runExecutionsBeforeClientResponse] which runs all blocks scheduled via [UI.beforeClientResponse]
      * * [cleanupDialogs]
+     *
+     * If you'd like to test your [ErrorHandler] then take a look at [runUIQueue] instead.
      * @throws IllegalStateException if the environment is not mocked
      */
     @JvmStatic

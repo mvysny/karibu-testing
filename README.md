@@ -88,6 +88,12 @@ in Java, Kotlin or Groovy, whichever suits you more.
 
 Karibu-Testing is published on Maven Central, so it's very easy to add as a Maven dependency.
 
+## Project Status
+
+The library is mature and stable since 2020. It has been extensively tested and employed in numerous
+real-world projects. Small features are being added infrequently,
+and compatibility with all latest Vaadin versions is checked on every commit.
+
 ## Example Projects
 
 A list of a very simple example projects that employ Karibu Testing:

@@ -770,6 +770,7 @@ public fun <T> TreeGrid<T>._getRootItems(): List<T> =
 /**
  * Expands all nodes. May invoke massive data loading.
  */
+@JvmOverloads
 public fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
     expandRecursively(_getRootItems(), depth)
 }

@@ -66,7 +66,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 expect(10) {
                     val g = TreeGrid<Int>()
                     g.dataProvider = treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })
-                    g.expandRecursively(listOf(0), 10)
+                    g._expandAll()
                     g._size()
                 }
             }

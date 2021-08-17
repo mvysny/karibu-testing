@@ -892,6 +892,17 @@ Java: `GridKt._editItem(grid.getEditor(), item)`.
 
 > Note: for this API to work, the Grid must be attached to an UI.
 
+#### TreeGrid
+
+All of the functions mentioned above also work on a TreeGrid. The index of a row is essentially
+the order number of a tree node in preorder search.
+
+There is one huge catch though: nodes not explicitly expanded are ignored, for performance reasons.
+Since by default all nodes are collapsed, this will make Karibu-Testing to only consider
+root items of a TreeGrid. In order for the `_size()` and all index-based functions to be able to see all
+items in the Grid, you have to expand all of the nodes, by calling
+`treeGrid._expandAll()`/`GridKt._expandAll(treeGrid)`.
+
 ### IronList
 
 Similar to Grid, but one column only, no sorting, no filtering, no header,

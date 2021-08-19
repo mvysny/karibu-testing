@@ -481,16 +481,17 @@ internal val HeaderRow.HeaderCell.column: Any
 
 private val abstractCellClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
 private val abstractColumnClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
+private val _AbstractCell_getColumn: Method by lazy {
+    val m: Method = abstractCellClass.getDeclaredMethod("getColumn")
+    m.isAccessible = true
+    m
+}
 
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */
 private val FooterRow.FooterCell.column: Any
-    get() {
-        val getColumn: Method = abstractCellClass.getDeclaredMethod("getColumn")
-        getColumn.isAccessible = true
-        return getColumn.invoke(this)
-    }
+    get() = _AbstractCell_getColumn.invoke(this)
 
 /**
  * Retrieves the cell for given [property]; it matches [Grid.Column.getKey] to [KProperty1.name].
@@ -511,6 +512,12 @@ public fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
     return cell
 }
 
+private val _AbstractColumn_getBottomLevelColumn: Method by lazy {
+    val method: Method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
+    method.isAccessible = true
+    method
+}
+
 /**
  * Retrieves column key from the `AbstractColumn` receiver. The problem here is that receiver can be `ColumnGroup` which doesn't have
  * a key.
@@ -518,9 +525,7 @@ public fun HeaderRow.getCell(key: String): HeaderRow.HeaderCell {
 private val Any.columnKey: String?
     get() {
         abstractColumnClass.cast(this)
-        val method: Method = abstractColumnClass.getDeclaredMethod("getBottomLevelColumn")
-        method.isAccessible = true
-        val gridColumn: Grid.Column<*> = method.invoke(this) as Grid.Column<*>
+        val gridColumn: Grid.Column<*> = _AbstractColumn_getBottomLevelColumn.invoke(this) as Grid.Column<*>
         return gridColumn.key
     }
 
@@ -543,19 +548,25 @@ public fun FooterRow.getCell(key: String): FooterRow.FooterCell {
     return cell
 }
 
+private val _AbstractColumn_getHeaderRenderer: Method by lazy {
+    val method: Method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
+    method.isAccessible = true
+    method
+}
 public val HeaderRow.HeaderCell.renderer: Renderer<*>?
     get() {
-        val method: Method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
-        method.isAccessible = true
-        val renderer: Any = method.invoke(column)
+        val renderer: Any = _AbstractColumn_getHeaderRenderer.invoke(column)
         return renderer as Renderer<*>?
     }
 
+private val _AbstractColumn_getFooterRenderer: Method by lazy {
+    val method: Method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
+    method.isAccessible = true
+    method
+}
 public val FooterRow.FooterCell.renderer: Renderer<*>?
     get() {
-        val method: Method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
-        method.isAccessible = true
-        val renderer = method.invoke(column)
+        val renderer = _AbstractColumn_getFooterRenderer.invoke(column)
         return renderer as Renderer<*>?
     }
 

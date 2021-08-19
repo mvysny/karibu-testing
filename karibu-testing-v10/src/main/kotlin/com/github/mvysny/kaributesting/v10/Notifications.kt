@@ -17,13 +17,20 @@ public fun getNotifications(): List<Notification> {
     return notifications
 }
 
+private val _Notification_templateElement: Field by lazy {
+    val f: Field = Notification::class.java.getDeclaredField("templateElement")
+    f.isAccessible = true
+    f
+}
+
+public val Notification._templateElement: Element
+    get() = _Notification_templateElement.get(this) as Element
+
 /**
  * Returns the notification text.
  */
 public fun Notification.getText(): String {
-    val f: Field = Notification::class.java.getDeclaredField("templateElement")
-    f.isAccessible = true
-    val e: Element = f.get(this) as Element
+    val e: Element = _templateElement
     return e.getProperty("innerHTML") ?: ""
 }
 

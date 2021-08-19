@@ -10,6 +10,13 @@ import org.jsoup.Jsoup
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
+private val _BasicRenderer_getFormattedValue: Method by lazy {
+    val getFormattedValueM: Method = BasicRenderer::class.java.declaredMethods
+        .first { it.name == "getFormattedValue" }
+    getFormattedValueM.isAccessible = true
+    getFormattedValueM
+}
+
 /**
  * Returns the output of this renderer for given [rowObject] formatted as close as possible
  * to the client-side output.
@@ -21,10 +28,7 @@ public fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = whe
     }
     is BasicRenderer<T, *> -> {
         val value: Any? = this.valueProvider.apply(rowObject)
-        val getFormattedValueM: Method = BasicRenderer::class.java.declaredMethods
-                .first { it.name == "getFormattedValue" }
-        getFormattedValueM.isAccessible = true
-        getFormattedValueM.invoke(this, value)
+        _BasicRenderer_getFormattedValue.invoke(this, value)
     }
     is ComponentRenderer<*, T> -> {
         val component: Component = createComponent(rowObject)
@@ -46,24 +50,30 @@ public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     return template
 }
 
+private val _BasicRenderer_valueProvider: Field by lazy {
+    val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
+    javaField.isAccessible = true
+    javaField
+}
+
 /**
  * Returns the [ValueProvider] set to [BasicRenderer].
  */
 @Suppress("UNCHECKED_CAST")
 public val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
-    get() {
-        val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
-        javaField.isAccessible = true
-        return javaField.get(this) as ValueProvider<T, V>
-    }
+    get() = _BasicRenderer_valueProvider.get(this) as ValueProvider<T, V>
+
+private val _Renderer_template: Field by lazy {
+    val templateF: Field = Renderer::class.java.getDeclaredField("template")
+    templateF.isAccessible = true
+    templateF
+}
 
 /**
  * Returns the Polymer Template set to the [Renderer].
  */
 public val Renderer<*>.template: String
     get() {
-        val templateF: Field = Renderer::class.java.getDeclaredField("template")
-        templateF.isAccessible = true
-        val template: String? = templateF.get(this) as String?
+        val template: String? = _Renderer_template.get(this) as String?
         return template ?: ""
     }

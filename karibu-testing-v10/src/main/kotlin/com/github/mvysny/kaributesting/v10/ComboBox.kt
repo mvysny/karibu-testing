@@ -31,17 +31,25 @@ public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
 
+private val _ComboBox_dataCommunicator: Field by lazy {
+    check(ComboBox::class.java.declaredFields.any { it.name == "dataCommunicator" }) {
+        "This function only works with Vaadin 12 or higher"
+    }
+    val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator")
+    field.isAccessible = true
+    field
+}
+
+@Suppress("UNCHECKED_CAST")
+internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>
+    get() = _ComboBox_dataCommunicator.get(this) as DataCommunicator<T>?
+        ?: fail("${toPrettyString()}: items/dataprovider has not been set")
+
 /**
  * Fetches items currently displayed in the suggestion box.
  */
-@Suppress("UNCHECKED_CAST")
-public fun <T> ComboBox<T>.getSuggestionItems(): List<T> {
-    check(ComboBox::class.java.declaredFields.any { it.name == "dataCommunicator" }) { "This function only works with Vaadin 12 or higher" }
-    val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator").apply { isAccessible = true }
-    val dataCommunicator: DataCommunicator<T> = field.get(this) as DataCommunicator<T>?
-            ?: fail("${toPrettyString()}: items/dataprovider has not been set")
-    return dataCommunicator.fetchAll()
-}
+public fun <T> ComboBox<T>.getSuggestionItems(): List<T> =
+    _dataCommunicator.fetchAll()
 
 /**
  * Fetches captions of items currently displayed in the suggestion box.

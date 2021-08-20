@@ -96,13 +96,15 @@ public object MockVaadin {
      * Properly closes the current UI and fire the detach event on it.
      * Does nothing if there is no current UI.
      */
-    public fun closeCurrentUI() {
+    public fun closeCurrentUI(fireUIDetach: Boolean) {
         val ui: UI = UI.getCurrent() ?: return
         lastNavigation.set(ui.internals.activeViewLocation)
         if (ui.isClosing && ui.internals.session != null) {
             ui._close()
         }
-        ComponentUtil.onComponentDetach(ui)
+        if (fireUIDetach) {
+            ComponentUtil.onComponentDetach(ui)
+        }
         UI.setCurrent(null)
         strongRefUI.remove()
     }
@@ -116,7 +118,7 @@ public object MockVaadin {
      */
     @JvmStatic
     public fun tearDown() {
-        clearVaadinInstances()
+        clearVaadinInstances(false)
         val service: VaadinService? = VaadinService.getCurrent()
         if (service != null) {
             service.fireServiceDestroyListeners(ServiceDestroyEvent(service))
@@ -125,8 +127,8 @@ public object MockVaadin {
         lastNavigation.remove()
     }
 
-    private fun clearVaadinInstances() {
-        closeCurrentUI()
+    private fun clearVaadinInstances(fireUIDetach: Boolean) {
+        closeCurrentUI(fireUIDetach)
         closeCurrentSession()
         CurrentInstance.set(VaadinRequest::class.java, null)
         CurrentInstance.set(VaadinResponse::class.java, null)
@@ -345,7 +347,7 @@ public object MockVaadin {
             // Vaadin 20.0.5+: closing session also clears the wrapped VaadinSession.getSession().
             // Acquire the wrapped session beforehand.
             val mockSession: MockHttpSession = session.mock
-            clearVaadinInstances()
+            clearVaadinInstances(true)
             mockSession.destroy()
             createSession(mockSession.servletContext, uiFactory)
         }
@@ -376,7 +378,7 @@ private class MockPage(ui: UI, private val uiFactory: () -> UI, private val sess
     override fun reload() {
         // recreate the UI on reload(), to simulate browser's F5
         super.reload()
-        MockVaadin.closeCurrentUI()
+        MockVaadin.closeCurrentUI(true)
         MockVaadin.createUI(uiFactory, session)
     }
 }

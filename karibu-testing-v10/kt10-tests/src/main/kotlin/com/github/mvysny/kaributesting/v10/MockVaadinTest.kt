@@ -117,6 +117,23 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             MockVaadin.tearDown()
             MockVaadin.tearDown()
         }
+
+        test("tearDown() calls UI detach listeners") {
+            val vl = UI.getCurrent().verticalLayout()
+            var vldetachCalled = 0
+            vl.addDetachListener {
+                vldetachCalled++
+                expect(1, "detach should be called only once") { vldetachCalled }
+            }
+            var detachCalled = 0
+            UI.getCurrent().addDetachListener {
+                detachCalled++
+                expect(1, "detach should be called only once") { detachCalled }
+            }
+            MockVaadin.tearDown()
+            expect(1, "detach should be called exactly once") { detachCalled }
+            expect(1, "detach should be called exactly once") { vldetachCalled }
+        }
     }
 
     group("proper mocking") {
@@ -274,7 +291,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         test("Page reload should re-create the UI") {
             val ui = UI.getCurrent()
             var detachCalled = false
-            ui.addDetachListener { detachCalled = true }
+            ui.addDetachListener {
+                expect(false, "detach should be called only once") { detachCalled }
+                detachCalled = true
+            }
             UI.getCurrent().page.reload()
             // a new UI must be created; but the Session must stay the same.
             expect(true) { UI.getCurrent() != null }

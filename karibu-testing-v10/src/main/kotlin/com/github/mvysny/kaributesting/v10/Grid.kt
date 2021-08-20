@@ -472,12 +472,9 @@ public fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */
+@Suppress("ConflictingExtensionProperty")  // conflicting property is "protected"
 internal val HeaderRow.HeaderCell.column: Any
-    get() {
-        val getColumn: Method = abstractCellClass.getDeclaredMethod("getColumn")
-        getColumn.isAccessible = true
-        return getColumn.invoke(this)
-    }
+    get() = _AbstractCell_getColumn.invoke(this)
 
 private val abstractCellClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractRow\$AbstractCell")
 private val abstractColumnClass: Class<*> = Class.forName("com.vaadin.flow.component.grid.AbstractColumn")
@@ -490,6 +487,7 @@ private val _AbstractCell_getColumn: Method by lazy {
 /**
  * Returns `com.vaadin.flow.component.grid.AbstractColumn`
  */
+@Suppress("ConflictingExtensionProperty")  // conflicting property is "protected"
 private val FooterRow.FooterCell.column: Any
     get() = _AbstractCell_getColumn.invoke(this)
 
@@ -589,6 +587,12 @@ private val gridSorterComponentRendererClass: Class<*>? = try {
     // Vaadin 18.0.3+ doesn't contain this class anymore and simply uses ComponentRenderer
     null
 }
+private val _GridSorterComponentRenderer_component: Field? =
+    if (gridSorterComponentRendererClass == null) { null } else {
+        val field = gridSorterComponentRendererClass.getDeclaredField("component")
+        field.isAccessible = true
+        field
+    }
 
 /**
  * Returns or sets the component in grid's header cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
@@ -597,9 +601,7 @@ public var HeaderRow.HeaderCell.component: Component?
     get() {
         val r: Renderer<*>? = renderer
         if (gridSorterComponentRendererClass != null && gridSorterComponentRendererClass.isInstance(r)) {
-            val componentField = gridSorterComponentRendererClass.getDeclaredField("component")
-            componentField.isAccessible = true
-            return componentField.get(r) as Component?
+            return _GridSorterComponentRenderer_component!!.get(r) as Component?
         }
         if (r is ComponentRenderer<*, *>) {
             // this is fine - the ComponentRenderer set via `setComponent()` always returns the same component.

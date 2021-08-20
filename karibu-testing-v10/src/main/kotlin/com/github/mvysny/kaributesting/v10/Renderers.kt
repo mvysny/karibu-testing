@@ -59,7 +59,7 @@ private val _BasicRenderer_valueProvider: Field by lazy {
 /**
  * Returns the [ValueProvider] set to [BasicRenderer].
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ConflictingExtensionProperty")
 public val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
     get() = _BasicRenderer_valueProvider.get(this) as ValueProvider<T, V>
 

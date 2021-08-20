@@ -41,6 +41,7 @@ public object MockVaadinHelper {
         VaadinServletContext(createMockContext())
 
     public fun getTokenFileFromClassloader(): JsonObject? {
+        // no need to optimize this method; the output is cached in VaadinMeta.flowBuildInfo
         checkVaadinSupportedByKaribuTesting()
 
         if (VaadinMeta.fullVersion.isAtLeast(19)) {

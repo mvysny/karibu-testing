@@ -185,7 +185,7 @@ public object MockVaadin {
 
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)
-        session.browser = createVaadinBrowser(request)
+        session.browser = WebBrowser(request)
         checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }
 
         // init Vaadin Response

@@ -11,11 +11,6 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
     val filter: String
     init {
         // compute the filter
-        val mgenerateEventKeyFilter = ShortcutRegistration::class.java.getDeclaredMethod("generateEventKeyFilter", Key::class.java)
-        mgenerateEventKeyFilter.isAccessible = true
-        val mgenerateEventModifierFilter = ShortcutRegistration::class.java.getDeclaredMethod("generateEventModifierFilter", Collection::class.java)
-        mgenerateEventModifierFilter.isAccessible = true
-
         filter = mgenerateEventKeyFilter.invoke(null, key).toString() + " && " +
                 mgenerateEventModifierFilter.invoke(null, modifiers).toString()
 
@@ -31,6 +26,15 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
         val probeFilter = key.removeSuffix(" && (event.stopPropagation() || true)")
             .removeSuffix(" && (event.preventDefault() || true)")
         return probeFilter.startsWith(filter)
+    }
+
+    companion object {
+        private val mgenerateEventKeyFilter = ShortcutRegistration::class.java.getDeclaredMethod("generateEventKeyFilter", Key::class.java)
+        private val mgenerateEventModifierFilter = ShortcutRegistration::class.java.getDeclaredMethod("generateEventModifierFilter", Collection::class.java)
+        init {
+            mgenerateEventKeyFilter.isAccessible = true
+            mgenerateEventModifierFilter.isAccessible = true
+        }
     }
 }
 

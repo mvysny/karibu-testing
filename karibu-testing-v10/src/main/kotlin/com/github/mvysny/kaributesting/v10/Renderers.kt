@@ -10,7 +10,7 @@ import org.jsoup.Jsoup
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
-private val _BasicRenderer_getFormattedValue: Method by lazy {
+private val _BasicRenderer_getFormattedValue: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
     val getFormattedValueM: Method = BasicRenderer::class.java.declaredMethods
         .first { it.name == "getFormattedValue" }
     getFormattedValueM.isAccessible = true
@@ -50,7 +50,7 @@ public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     return template
 }
 
-private val _BasicRenderer_valueProvider: Field by lazy {
+private val _BasicRenderer_valueProvider: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
     val javaField: Field = BasicRenderer::class.java.getDeclaredField("valueProvider")
     javaField.isAccessible = true
     javaField
@@ -63,7 +63,7 @@ private val _BasicRenderer_valueProvider: Field by lazy {
 public val <T, V> BasicRenderer<T, V>.valueProvider: ValueProvider<T, V>
     get() = _BasicRenderer_valueProvider.get(this) as ValueProvider<T, V>
 
-private val _Renderer_template: Field by lazy {
+private val _Renderer_template: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
     val templateF: Field = Renderer::class.java.getDeclaredField("template")
     templateF.isAccessible = true
     templateF

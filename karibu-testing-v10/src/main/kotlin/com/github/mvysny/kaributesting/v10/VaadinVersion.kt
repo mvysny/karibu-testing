@@ -77,7 +77,7 @@ public object VaadinMeta {
     /**
      * Vaadin Flow `flow-server.jar` version: for example 1.2.0 for Vaadin 12
      */
-    public val flowVersion: SemanticVersion by lazy {
+    public val flowVersion: SemanticVersion by lazy(LazyThreadSafetyMode.PUBLICATION) {
         SemanticVersion(
             Version.getMajorVersion(),
             Version.getMinorVersion(),
@@ -93,7 +93,7 @@ public object VaadinMeta {
     /**
      * Returns a full Vaadin version.
      */
-    public val fullVersion: SemanticVersion by lazy {
+    public val fullVersion: SemanticVersion by lazy(LazyThreadSafetyMode.PUBLICATION) {
         // for Vaadin 14+ the version can be detected from the VaadinCoreShrinkWrap class.
         // This doesn't work for Vaadin 13 or lower, but nevermind - we only support Vaadin 14+ anyway.
         val annotation: NpmPackage = checkNotNull(VaadinCoreShrinkWrap::class.java.getAnnotation(NpmPackage::class.java),
@@ -102,14 +102,14 @@ public object VaadinMeta {
         SemanticVersion.fromString(version)
     }
 
-    public val flowBuildInfo: JsonObject? by lazy {
+    public val flowBuildInfo: JsonObject? by lazy(LazyThreadSafetyMode.PUBLICATION) {
         MockVaadinHelper.getTokenFileFromClassloader()
     }
 
     /**
      * Always false.
      */
-    public val isCompatibilityMode: Boolean by lazy {
+    public val isCompatibilityMode: Boolean by lazy(LazyThreadSafetyMode.PUBLICATION) {
         checkVaadinSupportedByKaribuTesting()
         if (version == 14) {
             checkNotVaadin14CompatMode()

@@ -31,7 +31,7 @@ public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
 
-private val _ComboBox_dataCommunicator: Field by lazy {
+private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
     check(ComboBox::class.java.declaredFields.any { it.name == "dataCommunicator" }) {
         "This function only works with Vaadin 12 or higher"
     }

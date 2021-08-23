@@ -17,7 +17,7 @@ public fun getNotifications(): List<Notification> {
     return notifications
 }
 
-private val _Notification_templateElement: Field by lazy {
+private val _Notification_templateElement: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
     val f: Field = Notification::class.java.getDeclaredField("templateElement")
     f.isAccessible = true
     f

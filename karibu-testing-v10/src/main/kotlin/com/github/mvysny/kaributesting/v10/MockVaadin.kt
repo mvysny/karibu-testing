@@ -15,7 +15,6 @@ import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletContext
-import kotlin.test.expect
 
 public object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -83,9 +82,7 @@ public object MockVaadin {
             servlet.init(MockServletConfig(ctx))
         }
         val service: VaadinServletService = checkNotNull(servlet.serviceSafe)
-        expect(true, "$servlet failed to call VaadinServletService.init() in createServletService()") {
-            service.router != null
-        }
+        check(service.router != null) { "$servlet failed to call VaadinServletService.init() in createServletService()" }
         VaadinService.setCurrent(service)
 
         // init Vaadin Session
@@ -181,8 +178,8 @@ public object MockVaadin {
         val session: VaadinSession = service._createVaadinSession(VaadinRequest.getCurrent())
         httpSession.setAttribute(service.serviceName + ".lock", ReentrantLock().apply { lock() })
         session.refreshTransients(WrappedHttpSession(httpSession), service)
-        expect(true, "$session created from $service has null lock. See the MockSession class on how to mock locks properly") { session.lockInstance != null }
-        expect(true, "$session created from $service: lock must be locked!") { (session.lockInstance as ReentrantLock).isLocked }
+        check(session.lockInstance != null) { "$session created from $service has null lock. See the MockSession class on how to mock locks properly" }
+        check((session.lockInstance as ReentrantLock).isLocked) { "$session created from $service: lock must be locked!" }
         session.configuration = service.deploymentConfiguration
 
         VaadinSession.setCurrent(session)
@@ -354,21 +351,31 @@ public object MockVaadin {
     }
 }
 
+private val _VaadinService_sessionInitListeners: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val field: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
+    field.isAccessible = true
+    field
+}
+
 private fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
-    val listenerField: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
-    listenerField.isAccessible = true
     @Suppress("UNCHECKED_CAST")
-    val sessionInitListeners: Collection<SessionInitListener> = listenerField.get(this) as Collection<SessionInitListener>
+    val sessionInitListeners: Collection<SessionInitListener> =
+        _VaadinService_sessionInitListeners.get(this) as Collection<SessionInitListener>
     for (sessionInitListener in sessionInitListeners) {
         sessionInitListener.sessionInit(event)
     }
 }
 
+private val _VaadinService_sessionDestroyListeners: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val field: Field = VaadinService::class.java.getDeclaredField("serviceDestroyListeners")
+    field.isAccessible = true
+    field
+}
+
 private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent) {
-    val listenerField: Field = VaadinService::class.java.getDeclaredField("serviceDestroyListeners")
-    listenerField.isAccessible = true
     @Suppress("UNCHECKED_CAST")
-    val listeners: Collection<ServiceDestroyListener> = listenerField.get(this) as Collection<ServiceDestroyListener>
+    val listeners: Collection<ServiceDestroyListener> =
+        _VaadinService_sessionDestroyListeners.get(this) as Collection<ServiceDestroyListener>
     for (listener in listeners) {
         listener.serviceDestroy(event)
     }

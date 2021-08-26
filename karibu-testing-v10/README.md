@@ -375,7 +375,7 @@ A typical app will consist of multiple views. You can test the views of such app
 * Properly set up your UI by calling `MockVaadin.setup(Routes().autoDiscoverViews("your.app.package"))`. The `autoDiscoverViews()` function will
   automatically discover all of your `@Route`-annotated views; `MockVaadin` will then properly populate the internal Vaadin Flow `RouteRegistry`.
   Because of that, you can simply call the navigation from your tests to perform the navigation to the view, for example
-  `UI.getCurrent().navigateTo("books")`.
+  `navigateTo("books")`.
 
 Typically Flow will rely on Servlet container to auto-discover all routes. However, with browserless tests there is no servlet container and
 nobody will discover the `@Route`s automatically. That's why Karibu-Testing library provides means to discover those views, in the form of
@@ -390,7 +390,7 @@ class MyUITest : DynaTest({
     beforeEach { MockVaadin.setup(routes) }
     test("simple test") {
         // navigate to the "Categories" list route.
-        UI.getCurrent().navigateTo("categories")
+        navigateTo("categories")
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         val grid = _get<Grid<*>>()
@@ -420,7 +420,7 @@ public class MyUITest {
     @Test
     public void testGreeting() {
         // navigate to the "Categories" list route.
-        UI.getCurrent().navigateTo("categories");
+        NavigatorKt.navigateTo("categories");
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         final Grid<Person> grid = _get(Grid.class);
@@ -449,7 +449,7 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
     @Test
     void testGreeting() {
         // navigate to the "Categories" list route.
-        UI.current.navigateTo("categories")
+        NavigatorKt.navigateTo("categories")
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         Grid<Person> grid = _get(Grid)
@@ -458,6 +458,15 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
     }
 })
 ```
+
+Make sure to use the `navigateTo()` global function: it will perform the navigation
+automatically within the current UI, including optional query parameters:
+
+* "" (empty string)
+* `foo/bar` - any view
+* `foo/25` - any view with parameters
+* `foo/25?token=bar` - any view with parameters and query parameters
+* `?token=foo` - the root view with query parameters
 
 ### Polymer Templates / Lit Templates
 

@@ -28,13 +28,35 @@ internal fun DynaNodeGroup.navigatorTest() {
         expectView<TestingView>()
     }
 
+    test("navigation using navigateTo()") {
+        navigateTo("testing")
+        expect(TestingView::class.java) { currentView }
+        expectView<TestingView>()
+    }
+
     test("navigation to parametrized test") {
         navigateToView(ParametrizedView::class, 5)
         expect(ParametrizedView::class.java) { currentView }
         expectView<ParametrizedView>()
+        expect(5) { _get<ParametrizedView>().parameter }
         expectThrows(AssertionError::class) {
             expectView<TestingView>()
         }
+    }
+
+    test("navigation to parametrized test using navigateTo()") {
+        navigateTo("params/5")
+        expect(ParametrizedView::class.java) { currentView }
+        expectView<ParametrizedView>()
+        expect(5) { _get<ParametrizedView>().parameter }
+    }
+
+    test("query parameters using navigateTo()") {
+        navigateTo("params/5?foo=bar")
+        expect(5) { _get<ParametrizedView>().parameter }
+        expect("bar") { _get<ParametrizedView>().qp["foo"] }
+        expect(ParametrizedView::class.java) { currentView }
+        expectView<ParametrizedView>()
     }
 
     // tests for https://github.com/mvysny/karibu-testing/issues/34

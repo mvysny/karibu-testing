@@ -522,8 +522,11 @@ internal fun DynaNodeGroup.mockVaadinTest() {
 
 @Route("params")
 class ParametrizedView : VerticalLayout(), HasUrlParameter<Int> {
+    var parameter: Int? = null
+    lateinit var qp: QueryParameters
     override fun setParameter(event: BeforeEvent, parameter: Int?) {
-        parameter!!
+        this.parameter = parameter!!
+        qp = event.location.queryParameters
     }
 }
 

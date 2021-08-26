@@ -6,6 +6,7 @@ import com.github.mvysny.kaributesting.mockhttp.MockResponse
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.HasErrorParameter
+import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.QueryParameters
 import com.vaadin.flow.server.*
@@ -138,5 +139,14 @@ public operator fun QueryParameters.get(parameterName: String): String? {
  * Returns the values associated with given [parameterName]. Returns an empty list
  * if there is no such parameter.
  */
-public fun QueryParameters.getValues(parameterName: String): List<String>
-    =parameters[parameterName] ?: listOf()
+public fun QueryParameters.getValues(parameterName: String): List<String> =
+    parameters[parameterName] ?: listOf()
+
+/**
+ * Parses given query as a QueryParameters.
+ * @param query the query string e.g. `foo=bar&quak=foo`; the parameters may repeat.
+ */
+public fun QueryParameters(query: String): QueryParameters = when {
+    query.isBlank() -> QueryParameters.empty()
+    else -> Location("?${query.trim('?')}").queryParameters
+}

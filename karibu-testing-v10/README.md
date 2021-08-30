@@ -21,15 +21,15 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    testCompile "com.github.mvysny.kaributesting:karibu-testing-v10:x.y.z"
+    testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10:x.y.z")
 }
 ```
 
 > Note: obtain the newest version from the tag name above
 
-For Groovy, use `testCompile "com.github.mvysny.kaributesting:karibu-testing-v10-groovy:x.y.z"`
+For Groovy, use `testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10-groovy:x.y.z")`
 instead. Groovy support has been added starting from Karibu-Testing 1.1.20 and higher, and 1.2.1 and higher.
-If you're using Pro components, use `testCompile "com.github.mvysny.kaributesting:karibu-testing-v10-pro-groovy:x.y.z"` instead.
+If you're using Pro components, use `testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10-pro-groovy:x.y.z")` instead.
 
 For Maven it's really easy: Karibu-Testing is published on Maven Central, so all you need to do is to add the dependency
 to your `pom.xml`:

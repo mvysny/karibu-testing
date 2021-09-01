@@ -1,8 +1,8 @@
 package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.kaributesting.v10._fireEvent
-import com.github.mvysny.kaributesting.v10._internalId
 import com.github.mvysny.kaributesting.v10.toPrettyString
+import com.github.mvysny.kaributools._internalId
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.gridpro.EditorType
 import com.vaadin.flow.component.gridpro.GridPro

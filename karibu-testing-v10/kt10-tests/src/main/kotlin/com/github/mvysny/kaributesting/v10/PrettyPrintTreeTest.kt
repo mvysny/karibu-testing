@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.kaributools.header2
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI

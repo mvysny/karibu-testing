@@ -32,9 +32,6 @@ public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
 }
 
 private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    check(ComboBox::class.java.declaredFields.any { it.name == "dataCommunicator" }) {
-        "This function only works with Vaadin 12 or higher"
-    }
     val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator")
     field.isAccessible = true
     field

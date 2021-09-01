@@ -3,7 +3,7 @@ package com.github.mvysny.kaributesting.v10.pro
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.TestPerson
-import com.github.mvysny.kaributesting.v10.VaadinMeta
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.textfield.NumberField
 import kotlin.test.expect
@@ -13,7 +13,7 @@ internal fun DynaNodeGroup.gridProTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    if (VaadinMeta.version >= 14) {
+    if (VaadinVersion.get.major >= 14) {
         // Only GridPro 2.0.0 has addCellEditStartedListener()
         test("CellEditStartedEvent") {
             val grid = GridPro<TestPerson>(TestPerson::class.java)
@@ -40,14 +40,14 @@ internal fun DynaNodeGroup.gridProTestbatch() {
             grid._proedit(p) { col._text("Bar") }
             expect("Bar") { p.name }
         }
-        if (VaadinMeta.version >= 14) {
+        if (VaadinVersion.get.major >= 14) {
             // Only GridPro 2.0.0 has custom fields
             test("int + custom field") {
                 val grid = GridPro<TestPerson>(TestPerson::class.java)
                 grid.removeAllColumns()
                 val numberField = NumberField()
                 val col = grid.addEditColumn("age")
-                        .custom(numberField) { p, age -> p.age = age.toInt() }
+                    .custom(numberField) { p, age -> p.age = age.toInt() }
                 val p = TestPerson("Foo", 45)
                 numberField.value = 3.15
                 grid._proedit(p) { col._customFlush() }

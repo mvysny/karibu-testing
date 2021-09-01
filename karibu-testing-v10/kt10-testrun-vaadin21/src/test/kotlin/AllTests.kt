@@ -1,6 +1,6 @@
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10.*
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
+import com.github.mvysny.kaributools.VaadinVersion
 import java.net.URL
 import kotlin.test.expect
 
@@ -15,7 +15,7 @@ class AllTests : DynaTest({
         afterEach { MockVaadin.tearDown() }
 
         test("Vaadin version") {
-            expect(21) { VaadinMeta.version }
+            expect(21) { VaadinVersion.get.major }
             expect(false) { VaadinMeta.isCompatibilityMode }
         }
     }

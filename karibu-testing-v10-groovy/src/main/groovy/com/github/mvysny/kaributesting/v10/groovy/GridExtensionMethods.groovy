@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10.groovy
 import com.github.mvysny.kaributesting.v10.GridKt
 import com.github.mvysny.kaributesting.v10.PrettyPrintTree
 import com.github.mvysny.kaributesting.v10.RenderersKt
+import com.github.mvysny.kaributools.GridUtilsKt
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
@@ -225,7 +226,7 @@ class GridExtensionMethods {
 
     @NotNull
     static <T, V> ValueProvider<T, V> getValueProvider2(@NotNull BasicRenderer<T, V> self) {
-        RenderersKt.getValueProvider(self)
+        com.github.mvysny.kaributools.RenderersKt.getValueProvider(self)
     }
 
     /**
@@ -238,7 +239,7 @@ class GridExtensionMethods {
 
     @NotNull
     static String getTemplate(@NotNull Renderer<?> self) {
-        RenderersKt.getTemplate(self)
+        com.github.mvysny.kaributools.RenderersKt.getTemplate(self)
     }
 
     /**
@@ -247,7 +248,7 @@ class GridExtensionMethods {
      */
     @NotNull
     static <T> String getHeader2(@NotNull Grid.Column<T> self) {
-        GridKt.getHeader2(self)
+        GridUtilsKt.getHeader2(self)
     }
 
     /**
@@ -295,12 +296,12 @@ class GridExtensionMethods {
 
     @Nullable
     static Renderer<?> getRenderer(@NotNull HeaderRow.HeaderCell self) {
-        GridKt.getRenderer(self)
+        GridUtilsKt.getRenderer(self)
     }
 
     @Nullable
     static Renderer<?> getRenderer(@NotNull FooterRow.FooterCell self) {
-        GridKt.getRenderer(self)
+        GridUtilsKt.getRenderer(self)
     }
 
     /**
@@ -309,7 +310,7 @@ class GridExtensionMethods {
      */
     @Nullable
     static Component getComponent(@NotNull FooterRow.FooterCell self) {
-        GridKt.getComponent(self)
+        GridUtilsKt.getComponent(self)
     }
 
     /**
@@ -318,7 +319,7 @@ class GridExtensionMethods {
      */
     @Nullable
     static Component getComponent(@NotNull HeaderRow.HeaderCell self) {
-        GridKt.getComponent(self)
+        GridUtilsKt.getComponent(self)
     }
 
     @NotNull
@@ -334,7 +335,7 @@ class GridExtensionMethods {
      * Sorts given grid. Affects {@link #_findAll}, {@link #_get} and other data-fetching functions.
      */
     static <T> void sort(@NotNull Grid<T> self, QuerySortOrder... sortOrder) {
-        GridKt.sort(self, sortOrder)
+        GridUtilsKt.sort(self, sortOrder)
     }
 
     /**
@@ -420,7 +421,7 @@ class GridExtensionMethods {
      */
     @NotNull
     static String get_internalId(@NotNull Grid.Column<?> self) {
-        GridKt.get_internalId(self)
+        GridUtilsKt.get_internalId(self)
     }
 
     /**

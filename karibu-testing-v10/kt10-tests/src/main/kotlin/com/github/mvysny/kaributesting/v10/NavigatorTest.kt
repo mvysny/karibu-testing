@@ -6,6 +6,8 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.navigateToView
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.span
+import com.github.mvysny.kaributools.get
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog

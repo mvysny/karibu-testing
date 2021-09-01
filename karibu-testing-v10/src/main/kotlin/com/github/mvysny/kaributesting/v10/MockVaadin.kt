@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.mockhttp.*
 import com.github.mvysny.kaributesting.v10.mock.*
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.page.Page
@@ -72,8 +73,8 @@ public object MockVaadin {
      */
     @JvmStatic
     public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinMeta.fullVersion >= SemanticVersion.VAADIN_14_3_0) {
-            "Karibu-Testing only works with Vaadin ${SemanticVersion.VAADIN_14_3_0} but you're using ${VaadinMeta.fullVersion}"
+        check(VaadinVersion.get.isAtLeast(14, 3)) {
+            "Karibu-Testing only works with Vaadin 14.3.0+ but you're using ${VaadinVersion.get}"
         }
         check(!VaadinMeta.isCompatibilityMode)
 

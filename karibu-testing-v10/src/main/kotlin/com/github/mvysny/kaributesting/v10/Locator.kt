@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.DepthFirstTreeIterator
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
@@ -149,7 +150,7 @@ public fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.
         // if there's a PolymerTemplate, warn that Karibu-Testing can't really locate components in there:
         // https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates
         // fixes https://github.com/mvysny/karibu-testing/issues/35
-        val hasPolymerTemplates: Boolean = walk().any { it is PolymerTemplate<*> }
+        val hasPolymerTemplates: Boolean = walkAll().any { it is PolymerTemplate<*> }
         if (hasPolymerTemplates) {
             message = "$message\nWarning: Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates for more details."
         }
@@ -184,7 +185,7 @@ public fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit =
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitBeforeLookup()
-    val descendants: List<Component> = walk().toList()
+    val descendants: List<Component> = walkAll().toList()
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) {
@@ -196,26 +197,11 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
 private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }
 
 /**
- * Walks the child tree, preorder depth-first: first the node, then its descendants,
- * then its next sibling.
- */
-internal class PreorderTreeIterator<out T>(root: T, private val children: (T) -> List<T>) : Iterator<T> {
-    private val queue: Deque<T> = LinkedList<T>(listOf(root))
-    override fun hasNext(): Boolean = !queue.isEmpty()
-    override fun next(): T {
-        if (!hasNext()) throw NoSuchElementException()
-        val result: T = queue.pop()
-        children(result).reversed().forEach { queue.push(it) }
-        return result
-    }
-}
-
-/**
  * Walks the component child tree, depth-first: first the component, then its descendants,
  * then its next sibling.
  */
-private fun Component.walk(): Iterable<Component> = Iterable {
-    PreorderTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }
+private fun Component.walkAll(): Iterable<Component> = Iterable {
+    DepthFirstTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }
 }
 
 /**

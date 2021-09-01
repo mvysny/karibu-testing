@@ -2,12 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.page.Page
-import com.vaadin.flow.router.Location
-import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.RouteRegistry
 import kotlin.test.expect
-import kotlin.test.fail
 
 /**
  * Returns the browser's current path. Returns null if there is no current UI.
@@ -49,16 +45,4 @@ public fun <V: Component> expectView(view: Class<V>) {
  */
 public inline fun <reified V: Component> expectView() {
     expectView(V::class.java)
-}
-
-/**
- * Navigates to any kind of link within the [currentUI], including optional query parameters:
- * * "" (empty string)
- * * `foo/bar` - any view
- * * `foo/25` - any view with parameters
- * * `foo/25?token=bar` - any view with parameters and query parameters
- * * `?token=foo` - the root view with query parameters
- */
-public fun navigateTo(location: String) {
-    currentUI.internals.router.navigate(currentUI, Location(location), NavigationTrigger.UI_NAVIGATE)
 }

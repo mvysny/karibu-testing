@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.mockhttp.MockContext
 import com.github.mvysny.kaributesting.v10.VaadinMeta
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.server.DeploymentConfigurationFactory
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServlet
@@ -25,7 +26,7 @@ public object MockVaadinHelper {
             servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
         }
 
-        if (VaadinMeta.fullVersion.isAtLeast(14, 6) && VaadinMeta.fullVersion.isExactly(14)) {
+        if (VaadinVersion.get.isAtLeast(14, 6) && VaadinVersion.get.isExactly(14)) {
             // otherwise DeploymentConfigurationFactory.verifyMode() will fail for Vaadin 14.6+
             servlet.servletContext.setInitParameter("compatibilityMode", "false")
         }
@@ -44,7 +45,7 @@ public object MockVaadinHelper {
         // no need to optimize this method; the output is cached in VaadinMeta.flowBuildInfo
         checkVaadinSupportedByKaribuTesting()
 
-        if (VaadinMeta.fullVersion.isAtLeast(19)) {
+        if (VaadinVersion.get.isAtLeast(19)) {
             return MockVaadin19.getTokenFileFromClassloader()
         }
 

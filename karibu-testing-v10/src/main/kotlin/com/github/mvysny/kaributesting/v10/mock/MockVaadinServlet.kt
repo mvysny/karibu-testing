@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.v10.*
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*
@@ -29,8 +30,12 @@ public open class MockVaadinServlet @JvmOverloads constructor(
     override fun createDeploymentConfiguration(initParameters: Properties): DeploymentConfiguration {
         // make sure that Vaadin 14+ starts in npm mode even with `frontend/` and `flow-build-info.json` missing.
         // this check is required for testing a jar module with Vaadin 14 components.
-        if (VaadinMeta.version == 14) {
-            initParameters.remove(DeploymentConfigurationFactory::class.java.getDeclaredField("DEV_MODE_ENABLE_STRATEGY").get(null))
+        if (VaadinVersion.get.major == 14) {
+            initParameters.remove(
+                DeploymentConfigurationFactory::class.java.getDeclaredField(
+                    "DEV_MODE_ENABLE_STRATEGY"
+                ).get(null)
+            )
         }
         return super.createDeploymentConfiguration(initParameters)
     }

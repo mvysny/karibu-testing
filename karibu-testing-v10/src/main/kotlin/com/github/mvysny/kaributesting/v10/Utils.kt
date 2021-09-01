@@ -6,19 +6,14 @@ import com.github.mvysny.kaributesting.mockhttp.MockResponse
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.HasErrorParameter
-import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NotFoundException
-import com.vaadin.flow.router.QueryParameters
 import com.vaadin.flow.server.*
-import elemental.json.Json
 import elemental.json.JsonArray
-import elemental.json.JsonObject
 import elemental.json.JsonValue
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
-import java.net.URL
 import javax.servlet.Servlet
 import javax.servlet.ServletContext
 import kotlin.test.expect
@@ -35,11 +30,6 @@ public val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0
 public fun <T> expectList(vararg expected: T, actual: ()->List<T>) {
     expect(expected.toList(), actual)
 }
-
-/**
- * Parses the contents of given URL as a Json.
- */
-internal fun URL.readJson(): JsonObject = Json.parse(readText())
 
 /**
  * Adds a [value] at the end of the array.
@@ -120,33 +110,3 @@ public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSe
 public val VaadinContext.context: ServletContext get() = (this as VaadinServletContext).context
 
 public val Servlet.isInitialized: Boolean get() = servletConfig != null
-
-/**
- * Returns the singleton value associated with given [parameterName].
- * Returns null if there is no such parameter.
- * @throws IllegalStateException if the parameter has 2 or more values.
- */
-public operator fun QueryParameters.get(parameterName: String): String? {
-    val value = getValues(parameterName)
-    return when {
-        value.isEmpty() -> null
-        value.size == 1 -> value.first()
-        else -> throw IllegalStateException("Multiple values present for $parameterName: $value")
-    }
-}
-
-/**
- * Returns the values associated with given [parameterName]. Returns an empty list
- * if there is no such parameter.
- */
-public fun QueryParameters.getValues(parameterName: String): List<String> =
-    parameters[parameterName] ?: listOf()
-
-/**
- * Parses given query as a QueryParameters.
- * @param query the query string e.g. `foo=bar&quak=foo`; the parameters may repeat.
- */
-public fun QueryParameters(query: String): QueryParameters = when {
-    query.isBlank() -> QueryParameters.empty()
-    else -> Location("?${query.trim('?')}").queryParameters
-}

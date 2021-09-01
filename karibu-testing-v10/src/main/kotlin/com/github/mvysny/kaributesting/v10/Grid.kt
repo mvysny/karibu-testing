@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
@@ -108,7 +109,7 @@ public fun <T : Any> Grid<T>._getOrNull(rowIndex: Int): T? {
  * if not. Returns true for Vaadin 14.
  */
 public val Grid<*>._dataProviderSupportsSizeOp: Boolean get() {
-    if (VaadinMeta.version < 19) {
+    if (VaadinVersion.get.major < 19) {
         return true
     }
     val m = DataCommunicator::class.java.getDeclaredMethod("isDefinedSize")
@@ -131,12 +132,12 @@ public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when(this) {
 }
 
 public val DataCommunicator<*>._saneFetchLimit: Int get() =
-    if (VaadinMeta.version in 17..18) {
+    if (VaadinVersion.get.major in 17..18) {
         // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
         // https://github.com/vaadin/flow/issues/8828
         // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
         1000
-    } else if (VaadinMeta.version >= 19) {
+    } else if (VaadinVersion.get.major >= 19) {
         // don't use high value otherwise Vaadin 19+ will calculate negative limit and will pass it to SizeVerifier,
         // failing instantly.
         Int.MAX_VALUE / 1000
@@ -210,6 +211,9 @@ public fun <T, F> DataProvider<T, F>._size(filter: F? = null): Int {
 public fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: F? = null): Int =
     _rowSequence(root, filter = filter).count()
 
+private val _DataCommunicator_getDataProviderSize: Method =
+    DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
+
 /**
  * Returns the number of items in this Grid.
  *
@@ -228,8 +232,7 @@ public fun Grid<*>._size(): Int {
     if (!_dataProviderSupportsSizeOp) {
         return _findAll().size
     }
-    val m = DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
-    return m.invoke(dataCommunicator) as Int
+    return _DataCommunicator_getDataProviderSize.invoke(dataCommunicator) as Int
 }
 
 /**
@@ -341,49 +344,13 @@ public fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val renderer: Renderer<T> = this.renderer
     if (renderer is ColumnPathRenderer) {
         val valueProviders: MutableMap<String, ValueProvider<T, *>> = renderer.valueProviders
-        val valueProvider: ValueProvider<T, *> = valueProviders[internalId2]
+        val valueProvider: ValueProvider<T, *> = valueProviders[_internalId]
                 ?: return null
         val value: Any? = valueProvider.apply(rowObject)
         return value.toString()
     }
     return renderer._getPresentationValue(rowObject)
 }
-
-@Suppress("UNCHECKED_CAST")
-private val <T> Grid.Column<T>.internalId2: String
-    get() = Grid.Column::class.java.getDeclaredMethod("getInternalId").run {
-        isAccessible = true
-        invoke(this@internalId2) as String
-    }
-
-private fun Any.gridAbstractHeaderGetHeader(): String {
-    // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
-    val headerRendererField: Field = Class.forName("com.vaadin.flow.component.grid.AbstractColumn").getDeclaredField("headerRenderer")
-    headerRendererField.isAccessible = true
-    val e: Renderer<*>? = headerRendererField.get(this) as Renderer<*>?
-    return e?.template ?: ""
-}
-
-/**
- * Sets and retrieves the column header as set by [Grid.Column.setHeader] (String).
- * The result value is undefined if a component has been set as the header.
- */
-public var <T> Grid.Column<T>.header2: String
-    get() {
-        // nasty reflection. Added a feature request to have this: https://github.com/vaadin/vaadin-grid-flow/issues/567
-        var result: String = gridAbstractHeaderGetHeader()
-        if (result.isEmpty()) {
-            // in case of grouped cells, the header is stored in a parent ColumnGroup.
-            val parent: Component? = parent.orElse(null)
-            if (parent != null && parent.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" && parent.children.count() == 1L) {
-                result = parent.gridAbstractHeaderGetHeader()
-            }
-        }
-        return result
-    }
-    set(value: String) {
-        setHeader(value)
-    }
 
 private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
     val so: GridSortOrder<T>? = sortOrder.firstOrNull { it.sorted == column }
@@ -546,76 +513,6 @@ public fun FooterRow.getCell(key: String): FooterRow.FooterCell {
     return cell
 }
 
-private val _AbstractColumn_getHeaderRenderer: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val method: Method = abstractColumnClass.getDeclaredMethod("getHeaderRenderer")
-    method.isAccessible = true
-    method
-}
-public val HeaderRow.HeaderCell.renderer: Renderer<*>?
-    get() {
-        val renderer: Any = _AbstractColumn_getHeaderRenderer.invoke(column)
-        return renderer as Renderer<*>?
-    }
-
-private val _AbstractColumn_getFooterRenderer: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val method: Method = abstractColumnClass.getDeclaredMethod("getFooterRenderer")
-    method.isAccessible = true
-    method
-}
-public val FooterRow.FooterCell.renderer: Renderer<*>?
-    get() {
-        val renderer = _AbstractColumn_getFooterRenderer.invoke(column)
-        return renderer as Renderer<*>?
-    }
-
-/**
- * Returns or sets the component in grid's footer cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
- */
-public var FooterRow.FooterCell.component: Component?
-    get() {
-        val cr: ComponentRenderer<*, *> = (renderer as? ComponentRenderer<*, *>) ?: return null
-        // this is fine - the ComponentRenderer set via `setComponent()` always returns the same component.
-        return cr.createComponent(null)
-    }
-    set(value) {
-        setComponent(value)
-    }
-
-private val gridSorterComponentRendererClass: Class<*>? = try {
-    Class.forName("com.vaadin.flow.component.grid.GridSorterComponentRenderer")
-} catch (e: ClassNotFoundException) {
-    // Vaadin 18.0.3+ doesn't contain this class anymore and simply uses ComponentRenderer
-    null
-}
-private val _GridSorterComponentRenderer_component: Field? =
-    if (gridSorterComponentRendererClass == null) { null } else {
-        val field = gridSorterComponentRendererClass.getDeclaredField("component")
-        field.isAccessible = true
-        field
-    }
-
-/**
- * Returns or sets the component in grid's header cell. Returns `null` if the cell contains String, something else than a component or nothing at all.
- */
-public var HeaderRow.HeaderCell.component: Component?
-    get() {
-        val r: Renderer<*>? = renderer
-        if (gridSorterComponentRendererClass != null && gridSorterComponentRendererClass.isInstance(r)) {
-            return _GridSorterComponentRenderer_component!!.get(r) as Component?
-        }
-        if (r is ComponentRenderer<*, *>) {
-            // this is fine - the ComponentRenderer set via `setComponent()` always returns the same component.
-            @Suppress("UNCHECKED_CAST")
-            return (r as ComponentRenderer<*, Any?>).createComponent(null)
-        }
-        return null
-    }
-    set(value) {
-        setComponent(value)
-    }
-
-public val KProperty1<*, *>.asc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.ASCENDING)
-public val KProperty1<*, *>.desc: QuerySortOrder get() = QuerySortOrder(name, SortDirection.DESCENDING)
 /**
  * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
@@ -733,7 +630,7 @@ public fun <T, F> HierarchicalDataProvider<T, F>._rowSequence(root: T? = null,
     }
 
     fun itemSubtreeSequence(item: T): Sequence<T> =
-            PreorderTreeIterator(item) { getChildrenOf(it) } .asSequence()
+            DepthFirstTreeIterator(item) { getChildrenOf(it) } .asSequence()
 
     val roots: List<T> = getChildrenOf(root)
     return roots.map { itemSubtreeSequence(it) } .asSequence().flatten()
@@ -789,15 +686,6 @@ public fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
 }
 
 /**
- * Returns the column's Internal ID.
- */
-public val Grid.Column<*>._internalId: String get() {
-    val getInternalIdMethod: Method = Grid.Column::class.java.getDeclaredMethod("getInternalId")
-    getInternalIdMethod.isAccessible = true
-    return getInternalIdMethod.invoke(this) as String
-}
-
-/**
  * Returns the data provider currently set to this [HasItems].
  */
 public val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this) {
@@ -835,7 +723,7 @@ public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
  */
 public fun <T> Editor<T>._editItem(item: T) {
     expect(true, "${grid.toPrettyString()} is not attached, editItem() would do nothing. Make sure the Grid is attached to an UI") {
-        grid.isAttached
+        grid.isAttached()
     }
     editItem(item)
     MockVaadin.clientRoundtrip()

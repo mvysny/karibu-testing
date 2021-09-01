@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.vaadin.flow.component.UI
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.html.Anchor
 import java.lang.reflect.Field
 
@@ -18,7 +18,7 @@ public fun Anchor._click() {
  * the link is actually visible and enabled.
  */
 public fun Anchor.click() {
-    UI.getCurrent().navigate(href)
+    navigateTo(href)
 }
 
 /**

@@ -20,22 +20,6 @@ public fun Element._fireDomEvent(event: DomEvent) {
 }
 
 /**
- * This function actually works, as opposed to [Element.getTextRecursively].
- */
-public val Element.textRecursively2: String
-    get() {
-        // remove when this is fixed: https://github.com/vaadin/flow/issues/3668
-        val node = ElementUtil.toJsoup(Document(""), this)
-        return node.textRecursively
-    }
-
-public val Node.textRecursively: String
-    get() = when (this) {
-        is TextNode -> this.text()
-        else -> childNodes().joinToString(separator = "", transform = { it.textRecursively })
-    }
-
-/**
  * Gets the element mapped to the given state node.
  */
 public val StateNode._element: Element get() = Element.get(this)

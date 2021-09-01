@@ -84,15 +84,6 @@ public var Component.id_: String?
     }
 
 /**
- * Checks whether this component is currently attached to an [UI].
- *
- * Returns true for attached components even if the UI itself is closed.
- */
-public val Component.isAttached: Boolean
-    // see https://github.com/vaadin/flow/issues/7911
-    get() = element.node.isAttached
-
-/**
  * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
  * the text must be non-empty).
  */
@@ -190,13 +181,6 @@ public var Component.placeholder: String?
             else -> throw IllegalStateException("${toPrettyString()} doesn't support setting placeholder")
         }
     }
-
-/**
- * Removes the component from its parent. Does nothing if the component does not have a parent.
- */
-public fun Component.removeFromParent() {
-    (parent.orElse(null) as? HasComponents)?.remove(this)
-}
 
 /**
  * Checks whether this component matches given spec. All rules are matched except the [count] rule. The

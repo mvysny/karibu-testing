@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.v10.VaadinMeta
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.di.Lookup
 import com.vaadin.flow.di.LookupInitializer
 import com.vaadin.flow.server.VaadinContext
@@ -25,7 +26,7 @@ public object MockVaadin19 {
             LookupInitializer::class.java,
             Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl")
         )
-        val vaadinVersion = VaadinMeta.version
+        val vaadinVersion = VaadinVersion.get.major
         if (vaadinVersion >= 19) {
             loaders.add(Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"))
         }
@@ -85,12 +86,12 @@ public object MockVaadin19 {
 
 // only Vaadin 19+ and Vaadin 14.6+ (but not Vaadin 15-18) has Lookup
 internal val VaadinMeta.hasLookup: Boolean
-    get() = fullVersion.isAtLeast(19) ||
-            (fullVersion.isAtLeast(14,6) && fullVersion.isExactly(14))
+    get() = VaadinVersion.get.isAtLeast(19) ||
+            (VaadinVersion.get.isAtLeast(14,6) && VaadinVersion.get.isExactly(14))
 
 internal fun checkVaadinSupportedByKaribuTesting() {
     if (!VaadinMeta.hasLookup) {
         // this Vaadin has no Lookup support => unsupported
-        throw RuntimeException("Karibu-Testing 1.3+ only support Vaadin 19+ and Vaadin 14 (only 14.6+) but the project uses Vaadin ${VaadinMeta.fullVersion}. Please try Karibu-Testing 1.2.x instead.")
+        throw RuntimeException("Karibu-Testing 1.3+ only support Vaadin 19+ and Vaadin 14 (only 14.6+) but the project uses Vaadin ${VaadinVersion.get}. Please try Karibu-Testing 1.2.x instead.")
     }
 }

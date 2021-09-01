@@ -114,27 +114,6 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("header2") {
-        val grid: Grid<TestPerson> = Grid(TestPerson::class.java)
-        expect("") { grid.addColumn({ it }).header2 }
-        expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo") }.header2 }
-        expect("") { grid.addColumn({ it }).apply { setHeader(Text("Foo")) }.header2 }
-        expect("Foo") { grid.addColumn({ it }).apply { setHeader("Foo"); setSortProperty("name") }.header2 }
-    }
-
-    test("header2 with joined columns") {
-        lateinit var col1: Grid.Column<String>
-        lateinit var col2: Grid.Column<String>
-        UI.getCurrent().grid<String> {
-            col1 = addColumn(karibuDslI18n).setHeader("foo")
-            col2 = addColumn(karibuDslI18n).setHeader("bar")
-            appendHeaderRow()
-            prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
-        }
-        expect("foo") { col1.header2 }
-        expect("bar") { col2.header2 }
-    }
-
     test("renderers") {
         val grid = UI.getCurrent().grid<TestPerson> {
             addColumnFor(TestPerson::name)

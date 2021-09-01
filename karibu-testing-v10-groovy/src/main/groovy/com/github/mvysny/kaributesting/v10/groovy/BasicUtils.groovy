@@ -2,15 +2,13 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
 import com.github.mvysny.kaributesting.v10.ElementUtilsKt
-import com.github.mvysny.kaributesting.v10.HasValueUtilsKt
-import com.github.mvysny.kaributesting.v10.IconKt
-import com.github.mvysny.kaributesting.v10.IconName
 import com.github.mvysny.kaributesting.v10.NotificationsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
+import com.github.mvysny.kaributools.ComponentUtilsKt
+import com.github.mvysny.kaributools.IconName
+import com.github.mvysny.kaributools.IconUtilsKt
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.ComponentEvent
-import com.vaadin.flow.component.Focusable
-import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.DomEvent
@@ -100,7 +98,7 @@ class BasicUtils {
      * Returns true for attached components even if the UI itself is closed.
      */
     static boolean isAttached(@NotNull Component self) {
-        return BasicUtilsKt.isAttached(self)
+        return ComponentUtilsKt.isAttached(self)
     }
 
     /**
@@ -144,7 +142,7 @@ class BasicUtils {
      */
     @NotNull
     static String getTextRecursively2(@NotNull Element self) {
-        return ElementUtilsKt.getTextRecursively2(self)
+        return com.github.mvysny.kaributools.ElementUtilsKt.getTextRecursively2(self)
     }
 
     /**
@@ -152,7 +150,7 @@ class BasicUtils {
      */
     @NotNull
     static String getTextRecursively(@NotNull Node self) {
-        return ElementUtilsKt.getTextRecursively(self)
+        return com.github.mvysny.kaributools.ElementUtilsKt.getTextRecursively(self)
     }
 
     /**
@@ -184,7 +182,7 @@ class BasicUtils {
      * Removes the component from its parent. Does nothing if the component does not have a parent.
      */
     static void removeFromParent(@NotNull Component self) {
-        BasicUtilsKt.removeFromParent(self)
+        ComponentUtilsKt.removeFromParent(self)
     }
 
     /**
@@ -235,10 +233,10 @@ class BasicUtils {
 
     @Nullable
     static IconName getIconName(@NotNull Icon self) {
-        return IconKt.getIconName(self)
+        return IconUtilsKt.getIconName(self)
     }
 
     static void setIconName(@NotNull Icon self, @Nullable IconName iconName) {
-        IconKt.setIconName(self, iconName)
+        IconUtilsKt.setIconName(self, iconName)
     }
 }

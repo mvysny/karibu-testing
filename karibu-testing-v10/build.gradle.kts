@@ -8,6 +8,7 @@ dependencies {
     testImplementation("com.vaadin:vaadin:${properties["vaadin14_version"]}")
 
     api(project(":mock-servlet-environment"))
+    api("com.github.mvysny.karibu-tools:karibu-tools:${properties["karibu_tools_version"]}")
 
     testImplementation("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
     api(kotlin("test"))

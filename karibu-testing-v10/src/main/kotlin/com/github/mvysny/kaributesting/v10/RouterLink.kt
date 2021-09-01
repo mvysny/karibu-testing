@@ -2,7 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.vaadin.flow.component.UI
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.router.RouterLink
 
 /**
@@ -20,5 +20,5 @@ public fun RouterLink._click() {
  * the link is actually visible and enabled.
  */
 public fun RouterLink.click() {
-    UI.getCurrent().navigate(href)
+    navigateTo()
 }

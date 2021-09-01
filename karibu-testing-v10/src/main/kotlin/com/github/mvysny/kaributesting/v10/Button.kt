@@ -2,7 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.vaadin.flow.component.ClickEvent
+import com.github.mvysny.kaributools.serverClick
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
@@ -26,17 +26,7 @@ public fun Button._click() {
  */
 public fun <T: ClickNotifier<*>> T._click() {
     _checkClickable()
-    click()
-}
-
-/**
- * Clicks the component implementing the [ClickNotifier] interface.
- *
- * WARNING: also clicks disabled/invisible button. Please use [_click] instead.
- */
-internal fun <T: ClickNotifier<*>> T.click() {
-    (this as Component)._fireEvent(ClickEvent<Component>(this,
-            false, 0, 0, 0, 0, 0, 0, false, false, false, false))
+    serverClick()
 }
 
 /**

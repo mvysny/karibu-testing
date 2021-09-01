@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.router.*
@@ -44,7 +45,7 @@ public data class Routes(
      */
     @Suppress("UNCHECKED_CAST")
     public fun register(sc: VaadinContext) {
-        if (VaadinMeta.version >= 19) {
+        if (VaadinVersion.get.major >= 19) {
             // otherwise RouteRegistryInitializer will not perform the initialization but
             // will defer it until the Lookup is available.
             MockVaadin19.verifyHasLookup(sc)

@@ -51,7 +51,7 @@ class GridExtensionMethodsTest {
         treeDP._size()
         treeDP._size("a")
         grid._size()
-        grid.addColumn(ValueProvider.identity() as ValueProvider).setKey("length")
+        grid.addColumn(ValueProvider.identity() as ValueProvider).setKey("length").setSortable(true)
         grid._getColumnByKey("length")
 
         grid.addColumn(new NativeButtonRenderer<String>("foo")).setKey("foo")

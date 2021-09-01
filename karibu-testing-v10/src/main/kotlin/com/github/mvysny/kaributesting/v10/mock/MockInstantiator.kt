@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.v10.VaadinMeta
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.littemplate.LitTemplateParser
 import com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl
 import com.vaadin.flow.component.polymertemplate.TemplateParser
@@ -21,7 +21,7 @@ public open class MockInstantiator(public val delegate: Instantiator) : Instanti
         public fun create(delegate: Instantiator): Instantiator {
             checkVaadinSupportedByKaribuTesting()
 
-            if (VaadinMeta.version >= 19) {
+            if (VaadinVersion.get.major >= 19) {
                 return MockInstantiatorV18(delegate)
             }
 
@@ -54,8 +54,9 @@ private object ByteBuddyUtils {
 public class MockInstantiatorV14_6_0(delegate: Instantiator): MockInstantiator(delegate) {
 
     init {
-        check(VaadinMeta.version == 14 && VaadinMeta.fullVersion.isAtLeast(14, 6)) {
-            "Unsupported Vaadin version: ${VaadinMeta.fullVersion}"
+        check(
+            VaadinVersion.get.major == 14 && VaadinVersion.get.isAtLeast(14, 6)) {
+            "Unsupported Vaadin version: ${VaadinVersion.get}"
         }
     }
 

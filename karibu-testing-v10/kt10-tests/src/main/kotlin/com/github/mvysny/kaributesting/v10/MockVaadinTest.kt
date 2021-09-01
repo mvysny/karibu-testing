@@ -13,6 +13,8 @@ import com.github.mvysny.kaributesting.v10.mock.MockService
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
+import com.github.mvysny.kaributools.isAttached
+import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text
@@ -156,32 +158,32 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 }
             }
             vl.addAttachListener {
-                expect(true) { vl.isAttached }
+                expect(true) { vl.isAttached() }
                 attachCallCount++
             }
             vl.addDetachListener {
                 // a bug in Vaadin? I'd expect the node to be detached (null parent etc) at this point...
                 // See https://github.com/vaadin/flow/issues/8809
-                expect(true) { vl.isAttached }
+                expect(true) { vl.isAttached() }
                 detachCallCount++
             }
 
             // attach
             UI.getCurrent().add(vl)
             expect(2) { attachCallCount }
-            expect(true) { vl.isAttached }
+            expect(true) { vl.isAttached() }
             expect(0) { detachCallCount }
 
             // close UI - detach is not called.
             UI.getCurrent().close()
             expect(2) { attachCallCount }
-            expect(true) { vl.isAttached }
+            expect(true) { vl.isAttached() }
             expect(0) { detachCallCount }
 
             // detach
             vl.removeFromParent()
             expect(2) { attachCallCount }
-            expect(false) { vl.isAttached }
+            expect(false) { vl.isAttached() }
             expect(2) { detachCallCount }
         }
 
@@ -189,19 +191,19 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             val vl = UI.getCurrent().verticalLayout()
             var detachCalled = 0
             vl.addDetachListener { detachCalled++ }
-            expect(true) { vl.isAttached }
+            expect(true) { vl.isAttached() }
 
             // close UI - detach is not called.
             UI.getCurrent().close()
-            expect(true) { vl.isAttached }
+            expect(true) { vl.isAttached() }
             expect(0) { detachCalled }
-            expect(true) { UI.getCurrent().isAttached }
+            expect(true) { UI.getCurrent().isAttached() }
 
             // Mock closing of UI after request handled
             UI.getCurrent()._close()
-            expect(false) { vl.isAttached }
+            expect(false) { vl.isAttached() }
             expect(1) { detachCalled }
-            expect(false) { UI.getCurrent().isAttached }
+            expect(false) { UI.getCurrent().isAttached() }
         }
 
         test("navigation works in mocked env") {

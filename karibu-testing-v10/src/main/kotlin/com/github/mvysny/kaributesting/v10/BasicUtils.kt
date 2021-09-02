@@ -159,7 +159,7 @@ public val Component.isEnabled: Boolean
         else -> true
     }
 
-// modify when this is fixed: https://github.com/vaadin/flow/issues/4068
+@Deprecated("moved to karibu-tools")
 public var Component.placeholder: String?
     get() = when (this) {
         is TextField -> placeholder

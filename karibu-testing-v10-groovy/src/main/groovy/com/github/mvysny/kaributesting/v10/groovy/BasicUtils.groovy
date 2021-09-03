@@ -61,10 +61,10 @@ class BasicUtils {
      */
     @NotNull
     static String getLabel(@NotNull Component self) {
-        return BasicUtilsKt.getLabel(self)
+        return ComponentUtilsKt.getLabel(self)
     }
     static void setLabel(@NotNull Component self, @NotNull String label) {
-        BasicUtilsKt.setLabel(self, label)
+        ComponentUtilsKt.setLabel(self, label)
     }
 
     /**
@@ -76,10 +76,10 @@ class BasicUtils {
      */
     @NotNull
     static String getCaption(@NotNull Component self) {
-        return BasicUtilsKt.getCaption(self)
+        return ComponentUtilsKt.getCaption(self)
     }
     static void setCaption(@NotNull Component self, @NotNull String caption) {
-        BasicUtilsKt.setCaption(self, caption)
+        ComponentUtilsKt.setCaption(self, caption)
     }
 
     /**
@@ -172,10 +172,10 @@ class BasicUtils {
     // modify when this is fixed: https://github.com/vaadin/flow/issues/4068
     @Nullable
     static String getPlaceholder(@NotNull Component self) {
-        return BasicUtilsKt.getPlaceholder(self)
+        return ComponentUtilsKt.getPlaceholder(self)
     }
     static void setPlaceholder(@NotNull Component self, @Nullable String placeholder) {
-        BasicUtilsKt.setPlaceholder(self, placeholder)
+        ComponentUtilsKt.setPlaceholder(self, placeholder)
     }
 
     /**

@@ -1,10 +1,9 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.getText
 import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.notification.Notification
-import com.vaadin.flow.dom.Element
-import java.lang.reflect.Field
 import kotlin.streams.toList
 
 /**
@@ -16,23 +15,6 @@ public fun getNotifications(): List<Notification> {
     val notifications = UI.getCurrent().children.toList().filterIsInstance<Notification>()
     testingLifecycleHook.awaitAfterLookup()
     return notifications
-}
-
-private val _Notification_templateElement: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val f: Field = Notification::class.java.getDeclaredField("templateElement")
-    f.isAccessible = true
-    f
-}
-
-public val Notification._templateElement: Element
-    get() = _Notification_templateElement.get(this) as Element
-
-/**
- * Returns the notification text.
- */
-public fun Notification.getText(): String {
-    val e: Element = _templateElement
-    return e.getProperty("innerHTML") ?: ""
 }
 
 /**

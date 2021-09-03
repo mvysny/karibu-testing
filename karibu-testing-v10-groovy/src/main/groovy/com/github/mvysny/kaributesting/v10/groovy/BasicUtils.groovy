@@ -228,7 +228,7 @@ class BasicUtils {
      */
     @NotNull
     static String getText(@NotNull Notification self) {
-        NotificationsKt.getText(self)
+        com.github.mvysny.kaributools.NotificationsKt.getText(self)
     }
 
     @Nullable

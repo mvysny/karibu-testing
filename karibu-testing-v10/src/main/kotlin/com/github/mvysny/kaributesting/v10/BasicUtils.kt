@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.getVirtualChildren
 import com.vaadin.flow.component.*
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.server.VaadinSession

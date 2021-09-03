@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.header2
-import com.github.mvysny.kaributools.iconName
+import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.component.HasValue

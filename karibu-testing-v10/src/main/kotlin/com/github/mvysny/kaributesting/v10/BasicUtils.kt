@@ -3,15 +3,6 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.*
-import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.checkbox.Checkbox
-import com.vaadin.flow.component.combobox.ComboBox
-import com.vaadin.flow.component.datepicker.DatePicker
-import com.vaadin.flow.component.formlayout.FormLayout
-import com.vaadin.flow.component.html.Input
-import com.vaadin.flow.component.textfield.PasswordField
-import com.vaadin.flow.component.textfield.TextArea
-import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
@@ -37,41 +28,6 @@ public fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Js
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
 
-/**
- * Determines the component's `label` (usually it's the HTML element's `label` property, but it's [Checkbox.getLabel] for checkbox).
- * Intended to be used for fields such as [TextField].
- */
-public var Component.label: String
-    get() = when (this) {
-        is Checkbox -> label
-        else -> element.getProperty("label") ?: ""
-    }
-    set(value) {
-        when (this) {
-            is Checkbox -> label = value
-            else -> element.setProperty("label", if (value.isBlank()) null else value)
-        }
-    }
-
-/**
- * The Component's caption: [Button.getText] for [Button], [label] for fields such as [TextField].
- *
- * For FormItem: Concatenates texts from all elements placed in the `label` slot. This effectively
- * returns whatever was provided in the String label via [FormLayout.addFormItem].
- */
-public var Component.caption: String
-    get() = when (this) {
-        is Button -> text
-        is FormLayout.FormItem -> this.caption
-        else -> label
-    }
-    set(value) {
-        when (this) {
-            is Button -> text = value
-            is FormLayout.FormItem -> throw IllegalArgumentException("Setting the caption of FormItem is currently unsupported")
-            else -> label = value
-        }
-    }
 /**
  * The same as [Component.getId] but without Optional.
  *
@@ -157,29 +113,6 @@ public val Component.isEnabled: Boolean
     get() = when (this) {
         is HasEnabled -> isEnabled
         else -> true
-    }
-
-@Deprecated("moved to karibu-tools")
-public var Component.placeholder: String?
-    get() = when (this) {
-        is TextField -> placeholder
-        is TextArea -> placeholder
-        is PasswordField -> placeholder
-        is ComboBox<*> -> this.placeholder  // https://youtrack.jetbrains.com/issue/KT-24275
-        is DatePicker -> placeholder
-        is Input -> placeholder.orElse(null)
-        else -> null
-    }
-    set(value) {
-        when (this) {
-            is TextField -> placeholder = value
-            is TextArea -> placeholder = value
-            is PasswordField -> placeholder = value
-            is ComboBox<*> -> this.placeholder = value
-            is DatePicker -> placeholder = value
-            is Input -> setPlaceholder(value)
-            else -> throw IllegalStateException("${toPrettyString()} doesn't support setting placeholder")
-        }
     }
 
 /**

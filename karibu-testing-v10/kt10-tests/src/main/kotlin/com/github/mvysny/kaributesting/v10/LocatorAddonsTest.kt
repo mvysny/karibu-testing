@@ -6,6 +6,7 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.iconButton
 import com.github.mvysny.karibudsl.v10.span
 import com.github.mvysny.karibudsl.v10.verticalLayout
+import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span

@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.data.binder.ValidationException
 

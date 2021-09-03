@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.DateRangePopup
+import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.button.Button

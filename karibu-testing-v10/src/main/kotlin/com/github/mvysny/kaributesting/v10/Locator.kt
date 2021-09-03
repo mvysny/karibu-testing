@@ -3,6 +3,8 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.DepthFirstTreeIterator
+import com.github.mvysny.kaributools.caption
+import com.github.mvysny.kaributools.placeholder
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue

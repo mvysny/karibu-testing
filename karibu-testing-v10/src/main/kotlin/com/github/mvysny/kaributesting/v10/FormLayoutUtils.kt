@@ -18,12 +18,3 @@ public val FormLayout.FormItem.field: Component get() {
     }
     return fields[0]
 }
-
-/**
- * Concatenates texts from all elements placed in the `label` slot. This effectively
- * returns whatever was provided in the String label via [FormLayout.addFormItem].
- */
-public val FormLayout.FormItem.caption: String get() {
-    val captions: List<Component> = children.toList().filter { it.element.getAttribute("slot") == "label" }
-    return captions.joinToString("") { it._text ?: "" }
-}

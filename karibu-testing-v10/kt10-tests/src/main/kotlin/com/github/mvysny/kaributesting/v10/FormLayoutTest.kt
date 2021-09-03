@@ -3,24 +3,15 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.formItem
-import com.github.mvysny.karibudsl.v10.label
 import com.github.mvysny.karibudsl.v10.textField
-import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
-import java.lang.IllegalStateException
 import kotlin.test.expect
 
 internal fun DynaNodeGroup.formLayoutTest() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
-
-    test("caption") {
-        expect("") { FormLayout.FormItem().caption }
-        val fi: FormLayout.FormItem = FormLayout().addFormItem(Label("bar"), "foo")
-        expect("foo") { fi.caption }
-    }
 
     test("basic FormItem lookup") {
         val f: FormLayout = FormLayout().apply {

@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.IconName
+import com.github.mvysny.kaributools.caption
 import com.github.mvysny.kaributools.iconName
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasText

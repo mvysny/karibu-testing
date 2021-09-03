@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v10.component
+import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI

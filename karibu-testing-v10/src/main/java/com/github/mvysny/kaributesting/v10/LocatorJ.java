@@ -318,4 +318,11 @@ public class LocatorJ {
             return Unit.INSTANCE;
         });
     }
+
+    /**
+     * Expects that there are no dialogs shown.
+     */
+    public static void _assertNoDialogs() {
+        LocatorKt._expectNoDialogs();
+    }
 }

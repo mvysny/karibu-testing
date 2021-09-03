@@ -7,6 +7,7 @@ import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
@@ -14,6 +15,26 @@ import com.vaadin.flow.component.textfield.TextField
 import java.util.function.Predicate
 import kotlin.streams.asSequence
 import kotlin.test.expect
+
+internal fun DynaNodeGroup.locatorTest2() {
+    beforeEach { MockVaadin.setup() }
+    afterEach { MockVaadin.tearDown() }
+
+    test("_expectNoDialogs()") {
+        _expectNoDialogs() // should succeed on no dialogs
+        val dlg = Dialog()
+        dlg.open()
+        expectThrows(AssertionError::class,
+            """Too many visible Dialogs (1) in MockedUI[] matching Dialog and count=0..0: [Dialog[]]. Component tree:
+└── MockedUI[]
+    └── Dialog[]
+""") {
+            _expectNoDialogs()
+        }
+        dlg.close()
+        _expectNoDialogs()
+    }
+}
 
 internal fun DynaNodeGroup.locatorTest() {
 

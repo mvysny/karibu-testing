@@ -206,4 +206,8 @@ internal fun DynaNodeGroup.locatorJTest() {
             expect(false) { Button().matches { withPredicate { false } }}
         }
     }
+
+    test("_assertNoDialogs() smoke") {
+        LocatorJ._assertNoDialogs()
+    }
 }

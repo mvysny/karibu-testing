@@ -49,7 +49,12 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         locatorJTest()
     }
     group("locator") {
-        locatorTest()
+        group("with lifecycle hook testing") {
+            locatorTest()
+        }
+        group("no lifecycle hook testing") {
+            locatorTest2()
+        }
     }
     group("mock vaadin") {
         mockVaadinTest()

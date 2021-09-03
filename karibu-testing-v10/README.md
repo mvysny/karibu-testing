@@ -1083,6 +1083,14 @@ When testing a Vaadin Binder-based form, by default Flow Binder will throw a non
 To get more information in your tests, simply catch the `ValidationException` and throw a `RuntimeException`
 with a much more informative message obtained via `ValidationException.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(ex)`).
 
+### Dialogs
+
+Use the `getAllDialogs()` global function to retrieve a list of all currently opened dialogs
+(for Java/Groovy it's `DialogUtilsKt.getAllDialogs()`; the function comes from [karibu-tools](https://github.com/mvysny/karibu-tools/)).
+
+Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Groovy it's
+`LocatorJ._assertNoDialogs()`.
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

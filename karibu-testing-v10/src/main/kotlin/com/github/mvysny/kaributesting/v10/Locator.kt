@@ -9,6 +9,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
@@ -225,6 +226,13 @@ public fun <T: Component> Component._expectNone(clazz: Class<T>, block: SearchSp
         check(count == 0..0) { "You're calling _expectNone which expects 0 component, yet you tried to specify the count of $count" }
     }
     check(result.isEmpty()) // safety check that _find works as expected
+}
+
+/**
+ * Expects that there are no dialogs shown.
+ */
+public fun _expectNoDialogs() {
+    _expectNone<Dialog>()
 }
 
 /**

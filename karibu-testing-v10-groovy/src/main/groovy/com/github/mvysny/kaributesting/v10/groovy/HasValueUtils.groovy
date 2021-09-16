@@ -43,7 +43,7 @@ class HasValueUtils {
      * @param fromClient defaults to true
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C self, boolean fromClient = true) {
-        HasValueUtilsKt._fireValueChange(self, fromClient)
+    static void _fireValueChange(@NotNull AbstractField<?, ?> self, boolean fromClient = true) {
+        HasValueUtilsKt._fireValueChange(self as AbstractField, fromClient)
     }
 }

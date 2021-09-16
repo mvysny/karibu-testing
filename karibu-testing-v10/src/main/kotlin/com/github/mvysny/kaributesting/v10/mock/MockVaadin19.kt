@@ -26,15 +26,24 @@ public object MockVaadin19 {
             LookupInitializer::class.java,
             Class.forName("com.vaadin.flow.di.LookupInitializer${'$'}ResourceProviderImpl")
         )
+
+        fun tryLoad(clazz: String) {
+            // sometimes customers don't include entire vaadin-core and exclude stuff like fusion on purpose.
+            // load the class only if it exists.
+            try {
+                loaders.add(Class.forName(clazz))
+            } catch (ex: ClassNotFoundException) {}
+        }
+
         val vaadinVersion = VaadinVersion.get.major
         if (vaadinVersion >= 19) {
-            loaders.add(Class.forName("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler"))
+            tryLoad("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler")
         }
         if (vaadinVersion in 19..20) {
-            loaders.add(Class.forName("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl"))
+            tryLoad("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")
         }
         if (vaadinVersion >= 21) {
-            loaders.add(Class.forName("com.vaadin.fusion.frontend.EndpointGeneratorTaskFactoryImpl"))
+            tryLoad("com.vaadin.fusion.frontend.EndpointGeneratorTaskFactoryImpl")
         }
         loaderInitializer.onStartup(loaders, ctx)
 

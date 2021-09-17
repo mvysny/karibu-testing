@@ -769,8 +769,8 @@ all the above items prior setting the new value:
 * Kotlin, Groovy: `textField._value = "42"`
 * Java: `LocatorJ._setValue(textField, "42");`
 
-Changing the value fires the ValueChangeEvent with `fromClient` set to false.
-However, sometimes you need to fire a "client-side" value-change event,
+Changing the value fires the ValueChangeEvent with `isFromClient` set to false.
+However, sometimes you need to fire a "client-side"/"isfromuser" value-change event,
 to test a code reacting to such events. In such case please use:
 
 * Kotlin, Groovy: `textField._fireValueChange()`

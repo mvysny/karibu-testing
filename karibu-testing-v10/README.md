@@ -1472,7 +1472,24 @@ project demoes this possibility in the
 [MyUITest](https://gitlab.com/mvysny/vaadin14-mpr-gradle-demo/-/blob/master/src/test/kotlin/org/test/MyUITest.kt)
 class.
 
-# Parallel testing with multiple UIs
+# Tests with multiple UIs/Sessions
+
+Sometimes you tie things to the instances of an UI (or you scope beans to the UI scope).
+For example, you want to preserve route instances for the current tab, see
+[cached vaadin routes](https://mvysny.github.io/cached-vaadin-routes/) for more info.
+Alternatively, you want to test things for two users (e.g. logging one user in still
+forces other users to log in).
+
+## Simple tests
+
+The testing scenario is to assert that something holds for one UI but it doesn't
+for another (e.g. UI-scoped route instances). You can simply call
+`MockVaadin.setup()` to have a session and an UI ready, then manipulate the current UI
+and test stuff. After you're done, call `UI.getCurrent().page.reload()` to set a
+completely new UI instance to the `UI.current` while keeping the current session intact.
+You can now test that e.g. the route instance differs for the new UI.
+
+## Parallel testing with multiple UIs
 
 The testing scenario here is to simulate two users, using the same
 Vaadin app with two separate UIs at the same time.

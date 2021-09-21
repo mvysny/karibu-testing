@@ -1489,14 +1489,14 @@ and test stuff. After you're done, call `UI.getCurrent().page.reload()` to set a
 completely new UI instance to the `UI.current` while keeping the current session intact.
 You can now test that e.g. the route instance differs for the new UI.
 
-## Parallel testing with multiple UIs
+## Parallel testing with multiple UIs+Sessions
 
 The testing scenario here is to simulate two users, using the same
 Vaadin app with two separate UIs at the same time.
 
 The UI, VaadinSession and all other Vaadin objects are tied to the thread
 who called `MockVaadin.setup()`. Therefore, it is possible to have multiple UIs
-by starting two (or more) threads from the test method, then
+and Sessions by starting two (or more) threads from the test method, then
 calling `MockVaadin.setup()` from all of those threads.
 
 **WARNING:** Make sure you're using Karibu-Testing 1.1.27+ or 1.2.1+, otherwise

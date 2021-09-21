@@ -420,7 +420,7 @@ public class MyUITest {
     @Test
     public void testGreeting() {
         // navigate to the "Categories" list route.
-        NavigatorKt.navigateTo("categories");
+        RouterUtilsKt.navigateTo("categories");
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         final Grid<Person> grid = _get(Grid.class);
@@ -449,7 +449,7 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
     @Test
     void testGreeting() {
         // navigate to the "Categories" list route.
-        NavigatorKt.navigateTo("categories")
+        RouterUtilsKt.navigateTo("categories")
 
         // now the "Categories" list should be attached to your UI and displayed. Look up the Grid and assert on its contents.
         Grid<Person> grid = _get(Grid)
@@ -459,7 +459,7 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
 })
 ```
 
-Make sure to use the `navigateTo()` global function: it will perform the navigation
+Make sure to use the `navigateTo()` global function (Java: `RouterUtilsKt.navigateTo()`): it will perform the navigation
 automatically within the current UI, including optional query parameters:
 
 * "" (empty string)

@@ -36,4 +36,37 @@ class MockRequestTest : DynaTest({
         expectList("foo") { request.parameterNames.toList() }
         expectList("bar", "baz") { request.getParameterValues("foo")!!.toList() }
     }
+
+    test("getSession(false) returns the old invalid session") {
+        val session = request.session as MockHttpSession
+        expect(true) { session.isValid }
+        session.setAttribute("foo", "bar")
+        session.invalidate()
+        expect(session) { request.getSession(false) }
+        expect(false) { session.isValid }
+    }
+
+    test("getSession(true) creates a new session when invalidated") {
+        var session = request.session as MockHttpSession
+        expect(true) { session.isValid }
+        session.setAttribute("foo", "bar")
+        session.invalidate()
+        expect(false) { session.isValid }
+        expect(true) { session != request.getSession(true) }
+        session = request.getSession(true) as MockHttpSession
+        expect(true) { session.isValid }
+        expect(null) { session.getAttribute("foo") }
+    }
+
+    test("getSession() creates a new session when invalidated") {
+        var session = request.session as MockHttpSession
+        expect(true) { session.isValid }
+        session.setAttribute("foo", "bar")
+        session.invalidate()
+        expect(false) { session.isValid }
+        expect(true) { session != request.session }
+        session = request.session as MockHttpSession
+        expect(true) { session.isValid }
+        expect(null) { session.getAttribute("foo") }
+    }
 })

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.*
 import javax.servlet.http.*
 
-public open class MockRequest(private val session: HttpSession) : HttpServletRequest {
+public open class MockRequest(private var session: HttpSession) : HttpServletRequest {
 
     override fun getInputStream(): ServletInputStream {
         throw UnsupportedOperationException("not implemented")
@@ -57,9 +57,15 @@ public open class MockRequest(private val session: HttpSession) : HttpServletReq
 
     override fun getServletPath(): String = ""
 
-    override fun getSession(create: Boolean): HttpSession = session
+    override fun getSession(create: Boolean): HttpSession {
+        val isValid = (session as? MockHttpSession)?.isValid ?: true
+        if (create && !isValid) {
+            session = MockHttpSession.create(session.servletContext)
+        }
+        return session
+    }
 
-    override fun getSession(): HttpSession = session
+    override fun getSession(): HttpSession = getSession(true)
 
     override fun getServerName(): String = "127.0.0.1"
 

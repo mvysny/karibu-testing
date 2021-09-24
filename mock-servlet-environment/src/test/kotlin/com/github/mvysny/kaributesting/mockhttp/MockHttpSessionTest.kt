@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.mockhttp
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectList
+import com.github.mvysny.dynatest.expectThrows
 import java.io.Serializable
 import javax.servlet.http.HttpSession
 import kotlin.test.expect
@@ -31,5 +32,40 @@ class MockHttpSessionTest : DynaTest({
     test("serializable") {
         session.setAttribute("foo", "bar")
         (session as Serializable).cloneBySerialization()
+    }
+
+    group("invalidate") {
+        test("smoke") {
+            session.invalidate()
+            expect(false) { (session as MockHttpSession).isValid }
+        }
+        test("calling invalidate() second time throws") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.invalidate()
+            }
+        }
+        test("getAttribute() fails on invalidated session") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.getAttribute("foo")
+            }
+        }
+        test("getId() succeeds on invalidated session") {
+            session.invalidate()
+            session.id
+        }
+        test("getCreationTime() fails on invalidated session") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.creationTime
+            }
+        }
+        test("getLastAccessedTime() fails on invalidated session") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.lastAccessedTime
+            }
+        }
     }
 })

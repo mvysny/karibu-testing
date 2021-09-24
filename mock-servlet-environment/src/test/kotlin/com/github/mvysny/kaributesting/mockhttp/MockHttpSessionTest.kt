@@ -55,6 +55,14 @@ class MockHttpSessionTest : DynaTest({
             session.invalidate()
             session.id
         }
+        test("getServletContext() succeeds on invalidated session") {
+            session.invalidate()
+            session.servletContext
+        }
+        test("maxActiveInterval succeeds on invalidated session") {
+            session.invalidate()
+            session.maxInactiveInterval = session.maxInactiveInterval + 1
+        }
         test("getCreationTime() fails on invalidated session") {
             session.invalidate()
             expectThrows(IllegalStateException::class) {
@@ -65,6 +73,18 @@ class MockHttpSessionTest : DynaTest({
             session.invalidate()
             expectThrows(IllegalStateException::class) {
                 session.lastAccessedTime
+            }
+        }
+        test("getAttributeNames() fails on invalidated session") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.attributeNames
+            }
+        }
+        test("getValueNames() fails on invalidated session") {
+            session.invalidate()
+            expectThrows(IllegalStateException::class) {
+                session.valueNames
             }
         }
     }

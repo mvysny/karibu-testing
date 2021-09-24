@@ -13,7 +13,6 @@ import com.github.mvysny.kaributesting.v10.mock.MockService
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
-import com.github.mvysny.kaributools.isAttached
 import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
@@ -404,6 +403,25 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         test("attributes") {
             VaadinSession.getCurrent().session.setAttribute("foo", "bar")
             expect("bar") { VaadinSession.getCurrent().mock.getAttribute("foo") }
+        }
+        test("reinitializeSession()") {
+            var id = VaadinSession.getCurrent().session.id
+            VaadinSession.getCurrent().session.setAttribute("foo", "bar")
+            expect(true) { VaadinSession.getCurrent().hasLock() }
+
+            VaadinService.reinitializeSession(VaadinRequest.getCurrent())
+            // test that attributes are preserved
+            expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+            expect(true) { id != VaadinSession.getCurrent().session.id }
+            expect(true) { VaadinSession.getCurrent().hasLock() }
+
+            id = VaadinSession.getCurrent().session.id
+            // reinitialize again
+            VaadinService.reinitializeSession(VaadinRequest.getCurrent())
+            // test that attributes are preserved
+            expect("bar") { VaadinSession.getCurrent().session.getAttribute("foo") }
+            expect(true) { id != VaadinSession.getCurrent().session.id }
+            expect(true) { VaadinSession.getCurrent().hasLock() }
         }
     }
 

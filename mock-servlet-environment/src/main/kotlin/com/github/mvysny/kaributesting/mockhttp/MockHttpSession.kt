@@ -106,7 +106,9 @@ public open class MockHttpSession(
     }
 
     private fun checkValid() {
-        if (!isValid) throw IllegalStateException("invalidated: $this")
+        if (!isValid) {
+            throw IllegalStateException("invalidated: $this")
+        }
     }
 
     override fun toString(): String =

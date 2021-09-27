@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 # Only test on supported JDKs: https://adoptopenjdk.net/support.html
-        java: [1.8, 11, 16]
+        java: [1.8, 11, 17]
 
     runs-on: ${{ matrix.os }}
 

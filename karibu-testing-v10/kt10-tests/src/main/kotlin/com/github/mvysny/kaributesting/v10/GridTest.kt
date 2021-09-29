@@ -22,6 +22,7 @@ import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import com.vaadin.flow.function.ValueProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -126,6 +127,14 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         grid.expectRow(0, "name 0", "View", "Button[caption='name 0']", "1.3.2019")
+    }
+
+    test("column with ValueProvider") {
+        val grid = UI.getCurrent().grid<TestPerson> {
+            addColumn(ValueProvider<TestPerson, String> { it.name })
+        }
+        grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+        grid.expectRow(0, "name 0")
     }
 
     test("lookup finds components in header") {

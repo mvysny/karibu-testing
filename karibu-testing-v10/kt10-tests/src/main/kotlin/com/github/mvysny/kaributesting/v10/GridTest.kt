@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v10.component
+import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Text
@@ -23,6 +24,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.function.ValueProvider
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -499,9 +501,17 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 }
             }
 
-            // the test itself
-            expectThrows(ClassCastException::class, "java.lang.String cannot be cast to") {
-                grid.editor._editItem(TestPerson("name 0", 0))
+            // the test itself. Vaadin 22+ fails with
+            // BindingException: An exception has been thrown inside binding logic for the field element [checked='false', indeterminate='false']
+            // older Vaadin fails directly with ClassCastException: java.lang.String cannot be cast to
+            if (VaadinVersion.get.major >= 22) {
+                expectThrows(RuntimeException::class, "An exception has been thrown inside binding logic") {
+                    grid.editor._editItem(TestPerson("name 0", 0))
+                }
+            } else {
+                expectThrows(ClassCastException::class, "java.lang.String cannot be cast to") {
+                    grid.editor._editItem(TestPerson("name 0", 0))
+                }
             }
         }
         test("closing editor fires the event") {

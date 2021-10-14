@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.data.renderer.TextRenderer
 
@@ -24,10 +25,15 @@ internal fun DynaNodeGroup.radioButtonTests() {
         test("text renderer") {
             expectList("Item #1", "Item #2", "Item #3") {
                 val rb = RadioButtonGroup<Int>()
-                rb.setItems(1, 2, 3)
+                rb.setItems2(listOf(1, 2, 3))
                 rb.setRenderer(TextRenderer { "Item #$it" })
                 rb.getItemLabels()
             }
         }
     }
+}
+
+fun <T> RadioButtonGroup<T>.setItems2(items: Collection<T>) {
+    // this way it's also compatible with Vaadin 18.
+    dataProvider = ListDataProvider2(items)
 }

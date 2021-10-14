@@ -13,12 +13,12 @@ internal fun DynaNodeGroup.radioButtonTests() {
         test("no renderer set uses toString()") {
             expectList("1", "2", "3") {
                 val rb = RadioButtonGroup<Int>()
-                rb.setItems(1, 2, 3)
+                rb.setItems2(listOf(1, 2, 3))
                 rb.getItemLabels()
             }
             expectList("1", "2", "3") {
                 val rb = RadioButtonGroup<String>()
-                rb.setItems("1", "2", "3")
+                rb.setItems2(listOf("1", "2", "3"))
                 rb.getItemLabels()
             }
         }

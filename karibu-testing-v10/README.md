@@ -1091,6 +1091,11 @@ Use the `getAllDialogs()` global function to retrieve a list of all currently op
 Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Groovy it's
 `LocatorJ._assertNoDialogs()`.
 
+### Support for RadioButtonGroup
+
+* Call `radioButtonGroup.getItemLabels()` (or `RadioButtonsKt.getItemLabels()`)
+  to obtain the labels rendered on the individual radio buttons. (since Karibu-Testing 1.3.5)
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

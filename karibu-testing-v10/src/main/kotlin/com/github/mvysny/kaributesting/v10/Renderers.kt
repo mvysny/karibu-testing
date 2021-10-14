@@ -4,10 +4,7 @@ import com.github.mvysny.kaributools.template
 import com.github.mvysny.kaributools.textRecursively
 import com.github.mvysny.kaributools.valueProvider
 import com.vaadin.flow.component.Component
-import com.vaadin.flow.data.renderer.BasicRenderer
-import com.vaadin.flow.data.renderer.ComponentRenderer
-import com.vaadin.flow.data.renderer.Renderer
-import com.vaadin.flow.data.renderer.TemplateRenderer
+import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.ValueProvider
 import org.jsoup.Jsoup
 import java.lang.reflect.Method
@@ -32,6 +29,9 @@ public fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = whe
         val value: Any? = this.valueProvider.apply(rowObject)
         _BasicRenderer_getFormattedValue.invoke(this, value)
     }
+    is TextRenderer<T> -> {
+        renderText(rowObject)
+    }
     is ComponentRenderer<*, T> -> {
         val component: Component = createComponent(rowObject)
         component.toPrettyString()
@@ -51,3 +51,10 @@ public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
     }
     return template
 }
+
+/**
+ * Returns the text rendered for given [item].
+ */
+@Suppress("UNCHECKED_CAST")
+public fun <T> TextRenderer<T>.renderText(item: T): String =
+    createComponent(item).element.text

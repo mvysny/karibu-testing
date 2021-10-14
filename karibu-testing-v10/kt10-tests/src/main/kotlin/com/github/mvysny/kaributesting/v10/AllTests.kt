@@ -24,6 +24,9 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("element utils") {
         elementUtilsTestbatch()
     }
+    group("renderers") {
+        renderersTests()
+    }
     group("button") {
         buttonTestbatch()
     }
@@ -115,5 +118,8 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     }
     group("dialog") {
         dialogTestbatch()
+    }
+    group("radio button") {
+        radioButtonTests()
     }
 }

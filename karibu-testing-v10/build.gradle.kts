@@ -10,7 +10,7 @@ dependencies {
     api(project(":mock-servlet-environment"))
     api("com.github.mvysny.karibu-tools:karibu-tools:${properties["karibu_tools_version"]}")
 
-    testImplementation("com.github.mvysny.dynatest:dynatest-engine:${properties["dynatest_version"]}")
+    testImplementation("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
     api(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 

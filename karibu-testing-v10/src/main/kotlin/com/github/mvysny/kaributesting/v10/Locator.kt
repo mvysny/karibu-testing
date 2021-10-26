@@ -153,7 +153,7 @@ public fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.
         // if there's a PolymerTemplate, warn that Karibu-Testing can't really locate components in there:
         // https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates
         // fixes https://github.com/mvysny/karibu-testing/issues/35
-        val hasPolymerTemplates: Boolean = walkAll().any { it is PolymerTemplate<*> }
+        val hasPolymerTemplates: Boolean = _walkAll().any { it is PolymerTemplate<*> }
         if (hasPolymerTemplates) {
             message = "$message\nWarning: Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates for more details."
         }
@@ -188,7 +188,7 @@ public fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit =
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitBeforeLookup()
-    val descendants: List<Component> = walkAll().toList()
+    val descendants: List<Component> = _walkAll().toList()
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) {
@@ -197,13 +197,17 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     return descendants.filter { it.isEffectivelyVisible() && predicate(it) }
 }
 
-private fun <T: Component> Iterable<(T)->Boolean>.and(): (T)->Boolean = { component -> all { it(component) } }
+/**
+ * `AND`s all predicates.
+ */
+private fun <T> Iterable<(T) -> Boolean>.and(): (T) -> Boolean =
+    { component -> all { it(component) } }
 
 /**
- * Walks the component child tree, depth-first: first the component, then its descendants,
+ * Walks the component child/descendant tree, depth-first: first the component, then its descendants,
  * then its next sibling.
  */
-private fun Component.walkAll(): Iterable<Component> = Iterable {
+public fun Component._walkAll(): Iterable<Component> = Iterable {
     DepthFirstTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }
 }
 

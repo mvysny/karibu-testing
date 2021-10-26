@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -33,6 +34,36 @@ internal fun DynaNodeGroup.locatorTest2() {
         }
         dlg.close()
         _expectNoDialogs()
+    }
+
+    group("InternalServerError handling") {
+        test("component lookup fails on navigation error") {
+            // Vaadin shows InternalServerError when an exception occurs during the navigation phase.
+            // the _expect*() functions should detect this and fail fast.
+            currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
+            navigateTo("")
+            expectThrows<AssertionError>("An internal server error occurred; please check log for the actual stack-trace. Error text: There was an exception while trying to navigate to") {
+                _expectOne<UI>()
+            }
+        }
+        group("_expectInternalServerError") {
+            test("fails on no error") {
+                expectThrows<java.lang.AssertionError>(
+                    """Expected an internal server error but none happened. Component tree:
+└── MockedUI[]"""
+                ) { _expectInternalServerError() }
+            }
+            test("succeeds on error") {
+                currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
+                navigateTo("")
+                _expectInternalServerError()
+            }
+            test("matches error message correctly") {
+                currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
+                navigateTo("")
+                _expectInternalServerError("Simulated")
+            }
+        }
     }
 }
 

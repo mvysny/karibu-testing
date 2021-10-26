@@ -5,6 +5,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.kaributools.getVirtualChildren
 import com.vaadin.flow.component.*
 import com.vaadin.flow.dom.DomEvent
+import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
@@ -156,3 +157,5 @@ public fun UI._close() {
  */
 public fun Component._getVirtualChildren(): List<Component> =
     element.getVirtualChildren().map { it._findComponents() }.flatten()
+
+internal val InternalServerError.errorMessage: String get() = element.text

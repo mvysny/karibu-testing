@@ -1416,6 +1416,25 @@ MockVaadin.runUIQueue(true)
 expectNotifications("An application error #6 occurred, please see application logs for details")
 ```
 
+## Capturing navigation errors / `InternalServerError`
+
+It's important to check that any navigation redirects (e.g. redirects to LoginView if no
+user is logged in) does not interfere with Vaadin internal `InternalServerError` route (otherwise
+any exceptions occurring during navigation to LoginView are either silently lost, or endless chain
+of redirects to LoginView will take place).
+
+You can test for this as follows (since Karibu-Testing 1.3.5):
+
+```kotlin
+test("InternalServerError shown properly") {
+    currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
+    navigateTo("")
+    _expectInternalServerError()
+}
+```
+
+For Java/Groovy the function is located at `LocatorKt._expectInternalServerError()`.
+
 # Support for Vaadin Pro Components
 
 ## Grid Pro

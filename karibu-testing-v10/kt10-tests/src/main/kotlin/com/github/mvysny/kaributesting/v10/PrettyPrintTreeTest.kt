@@ -57,7 +57,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
         expect("Icon[icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
         expect("Button[icon='vaadin:abacus']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
-        expect("FormItem[caption='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
+        expect("FormItem[label='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
         expect("Html[<b>foo bar baz <i>foobar</i></b>]") {
             Html("\n    <b>foo\nbar\n    baz\n<i>foobar</i></b>").toPrettyString()
         }

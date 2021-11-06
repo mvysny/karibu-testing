@@ -144,7 +144,7 @@ for more details.
 * The [browserless web testing](https://mvysny.github.io/browserless-web-testing/) article describes this technique in more depth.
 * The [Testing the UI without a browser](https://vaadin.com/blog/testing-the-ui-without-a-browser) blog post summarizes this technique.
 
-This project also offers a mock/fake servlet API implementation, see [mock-servlet-environment](mock-servlet-environment/README.md) for more details.
+This project also offers a mock/fake servlet API implementation, see [mock-servlet-environment](mock-servlet-environment/) for more details.
 
 ## FAQ
 

@@ -27,22 +27,22 @@ internal fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
 
 public object MockHttpEnvironment {
     /**
-     * [HttpServletRequest.getLocalPort]
+     * [MockRequest.getLocalPort]
      */
     public var localPort: Int = 8080
 
     /**
-     * [HttpServletRequest.getServerPort]
+     * [MockRequest.getServerPort]
      */
     public var serverPort: Int = 8080
 
     /**
-     * [HttpServletRequest.getUserPrincipal]
+     * [MockRequest.getUserPrincipal]
      */
     public var userPrincipal: Principal? = null
 
     /**
-     * [HttpServletRequest.getRemotePort]
+     * [MockRequest.getRemotePort]
      */
     public var remotePort: Int = 8080
 }

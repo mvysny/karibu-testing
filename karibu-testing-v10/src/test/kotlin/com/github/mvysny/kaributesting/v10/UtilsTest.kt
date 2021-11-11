@@ -35,4 +35,27 @@ class UtilsTest : DynaTest({
 
         expect(true) { Foo::class.java.isRouteNotFound }
     }
+
+    test("ellipsize") {
+        expect("a") { "a".ellipsize(3) }
+        expect("a") { "a".ellipsize(4) }
+        expect("a") { "a".ellipsize(100) }
+        expect("...") { "aaaaaa".ellipsize(3) }
+        expect("a...") { "aaaaaa".ellipsize(4) }
+        expect("aa...") { "aaaaaa".ellipsize(5) }
+        expect("aaaaaa") { "aaaaaa".ellipsize(6) }
+        expect("aaaaaa") { "aaaaaa".ellipsize(7) }
+        expect("aaaaaa") { "aaaaaa".ellipsize(100) }
+    }
+
+    test("hasCustomToString") {
+        expect(true) { String::class.java.hasCustomToString() }
+        expect(false) { Object::class.java.hasCustomToString() }
+        class Hello()
+        expect(false) { Hello::class.java.hasCustomToString() }
+        class Hello2() {
+            override fun toString(): String = "Hello2()"
+        }
+        expect(true) { Hello2::class.java.hasCustomToString() }
+    }
 })

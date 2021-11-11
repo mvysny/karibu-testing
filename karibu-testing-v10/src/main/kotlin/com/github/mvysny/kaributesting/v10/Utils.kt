@@ -53,9 +53,12 @@ internal fun String.parseJvmVersion(): Int {
     return version.toInt()
 }
 
-internal fun String.ellipsize(maxLength: Int, ellipsize: String = "..."): String = when {
-    (length <= maxLength) || (length <= ellipsize.length) -> this
-    else -> take(length - ellipsize.length) + ellipsize
+internal fun String.ellipsize(maxLength: Int, ellipsize: String = "..."): String {
+    require(maxLength >= ellipsize.length) { "maxLength must be at least the size of ellipsize $ellipsize but it was $maxLength" }
+    return when {
+        (length <= maxLength) || (length <= ellipsize.length) -> this
+        else -> take(maxLength - ellipsize.length) + ellipsize
+    }
 }
 
 /**
@@ -110,3 +113,6 @@ public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSe
 public val VaadinContext.context: ServletContext get() = (this as VaadinServletContext).context
 
 public val Servlet.isInitialized: Boolean get() = servletConfig != null
+
+internal fun Class<*>.hasCustomToString(): Boolean =
+    getMethod("toString").declaringClass != java.lang.Object::class.java

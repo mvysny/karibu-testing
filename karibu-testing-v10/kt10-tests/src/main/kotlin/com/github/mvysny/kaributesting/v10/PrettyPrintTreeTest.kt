@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.HtmlSpan
 import com.github.mvysny.kaributools.header2
+import com.github.mvysny.kaributools.tooltip
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
@@ -51,13 +52,16 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
         expect("Anchor[href='']") { Anchor().toPrettyString() }
         expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
-        expect("Image[src='']") { Image().toPrettyString() }
-        expect("Image[src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
+        expect("Image[]") { Image().toPrettyString() }
+        expect("Image[@src='vaadin.com']") { Image("vaadin.com", "").toPrettyString() }
         expect("TextField[#25, value='', errorMessage='failed validation']") {
             TextField().apply { id_ = "25"; errorMessage = "failed validation" }.toPrettyString()
         }
-        expect("Icon[icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
-        expect("Button[icon='vaadin:abacus']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
+        expect("TextField[label='foobar', value='']") {
+            TextField("foobar").toPrettyString()
+        }
+        expect("Icon[@icon='vaadin:abacus']") { VaadinIcon.ABACUS.create().toPrettyString() }
+        expect("Button[icon='vaadin:abacus', @theme='icon']") { Button(VaadinIcon.ABACUS.create()).toPrettyString() }
         expect("FormItem[label='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
         expect("Html[<b>foo bar baz <i>foobar</i></b>]") {
             Html("\n    <b>foo\nbar\n    baz\n<i>foobar</i></b>").toPrettyString()
@@ -67,6 +71,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
         expect("MyComponentWithToString[my-div(25)]") {
             MyComponentWithToString().toPrettyString()
+        }
+        expect("Div[@title='foobar']") {
+            Div().apply { tooltip = "foobar" } .toPrettyString()
         }
     }
 

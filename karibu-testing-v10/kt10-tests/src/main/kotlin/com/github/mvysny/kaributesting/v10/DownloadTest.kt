@@ -38,7 +38,7 @@ fun DynaNodeGroup.downloadTestBattery() {
         }
         test("no src") {
             val link = UI.getCurrent().image("")
-            expectThrows(AssertionError::class, "src hasn't been set for Image[src='']") {
+            expectThrows(AssertionError::class, "src hasn't been set for Image[]") {
                 link.download()
             }
         }

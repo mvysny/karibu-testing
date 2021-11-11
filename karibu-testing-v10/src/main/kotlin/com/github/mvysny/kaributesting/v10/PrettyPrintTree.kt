@@ -122,12 +122,6 @@ public fun Component.toPrettyString(): String {
     if (this is Anchor) {
         list.add("href='$_href'")
     }
-    if (this is Image) {
-        list.add("src='$src'")
-    }
-    if (this is Icon) {
-        list.add("icon='$iconName'")
-    }
     if (this is Button && icon is Icon) {
         list.add("icon='${(icon as Icon).iconName}'")
     }
@@ -141,6 +135,14 @@ public fun Component.toPrettyString(): String {
     if (this.dataProvider != null) {
         list.add("dataprovider='${this.dataProvider}'")
     }
+    element.attributeNames
+        .filter { !dontDumpAttributes.contains(it) }
+        .forEach { attributeName ->
+            val value = element.getAttribute(attributeName)
+            if (!value.isNullOrBlank()) {
+                list.add("@$attributeName='$value'")
+            }
+        }
     if (this !is Html && !element.getProperty("innerHTML").isNullOrBlank()) {
         val innerHTML =
             element.getProperty("innerHTML").trim().replace(Regex("\\s+"), " ")
@@ -169,3 +171,5 @@ public fun Component.toPrettyString(): String {
  * By default does nothing.
  */
 public var prettyStringHook: (component: Component, list: LinkedList<String>) -> Unit = { _, _ -> }
+
+public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href")

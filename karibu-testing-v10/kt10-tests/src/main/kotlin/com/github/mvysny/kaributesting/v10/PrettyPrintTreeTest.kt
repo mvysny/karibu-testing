@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.kaributools.HtmlSpan
 import com.github.mvysny.kaributools.header2
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.Text
@@ -60,6 +61,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("FormItem[label='foo']") { FormLayout().addFormItem(TextField(), "foo").toPrettyString() }
         expect("Html[<b>foo bar baz <i>foobar</i></b>]") {
             Html("\n    <b>foo\nbar\n    baz\n<i>foobar</i></b>").toPrettyString()
+        }
+        expect("HtmlSpan[innerHTML='aaa<b>bbbb</b>ccc']") {
+            HtmlSpan("aaa<b>bbbb</b>ccc").toPrettyString()
         }
     }
 

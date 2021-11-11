@@ -141,6 +141,11 @@ public fun Component.toPrettyString(): String {
     if (this.dataProvider != null) {
         list.add("dataprovider='${this.dataProvider}'")
     }
+    if (this !is Html && !element.getProperty("innerHTML").isNullOrBlank()) {
+        val innerHTML =
+            element.getProperty("innerHTML").trim().replace(Regex("\\s+"), " ")
+        list.add("innerHTML='$innerHTML'")
+    }
     prettyStringHook(this, list)
     var name: String = javaClass.simpleName
     if (name.isEmpty()) {

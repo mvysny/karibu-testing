@@ -65,6 +65,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("HtmlSpan[innerHTML='aaa<b>bbbb</b>ccc']") {
             HtmlSpan("aaa<b>bbbb</b>ccc").toPrettyString()
         }
+        expect("MyComponentWithToString[my-div(25)]") {
+            MyComponentWithToString().toPrettyString()
+        }
     }
 
     test("menu dump") {
@@ -148,4 +151,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             └── Column[header='bar']""".trim()) { grid.toPrettyTree().trim() }
         }
     }
+}
+
+class MyComponentWithToString : Div() {
+    override fun toString(): String = "my-div(25)"
 }

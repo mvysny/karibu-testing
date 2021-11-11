@@ -146,6 +146,13 @@ public fun Component.toPrettyString(): String {
             element.getProperty("innerHTML").trim().replace(Regex("\\s+"), " ")
         list.add("innerHTML='$innerHTML'")
     }
+    if (this.javaClass.hasCustomToString()) {
+        // by default Vaadin components do not introduce toString() at all;
+        // toString() therefore defaults to Object's toString() which is useless. However,
+        // if a component does introduce a toString() then use it - it could provide
+        // valuable information.
+        list.add(this.toString())
+    }
     prettyStringHook(this, list)
     var name: String = javaClass.simpleName
     if (name.isEmpty()) {

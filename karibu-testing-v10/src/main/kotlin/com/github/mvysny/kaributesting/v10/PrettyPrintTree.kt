@@ -74,10 +74,6 @@ public fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).pri
 @Suppress("UNCHECKED_CAST")
 public fun Component.toPrettyString(): String {
     val list = LinkedList<String>()
-    val slot: String? = element.getAttribute("slot")
-    if (!slot.isNullOrBlank()) {
-        list.add("slot='$slot'")
-    }
     if (id.isPresent) {
         list.add("#${id.get()}")
     }
@@ -137,6 +133,7 @@ public fun Component.toPrettyString(): String {
     }
     element.attributeNames
         .filter { !dontDumpAttributes.contains(it) }
+        .sorted() // the attributes may come in arbitrary order; make sure to sort them, in order to have predictable order and repeatable tests.
         .forEach { attributeName ->
             val value = element.getAttribute(attributeName)
             if (!value.isNullOrBlank()) {
@@ -172,4 +169,11 @@ public fun Component.toPrettyString(): String {
  */
 public var prettyStringHook: (component: Component, list: LinkedList<String>) -> Unit = { _, _ -> }
 
+/**
+ * Never dump these attributes in [toPrettyString]. By default these attributes are ignored:
+ *
+ * * `disabled` - dumped separately as "DISABLED" string.
+ * * `id` - dumped as Component.id
+ * * `href` - there's special processing for [Anchor._href].
+ */
 public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href")

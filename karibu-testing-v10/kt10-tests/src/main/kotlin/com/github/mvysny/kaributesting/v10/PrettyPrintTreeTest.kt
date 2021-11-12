@@ -16,6 +16,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Image
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
@@ -74,6 +75,11 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
         expect("Div[@title='foobar']") {
             Div().apply { tooltip = "foobar" } .toPrettyString()
+        }
+        expect("Span[text='hi', @slot='prefix']") {
+            val testSpan = Span("hi")
+            TextField().prefixComponent = testSpan
+            testSpan.toPrettyString()
         }
     }
 

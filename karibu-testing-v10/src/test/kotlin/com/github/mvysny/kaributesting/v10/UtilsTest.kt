@@ -12,6 +12,12 @@ import kotlin.test.expect
  * @author mavi
  */
 class UtilsTest : DynaTest({
+    group("serializeDeserialize") {
+        test("primitives") {
+            expect("foo") { "foo".serializeDeserialize() }
+            expect(false) { false.serializeDeserialize() }
+        }
+    }
 
     group("Json") {
         group("unwrap") {

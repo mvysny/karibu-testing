@@ -9,6 +9,7 @@ import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.server.*
 import elemental.json.*
+import elemental.json.impl.JreJsonValue
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -76,12 +77,7 @@ public fun List<JsonValue>.unwrap(): List<Any?> =
  */
 public fun JsonValue.unwrap(): Any? = when(this) {
     is JsonArray -> this.toList().unwrap()
-    is JsonObject -> this
-    is JsonBoolean -> this.boolean
-    is JsonNull -> null
-    is JsonNumber -> this.number
-    is JsonString -> this.string
-    else -> throw RuntimeException("unsupported JSON type ${this.javaClass}")
+    else -> (this as JreJsonValue).`object`
 }
 
 /**

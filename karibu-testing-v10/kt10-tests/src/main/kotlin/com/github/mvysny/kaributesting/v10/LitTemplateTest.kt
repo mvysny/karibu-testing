@@ -45,6 +45,11 @@ fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
 
     test("proper error message on unloadable template") {
         expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
+            // mockGetSourcesFromTemplate() should fail with an informative error message; stacktrace:
+//            at com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser$Companion.mockGetSourcesFromTemplate(MockNpmTemplateParser.kt:78)
+//            at com.github.mvysny.kaributesting.v10.mock.MockLitTemplateParserImpl.getSourcesFromTemplate(MockInstantiator.kt:75)
+//            at com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl.getTemplateContent(LitTemplateParserImpl.java:115)
+//            at com.vaadin.flow.component.littemplate.LitTemplateDataAnalyzer.parseTemplate(LitTemplateDataAnalyzer.java:75)
             LitUnloadableTemplate()
         }
         expectThrows(RuntimeException::class, "load template sources for <non-existent4> @foo/non-existent.js. Please") {

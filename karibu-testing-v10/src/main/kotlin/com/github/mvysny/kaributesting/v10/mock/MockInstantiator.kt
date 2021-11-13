@@ -6,6 +6,7 @@ import com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl
 import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
 import com.vaadin.flow.i18n.I18NProvider
+import com.vaadin.flow.server.VaadinService
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.implementation.MethodCall
 import net.bytebuddy.matcher.ElementMatchers
@@ -72,6 +73,9 @@ public class MockInstantiatorV14_6_0(delegate: Instantiator): MockInstantiator(d
 
 private object MockLitTemplateParserImpl : LitTemplateParserImpl() {
     override fun getSourcesFromTemplate(tag: String, url: String): String =
+        MockNpmTemplateParser.mockGetSourcesFromTemplate(tag, url)
+    // Vaadin 22.0.0.beta2+ adds a new `service` parameter, need to override that function as well.
+    open fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String =
         MockNpmTemplateParser.mockGetSourcesFromTemplate(tag, url)
 }
 

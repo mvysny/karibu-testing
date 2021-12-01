@@ -157,9 +157,9 @@ public object MockVaadin {
     /**
      * Change & call [setup] to set a different browser.
      *
-     * The default is Firefox 71 on Ubuntu Linux.
+     * The default is Firefox 94 on Ubuntu Linux.
      */
-    public var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0"
+    public var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:94.0) Gecko/20100101 Firefox/94.0"
 
     private fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService

@@ -42,7 +42,22 @@ public object MockHttpEnvironment {
     public var userPrincipal: Principal? = null
 
     /**
+     * [MockRequest.isUserInRole]
+     */
+    public var isUserInRole: (Principal, role: String) -> Boolean = { _, _ ->  false }
+
+    /**
      * [MockRequest.getRemotePort]
      */
     public var remotePort: Int = 8080
+
+    /**
+     * [MockRequest.getAuthType]
+     */
+    public var authType: String? = null
+
+    /**
+     * [MockRequest.isSecure]
+     */
+    public var isSecure: Boolean = false
 }

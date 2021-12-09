@@ -51,6 +51,9 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         throw UnsupportedOperationException("not implemented")
     }
 
+    /**
+     * Returns [MockHttpEnvironment.serverPort].
+     */
     override fun getServerPort(): Int = MockHttpEnvironment.serverPort
 
     override fun getRequestedSessionId(): String = session.id
@@ -86,6 +89,9 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun isRequestedSessionIdFromURL(): Boolean = false
 
+    /**
+     * Returns [MockHttpEnvironment.localPort].
+     */
     override fun getLocalPort(): Int = MockHttpEnvironment.localPort
 
     override fun isRequestedSessionIdFromUrl(): Boolean = false
@@ -136,8 +142,12 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         throw UnsupportedOperationException("not implemented")
     }
 
-    override fun isUserInRole(role: String?): Boolean {
-        throw UnsupportedOperationException("not implemented")
+    /**
+     * Set [MockHttpEnvironment.isUserInRole] to modify the outcome of this function.
+     */
+    override fun isUserInRole(role: String): Boolean {
+        val p = userPrincipal ?: return false
+        return MockHttpEnvironment.isUserInRole(p, role)
     }
 
     override fun getPathInfo(): String? = null
@@ -172,6 +182,9 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         return if (h == null) Collections.emptyEnumeration() else Collections.enumeration(h)
     }
 
+    /**
+     * Returns [MockHttpEnvironment.userPrincipal].
+     */
     override fun getUserPrincipal(): Principal? = MockHttpEnvironment.userPrincipal
 
     override fun getReader(): BufferedReader {
@@ -180,7 +193,10 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun getLocales(): Enumeration<Locale> = Collections.enumeration(listOf(locale))
 
-    override fun getAuthType(): String? = null
+    /**
+     * Returns [MockHttpEnvironment.authType]
+     */
+    override fun getAuthType(): String? = MockHttpEnvironment.authType
 
     override fun getCharacterEncoding(): String? = null
 
@@ -211,15 +227,21 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         attributes.putOrRemove(name, value)
     }
 
-    override fun getParameter(parameter: String): String? = parameters.get(parameter)?.get(0)
+    override fun getParameter(parameter: String): String? = parameters[parameter]?.get(0)
 
+    /**
+     * Returns [MockHttpEnvironment.remotePort].
+     */
     override fun getRemotePort(): Int = MockHttpEnvironment.remotePort
 
     override fun getDateHeader(name: String?): Long = -1
 
     override fun getRemoteHost(): String = "127.0.0.1"
 
-    override fun isSecure(): Boolean = false
+    /**
+     * Returns [MockHttpEnvironment.isSecure]
+     */
+    override fun isSecure(): Boolean = MockHttpEnvironment.isSecure
 
     public fun setParameter(name: String, vararg values: String) {
         parameters[name] = arrayOf(*values)

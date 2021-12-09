@@ -37,16 +37,6 @@ public object MockHttpEnvironment {
     public var serverPort: Int = 8080
 
     /**
-     * [MockRequest.getUserPrincipal]
-     */
-    public var userPrincipal: Principal? = null
-
-    /**
-     * [MockRequest.isUserInRole]
-     */
-    public var isUserInRole: (Principal, role: String) -> Boolean = { _, _ ->  false }
-
-    /**
      * [MockRequest.getRemotePort]
      */
     public var remotePort: Int = 8080

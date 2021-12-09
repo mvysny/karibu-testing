@@ -1498,10 +1498,18 @@ ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
 ## Security/Principal/isUserInRole
 
 (Since Karibu-Testing 1.3.8):
-It's possible to override `HttpRequest.getUserPrincipal()` and `isUserInRole()`; see
-`MockRequest` and `MockHttpEnvironment` class for more details. It's even
+It's possible to override `HttpRequest.getUserPrincipal()` and `isUserInRole()`; see the
+`MockRequest` class for more details. It's even
 possible to provide a custom implementation of `MockRequest` by modifying the
 `MockVaadin.mockRequestFactory` closure accordingly.
+
+An example which will fool
+Vaadin's `AccessAnnotationChecker` and `ViewAccessChecker`:
+
+```kotlin
+currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
+currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+```
 
 # MPR (Multi-Platform Runtime)
 

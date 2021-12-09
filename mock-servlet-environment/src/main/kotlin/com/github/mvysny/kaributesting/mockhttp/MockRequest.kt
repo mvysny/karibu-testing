@@ -142,12 +142,14 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         throw UnsupportedOperationException("not implemented")
     }
 
+    public var isUserInRole: (Principal, role: String) -> Boolean = { _, _ ->  false }
+
     /**
-     * Set [MockHttpEnvironment.isUserInRole] to modify the outcome of this function.
+     * Set [isUserInRole] to modify the outcome of this function.
      */
     override fun isUserInRole(role: String): Boolean {
         val p = userPrincipal ?: return false
-        return MockHttpEnvironment.isUserInRole(p, role)
+        return isUserInRole(p, role)
     }
 
     override fun getPathInfo(): String? = null
@@ -182,10 +184,12 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
         return if (h == null) Collections.emptyEnumeration() else Collections.enumeration(h)
     }
 
+    public var userPrincipalInt: Principal? = null
+
     /**
-     * Returns [MockHttpEnvironment.userPrincipal].
+     * Set via [userPrincipalInt].
      */
-    override fun getUserPrincipal(): Principal? = MockHttpEnvironment.userPrincipal
+    override fun getUserPrincipal(): Principal? = userPrincipalInt
 
     override fun getReader(): BufferedReader {
         throw UnsupportedOperationException("not implemented")

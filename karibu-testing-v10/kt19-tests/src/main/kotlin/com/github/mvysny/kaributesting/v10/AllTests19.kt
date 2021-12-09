@@ -11,4 +11,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     group("Grid 19") {
         grid19Testbatch()
     }
+
+    group("security") {
+        securityTests()
+    }
 }

@@ -72,17 +72,17 @@ class MockRequestTest : DynaTest({
 
     test("principal") {
         expect(null) { request.userPrincipal }
-        MockHttpEnvironment.userPrincipal = MockPrincipal("foo")
+        request.userPrincipalInt = MockPrincipal("foo")
         expect(MockPrincipal("foo")) { request.userPrincipal }
     }
 
     test("isUserInRole") {
         expect(false) { request.isUserInRole("foo") }
-        MockHttpEnvironment.userPrincipal = MockPrincipal("foo")
+        request.userPrincipalInt = MockPrincipal("foo")
         expect(false) { request.isUserInRole("foo") }
-        MockHttpEnvironment.userPrincipal = MockPrincipal("foo", listOf("foo"))
+        request.userPrincipalInt = MockPrincipal("foo", listOf("foo"))
         expect(false) { request.isUserInRole("foo") }
-        MockHttpEnvironment.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        request.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(true) { request.isUserInRole("foo") }
     }
 })

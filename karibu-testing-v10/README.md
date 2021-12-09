@@ -1495,6 +1495,14 @@ Java:
 ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
 ```
 
+## Security/Principal/isUserInRole
+
+(Since Karibu-Testing 1.3.8):
+It's possible to override `HttpRequest.getUserPrincipal()` and `isUserInRole()`; see
+`MockRequest` and `MockHttpEnvironment` class for more details. It's even
+possible to provide a custom implementation of `MockRequest` by modifying the
+`MockVaadin.mockRequestFactory` closure accordingly.
+
 # MPR (Multi-Platform Runtime)
 
 It is possible to use Karibu-Testing to test [Vaadin MPR](https://vaadin.com/docs/v14/mpr/Overview.html)-based apps.

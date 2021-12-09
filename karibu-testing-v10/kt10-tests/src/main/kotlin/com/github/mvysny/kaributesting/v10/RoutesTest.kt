@@ -37,7 +37,6 @@ fun DynaNodeGroup.routesTestBatch() {
     // https://github.com/mvysny/karibu-testing/issues/50
     test("app-specific NotFoundException handler removes MockRouteNotFoundError") {
         val routes: Routes = Routes().autoDiscoverViews()
-        expect(allViews) { routes.routes.toSet() }
         expect(setOf(ErrorView::class.java, InternalServerError::class.java, MyRouteNotFoundError::class.java, RouteNotFoundError::class.java)) { routes.errorRoutes.toSet() }
         // make sure that Vaadin initializes properly with this set of views
         MockVaadin.setup(routes)

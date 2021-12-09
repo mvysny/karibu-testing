@@ -161,12 +161,18 @@ public object MockVaadin {
      */
     public var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:94.0) Gecko/20100101 Firefox/94.0"
 
+    /**
+     * Creates [MockRequest]; override if you need to return a class that extends [MockRequest]
+     * and modifies its behavior.
+     */
+    public var mockRequestFactory: (MockHttpSession) -> MockRequest = { MockRequest(it) }
+
     private fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
         val httpSession: MockHttpSession = MockHttpSession.create(ctx)
 
         // init Vaadin Request
-        val mockRequest = MockRequest(httpSession)
+        val mockRequest = mockRequestFactory(httpSession)
         // so that session.browser.updateRequestDetails() also creates browserDetails
         mockRequest.headers["User-Agent"] = listOf(userAgent)
         val request = createVaadinServletRequest(mockRequest, service)

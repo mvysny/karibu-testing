@@ -838,7 +838,7 @@ contents of the Grid.
 #### Clicking Renderers
 
 You can use `grid._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
-or a `Button`/`ClickNotifier` component produced by `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
+or a `Button`/`ClickNotifier` component produced by a `ComponentRenderer` (Java: `GridKt._clickRenderer(0, "edit")`).
 
 If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`,
 please use the `grid._getCellComponent()` function instead (since Karibu-Testing 1.2.12):
@@ -854,6 +854,19 @@ Kotlin:
 ```
 
 Please see the `GridKt` class for more details.
+
+#### ComponentRenderer
+
+You can use the `grid._getCellComponent()` function to get the component produced
+by `ComponentRenderer`.
+
+If your `ComponentRenderer` produces a `HorizontalLayout` with buttons, you can first retrieve
+the layout, then use the `_get()` function to look up buttons within the layout:
+
+```kotlin
+val buttons = grid._getCellComponent(0, "buttons") as HorizontalLayout
+buttons._get { id = "edit" } ._click()
+```
 
 #### Grid Filters
 

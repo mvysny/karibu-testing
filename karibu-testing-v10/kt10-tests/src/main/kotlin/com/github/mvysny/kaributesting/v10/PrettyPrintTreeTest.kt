@@ -83,6 +83,15 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
     }
 
+    test("styles not duplicated") {
+        val div = Div()
+        expect("Div[]") { div.toPrettyString() }
+        div.setWidthFull()
+        expect("Div[@style='width:100%']") { div.toPrettyString() }
+        div.style.set("flex-shrink", "1")
+        expect("Div[@style='width:100%;flex-shrink:1']") { div.toPrettyString() }
+    }
+
     test("menu dump") {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {

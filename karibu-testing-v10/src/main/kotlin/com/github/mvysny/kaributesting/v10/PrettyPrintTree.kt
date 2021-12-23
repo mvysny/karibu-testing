@@ -86,9 +86,6 @@ public fun Component.toPrettyString(): String {
     if (!isEnabled) {
         list.add("DISABLED")
     }
-    if (element.style.names.toList().isNotEmpty()) {
-        list.add(element.style.names.toList().joinToString(" ") { "$it:${element.style[it]}" })
-    }
     if (label.isNotBlank()) {
         list.add("label='$label'")
     }

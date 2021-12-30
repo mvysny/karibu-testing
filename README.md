@@ -100,11 +100,11 @@ A list of a very simple example projects that employ Karibu Testing:
 
 * Vaadin 8 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
 * Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
-* Vaadin 14 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 21 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
 * Vaadin 14 + Java + Maven + JUnit 5: [skeleton-starter-kt](https://github.com/mvysny/skeleton-starter-kt)
 * Vaadin 14 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
 * Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
-* Vaadin 14 + Spring Boot + Java + Maven + JUnit 5: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
+* Vaadin 21 + Spring Boot + Java + Maven + JUnit 5: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
 * Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)

@@ -1,7 +1,7 @@
-# Test Runner For Vaadin 21 tests
+# Test Runner For Vaadin 23 tests
 
 Runs all tests from the [kt10-tests](../kt10-tests) test battery.
-Simulates a WAR app with the setup "Vaadin 21 + npm + webpack + Polymer 3".
+Simulates a WAR app with the setup "Vaadin 23 + pnpm + webpack".
 
 The setup is activated by having
 a specially placed [flow-build-info.json](src/test/resources/META-INF/VAADIN/config/flow-build-info.json)

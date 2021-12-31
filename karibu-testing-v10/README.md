@@ -1026,10 +1026,11 @@ Java:
 ContextMenuKt._clickItemWithCaption(menuBar, "Save");
 ```
 
-### Support for LoginForm and LoginOverlay
+### Support for LoginForm, LoginOverlay (and LoginView)
 
-The username/password text fields are not accessible from server-side so we can't
-fill those in directly. Instead we'll simply fire the login event as follows:
+The username/password text fields are not accessible from server-side (they are only
+present on the client-side, in the browser, see [Issue #95](https://github.com/mvysny/karibu-testing/issues/95) for more details)
+so we can't fill those in directly. The only thing we can do is to fire the login event as follows:
 
 Kotlin:
 ```kotlin

@@ -36,17 +36,14 @@ The library supports Kotlin, Java and Groovy (Groovy support for Vaadin 14+ only
 
 For the Getting Started documentation and for the full API documentation:
 
-### Vaadin 8
-
-Head to [Testing with Vaadin Framework 8](karibu-testing-v8). Karibu-Testing is compatible with any Vaadin 8.x version.
-
 ### Vaadin 14+
 
-Head to [Testing with Vaadin](karibu-testing-v10).
-Karibu-Testing is compatible with any Vaadin 14+ version (14, 15, 16, 17, 18 etc).
+**>>>The main documentation for Vaadin 14+ is located at** [Testing with Vaadin](karibu-testing-v10) **<<<**.
+Karibu-Testing is compatible with any Vaadin 14+ version (14, 15, 16, 17, 18, 19, 20, 21, 22, 23 etc).
 
-> *Note:* Starting with version 1.0.0, Karibu-Testing changed the Java package and the Maven group ID in order to be allowed to be present in Maven Central. Be sure
-to change the `groupId` to `com.github.mvysny.kaributesting` in your projects.
+### Vaadin 8
+
+**>>>The main documentation for Vaadin 8 is located at** [Testing with Vaadin Framework 8](karibu-testing-v8) **<<<**. Karibu-Testing is compatible with any Vaadin 8.x version.
 
 ## Why Unit-testing?
 

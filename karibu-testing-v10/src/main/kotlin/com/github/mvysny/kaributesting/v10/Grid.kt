@@ -549,7 +549,20 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey:
 public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<*>?, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
-    val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
+    // fire SelectionEvent if need be: https://github.com/mvysny/karibu-testing/issues/96
+    val item: T = _get(rowIndex)
+    if (selectionMode == Grid.SelectionMode.SINGLE) {
+        val selectedItem: T? = selectedItems.firstOrNull()
+        if (selectedItem != item) {
+            select(item)
+        } else {
+            // clicking on a selected item will de-select it.
+            deselectAll()
+        }
+    }
+
+    // fire ItemClickEvent
+    val itemKey: String = dataCommunicator.keyMapper.key(item)
     val internalColumnId = column?._internalId
     val event = ItemClickEvent<T>(this, true, itemKey, internalColumnId, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
     _fireEvent(event)

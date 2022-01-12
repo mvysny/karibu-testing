@@ -25,6 +25,7 @@ import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import com.vaadin.flow.data.selection.SelectionEvent
 import com.vaadin.flow.function.ValueProvider
 import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
@@ -405,6 +406,93 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addItemClickListener { e -> event = e }
 
+            }
+            grid._clickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
+        }
+        test("SingleSelect: SelectionEvent fired as well") {
+            // see https://github.com/mvysny/karibu-testing/issues/96
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var selectionEvent: SelectionEvent<*, *>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+                addSelectionListener { e -> selectionEvent = e }
+
+            }
+            grid._clickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
+            expect(TestPerson("name 2", 2)) { selectionEvent.firstSelectedItem.get() }
+        }
+        test("SingleSelect: Selection cleared when clicking an item two times") {
+            // see https://github.com/mvysny/karibu-testing/issues/96
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var selectionEvent: SelectionEvent<*, *>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+                addSelectionListener { e -> selectionEvent = e }
+
+            }
+            grid._clickItem(2, nameColumn.key)
+            grid._clickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
+            expect(null) { selectionEvent.firstSelectedItem.orElse(null) }
+        }
+        test("SingleSelect: Selection properly updated when clicking another item") {
+            // see https://github.com/mvysny/karibu-testing/issues/96
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var selectionEvent: SelectionEvent<*, *>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+                addSelectionListener { e -> selectionEvent = e }
+
+            }
+            grid._clickItem(2, nameColumn.key)
+            grid._clickItem(1, nameColumn.key)
+            expect(nameColumn) { event.column }
+            expect(TestPerson("name 1", 1)) { selectionEvent.firstSelectedItem.get() }
+        }
+        test("MultiSelect: no SelectionEvent fired") {
+            // see https://github.com/mvysny/karibu-testing/issues/96
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                setSelectionMode(Grid.SelectionMode.MULTI)
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
+                addSelectionListener { fail("No selection event should be fired") }
+            }
+            grid._clickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
+        }
+        test("no selection: no SelectionEvent fired") {
+            // see https://github.com/mvysny/karibu-testing/issues/96
+            lateinit var event: ItemClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = Grid<TestPerson>().apply {
+                setSelectionMode(Grid.SelectionMode.NONE)
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemClickListener { e -> event = e }
             }
             grid._clickItem(2, nameColumn.key)
             expect(nameColumn) { event.column }

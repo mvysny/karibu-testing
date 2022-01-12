@@ -20,14 +20,14 @@ private val _BasicRenderer_getFormattedValue: Method by lazy(LazyThreadSafetyMod
  * Returns the output of this renderer for given [rowObject] formatted as close as possible
  * to the client-side output.
  */
-public fun <T : Any> Renderer<T>._getPresentationValue(rowObject: T): Any? = when (this) {
+public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when (this) {
     is TemplateRenderer<T> -> {
         val renderedTemplateHtml: String = this.renderTemplate(rowObject)
         Jsoup.parse(renderedTemplateHtml).textRecursively
     }
     is BasicRenderer<T, *> -> {
         val value: Any? = this.valueProvider.apply(rowObject)
-        _BasicRenderer_getFormattedValue.invoke(this, value)
+        _BasicRenderer_getFormattedValue.invoke(this, value) as String?
     }
     is TextRenderer<T> -> {
         renderText(rowObject)

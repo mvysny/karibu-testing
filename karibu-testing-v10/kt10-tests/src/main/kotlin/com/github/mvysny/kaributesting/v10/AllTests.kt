@@ -122,4 +122,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("radio button") {
         radioButtonTests()
     }
+    group("ListBox") {
+        listBoxTestbatch()
+    }
 }

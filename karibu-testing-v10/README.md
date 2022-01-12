@@ -986,6 +986,13 @@ filtering the suggestions.
 You can also use `comboBox._fireCustomValueSet()`/`ComboBoxKt._fireCustomValueSet()` to simulate user creating a
 new item in the ComboBox.
 
+### Support for ListBox/MultiSelectListBox
+
+(Since Karibu-Testing 1.3.9)
+
+Call `listBox.getRenderedItems()`/`ListBoxKt.getRenderedItems(listBox)` to retrieve
+the rendered items (items from the DataProvider passed through the item renderer).
+
 ### Downloading Anchor/Image Contents
 
 Call `anchor._download()`/`DownloadKt._download(anchor)` to download contents of the `StreamResource` to which the Anchor points to.

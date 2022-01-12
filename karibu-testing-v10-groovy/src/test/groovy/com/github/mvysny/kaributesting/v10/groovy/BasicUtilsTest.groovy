@@ -17,7 +17,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import static kotlin.test.AssertionsKt.expect
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Merely a test of the API. No need to test the implementation, it is thoroughly tested elsewhere.
@@ -26,7 +26,6 @@ import static kotlin.test.AssertionsKt.expect
 @CompileStatic
 class BasicUtilsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup()
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }
@@ -54,8 +53,8 @@ class BasicUtilsTest {
         new TextField().placeholder
         new TextField().placeholder = ""
         new Button().removeFromParent()
-        expect(true) { new Button("Hello!").matches { caption = "Hello!" } }
-        expect(false) { new Button("Hello!").matches { caption = "Bar" } }
+        assertTrue(new Button("Hello!").matches { caption = "Hello!" })
+        assertFalse(new Button("Hello!").matches { caption = "Bar" })
         new TextArea()._focus()
         new TextArea()._blur()
         Notification.show("foo").text

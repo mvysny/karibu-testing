@@ -27,7 +27,6 @@ import java.text.NumberFormat
 @CompileStatic
 class GridExtensionMethodsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup()
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }

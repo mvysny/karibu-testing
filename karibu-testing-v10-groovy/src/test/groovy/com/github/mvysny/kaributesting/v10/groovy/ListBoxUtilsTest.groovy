@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
 @CompileStatic
 class ListBoxUtilsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup()
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }

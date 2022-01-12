@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 @CompileStatic
 class RouterLinkUtilsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup(DummyRootRoute.routes)
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }

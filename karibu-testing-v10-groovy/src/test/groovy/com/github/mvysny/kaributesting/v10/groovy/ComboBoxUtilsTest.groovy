@@ -18,7 +18,6 @@ import java.util.stream.Stream
 @CompileStatic
 class ComboBoxUtilsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup()
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }

@@ -532,28 +532,25 @@ public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
 @JvmOverloads
 public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
-    checkEditableByUser()
-    val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
-    val event = ItemClickEvent<T>(this, true, itemKey, null, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
-    _fireEvent(event)
+    _clickItem(rowIndex, null, button, ctrlKey, shiftKey, altKey, metaKey)
 }
 
 /**
  * Fires the [ItemClickEvent] event for given [rowIndex] and a [column] which invokes all item click listeners
  * registered via [Grid.addItemClickListener].
  * @param button the id of the pressed mouse button
- * @param column the column to be clicked
+ * @param column optional column to be clicked
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
  * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
  * @param altKey `true` if the alt key was down when the event was fired, `false` otherwise
  * @param metaKey `true` if the meta key was down when the event was fired, `false` otherwise
  */
 @JvmOverloads
-public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<*>, button: Int = 1, ctrlKey: Boolean = false,
+public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<*>?, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
     checkEditableByUser()
     val itemKey: String = dataCommunicator.keyMapper.key(_get(rowIndex))
-    val internalColumnId = column._internalId
+    val internalColumnId = column?._internalId
     val event = ItemClickEvent<T>(this, true, itemKey, internalColumnId, -1, -1, -1, -1, 1, button, ctrlKey, shiftKey, altKey, metaKey)
     _fireEvent(event)
 }
@@ -571,7 +568,7 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, column: Grid.Column<*>, b
 @JvmOverloads
 public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, columnKey: String, button: Int = 1, ctrlKey: Boolean = false,
                            shiftKey: Boolean = false, altKey: Boolean = false, metaKey: Boolean = false) {
-    _clickItem(rowIndex, getColumnByKey(columnKey), button, ctrlKey, shiftKey, altKey, metaKey)
+    _clickItem(rowIndex, _getColumnByKey(columnKey), button, ctrlKey, shiftKey, altKey, metaKey)
 }
 
 /**

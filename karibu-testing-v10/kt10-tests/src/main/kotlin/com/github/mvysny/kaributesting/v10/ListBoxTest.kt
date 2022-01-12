@@ -5,7 +5,6 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.listbox.ListBox
 import com.vaadin.flow.component.listbox.ListBoxBase
 import com.vaadin.flow.component.listbox.MultiSelectListBox
-import com.vaadin.flow.data.binder.HasDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.function.SerializableFunction

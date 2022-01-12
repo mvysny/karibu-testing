@@ -125,4 +125,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("ListBox") {
         listBoxTestbatch()
     }
+    group("CheckboxGroup") {
+        checkboxGroupTests()
+    }
 }

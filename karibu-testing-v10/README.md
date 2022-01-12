@@ -1124,6 +1124,13 @@ Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Gr
 * Call `radioButtonGroup.getItemLabels()` (or `RadioButtonsKt.getItemLabels()`)
   to obtain the labels rendered on the individual radio buttons. (since Karibu-Testing 1.3.5)
 
+### Support for CheckboxGroup
+
+(Since Karibu-Testing 1.3.9)
+
+Call `checkboxGroup.getItemLabels()`/`CheckboxGroupKt.getItemLabels(checkboxGroup)` to retrieve
+the rendered items (items from the DataProvider passed through the item label provider).
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

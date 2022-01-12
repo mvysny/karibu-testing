@@ -20,10 +20,13 @@ import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.provider.ListDataProvider
+import com.vaadin.flow.data.provider.QuerySortOrder
+import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.function.ValueProvider
+import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -82,6 +85,17 @@ internal fun DynaNodeGroup.gridTestbatch() {
             sort(TestPerson::name.asc, TestPerson::age.desc)
         }
         expect("--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
+    }
+
+    test("sort fails with an informative error message on missing column") {
+        // https://github.com/mvysny/karibu-testing/issues/97
+        expectThrows(AssertionError::class, "No such column with key 'Last Name'; available columns: [name, age]") {
+            UI.getCurrent().grid<TestPerson>() {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                sort(QuerySortOrder("Last Name", SortDirection.ASCENDING))
+            }
+        }
     }
 
     group("expectRow()") {

@@ -517,7 +517,7 @@ public fun FooterRow.getCell(key: String): FooterRow.FooterCell {
  * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
 public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
-    sort(sortOrder.map { GridSortOrder(getColumnByKey(it.sorted), it.direction) })
+    sort(sortOrder.map { GridSortOrder(_getColumnByKey(it.sorted), it.direction) })
 }
 
 /**

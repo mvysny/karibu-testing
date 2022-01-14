@@ -1,9 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -21,7 +20,7 @@ val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
         ParametrizedView::class.java, ChildView::class.java, NavigationPostponeView::class.java)
 val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
 
-@DynaNodeDsl
+@DynaTestDsl
 fun DynaNodeGroup.routesTestBatch() {
     afterEach { MockVaadin.tearDown() }
 

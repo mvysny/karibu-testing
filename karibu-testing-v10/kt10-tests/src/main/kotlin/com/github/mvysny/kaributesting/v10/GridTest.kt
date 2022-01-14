@@ -1,14 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
-import com.github.mvysny.karibudsl.v10.component
 import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.ClickNotifier
-import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
@@ -19,7 +17,6 @@ import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
-import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.QuerySortOrder
 import com.vaadin.flow.data.provider.SortDirection
@@ -28,8 +25,6 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.selection.SelectionEvent
 import com.vaadin.flow.function.ValueProvider
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -37,7 +32,7 @@ import java.util.*
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.gridTestbatch() {
 
     beforeEach { MockVaadin.setup() }

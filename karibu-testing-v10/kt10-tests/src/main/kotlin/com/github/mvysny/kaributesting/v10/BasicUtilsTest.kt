@@ -1,11 +1,10 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
-import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.TextField
@@ -17,7 +16,7 @@ import com.vaadin.flow.router.Route
 import elemental.json.Json
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
     group("checkEditableByUser") {

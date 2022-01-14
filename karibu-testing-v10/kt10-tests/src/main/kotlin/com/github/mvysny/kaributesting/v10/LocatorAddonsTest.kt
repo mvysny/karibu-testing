@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.iconButton
@@ -14,7 +14,7 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.locatorAddonsTestbatch() {
 
     beforeEach { MockVaadin.setup() }

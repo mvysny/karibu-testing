@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.anchor
 import com.github.mvysny.karibudsl.v10.image
@@ -10,7 +10,7 @@ import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 fun DynaNodeGroup.downloadTestBattery() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

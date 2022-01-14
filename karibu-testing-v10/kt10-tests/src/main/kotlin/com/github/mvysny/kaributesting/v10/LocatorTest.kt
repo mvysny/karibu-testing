@@ -1,9 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.text
+import com.github.mvysny.karibudsl.v10.textField
+import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
@@ -18,7 +21,7 @@ import java.util.function.Predicate
 import kotlin.streams.asSequence
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.locatorTest2() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
@@ -69,7 +72,7 @@ internal fun DynaNodeGroup.locatorTest2() {
     }
 }
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.locatorTest() {
 
     beforeEach { MockVaadin.setup() }

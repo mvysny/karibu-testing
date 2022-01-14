@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.listbox.ListBox
 import com.vaadin.flow.component.listbox.ListBoxBase
@@ -10,7 +10,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.function.SerializableFunction
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.listBoxTestbatch() {
 
     beforeEach { MockVaadin.setup() }

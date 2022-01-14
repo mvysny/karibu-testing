@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10.pro
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.TestPerson
 import com.github.mvysny.kaributools.VaadinVersion
@@ -9,7 +9,7 @@ import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.textfield.NumberField
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.gridProTestbatch() {
 
     beforeEach { MockVaadin.setup() }

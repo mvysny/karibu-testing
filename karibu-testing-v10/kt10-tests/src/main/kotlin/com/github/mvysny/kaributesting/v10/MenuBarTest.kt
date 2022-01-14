@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.item
 import com.github.mvysny.karibudsl.v10.menuBar
 import com.vaadin.flow.component.UI
@@ -11,7 +11,7 @@ import com.vaadin.flow.component.menubar.MenuBar
 import kotlin.streams.toList
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.menuBarTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

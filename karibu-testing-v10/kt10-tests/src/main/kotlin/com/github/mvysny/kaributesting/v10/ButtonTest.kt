@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.checkBox
@@ -12,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.buttonTestbatch() {
     group("button click") {
         fun expectClickCount(button: Button, clickCount: Int, block: Button.()->Unit) {

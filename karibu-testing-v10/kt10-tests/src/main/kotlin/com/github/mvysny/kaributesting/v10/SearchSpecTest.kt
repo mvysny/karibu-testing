@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.DateRangePopup
 import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
@@ -22,7 +22,7 @@ import com.vaadin.flow.component.timepicker.TimePicker
 import java.util.function.Predicate
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.searchSpecTest() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

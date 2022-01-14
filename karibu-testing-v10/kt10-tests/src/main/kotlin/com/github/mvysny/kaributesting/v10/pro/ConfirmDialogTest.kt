@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10.pro
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10._expectNone
 import com.github.mvysny.kaributesting.v10._expectOne
@@ -10,7 +10,7 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.confirmDialogTestbatch() {
 
     beforeEach { MockVaadin.setup() }

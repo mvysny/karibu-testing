@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.beanValidationBinder
 import com.github.mvysny.karibudsl.v10.bind
 import com.vaadin.flow.component.textfield.TextField
@@ -15,7 +15,7 @@ private class Person(
         @field:NotNull var name: String? = null
 )
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.binderTestbatch() {
     test("verbose message") {
         val binder: Binder<Person> = beanValidationBinder<Person>()

@@ -1,12 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.dom.DomEvent
 import elemental.json.Json
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.elementUtilsTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

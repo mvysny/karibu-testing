@@ -1,16 +1,18 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.ModifierKey.Alt
+import com.github.mvysny.karibudsl.v10.addClickShortcut
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.Key
 import com.vaadin.flow.component.KeyModifier
 import com.vaadin.flow.component.Shortcuts
 import com.vaadin.flow.server.Command
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.shortcutsTestBatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

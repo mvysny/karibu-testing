@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 import npmPolymerTemplateTestBatch
@@ -9,6 +10,7 @@ import java.util.*
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
+@DynaTestDsl
 fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     beforeEach {
         // make sure that Validator produces messages in English

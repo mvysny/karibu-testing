@@ -1,12 +1,12 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectList
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.select.Select
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.comboBoxTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

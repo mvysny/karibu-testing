@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.ironlist.IronList
@@ -15,7 +15,7 @@ import java.time.format.FormatStyle
 import java.util.*
 import kotlin.test.expect
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.ironListTestbatch() {
 
     beforeEach { MockVaadin.setup() }

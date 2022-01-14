@@ -1,7 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.navigateToView
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.auth.AccessAnnotationChecker
@@ -19,7 +19,7 @@ import kotlin.test.expect
  * Tests that we can mock `HttpServletRequest.isUserInRole()` and `HttpServletRequest.getUserPrincipal()`
  * in order for [AccessAnnotationChecker] to work properly.
  */
-@DynaNodeDsl
+@DynaTestDsl
 fun DynaNodeGroup.securityTests() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

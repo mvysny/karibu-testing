@@ -1,8 +1,8 @@
 @file:Suppress("DEPRECATION")
 
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.Component
@@ -11,12 +11,11 @@ import com.vaadin.flow.component.dependency.JsModule
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.templatemodel.TemplateModel
-import java.lang.RuntimeException
 
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
-@DynaNodeDsl
+@DynaTestDsl
 fun DynaNodeGroup.npmPolymerTemplateTestBatch(isModuleTest: Boolean) {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

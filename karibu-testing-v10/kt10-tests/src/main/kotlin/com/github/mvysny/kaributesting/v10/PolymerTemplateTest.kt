@@ -1,15 +1,16 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.*
+import com.github.mvysny.dynatest.DynaNodeGroup
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectList
+import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
-import java.lang.IllegalStateException
+import kotlin.streams.toList
 import kotlin.test.expect
-import kotlin.streams.*
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.polymerTemplateTest() {
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.github") }

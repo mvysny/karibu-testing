@@ -1,12 +1,11 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
-import com.vaadin.flow.component.combobox.ComboBox
+import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.data.renderer.TextRenderer
 
-@DynaNodeDsl
+@DynaTestDsl
 internal fun DynaNodeGroup.radioButtonTests() {
     group("getItemLabels()") {
         test("empty") {

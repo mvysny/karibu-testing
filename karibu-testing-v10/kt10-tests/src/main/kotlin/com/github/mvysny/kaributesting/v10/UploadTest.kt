@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.UI
@@ -12,9 +13,7 @@ import java.lang.RuntimeException
 import kotlin.test.expect
 import kotlin.test.fail
 
-/**
- * @author mavi
- */
+@DynaNodeDsl
 internal fun DynaNodeGroup.uploadTestbatch() {
 
     beforeEach { MockVaadin.setup() }

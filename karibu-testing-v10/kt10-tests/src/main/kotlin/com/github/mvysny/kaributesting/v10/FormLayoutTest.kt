@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.formItem
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.formLayoutTest() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

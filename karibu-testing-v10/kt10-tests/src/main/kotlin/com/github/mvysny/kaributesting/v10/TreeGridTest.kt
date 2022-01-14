@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.addColumnFor
 import com.vaadin.flow.component.treegrid.TreeGrid
@@ -11,6 +12,7 @@ import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import java.util.stream.Stream
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.treeGridTestbatch() {
 
     beforeEach { MockVaadin.setup() }

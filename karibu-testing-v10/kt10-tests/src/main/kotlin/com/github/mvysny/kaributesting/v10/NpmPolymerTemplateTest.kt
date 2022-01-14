@@ -1,6 +1,7 @@
 @file:Suppress("DEPRECATION")
 
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
@@ -15,6 +16,7 @@ import java.lang.RuntimeException
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
+@DynaNodeDsl
 fun DynaNodeGroup.npmPolymerTemplateTestBatch(isModuleTest: Boolean) {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

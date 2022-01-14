@@ -1,9 +1,11 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.vaadin.flow.component.login.LoginOverlay
 import kotlin.test.expect
 
+@DynaNodeDsl
 fun DynaNodeGroup.loginFormTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

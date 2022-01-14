@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.HtmlSpan
@@ -23,6 +24,7 @@ import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 import kotlin.test.fail
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.prettyPrintTreeTest() {
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.github") }

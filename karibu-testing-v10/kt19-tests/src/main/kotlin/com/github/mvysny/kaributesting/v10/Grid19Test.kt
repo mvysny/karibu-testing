@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.grid
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.data.provider.CallbackDataProvider
 import kotlin.test.expect
 
+@DynaNodeDsl
 fun DynaNodeGroup.grid19Testbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

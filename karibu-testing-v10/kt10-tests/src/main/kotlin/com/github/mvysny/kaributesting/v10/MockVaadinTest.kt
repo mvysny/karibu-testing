@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectThrows
@@ -36,6 +37,7 @@ import kotlin.concurrent.thread
 import kotlin.concurrent.write
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.mockVaadinTest() {
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.github") }

@@ -16,6 +16,7 @@ import com.vaadin.flow.router.Route
 import elemental.json.Json
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
     group("checkEditableByUser") {

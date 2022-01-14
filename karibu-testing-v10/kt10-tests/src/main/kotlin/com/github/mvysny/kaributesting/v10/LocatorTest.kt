@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
@@ -17,6 +18,7 @@ import java.util.function.Predicate
 import kotlin.streams.asSequence
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.locatorTest2() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
@@ -67,6 +69,7 @@ internal fun DynaNodeGroup.locatorTest2() {
     }
 }
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.locatorTest() {
 
     beforeEach { MockVaadin.setup() }

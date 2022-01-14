@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.hasValueTestbatch() {
     group("HasValue.setValue()") {
         test("enabled check box") {

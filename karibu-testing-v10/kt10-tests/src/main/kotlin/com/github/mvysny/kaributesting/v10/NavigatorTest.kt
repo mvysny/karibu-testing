@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
@@ -18,6 +19,7 @@ import com.vaadin.flow.router.BeforeLeaveObserver
 import com.vaadin.flow.router.Route
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.navigatorTest() {
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.github") }

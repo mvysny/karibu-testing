@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.dynatest.expectThrows
@@ -21,6 +22,7 @@ import kotlin.test.expect
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
+@DynaNodeDsl
 fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

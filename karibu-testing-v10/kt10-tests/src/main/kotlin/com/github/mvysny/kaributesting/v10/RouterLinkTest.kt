@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.anchor
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.NotFoundException
 import kotlin.test.expect
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.routerLinkBatch() {
     beforeEach {
         MockVaadin.setup(Routes().apply { routes.add(TestingView::class.java) })

@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v10.ModifierKey.Alt
@@ -9,9 +10,7 @@ import com.vaadin.flow.component.Shortcuts
 import com.vaadin.flow.server.Command
 import kotlin.test.expect
 
-/**
- * @author Martin Vysny <mavi@vaadin.com>
- */
+@DynaNodeDsl
 internal fun DynaNodeGroup.shortcutsTestBatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

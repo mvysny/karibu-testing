@@ -1,8 +1,10 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.dynatest.DynaNodeDsl
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.vaadin.flow.component.checkbox.CheckboxGroup
 
+@DynaNodeDsl
 internal fun DynaNodeGroup.checkboxGroupTests() {
 
     beforeEach { MockVaadin.setup() }

@@ -147,6 +147,11 @@ public val DataCommunicator<*>._saneFetchLimit: Int get() =
 
 public val Grid<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
 
+private val _DataCommunicator_fetchFromProvider: Method =
+    DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java).apply {
+        isAccessible = true
+    }
+
 /**
  * Returns items in given range from this data communicator. Uses current Grid sorting.
  * Any ConfigurableFilterDataProvider will automatically apply its filters.
@@ -155,9 +160,8 @@ public val Grid<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
  */
 public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     require(limit <= _saneFetchLimit) { "Vaadin doesn't handle fetching of many items very well unfortunately. The sane limit is $_saneFetchLimit but you asked for $limit" }
-    val m: Method = DataCommunicator::class.java.getDeclaredMethod("fetchFromProvider", Int::class.java, Int::class.java)
-    m.isAccessible = true
-    @Suppress("UNCHECKED_CAST") val fetched: Stream<T> = m.invoke(this, offset, limit) as Stream<T>
+    @Suppress("UNCHECKED_CAST")
+    val fetched: Stream<T> = _DataCommunicator_fetchFromProvider.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()
 }
 
@@ -301,7 +305,7 @@ public fun <T : Any> Grid<T>._getCellComponent(
 }
 
 /**
- * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
+ * Returns the formatted value of given column as a String. Uses [getPresentationValue]
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
  * @param columnKey the column ID.
@@ -314,7 +318,7 @@ public fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): St
 }
 
 /**
- * Returns the formatted value as a String. Does not use renderer to render the value - simply calls value provider and presentation provider
+ * Returns the formatted value as a String. Uses [getPresentationValue]
  * and converts the result to string (even if the result is a [Component]).
  * @param rowObject the bean
  */
@@ -322,14 +326,29 @@ public fun <T : Any> Grid<T>._getFormatted(rowIndex: Int, columnKey: String): St
 public fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
         getPresentationValue(rowObject).toString()
 
+/**
+ * Returns the formatted row as a list of Strings, one for every visible column.
+ * Uses [_getFormatted].
+ * @param rowObject the bean
+ */
 public fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
         columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
 
+/**
+ * Returns the formatted row as a list of Strings, one for every visible column.
+ * Uses [_getFormatted]. Fails if the [rowIndex] is not within the limits.
+ * @param rowIndex the index of the row, 0..size-1.
+ */
 public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
     return _getFormattedRow(rowObject)
 }
 
+/**
+ * Returns the formatted row as a list of Strings, one for every visible column.
+ * Uses [_getFormatted]. Returns null if the [rowIndex] is not within the limits.
+ * @param rowIndex the index of the row, 0-based.
+ */
 public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>? {
     val rowObject: T = _getOrNull(rowIndex) ?: return null
     return _getFormattedRow(rowObject)
@@ -337,7 +356,7 @@ public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>
 
 /**
  * Returns the output of renderer set for this column for given [rowObject] formatted as close as possible
- * to the client-side output.
+ * to the client-side output, using [Grid.Column.renderer].
  */
 @Suppress("UNCHECKED_CAST")
 public fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {

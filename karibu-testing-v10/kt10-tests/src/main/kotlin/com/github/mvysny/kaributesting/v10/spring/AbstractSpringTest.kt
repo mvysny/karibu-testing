@@ -37,18 +37,15 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
 
     @BeforeEach
     fun setup() {
-        if (!skip) {
-            val uiFactory: () -> MockedUI = { MockedUI() }
-            val servlet: SpringServlet =
-                MockSpringServlet(routes, ctx, uiFactory)
-            MockVaadin.setup(uiFactory, servlet)
-        }
+        assumeFalse(skip, "Skipping test: Vaadin 23 requires JDK11+")
+
+        val uiFactory: () -> MockedUI = { MockedUI() }
+        val servlet: SpringServlet = MockSpringServlet(routes, ctx, uiFactory)
+        MockVaadin.setup(uiFactory, servlet)
     }
 
     @Test
     fun testDestroyListenersCalled() {
-        assumeFalse(skip, "Skipping test: Vaadin 23 requires JDK11+")
-
         // check correct vaadin instances
         VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService

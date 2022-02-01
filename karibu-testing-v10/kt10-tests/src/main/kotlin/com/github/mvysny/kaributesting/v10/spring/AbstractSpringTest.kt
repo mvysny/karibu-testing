@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10.spring
 
+import com.github.mvysny.dynatest.jvmVersion
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.ReviewsList
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
@@ -10,6 +11,7 @@ import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
 import com.vaadin.flow.spring.SpringVaadinSession
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,22 +27,28 @@ import kotlin.test.expect
 @SpringBootTest
 @WebAppConfiguration
 @DirtiesContext
-abstract class AbstractSpringTest {
+abstract class AbstractSpringTest(val vaadinVersion: Int) {
 
     private val routes: Routes = Routes()
+    private val skip = vaadinVersion >= 23 && jvmVersion < 11
 
     @Autowired
     private lateinit var ctx: ApplicationContext
 
     @BeforeEach
     fun setup() {
-        val uiFactory: () -> MockedUI = { MockedUI() }
-        val servlet: SpringServlet = MockSpringServlet(routes, ctx, uiFactory)
-        MockVaadin.setup(uiFactory, servlet)
+        if (!skip) {
+            val uiFactory: () -> MockedUI = { MockedUI() }
+            val servlet: SpringServlet =
+                MockSpringServlet(routes, ctx, uiFactory)
+            MockVaadin.setup(uiFactory, servlet)
+        }
     }
 
     @Test
     fun testDestroyListenersCalled() {
+        assumeFalse(skip, "Skipping test: Vaadin 23 requires JDK11+")
+
         // check correct vaadin instances
         VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService
@@ -57,6 +65,8 @@ abstract class AbstractSpringTest {
      */
     @Test
     fun testPolymerTemplateComponent() {
+        assumeFalse(skip, "Skipping test: Vaadin 23 requires JDK11+")
+
         ReviewsList()
     }
 

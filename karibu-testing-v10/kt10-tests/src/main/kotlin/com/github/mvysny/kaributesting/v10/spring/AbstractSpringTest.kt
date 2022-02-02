@@ -11,7 +11,7 @@ import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
 import com.vaadin.flow.spring.SpringVaadinSession
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assumptions.assumeFalse
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,14 +30,13 @@ import kotlin.test.expect
 abstract class AbstractSpringTest(val vaadinVersion: Int) {
 
     private val routes: Routes = Routes()
-    private val skip = vaadinVersion >= 23 && jvmVersion < 11
 
     @Autowired
     private lateinit var ctx: ApplicationContext
 
     @BeforeEach
     fun setup() {
-        if (skip) return
+        assumeTrue(vaadinVersion < 23 || jvmVersion >= 11, "Vaadin 23+ only supports JDK 11+")
 
         val uiFactory: () -> MockedUI = { MockedUI() }
         val servlet: SpringServlet =
@@ -47,8 +46,6 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
 
     @Test
     fun testDestroyListenersCalled() {
-        if (skip) return
-
         // check correct vaadin instances
         VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService
@@ -65,8 +62,6 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
      */
     @Test
     fun testPolymerTemplateComponent() {
-        if (skip) return
-
         ReviewsList()
     }
 

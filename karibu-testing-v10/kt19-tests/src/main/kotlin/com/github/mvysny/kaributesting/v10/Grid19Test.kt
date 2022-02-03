@@ -15,16 +15,33 @@ fun DynaNodeGroup.grid19Testbatch() {
     afterEach { MockVaadin.tearDown() }
 
     group("FetchCallback with no size info") {
-        // https://github.com/mvysny/karibu-testing/issues/72
-        test("_get") {
-            val grid: Grid<String> = UI.getCurrent().grid<String> {
-                setItems(CallbackDataProvider.FetchCallback<String, Void> { query ->
-                    listOf("a", "b", "c").stream().skip(query.offset.toLong())
-                        .limit(query.limit.toLong())
-                })
+        group("_get") {
+            // https://github.com/mvysny/karibu-testing/issues/72
+            test("offset/limit") {
+                val grid: Grid<String> = UI.getCurrent().grid<String> {
+                    setItems(CallbackDataProvider.FetchCallback<String, Void> { query ->
+                        listOf("a", "b", "c").stream()
+                            .skip(query.offset.toLong())
+                            .limit(query.limit.toLong())
+                    })
+                }
+                expect("b") { grid._get(1) }
+                expect(null) { grid._getOrNull(4) }
             }
-            expect("b") { grid._get(1) }
-            expect(null) { grid._getOrNull(4) }
+            test("paging") {
+                // https://github.com/mvysny/karibu-testing/issues/99
+                val grid: Grid<Int> = UI.getCurrent().grid<Int> {
+                    setItems(CallbackDataProvider.FetchCallback<Int, Void> { query ->
+                        (0..1000).toList().stream()
+                            .skip(query.page.toLong() * query.pageSize)
+                            .limit(query.pageSize.toLong())
+                    })
+                }
+                expect(0) { grid._get(0) }
+                expect(1) { grid._get(1) }
+                expect(1000) { grid._get(1000) }
+                expect(null) { grid._getOrNull(1001) }
+            }
         }
 
         group("_dump") {

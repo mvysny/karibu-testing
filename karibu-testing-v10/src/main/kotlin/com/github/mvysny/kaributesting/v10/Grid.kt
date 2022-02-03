@@ -152,6 +152,10 @@ private val _DataCommunicator_fetchFromProvider: Method =
         isAccessible = true
     }
 
+private val _DataCommunicator_setPagingEnabled: Method? =
+    DataCommunicator::class.java.declaredMethods.firstOrNull { it.name == "setPagingEnabled" }
+
+
 /**
  * Returns items in given range from this data communicator. Uses current Grid sorting.
  * Any ConfigurableFilterDataProvider will automatically apply its filters.
@@ -160,6 +164,10 @@ private val _DataCommunicator_fetchFromProvider: Method =
  */
 public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     require(limit <= _saneFetchLimit) { "Vaadin doesn't handle fetching of many items very well unfortunately. The sane limit is $_saneFetchLimit but you asked for $limit" }
+
+    // make sure the DataCommunicator is not in paged mode: https://github.com/mvysny/karibu-testing/issues/99
+    _DataCommunicator_setPagingEnabled?.invoke(this, false)
+
     @Suppress("UNCHECKED_CAST")
     val fetched: Stream<T> = _DataCommunicator_fetchFromProvider.invoke(this, offset, limit) as Stream<T>
     return fetched.toList()

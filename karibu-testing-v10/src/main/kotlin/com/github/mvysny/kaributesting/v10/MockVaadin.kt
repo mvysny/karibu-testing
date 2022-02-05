@@ -16,6 +16,7 @@ import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletContext
+import kotlin.test.expect
 
 public object MockVaadin {
     // prevent GC on Vaadin Session and Vaadin UI as they are only soft-referenced from the Vaadin itself.
@@ -312,6 +313,9 @@ public object MockVaadin {
         }
 
         try {
+            // make sure the lock is held exactly once, otherwise the session.unlock() won't
+            // process all Runnables registered via ui.access()
+            expect(1) { (session.lockInstance as ReentrantLock).holdCount }
             session.unlock()  // this will process all Runnables registered via ui.access()
             // lock the session back, so that the test can continue running as-if in the UI thread.
             session.lock()

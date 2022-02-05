@@ -113,6 +113,11 @@ public interface TestingLifecycleHook {
  */
 public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 
+
+private val _ConfirmDialog_Class: Class<*>? = try {
+    Class.forName("com.vaadin.flow.component.confirmdialog.ConfirmDialog")
+} catch (e: ClassNotFoundException) { null }
+
 /**
  * Flow Server does not close the dialog when [Dialog.close] is called; instead it tells client-side dialog to close,
  * which then fires event back to the server that the dialog was closed, and removes itself from the DOM.
@@ -128,13 +133,10 @@ public fun cleanupDialogs() {
     }
 
     // also clean up ConfirmDialog. But careful - this is a Pro component and may not be on classpath.
-    val dlgClass: Class<*>? = try {
-        Class.forName("com.vaadin.flow.component.confirmdialog.ConfirmDialog")
-    } catch (e: ClassNotFoundException) { null }
-    if (dlgClass != null) {
-        val isOpenedMethod: Method = dlgClass.getMethod("isOpened")
+    if (_ConfirmDialog_Class != null) {
+        val isOpenedMethod: Method = _ConfirmDialog_Class.getMethod("isOpened")
         UI.getCurrent().children.forEach {
-            if (dlgClass.isInstance(it) && !(isOpenedMethod.invoke(it) as Boolean)) {
+            if (_ConfirmDialog_Class.isInstance(it) && !(isOpenedMethod.invoke(it) as Boolean)) {
                 it.element.removeFromParent()
             }
         }

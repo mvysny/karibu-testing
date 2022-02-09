@@ -976,12 +976,12 @@ fire `FailedEvent` and `FinishedEvent`.
 
 ### Support for ComboBox/Select
 
-You can use static methods from `ComboBox.kt` to assert on the state of the combo box.
+You can use static methods from `ComboBox.kt` to assert on the state of the ComboBox or Select component.
 For example, you can call `comboBox.getSuggestions()`/`ComboBoxKt.getSuggestions()` to return the current list
 of dropdown suggestions, formatted according to the current `ItemLabelGenerator`.
 
 You can also use `comboBox.setUserInput()`/`ComboBoxKt.setUserInput()` to simulate user typing into the ComboBox,
-filtering the suggestions.
+filtering the suggestions. (Not available for Select since Select doesn't support user input)
 
 You can also use `comboBox._fireCustomValueSet()`/`ComboBoxKt._fireCustomValueSet()` to simulate user creating a
 new item in the ComboBox.

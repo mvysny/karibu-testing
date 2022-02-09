@@ -53,6 +53,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("Column[header='My Header']") {
             Grid<Any>().run { addColumn { it }.apply { header2 = "My Header" } }.toPrettyString()
         }
+        expect("Column[header='My Header', key='foo']") {
+            Grid<Any>().run { addColumn { it }.apply { header2 = "My Header"; key = "foo" } }.toPrettyString()
+        }
         expect("Anchor[href='']") { Anchor().toPrettyString() }
         expect("Anchor[href='vaadin.com']") { Anchor("vaadin.com").toPrettyString() }
         expect("Image[]") { Image().toPrettyString() }

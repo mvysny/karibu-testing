@@ -106,8 +106,13 @@ public fun Component.toPrettyString(): String {
             list.add("errorMessage='$errorMessage'")
         }
     }
-    if (this is Grid.Column<*> && this.header2.isNotBlank()) {
-        list.add("header='${this.header2}'")
+    if (this is Grid.Column<*>) {
+        if (this.header2.isNotBlank()) {
+            list.add("header='${this.header2}'")
+        }
+        if (!this.key.isNullOrBlank()) {
+            list.add("key='${this.key}'")
+        }
     }
     if (!placeholder.isNullOrBlank()) {
         list.add("placeholder='$placeholder'")

@@ -60,5 +60,10 @@ class BasicUtilsTest {
         Notification.show("foo").text
         new Icon().iconName
         new Icon().iconName = null
+        new TextField()._getVirtualChildren()
+    }
+
+    @Test void api2() {
+        UI.current._close()
     }
 }

@@ -9,10 +9,12 @@ import com.github.mvysny.kaributools.IconName
 import com.github.mvysny.kaributools.IconUtilsKt
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.ComponentEvent
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
+import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
 import groovy.transform.CompileDynamic
@@ -238,5 +240,22 @@ class BasicUtils {
 
     static void setIconName(@NotNull Icon self, @Nullable IconName iconName) {
         IconUtilsKt.setIconName(self, iconName)
+    }
+
+    /**
+     * Closes the UI and simulates the end of the request. The [UI.close] is called,
+     * but also the session is set to null which fires the detach listeners and makes
+     * the UI and all of its components detached.
+     */
+    static void _close(@NotNull UI self) {
+        BasicUtilsKt._close(self)
+    }
+
+    /**
+     * Returns child components which were added to this component via
+     * [com.vaadin.flow.dom.Element.appendVirtualChild].
+     */
+    static List<Component> _getVirtualChildren(@NotNull Component self) {
+        BasicUtilsKt._getVirtualChildren(self)
     }
 }

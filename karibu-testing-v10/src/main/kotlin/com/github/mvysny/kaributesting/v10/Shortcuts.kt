@@ -7,6 +7,11 @@ import com.vaadin.flow.component.ShortcutRegistration
 import elemental.json.impl.JreJsonFactory
 import elemental.json.impl.JreJsonObject
 
+/**
+ * Take a look at `DomEventListenerWrapper.matchesFilter()` to see why this is necessary.
+ * If this stuff stops working, place a breakpoint into the [getBoolean]/[hasKey] function,
+ * to see what kind of keys you're receiving and whether it matches [filter].
+ */
 private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>) : JreJsonObject(JreJsonFactory()) {
     val filter: String
     init {
@@ -18,14 +23,32 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
         put("event.key", key.keys.first())
     }
 
+    override fun hasKey(key: String): Boolean {
+        // the "key" is a JavaScript expression which matches the key pressed.
+        // we need to match it against the 'filter'
+        if (!key.startsWith("([")) {
+            // not a filter
+            return super.hasKey(key)
+        }
+        return matchesFilter(key)
+    }
+
+    private fun matchesFilter(key: String): Boolean {
+        // the "key" is a JavaScript expression which matches the key pressed.
+        // we need to match it against the 'filter'
+        val probeFilter = key.removeSuffix(" && (event.stopPropagation() || true)")
+            .removeSuffix(" && (event.preventDefault() || true)")
+        return probeFilter.startsWith(filter)
+    }
+
     override fun getBoolean(key: String): Boolean {
+        // the "key" is a JavaScript expression which matches the key pressed.
+        // we need to match it against the 'filter'
         if (!key.startsWith("([")) {
             // not a filter
             return super.getBoolean(key)
         }
-        val probeFilter = key.removeSuffix(" && (event.stopPropagation() || true)")
-            .removeSuffix(" && (event.preventDefault() || true)")
-        return probeFilter.startsWith(filter)
+        return matchesFilter(key)
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.component
+import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.MenuItemBase
@@ -113,10 +114,21 @@ public interface TestingLifecycleHook {
  */
 public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 
-
 private val _ConfirmDialog_Class: Class<*>? = try {
     Class.forName("com.vaadin.flow.component.confirmdialog.ConfirmDialog")
 } catch (e: ClassNotFoundException) { null }
+private val _ConfirmDialog_isOpened: Method? =
+    _ConfirmDialog_Class?.getMethod("isOpened")
+private fun isDialogAndNeedsRemoval(c: Component): Boolean {
+    if (c is Dialog && !c.isOpened) {
+        return true
+    }
+    // also support ConfirmDialog. But be careful - this is a Pro component and may not be on classpath.
+    if (_ConfirmDialog_Class != null && _ConfirmDialog_isOpened != null && _ConfirmDialog_Class.isInstance(c) && !(_ConfirmDialog_isOpened.invoke(c) as Boolean)) {
+        return true
+    }
+    return false
+}
 
 /**
  * Flow Server does not close the dialog when [Dialog.close] is called; instead it tells client-side dialog to close,
@@ -126,19 +138,10 @@ private val _ConfirmDialog_Class: Class<*>? = try {
  * Also see [com.github.mvysny.kaributesting.v10.mock.MockedUI] for more details
  */
 public fun cleanupDialogs() {
-    UI.getCurrent().children.forEach {
-        if (it is Dialog && !it.isOpened) {
-            it.element.removeFromParent()
-        }
-    }
-
-    // also clean up ConfirmDialog. But careful - this is a Pro component and may not be on classpath.
-    if (_ConfirmDialog_Class != null) {
-        val isOpenedMethod: Method = _ConfirmDialog_Class.getMethod("isOpened")
-        UI.getCurrent().children.forEach {
-            if (_ConfirmDialog_Class.isInstance(it) && !(isOpenedMethod.invoke(it) as Boolean)) {
-                it.element.removeFromParent()
-            }
-        }
-    }
+    // Starting with Vaadin 23, nested dialogs are also nested within respective
+    // modal dialog within the UI. This is probably related to the "server-side
+    // modality curtain" feature. Also see https://github.com/mvysny/karibu-testing/issues/102
+    UI.getCurrent().walk()
+        .filter { isDialogAndNeedsRemoval(it) }
+        .forEach { it.element.removeFromParent() }
 }

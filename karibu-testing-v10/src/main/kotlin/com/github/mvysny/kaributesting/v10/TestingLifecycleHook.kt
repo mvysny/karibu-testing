@@ -119,12 +119,17 @@ private val _ConfirmDialog_Class: Class<*>? = try {
 } catch (e: ClassNotFoundException) { null }
 private val _ConfirmDialog_isOpened: Method? =
     _ConfirmDialog_Class?.getMethod("isOpened")
-private fun isDialogAndNeedsRemoval(c: Component): Boolean {
-    if (c is Dialog && !c.isOpened) {
+
+/**
+ * Checks whether given [component] is a dialog and needs to be removed from the UI.
+ * See [cleanupDialogs] for more info.
+ */
+private fun isDialogAndNeedsRemoval(component: Component): Boolean {
+    if (component is Dialog && !component.isOpened) {
         return true
     }
     // also support ConfirmDialog. But be careful - this is a Pro component and may not be on classpath.
-    if (_ConfirmDialog_Class != null && _ConfirmDialog_isOpened != null && _ConfirmDialog_Class.isInstance(c) && !(_ConfirmDialog_isOpened.invoke(c) as Boolean)) {
+    if (_ConfirmDialog_Class != null && _ConfirmDialog_isOpened != null && _ConfirmDialog_Class.isInstance(component) && !(_ConfirmDialog_isOpened.invoke(component) as Boolean)) {
         return true
     }
     return false

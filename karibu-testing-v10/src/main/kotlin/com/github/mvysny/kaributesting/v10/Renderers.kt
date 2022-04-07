@@ -36,7 +36,12 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when (
         val component: Component = createComponent(rowObject)
         component.toPrettyString()
     }
-    else -> null
+    else -> if (this::class.simpleName == "LitRenderer"){
+        val renderedLitTemplateHtml :String = renderLitTemplate(this.template, this.valueProviders, rowObject)
+        Jsoup.parse(renderedLitTemplateHtml).textRecursively
+    } else {
+        null
+    }
 }
 
 /**
@@ -50,6 +55,16 @@ public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
         }
     }
     return template
+}
+
+public fun <T> renderLitTemplate(template: String , valueProviders: Map<String,ValueProvider<T,*>>,item: T): String {
+    var renderedTemplate = template;
+    valueProviders.forEach { (k: String, v: ValueProvider<T, *>) ->
+        if (template.contains("\${item.$k}")) {
+            renderedTemplate = renderedTemplate.replace("\${item.$k}", v.apply(item).toString())
+        }
+    }
+    return renderedTemplate
 }
 
 /**

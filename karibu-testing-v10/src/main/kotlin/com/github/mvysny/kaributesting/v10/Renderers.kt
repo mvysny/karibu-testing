@@ -36,7 +36,21 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when (
         val component: Component = createComponent(rowObject)
         component.toPrettyString()
     }
-    else -> null
+    else -> if (this::class.simpleName == "LitRenderer") {
+        // LitRenderer re-declares private members
+        val templateProperty = this::class.java.getDeclaredField("templateExpression")
+        templateProperty.isAccessible = true
+        val templateExpression = templateProperty.get(this) as String
+
+        val valueProvidersProperty = this::class.java.getDeclaredField("valueProviders")
+        valueProvidersProperty.isAccessible = true
+        val valueProviders = valueProvidersProperty.get(this) as Map<String, ValueProvider<T, *>>
+
+        val renderedLitTemplateHtml: String = renderLitTemplate(templateExpression, valueProviders, rowObject)
+        Jsoup.parse(renderedLitTemplateHtml).textRecursively
+    } else {
+        null
+    }
 }
 
 /**
@@ -50,6 +64,16 @@ public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
         }
     }
     return template
+}
+
+public fun <T> renderLitTemplate(template: String, valueProviders: Map<String, ValueProvider<T, *>>, item: T): String {
+    var renderedTemplate = template;
+    valueProviders.forEach { (k: String, v: ValueProvider<T, *>) ->
+        if (renderedTemplate.contains("\${item.$k}")) {
+            renderedTemplate = renderedTemplate.replace("\${item.$k}", v.apply(item).toString())
+        }
+    }
+    return renderedTemplate
 }
 
 /**

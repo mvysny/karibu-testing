@@ -13,12 +13,15 @@ import kotlin.test.expect
 
 @DynaTestDsl
 internal fun DynaNodeGroup.renderers22Tests() {
-    test("_getPresentationValue()") {
-        expect("Item #25") {
-            MockVaadin.setup(Routes(), { UI() })
-            val r = LitRenderer.of<Int>("<div>\${item.foo}</div>")
-                .withProperty("foo") { "Item #$it" }
-            r._getPresentationValue(25)
+    beforeEach { MockVaadin.setup() }
+
+    group("LitRenderer") {
+        test("_getPresentationValue()") {
+            expect("Item #25") {
+                val r = LitRenderer.of<Int>("<div>\${item.foo}</div>")
+                    .withProperty("foo") { "Item #$it" }
+                r._getPresentationValue(25)
+            }
         }
     }
 }

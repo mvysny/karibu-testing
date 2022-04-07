@@ -10,7 +10,7 @@ import com.github.mvysny.dynatest.DynaTestDsl
 fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     allTests(isModuleTest)
 
-    group("Grid 19") {
+    group("Grid Vaadin 19+") {
         grid19Testbatch()
     }
 
@@ -18,7 +18,7 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
         securityTests()
     }
 
-    group("Renderers 22"){
+    group("Renderers Vaadin 22+"){
         renderers22Tests()
     }
 }

@@ -17,4 +17,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     group("security") {
         securityTests()
     }
+
+    group("Renderers 22"){
+        renderers22Tests()
+    }
 }

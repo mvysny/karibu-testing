@@ -14,4 +14,6 @@ include("karibu-testing-v8",
         "karibu-testing-v10:kt10-testrun-vaadin22-module",
         "karibu-testing-v10:kt10-testrun-vaadin23",
         "karibu-testing-v10:kt10-testrun-vaadin23-module",
+        "karibu-testing-v10:kt10-testrun-vaadin23.next",
+        "karibu-testing-v10:kt10-testrun-vaadin23.next-module",
 )

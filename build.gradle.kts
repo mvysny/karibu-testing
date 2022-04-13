@@ -102,4 +102,8 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    configurations.implementation {
+        exclude(module = "fusion-endpoint") // Vaadin 22: exclude fusion: it brings tons of dependencies (including swagger)
+    }
 }

@@ -1145,7 +1145,8 @@ is implemented in JavaScript and thus it's impossible to click from Karibu-Testi
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.
 
-Suppose you have a dynamic form which allows you to add multiple addresses, one of those being primary. You'll have the following `AddressPanel` class:
+Suppose you have a custom component: a form which allows you to add multiple addresses,
+one of those being primary. You'll have the following `AddressPanel` class:
 
 ```kotlin
 class AddressPanel : FormLayout() {

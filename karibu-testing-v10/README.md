@@ -1137,7 +1137,9 @@ the rendered items (items from the DataProvider passed through the item label pr
 ### Support for Details
 
 You can look up components in both Details's summary slot and the contents slot, regardless
-of whether the Details is opened/expanded or not.
+of whether the Details is opened/expanded or not. The button to expand/collapse details
+is implemented in JavaScript and thus it's impossible to click from Karibu-Testing; use
+`details.setOpened(true)` to expand/collapse the Details component.
 
 ## Adding support for custom search criteria
 

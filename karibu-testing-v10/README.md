@@ -1134,6 +1134,11 @@ Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Gr
 Call `checkboxGroup.getItemLabels()`/`CheckboxGroupKt.getItemLabels(checkboxGroup)` to retrieve
 the rendered items (items from the DataProvider passed through the item label provider).
 
+### Support for Details
+
+You can look up components in both Details's summary slot and the contents slot, regardless
+of whether the Details is opened/expanded or not.
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

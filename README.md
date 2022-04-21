@@ -60,6 +60,10 @@ Advantages over the traditional testing with [Selenium](https://www.seleniumhq.o
 * *Robust*: the test runs in the same JVM as the server. If the
   server fails to start and throws an exception, the test method too will fail with the same exception.
   No need to go hunting for exceptions in a log located somewhere on a CI server.
+* No need to write massive set of
+  [Page Objects](https://vaadin.com/docs/v14/tools/testbench/testbench-maintainable-tests-using-page-objects).
+  Remember - you're already on the server, and you have access to the actual Java components
+  which already are providing you with high-level APIs, exactly as Page Objects do.
 
 With this technique you can run 600 UI tests in 7 seconds, as opposing to 1-2 hours with Selenium-based approach.
 Because of the speed, you can let the UI tests run after every commit by your continuous integration server.

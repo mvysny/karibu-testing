@@ -64,6 +64,10 @@ Advantages over the traditional testing with [Selenium](https://www.seleniumhq.o
   [Page Objects](https://vaadin.com/docs/v14/tools/testbench/testbench-maintainable-tests-using-page-objects).
   Remember - you're already on the server, and you have access to the actual Java components
   which already are providing you with high-level APIs, exactly as Page Objects do.
+* Full access to the *Database*. You're server-side - you can access the database from your tests the same way your
+  business logic accesses the database. You can run a bunch of SQLs to restore the database to a known state before
+  every test. Even better - you can run the test in a transaction then roll back after the test, to
+  perform fast database revert to a known state.
 
 With this technique you can run 600 UI tests in 7 seconds, as opposing to 1-2 hours with Selenium-based approach.
 Because of the speed, you can let the UI tests run after every commit by your continuous integration server.

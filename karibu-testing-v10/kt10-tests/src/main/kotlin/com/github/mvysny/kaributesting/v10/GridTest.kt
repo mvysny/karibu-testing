@@ -6,6 +6,7 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.caption
+import com.github.mvysny.kaributools.selectionMode
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -624,6 +625,49 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(true) { fired }
         }
     }
+
+    group("selection") {
+        test("single selection") {
+            val items = (0..10).map { TestPerson("name $it", it) }
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2(items)
+            }
+            grid._select(items[1])
+            expect(setOf(items[1])) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.MULTI
+            grid._select(items[1])
+            expect(setOf(items[1])) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.NONE
+            expectThrows<IllegalStateException>("selection mode is currently set to NONE") {
+                grid._select(items[1])
+            }
+            expect(setOf()) { grid.selectedItems }
+        }
+
+        test("_selectAll()") {
+            val items = (0..10).map { TestPerson("name $it", it) }
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2(items)
+            }
+
+            expectThrows<AssertionError>("Expected multi-select but got SINGLE") {
+                grid._selectAll()
+            }
+            expect(setOf()) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.NONE
+            expectThrows<AssertionError>("Expected multi-select but got NONE") {
+                grid._selectAll()
+            }
+            expect(setOf()) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.MULTI
+            grid._selectAll()
+            expect(items.toSet()) { grid.selectedItems }
+        }
+    }
 }
 
 data class TestPerson(var name: String, var age: Int): Comparable<TestPerson> {
@@ -631,6 +675,9 @@ data class TestPerson(var name: String, var age: Int): Comparable<TestPerson> {
 }
 
 fun <T> Grid<T>.setItems2(items: Collection<T>) {
+    // Vaadin 15+ uses DataView and setItems() has been moved to HasDataView,
+    // introducing binary incompatibility. We thus can't have a code which calls [setItems] since that
+    // will not work with both Vaadin 14 and Vaadin 15+. This is a workaround.
     dataProvider = ListDataProvider2(items)
 }
 

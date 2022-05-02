@@ -759,9 +759,37 @@ public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
  * mocked properly, calls the editor bindings, and fires the editor-open-event.
  */
 public fun <T> Editor<T>._editItem(item: T) {
+    grid.checkEditableByUser()
     expect(true, "${grid.toPrettyString()} is not attached, editItem() would do nothing. Make sure the Grid is attached to an UI") {
-        grid.isAttached()
+        grid.isAttached
     }
     editItem(item)
     MockVaadin.clientRoundtrip()
+}
+
+/**
+ * Clears the selection and select only given [item].
+ */
+public fun <T: Any> Grid<T>._select(item: T) {
+    checkEditableByUser()
+    deselectAll()
+    // fails properly if the Grid doesn't support selection.
+    selectionModel.selectFromClient(item)
+}
+
+/**
+ * Selects all items in the Grid; runs the same code as when the "select all" checkbox is checked.
+ * Fails if the grid is not multi-select or the "select all" checkbox is hidden.
+ */
+public fun <T> Grid<T>._selectAll() {
+    checkEditableByUser()
+    expect(Grid.SelectionMode.MULTI, "Expected multi-select but got $selectionMode") { selectionMode }
+    expect(true, "SelectAll checkbox not visible") {
+        (selectionModel as AbstractGridMultiSelectionModel<T>).isSelectAllCheckboxVisible
+    }
+
+    // call AbstractGridMultiSelectionModel.clientSelectAll()
+    val clientSelectAllMethod = AbstractGridMultiSelectionModel::class.java.getDeclaredMethod("clientSelectAll")
+    clientSelectAllMethod.isAccessible = true
+    clientSelectAllMethod.invoke(selectionModel)
 }

@@ -901,6 +901,21 @@ the `DataProvider`'s fetching methods. However, the sorting is
 automatically applied by Karibu-Testing as if by the Grid itself,
 when you call Karibu-Testing's `GridKt` methods.
 
+#### Selection
+
+The default API of `grid.select()` has a bunch of shortcomings making it unfit for
+testing purposes:
+
+* Doesn't check whether the Grid is enabled+visible
+* Will silently do nothing if Grid is in NONE selection mode
+
+Therefore Karibu-Testing (since 1.3.13) introduces:
+
+* `grid._select(item)` which deselects all items and selects given item only, failing
+  if the grid is not editable or it doesn't support selection. Java: `GridKt._select(grid, item)`
+* `grid._selectAll()` only works with multi-select Grid; fails if the grid is not
+  editable or the select-all checkbox is not visible.
+
 #### Grid Editors
 
 The grid supports inline editing of one row, via the `Grid.getEditor()` API.

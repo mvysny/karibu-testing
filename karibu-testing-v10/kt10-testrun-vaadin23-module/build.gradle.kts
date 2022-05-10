@@ -4,3 +4,6 @@ dependencies {
         exclude(group = "com.github.appreciated")
     }
 }
+
+// Vaadin 23 requires Java 11 or higher
+tasks.test { onlyIf { JavaVersion.current() >= JavaVersion.VERSION_11 } }

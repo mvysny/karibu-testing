@@ -14,9 +14,15 @@ you can instantiate your components and views directly from your JUnit test meth
 In order to do so, Karibu-Testing mocks `CurrentRequest`, `VaadinSession` and others in your
 currently running JVM (in which your JUnit tests run).
 
-Karibu-Testing removes the necessity to run
-both the browser and the servlet container, in order to test your Vaadin-based apps
-insanely fast.
+Karibu-Testing only runs in JVM and only tests server-side code. There is no browser running
+and no JavaScript code running, which means that there is no communication between the browser and the server,
+which means that you don't even need to run the servlet container. You simply create new instance
+of your Vaadin form, modify the field values directly, then simulate a click to the "Save" button
+and see the binder validations running. You can even call `UI.navigate()` to
+navigate to a view; the navigation is handled completely server-side and adds components to `UI.getCurrent()`.
+You then assert on the contents of `UI.getCurrent()` to verify that your code ran properly.
+
+In short, Karibu-Testing is here to perform:
 
 1. *containerless testing*: You don't need to launch the servlet container.
 Karibu-Testing creates Vaadin Session, the UI and other necessary Vaadin classes

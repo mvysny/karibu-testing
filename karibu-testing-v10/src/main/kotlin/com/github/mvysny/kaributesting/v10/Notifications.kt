@@ -2,7 +2,9 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.getText
 import com.github.mvysny.kaributools.removeFromParent
+import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
 import kotlin.streams.toList
 
@@ -10,9 +12,18 @@ import kotlin.streams.toList
  * Returns the list of currently displayed notifications.
  */
 public fun getNotifications(): List<Notification> {
-    // notifications are opened lazily. Make sure they are attached to the UI
+    // Notifications attach themselves directly amongst the children of the UI. However,
+    // notifications are opened lazily; make sure to run the runExecutionsBeforeClientResponse()
+    // in order for the Notifications to actually add themselves to the UI.
     testingLifecycleHook.awaitBeforeLookup()
-    val notifications = UI.getCurrent().children.toList().filterIsInstance<Notification>()
+
+    // Vaadin 23: It's not enough to only consider the children of UI.getCurrent().
+    // The server-side modality curtain introduced in Vaadin 23 will cause notifications
+    // to be nested within the modal dialog itself.
+    val posibleNotificationParents = UI.getCurrent().walk()
+        .filter { it is UI || (it is Dialog && it.isModal) }
+    val notifications = posibleNotificationParents.flatMap { it.children.toList() } .filterIsInstance<Notification>()
+
     testingLifecycleHook.awaitAfterLookup()
     return notifications
 }

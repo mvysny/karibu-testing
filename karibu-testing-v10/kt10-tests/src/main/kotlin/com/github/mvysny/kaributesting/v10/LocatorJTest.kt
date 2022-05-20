@@ -192,7 +192,9 @@ internal fun DynaNodeGroup.locatorJTest() {
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { withClasses("a") } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { withClasses("b") } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { withClasses("a b") } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { withClasses("a   b") } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withClasses("a c") } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withClasses("a   c") } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withClasses("c") } }
         }
         test("withoutStyles") {
@@ -200,8 +202,12 @@ internal fun DynaNodeGroup.locatorJTest() {
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("a") } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("b") } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("a b") } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("a   b") } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("a c") } }
+            expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("a   c") } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("c") } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("c d") } }
+            expect(true) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses("c   d") } }
         }
         test("predicates") {
             expect(true) { Button().matches {}}

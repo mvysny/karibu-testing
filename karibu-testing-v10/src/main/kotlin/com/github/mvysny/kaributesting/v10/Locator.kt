@@ -31,6 +31,8 @@ import java.util.function.Predicate
  * @property classes if not null, the component must match all of these class names. Space-separated.
  * @property withoutClasses if not null, the component must NOT match any of these class names. Space-separated.
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
+ * @property themes if not null, the component must have all theme names defined. Space-separated
+ * @property withoutThemes if not null, the component must NOT have any of the theme names defined. Space-separated
  */
 public class SearchSpec<T : Component>(
         public val clazz: Class<T>,
@@ -42,7 +44,9 @@ public class SearchSpec<T : Component>(
         public var value: Any? = null,
         public var classes: String? = null,
         public var withoutClasses: String? = null,
-        public var predicates: MutableList<Predicate<T>> = mutableListOf()
+        public var predicates: MutableList<Predicate<T>> = mutableListOf(),
+        var themes: String? = null,
+        var withoutThemes: String? = null
 ) {
 
     override fun toString(): String {
@@ -53,6 +57,8 @@ public class SearchSpec<T : Component>(
         if (text != null) list.add("text='$text'")
         if (!classes.isNullOrBlank()) list.add("classes='$classes'")
         if (!withoutClasses.isNullOrBlank()) list.add("withoutClasses='$withoutClasses'")
+        if (!themes.isNullOrBlank()) list.add("themes='$themes'")
+        if (!withoutThemes.isNullOrBlank()) list.add("withoutThemes='$withoutThemes'")
         if (value != null) list.add("value=$value")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
@@ -88,6 +94,14 @@ private fun Component.hasAllClasses(classes: String): Boolean {
 private fun Component.doesntHaveAnyClasses(classes: String): Boolean {
     if (this !is HasStyle) return true
     return classes.split(' ').filterNotBlank().all { !classNames.contains(it) }
+}
+
+private fun Component.hasAllThemes(themes: String): Boolean {
+    return themes.split(' ').filterNotBlank().all { element.themeList.contains(it) }
+}
+
+private fun Component.notContainsThemes(themes: String): Boolean {
+    return themes.split(' ').filterNotBlank().all { !element.themeList.contains(it) }
 }
 
 /**

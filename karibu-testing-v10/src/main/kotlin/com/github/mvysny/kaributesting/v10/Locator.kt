@@ -82,14 +82,12 @@ public class SearchSpec<T : Component>(
 public fun Iterable<String?>.filterNotBlank(): List<String> = filterNotNull().filter { it.isNotBlank() }
 
 private fun Component.hasAllClasses(classes: String): Boolean {
-    if (classes.contains(' ')) return classes.split(' ').filterNotBlank().all { hasAllClasses(it) }
     if (this !is HasStyle) return false
-    return classNames.contains(classes)
+    return classes.split(' ').filterNotBlank().all { classNames.contains(it) }
 }
 private fun Component.doesntHaveAnyClasses(classes: String): Boolean {
-    if (classes.contains(' ')) return classes.split(' ').filterNotBlank().all { !hasAllClasses(it) }
     if (this !is HasStyle) return true
-    return !classNames.contains(classes)
+    return classes.split(' ').filterNotBlank().all { !classNames.contains(it) }
 }
 
 /**

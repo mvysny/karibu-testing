@@ -30,9 +30,9 @@ import java.util.function.Predicate
  * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
  * @property classes if not null, the component must match all of these class names. Space-separated.
  * @property withoutClasses if not null, the component must NOT match any of these class names. Space-separated.
- * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  * @property themes if not null, the component must have all theme names defined. Space-separated
  * @property withoutThemes if not null, the component must NOT have any of the theme names defined. Space-separated
+ * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  */
 public class SearchSpec<T : Component>(
         public val clazz: Class<T>,
@@ -44,9 +44,9 @@ public class SearchSpec<T : Component>(
         public var value: Any? = null,
         public var classes: String? = null,
         public var withoutClasses: String? = null,
-        public var predicates: MutableList<Predicate<T>> = mutableListOf(),
-        var themes: String? = null,
-        var withoutThemes: String? = null
+        public var themes: String? = null,
+        public var withoutThemes: String? = null,
+        public var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
     override fun toString(): String {

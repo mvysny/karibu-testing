@@ -79,6 +79,9 @@ public class SearchSpec<T : Component>(
     }
 }
 
+/**
+ * Return a list containing only strings that are not null nor [String.isNotBlank].
+ */
 public fun Iterable<String?>.filterNotBlank(): List<String> = filterNotNull().filter { it.isNotBlank() }
 
 private fun Component.hasAllClasses(classes: String): Boolean {

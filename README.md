@@ -66,8 +66,9 @@ Advantages over the traditional testing with [Selenium](https://www.seleniumhq.o
 * *Robust*: the test runs in the same JVM as the server. If the
   server fails to start and throws an exception, the test method too will fail with the same exception.
   No need to go hunting for exceptions in a log located somewhere on a CI server.
-* No need to write massive set of
-  [Page Objects](https://vaadin.com/docs/v14/tools/testbench/testbench-maintainable-tests-using-page-objects).
+* No need to write
+  [Page Object](https://vaadin.com/docs/v14/tools/testbench/testbench-maintainable-tests-using-page-objects) for every
+  Vaadin component, form and view your app contains, effectively doubling your code-base.
   Remember - you're already on the server, and you have access to the actual Java components
   which already are providing you with high-level APIs, exactly as Page Objects do.
 * Full access to the *Database*. You're server-side - you can access the database from your tests the same way your

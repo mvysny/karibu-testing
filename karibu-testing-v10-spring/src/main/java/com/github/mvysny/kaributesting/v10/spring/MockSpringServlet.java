@@ -11,7 +11,9 @@ import com.vaadin.flow.spring.SpringServlet;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 /**
@@ -46,5 +48,13 @@ public class MockSpringServlet extends SpringServlet {
         service.init();
         routes.register((VaadinServletContext) service.getContext());
         return service;
+    }
+
+    @Override
+    public void init(ServletConfig servletConfig) throws ServletException {
+        super.init(servletConfig);
+        // some apps retrieve Spring's WebApplicationContext from the ServletContext,
+        // via WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE.
+        servletConfig.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, ctx);
     }
 }

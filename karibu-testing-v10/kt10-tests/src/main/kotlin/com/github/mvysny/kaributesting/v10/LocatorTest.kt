@@ -236,6 +236,38 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(true) { Button().matches {}}
             expect(false) { Button().matches { predicates.add(Predicate { false }) }}
         }
+        test("themes") {
+            expect(true) { Button().apply { addThemeNames("custom-theme", "my-theme") }.matches {} }
+            expect(true) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { themes = "custom-theme" }
+            }
+            expect(true) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { themes = "my-theme" }
+            }
+            expect(true) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }
+                    .matches { themes = "custom-theme my-theme" }
+            }
+            expect(false) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { themes = "no-theme" }
+            }
+        }
+        test("withoutThemes") {
+            expect(true) { Button().apply { addThemeNames("custom-theme", "my-theme") }.matches {} }
+            expect(false) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { withoutThemes = "custom-theme" }
+            }
+            expect(false) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { withoutThemes = "my-theme" }
+            }
+            expect(false) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }
+                    .matches { withoutThemes = "custom-theme my-theme" }
+            }
+            expect(true) {
+                Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { withoutThemes = "no-theme" }
+            }
+        }
     }
 
     group("unmocked env") {

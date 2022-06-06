@@ -6,7 +6,9 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.ContextMenu
+import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -20,11 +22,25 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
-                item("click me", { _ -> clicked++ })
+                item("click me", { clicked++ })
             }
         }
         cm._clickItemWithCaption("click me")
         expect(1) { clicked }
+    }
+
+    test("click toggles isChecked") {
+        var clicked = 0
+        lateinit var cm: ContextMenu
+        lateinit var i: MenuItem
+        UI.getCurrent().div {
+            cm = contextMenu {
+                i = item("click me", { clicked++ }) { isCheckable = true }
+            }
+        }
+        cm._clickItemWithCaption("click me")
+        expect(1) { clicked }
+        expect(true) { i.isChecked }
     }
 
     test("clicking menu item calls the 'menu open' listeners") {
@@ -139,15 +155,26 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
 
     group("grid context menu") {
         test("simple click") {
-            var clicked: String? = null
+            lateinit var clicked: String
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
-                    item("click me", { e -> clicked = e })
+                    item("click me", { e -> clicked = e!! })
                 }
             }
             cm._clickItemWithCaption("click me", "foo")
             expect("foo") { clicked }
+        }
+        test("click toggles isChecked") {
+            lateinit var i: GridMenuItem<String>
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    i = item("click me") { isCheckable = true }
+                }
+            }
+            cm._clickItemWithCaption("click me", "foo")
+            expect(true) { i.isChecked }
         }
         test("submenu click") {
             var clicked: String? = null

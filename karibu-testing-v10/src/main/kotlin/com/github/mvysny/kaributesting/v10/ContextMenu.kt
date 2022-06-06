@@ -128,10 +128,15 @@ private fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
     _fireEvent(ClickEvent<MenuItem>(this, true, 0, 0, 0, 0, 1, 1, false, false, false, false))
+    if (isCheckable) {
+        isChecked = !isChecked
+    }
 }
 
 /**
  * Tries to click given menu item, passing in given [gridItem].
+ * @param gridItem the item which was clicked. `null` when the grid is "right-clicked"
+ * outside of any item (e.g. if there are no items shown in the grid).
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */

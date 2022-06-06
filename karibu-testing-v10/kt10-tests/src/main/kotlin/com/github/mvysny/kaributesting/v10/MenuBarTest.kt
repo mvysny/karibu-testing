@@ -16,13 +16,24 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
-    test("_clickItemWithCaption") {
+    test("_clickItemWithCaption fires click listener") {
         var clicked = 0
         val menuBar: MenuBar = UI.getCurrent().menuBar {
             item("foo", { clicked++ })
         }
         menuBar._clickItemWithCaption("foo")
         expect(1) { clicked }
+    }
+
+    test("_clickItemWithCaption toggles isChecked") {
+        lateinit var i: MenuItem
+        val menuBar: MenuBar = UI.getCurrent().menuBar {
+            item("bar") {
+                i = item("foo") { isCheckable = true }
+            }
+        }
+        menuBar._clickItemWithCaption("foo")
+        expect(true) { i.isChecked }
     }
 
     test("_click") {

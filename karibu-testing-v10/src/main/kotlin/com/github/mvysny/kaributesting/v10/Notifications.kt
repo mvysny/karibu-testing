@@ -1,8 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.getText
-import com.github.mvysny.kaributools.removeFromParent
-import com.github.mvysny.kaributools.walk
+import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
@@ -20,9 +18,12 @@ public fun getNotifications(): List<Notification> {
     // Vaadin 23: It's not enough to only consider the children of UI.getCurrent().
     // The server-side modality curtain introduced in Vaadin 23 will cause notifications
     // to be nested within the modal dialog itself.
-    val posibleNotificationParents = UI.getCurrent().walk()
+    val possibleNotificationParents = UI.getCurrent().walk()
         .filter { it is UI || (it is Dialog && it.isModal) }
-    val notifications = posibleNotificationParents.flatMap { it.children.toList() } .filterIsInstance<Notification>()
+    val notifications = possibleNotificationParents
+        .flatMap { it.children.toList() }
+        .filterIsInstance<Notification>()
+        .filter { it.isOpened }
 
     testingLifecycleHook.awaitAfterLookup()
     return notifications
@@ -48,5 +49,17 @@ public fun expectNoNotifications() {
  * Clears and removes all notifications from screen.
  */
 public fun clearNotifications() {
-    getNotifications().forEach { it.removeFromParent() }
+    getNotifications().forEach { it._close() }
+}
+
+/**
+ * Closes the notification and cleans it up properly.
+ */
+public fun Notification._close() {
+    close()
+    // removeFromParent() stopped working since Vaadin 23.0.10+
+    // See https://github.com/mvysny/karibu-testing/issues/113
+    if (VaadinVersion.get <= SemanticVersion(23, 0, 9)) {
+        removeFromParent()
+    }
 }

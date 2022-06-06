@@ -38,7 +38,7 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
     // https://github.com/mvysny/karibu-testing/issues/35
     test("when lookup of a component fails, notify user that it might be because of PolymerTemplate") {
         UI.getCurrent().add(ReviewsList())
-        expectThrows(AssertionError::class, "Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates") {
+        expectThrows(AssertionError::class, "Karibu-Testing is not able to look up components from inside of PolymerTemplate/LitTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates") {
             _get<Button>()
         }
     }
@@ -49,5 +49,22 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
             _get<Button>()
         }
         expect(false, ex.message) { ex.message!!.contains("PolymerTemplate", true) }
+    }
+
+    group("overriding TestingLifecycleHook.getAllComponents()") {
+        afterEach { testingLifecycleHook = TestingLifecycleHook.default }
+        test("PolymerTemplate") {
+            testingLifecycleHook = object : TestingLifecycleHook {
+                override fun getAllChildren(component: Component): List<Component> {
+                    if (component is ReviewsList) {
+                        return listOf(component.addReview, component.header, component.search)
+                    }
+                    return super.getAllChildren(component)
+                }
+            }
+            val list = ReviewsList()
+            expectList() { list.children.toList() }
+            expectList(list, list.addReview, list.header, list.search) { list._find<Component>() }
+        }
     }
 }

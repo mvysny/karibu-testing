@@ -10,6 +10,7 @@ import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
@@ -154,9 +155,9 @@ public fun <T: Component> Component._find(clazz: Class<T>, block: SearchSpec<T>.
         // if there's a PolymerTemplate, warn that Karibu-Testing can't really locate components in there:
         // https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates
         // fixes https://github.com/mvysny/karibu-testing/issues/35
-        val hasPolymerTemplates: Boolean = _walkAll().any { it is PolymerTemplate<*> }
+        val hasPolymerTemplates: Boolean = _walkAll().any { it is PolymerTemplate<*> || it is LitTemplate }
         if (hasPolymerTemplates) {
-            message = "$message\nWarning: Karibu-Testing is not able to look up components from inside of PolymerTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates for more details."
+            message = "$message\nWarning: Karibu-Testing is not able to look up components from inside of PolymerTemplate/LitTemplate. Please see https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates for more details."
         }
 
         // find() used to fail with IllegalArgumentException which makes sense for a general-purpose utility method. However,

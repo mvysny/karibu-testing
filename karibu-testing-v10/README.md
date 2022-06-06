@@ -490,7 +490,8 @@ That makes it impossible for Karibu-Testing to look up components inside of a Po
 Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
 To work around the look-up issue,
 simply publish your `@Id`-annotated
-fields as `public` or `internal` (Kotlin) or with package visibility (Java).
+fields as `public` or `internal` (Kotlin) or with package visibility (Java),
+then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
 
 Also you can still invoke event listeners (such as button clicks) easily since
 the event listeners are defined server-side.
@@ -552,6 +553,63 @@ the following:
    you will therefore have to expose the inner PolymerTemplate via a field of the outer PolymerTemplate,
    then access the inner PolymerTemplate via that field.
 
+Even better, read below on how to make Karibu-Testing recognize certain children of
+certain PolymerTemplates/LitTemplates.
+
+#### Overriding `TestLifecycleHook.getAllComponents()`
+
+In certain cases/apps the PolymerTemplate is ultimately populated by components that
+are constructed on the server-side. For example, you could have a PolymerTemplate
+for the main app route, which would nest individual routes inside.
+The routes are server-constructed and have proper state management (so they're not just "shells");
+having access to the routes themselves would therefore be valuable.
+See [https://github.com/mvysny/karibu-testing/issues/114](#114) for more details.
+
+The solution is to override `TestLifecycleHook.getAllComponents()` as follows:
+
+Kotlin:
+```kotlin
+testingLifecycleHook = object : TestingLifecycleHook {
+    override fun getAllChildren(component: Component): List<Component> {
+        if (component is ReviewsList) {
+            return listOf(component.addReview, component.header, component.search)
+        }
+        return super.getAllChildren(component)
+    }
+}
+```
+
+Java:
+```java
+public class MyLifecycleHook implements TestingLifecycleHook {
+
+    @Override
+    public void awaitAfterLookup() {
+        TestingLifecycleHook.Companion.getDefault().awaitAfterLookup();
+    }
+
+    @Override
+    public void awaitBeforeLookup() {
+        TestingLifecycleHook.Companion.getDefault().awaitBeforeLookup();
+    }
+
+    @NotNull
+    @Override
+    public List<Component> getAllChildren(@NotNull Component component) {
+        if (component instanceof BaseView) {
+            return Arrays.asList(((BaseView) component).main);
+        }
+        return TestingLifecycleHook.Companion.getDefault().getAllChildren(component);
+    }
+}
+```
+To register:
+```java
+@BeforeAll
+public static void configureKaribu() {
+    TestingLifecycleHookKt.setTestingLifecycleHook(new MyLifecycleHook());
+}
+```
 
 #### PolymerTemplates which load stuff from the `node_modules` folder
 

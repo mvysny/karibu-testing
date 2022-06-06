@@ -26,6 +26,12 @@ import kotlin.streams.toList
  * would be both laborous and error-prone, the default operation is that Karibu Testing pretends as if there was a client-server
  * roundtrip before every component lookup
  * via the [_get]/[_find]/[_expectNone]/[_expectOne] call. Therefore, [MockVaadin.clientRoundtrip] is called from [awaitBeforeLookup] by default.
+ *
+ * ### Providing children of a PolymerTemplate/LitTemplate
+ *
+ * You can override [getAllChildren] to provide children of your particular view extending from PolymerTemplate/LitTemplate.
+ * See the Karibu-Testing documentation for more help. Make sure to call the original implementation in your override, or alternatively
+ * call [TestingLifecycleHook.default], otherwise Karibu-Testing will not discover the children of basic components.
  */
 public interface TestingLifecycleHook {
     /**
@@ -103,6 +109,7 @@ public interface TestingLifecycleHook {
         /**
          * A default lifecycle hook that simply runs default implementations of the hook functions.
          */
+        @JvmStatic
         public val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
     }
 }

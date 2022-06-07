@@ -8,10 +8,9 @@ import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.notification.Notification
 import java.util.*
-import kotlin.streams.toList
 
 /**
  * If true, [PrettyPrintTree] will use `\--` instead of `└──` which tend to render on some terminals as `???`.
@@ -146,6 +145,12 @@ public fun Component.toPrettyString(): String {
         val innerHTML =
             element.getProperty("innerHTML").trim().replace(Regex("\\s+"), " ")
         list.add("innerHTML='$innerHTML'")
+    }
+    if (this is Notification) {
+        list.add("'${this.getText().ellipsize(20)}'")
+        if (!this.isOpened) {
+            list.add("CLOSED")
+        }
     }
     if (this.javaClass.hasCustomToString()) {
         // by default Vaadin components do not introduce toString() at all;

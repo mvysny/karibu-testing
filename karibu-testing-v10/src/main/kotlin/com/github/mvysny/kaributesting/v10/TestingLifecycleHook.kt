@@ -53,9 +53,10 @@ public interface TestingLifecycleHook {
     public fun awaitAfterLookup() {}
 
     /**
-     * Provides all children of given component. Provides workarounds for certain components:
+     * Provides all direct children of given component. Provides workarounds for certain components:
      * * For [Grid.Column] the function will also return cell components nested in all headers and footers for that particular column.
      * * For [MenuItemBase] the function returns all items of a sub-menu.
+     * Only direct children are considered - don't return children of children.
      */
     public fun getAllChildren(component: Component): List<Component> = when {
         component is Grid<*> -> {

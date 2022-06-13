@@ -7,6 +7,8 @@ import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.textfield.EmailField
+import com.vaadin.flow.component.textfield.TextField
 import kotlin.streams.toList
 import kotlin.test.expect
 
@@ -65,6 +67,22 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
             val list = ReviewsList()
             expectList() { list.children.toList() }
             expectList(list, list.addReview, list.header, list.search) { list._find<Component>() }
+        }
+    }
+
+    group("includeVirtualChildrenInTemplates") {
+        afterEach { includeVirtualChildrenInTemplates = false }
+        test("false") {
+            val list = ReviewsList()
+            expectList(list) {
+                list._walkAll().toList()
+            }
+        }
+        test("true") {
+            includeVirtualChildrenInTemplates = true
+            val form = ReviewsList()
+            expect(setOf(form, form.search, form.header, form.addReview)) { form._walkAll().toSet() }
+            expect(form.search) { form._get<TextField>() }
         }
     }
 }

@@ -223,7 +223,9 @@ private fun <T> Iterable<(T) -> Boolean>.and(): (T) -> Boolean =
 
 /**
  * Walks the component child/descendant tree, depth-first: first the component, then its descendants,
- * then its next sibling.
+ * then its next sibling. Uses [TestingLifecycleHook.getAllChildren] to get the children.
+ *
+ * Returns [this] as the first item.
  */
 public fun Component._walkAll(): Iterable<Component> = Iterable {
     DepthFirstTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }

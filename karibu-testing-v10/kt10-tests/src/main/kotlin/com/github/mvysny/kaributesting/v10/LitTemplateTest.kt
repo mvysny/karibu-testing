@@ -59,6 +59,22 @@ fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
     test("form") {
         UI.getCurrent().add(MyForm())
     }
+
+    group("includeVirtualChildrenInTemplates") {
+        afterEach { includeVirtualChildrenInTemplates = false }
+        test("false") {
+            // okay, apparently LitTemplate lists its children as regular children (and not virtual children). whatever.
+            val form = MyForm()
+            expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._walkAll().toSet() }
+            expect(form.emailField) { form._get<EmailField>() }
+        }
+        test("true") {
+            includeVirtualChildrenInTemplates = true
+            val form = MyForm()
+            expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._walkAll().toSet() }
+            expect(form.emailField) { form._get<EmailField>() }
+        }
+    }
 }
 
 @Tag("color-picker-field")
@@ -91,13 +107,13 @@ data class Employee(var firstName: String? = null, var lastName: String? = null,
 @JsModule("./src/my-form.ts")
 class MyForm : LitTemplate() {
     @Id
-    private lateinit var firstNameField: TextField
+    lateinit var firstNameField: TextField
 
     @Id
-    private lateinit var lastNameField: TextField
+    lateinit var lastNameField: TextField
 
     @Id
-    private lateinit var emailField: EmailField
+    lateinit var emailField: EmailField
     val binder: Binder<Employee> = BeanValidationBinder(Employee::class.java)
 
     init {

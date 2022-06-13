@@ -488,13 +488,20 @@ the `verticalLayout.getChildren()` will return an empty Stream.
 That makes it impossible for Karibu-Testing to look up components inside of a Polymer Template.
 
 Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
-To work around the look-up issue,
-simply publish your `@Id`-annotated
-fields as `public` or `internal` (Kotlin) or with package visibility (Java),
-then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
+There are three ways to work around the look-up issue:
 
-Also you can still invoke event listeners (such as button clicks) easily since
-the event listeners are defined server-side.
+1. Set `includeVirtualChildrenInTemplates` to true (`TestingLifecycleHookKt.setIncludeVirtualChildrenInTemplates(true)`) -
+   the easiest option but also may expose too much. Use at your own risk.
+2. Manual workaround: publish your `@Id`-annotated fields as `public` or `internal` (Kotlin) or with package visibility (Java),
+   then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
+3. Override `TestingLifecycleHook.getAllComponents()` to include fields from your templates.
+4. (the best) stop using templates in your app.
+
+Any of the above will work; moreover you can still invoke event listeners (such as button clicks) easily since
+the event listeners are set to the 'component shells' from a server-side, and therefore they
+are accessible to Karibu.
+
+#### Manual Workaround
 
 Please see the following example code:
 
@@ -542,7 +549,7 @@ public void createReviewTest() {
 }
 ```
 
-#### Nested Polymer Templates
+##### Nested Polymer Templates
 
 Sometimes you have a PolymerTemplate nested inside another PolymerTemplate, etc.
 In order to access components from the inner PolymerTemplate, you will have to do

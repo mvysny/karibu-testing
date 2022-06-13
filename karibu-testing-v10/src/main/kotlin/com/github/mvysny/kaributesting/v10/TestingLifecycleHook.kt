@@ -134,13 +134,8 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             // don't include virtual children since that would make the MenuItems appear two times.
             component.children.toList()
         }
-        component is PolymerTemplate<*> -> {
-            // don't include virtual children since those will include nested components.
-            // however, those components are only they are only "shallow shells" of components constructed
-            // server-side - almost none of their properties are transferred to the server-side.
-            // Listing those components with null captions and other properties would only be confusing.
-            // Therefore, let's leave the virtual children out for now.
-            // See https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates
+        component.isTemplate && !includeVirtualChildrenInTemplates -> {
+            // don't include virtual children; see [includeVirtualChildrenInTemplates] for more details.
             component.children.toList()
         }
         component.javaClass.name == "com.vaadin.flow.component.grid.ColumnGroup" -> {
@@ -158,6 +153,26 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
         else -> (component.children.toList() + component._getVirtualChildren()).distinct()
     }
 }
+
+internal val Component.isTemplate: Boolean get() = this is PolymerTemplate<*> || this.javaClass.name == "com.vaadin.flow.component.littemplate.LitTemplate"
+
+/**
+ * [PolymerTemplate]s and LitTemplates are a bit tricky.
+ * The purpose of PolymerTemplates is to move as much code as possible to the client-side,
+ * while Karibu is designed to test server-side code only. The child components
+ * are either not accessible from the server-side altogether,
+ * or they are only "shallow shells" of components constructed server-side -
+ * almost none of their properties are transferred to the server-side.
+ *
+ * Also see [Polymer Templates / Lit Templates](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#polymer-templates--lit-templates)
+ * for more info.
+ *
+ * Theese child components are still available on server-side and attached to the Template as virtual children, therefore
+ * it is possible to obtain them from the server-side. If you understand the risks
+ * and shortcomings of this, set this property to `true` to include virtual children in
+ * Karibu-recognized tree of components.
+ */
+public var includeVirtualChildrenInTemplates: Boolean = false
 
 /**
  * Additional bits for Vaadin 23.1.

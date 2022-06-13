@@ -76,7 +76,7 @@ internal fun DynaNodeGroup.locatorTest2() {
 internal fun DynaNodeGroup.locatorTest() {
 
     beforeEach { MockVaadin.setup() }
-    beforeEach { testingLifecycleHook = MyLifecycleHook() }
+    beforeEach { testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default) }
     afterEach { testingLifecycleHook = TestingLifecycleHook.default }
     afterEach { MockVaadin.tearDown() }
 
@@ -380,7 +380,11 @@ internal fun DynaNodeGroup.locatorTest() {
     }
 }
 
-data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfterLookupCalled: Boolean = false) : TestingLifecycleHook {
+class MyLifecycleHook(
+    val delegate: TestingLifecycleHook,
+    var isBeforeLookupCalled: Boolean = false,
+    var isAfterLookupCalled: Boolean = false
+) : TestingLifecycleHook by delegate {
     override fun awaitBeforeLookup() {
         check(!isBeforeLookupCalled) { "awaitBeforeLookup() has been already called" }
         check(!isAfterLookupCalled) { "awaitAfterLookup() has been already called" }
@@ -395,6 +399,7 @@ data class MyLifecycleHook(var isBeforeLookupCalled: Boolean = false, var isAfte
 }
 
 fun expectAfterLookupCalled() {
-    expect(MyLifecycleHook(true, true)) { testingLifecycleHook }
-    testingLifecycleHook = MyLifecycleHook()
+    expect(true) { (testingLifecycleHook as MyLifecycleHook).isBeforeLookupCalled }
+    expect(true) { (testingLifecycleHook as MyLifecycleHook).isAfterLookupCalled }
+    testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
 }

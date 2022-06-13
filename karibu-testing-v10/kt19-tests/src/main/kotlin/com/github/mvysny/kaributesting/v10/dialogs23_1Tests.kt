@@ -16,7 +16,7 @@ fun DynaNodeGroup.dialog23_1tests() {
         dialog.header.add(Span("Foo"))
         dialog.footer.add(Button("Bar"))
         dialog.open()
-        _expectOne<Span> { caption = "Foo" }
+        _expectOne<Span> { text = "Foo" }
         _expectOne<Button> { caption = "Bar" }
     }
 }

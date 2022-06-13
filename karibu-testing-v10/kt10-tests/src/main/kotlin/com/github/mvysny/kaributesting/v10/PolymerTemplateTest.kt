@@ -54,12 +54,12 @@ internal fun DynaNodeGroup.polymerTemplateTest() {
     group("overriding TestingLifecycleHook.getAllComponents()") {
         afterEach { testingLifecycleHook = TestingLifecycleHook.default }
         test("PolymerTemplate") {
-            testingLifecycleHook = object : TestingLifecycleHook {
+            testingLifecycleHook = object : TestingLifecycleHook by TestingLifecycleHook.default {
                 override fun getAllChildren(component: Component): List<Component> {
                     if (component is ReviewsList) {
                         return listOf(component.addReview, component.header, component.search)
                     }
-                    return super.getAllChildren(component)
+                    return TestingLifecycleHook.default.getAllChildren(component)
                 }
             }
             val list = ReviewsList()

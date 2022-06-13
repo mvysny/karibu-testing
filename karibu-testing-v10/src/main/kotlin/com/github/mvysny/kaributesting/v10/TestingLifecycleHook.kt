@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.component
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
@@ -9,12 +10,15 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
+import com.vaadin.flow.dom.Element
 import java.lang.reflect.Method
 import kotlin.streams.toList
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
  * provide your own custom implementation of this interface, then set it into [testingLifecycleHook].
+ * Make sure to call the [TestingLifecycleHook.default] implementation,
+ * otherwise Karibu-Testing will not discover the children of basic components.
  *
  * ### Mocking server request end
  *
@@ -30,27 +34,75 @@ import kotlin.streams.toList
  * ### Providing children of a PolymerTemplate/LitTemplate
  *
  * You can override [getAllChildren] to provide children of your particular view extending from PolymerTemplate/LitTemplate.
- * See the Karibu-Testing documentation for more help. Make sure to call the original implementation in your override, or alternatively
- * call [TestingLifecycleHook.default], otherwise Karibu-Testing will not discover the children of basic components.
+ * See the Karibu-Testing documentation for more help.
+ *
+ * ### Delegating properly to the default impl
+ * ```
+ * class MyLifecycleHook(val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {
+ *   override fun awaitBeforeLookup() { delegate.awaitBeforeLookup() }
+ * }
+ * testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
+ * ```
+ * @see TestingLifecycleHookVaadin14Default for the default implementation
  */
 public interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
      *
-     * The default implementation calls the [MockVaadin.clientRoundtrip] method. When implementing this method, you should
+     * See [TestingLifecycleHookVaadin14Default.awaitBeforeLookup] for the default implementation.
+     */
+    public fun awaitBeforeLookup()
+
+    /**
+     * Invoked after every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
+     * Invoked even if the `_get()`/`_find()`/`_expectNone()` function fails.
+     *
+     * See [TestingLifecycleHookVaadin14Default.awaitAfterLookup] for the default implementation.
+     */
+    public fun awaitAfterLookup()
+
+    /**
+     * Provides all direct children of given component. May include virtual children.
+     *
+     * See [TestingLifecycleHookVaadin14Default.getAllChildren] for the default implementation.
+     */
+    public fun getAllChildren(component: Component): List<Component>
+
+    public companion object {
+        /**
+         * A default lifecycle hook that works well with all Vaadin versions.
+         */
+        @JvmStatic
+        public val default: TestingLifecycleHook get() {
+            var hook: TestingLifecycleHook = TestingLifecycleHookVaadin14Default()
+            if (VaadinVersion.get.isAtLeast(23, 1)) {
+                hook = TestingLifecycleHookVaadin23_1(hook)
+            }
+            return hook
+        }
+    }
+}
+
+/**
+ * The default implementation of [TestingLifecycleHook] that works for all Vaadin versions.
+ * See [TestingLifecycleHookVaadin23_1] for additional bits for Vaadin 23.1.
+ */
+public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
+    /**
+     * Calls the [MockVaadin.clientRoundtrip] method. When overriding this method, you should
      * also call [MockVaadin.clientRoundtrip] (or simply call super).
      */
-    public fun awaitBeforeLookup() {
+    override fun awaitBeforeLookup() {
         if (UI.getCurrent() != null) {
             MockVaadin.clientRoundtrip()
         }
     }
 
     /**
-     * Invoked after every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
-     * Invoked even if the `_get()`/`_find()`/`_expectNone()` function fails.
+     * The function does nothing by default.
      */
-    public fun awaitAfterLookup() {}
+    override fun awaitAfterLookup() {
+    }
 
     /**
      * Provides all direct children of given component. Provides workarounds for certain components:
@@ -58,19 +110,19 @@ public interface TestingLifecycleHook {
      * * For [MenuItemBase] the function returns all items of a sub-menu.
      * Only direct children are considered - don't return children of children.
      */
-    public fun getAllChildren(component: Component): List<Component> = when {
+    override fun getAllChildren(component: Component): List<Component> = when {
         component is Grid<*> -> {
             // don't attach the header/footer components as a child of the Column component:
             // that would make components in merged cells appear more than once.
             // see https://github.com/mvysny/karibu-testing/issues/52
             val headerComponents: List<Component> = component.headerRows
-                    .flatMap { it.cells.map { it.component } }
-                    .filterNotNull()
+                .flatMap { it.cells.map { it.component } }
+                .filterNotNull()
             val footerComponents: List<Component> = component.footerRows
-                    .flatMap { it.cells.map { it.component } }
-                    .filterNotNull()
+                .flatMap { it.cells.map { it.component } }
+                .filterNotNull()
             val editorComponents: List<Component> = component.columns
-                    .mapNotNull { it.editorComponent }
+                .mapNotNull { it.editorComponent }
             val children = component.children.toList()
             (headerComponents + footerComponents + editorComponents + children).distinct()
         }
@@ -105,20 +157,68 @@ public interface TestingLifecycleHook {
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
         else -> (component.children.toList() + component._getVirtualChildren()).distinct()
     }
+}
 
-    public companion object {
-        /**
-         * A default lifecycle hook that simply runs default implementations of the hook functions.
-         */
-        @JvmStatic
-        public val default: TestingLifecycleHook get() = object : TestingLifecycleHook {}
+/**
+ * Additional bits for Vaadin 23.1.
+ */
+public open class TestingLifecycleHookVaadin23_1(public val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private val dialogHeaderFooter_rootField =
+        Class.forName("com.vaadin.flow.component.dialog.Dialog${'$'}DialogHeaderFooter").getDeclaredField("root")
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private val dialog_getHeader =
+        Dialog::class.java.getDeclaredMethod("getHeader")
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private val dialog_getFooter =
+        Dialog::class.java.getDeclaredMethod("getFooter")
+
+    init {
+        dialogHeaderFooter_rootField.isAccessible = true
+    }
+
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private fun getChildrenOfDialogHeaderOrFooter(dialogHeaderFooter: Any): List<Component> {
+        val root = dialogHeaderFooter_rootField.get(dialogHeaderFooter) as Element
+        return root.children.map { it.component.orElse(null) } .toList().filterNotNull()
+    }
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private fun getDialogHeaderChildren(dlg: Dialog): List<Component> {
+        val header = dialog_getHeader.invoke(dlg)
+        return getChildrenOfDialogHeaderOrFooter(header)
+    }
+    /**
+     * Vaadin 23.1 added Dialog.footer and header
+     */
+    private fun getDialogFooterChildren(dlg: Dialog): List<Component> {
+        val header = dialog_getFooter.invoke(dlg)
+        return getChildrenOfDialogHeaderOrFooter(header)
+    }
+
+    override fun getAllChildren(component: Component): List<Component> {
+        var list = delegate.getAllChildren(component)
+        if (component is Dialog) {
+            // https://github.com/mvysny/karibu-testing/issues/115
+            list = getDialogHeaderChildren(component) + list + getDialogFooterChildren(component)
+        }
+        return list
     }
 }
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
  * set your custom implementation here. See [TestingLifecycleHook] for more info on
- * where exactly you can hook into.
+ * where exactly you can hook into. The best way is to delegate to the [TestingLifecycleHook.default] implementation.
  */
 public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 

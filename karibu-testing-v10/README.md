@@ -556,7 +556,7 @@ the following:
 Even better, read below on how to make Karibu-Testing recognize certain children of
 certain PolymerTemplates/LitTemplates.
 
-#### Overriding `TestLifecycleHook.getAllComponents()`
+#### Overriding `TestingLifecycleHook.getAllComponents()`
 
 In certain cases/apps the PolymerTemplate is ultimately populated by components that
 are constructed on the server-side. For example, you could have a PolymerTemplate
@@ -565,18 +565,19 @@ The routes are server-constructed and have proper state management (so they're n
 having access to the routes themselves would therefore be valuable.
 See [https://github.com/mvysny/karibu-testing/issues/114](#114) for more details.
 
-The solution is to override `TestLifecycleHook.getAllComponents()` as follows:
+The solution is to override `TestingLifecycleHook.getAllComponents()` as follows:
 
 Kotlin:
 ```kotlin
-testingLifecycleHook = object : TestingLifecycleHook {
-    override fun getAllChildren(component: Component): List<Component> {
-        if (component is ReviewsList) {
-            return listOf(component.addReview, component.header, component.search)
-        }
-        return super.getAllChildren(component)
+class MyLifecycleHook(val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {
+  override fun getAllChildren(component: Component): List<Component> {
+    if (component is ReviewsList) {
+      return listOf(component.addReview, component.header, component.search)
     }
+    return delegate.getAllChildren(component)
+  }
 }
+testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
 ```
 
 Java:
@@ -585,12 +586,12 @@ public class MyLifecycleHook implements TestingLifecycleHook {
 
     @Override
     public void awaitAfterLookup() {
-        TestingLifecycleHook.Companion.getDefault().awaitAfterLookup();
+        TestingLifecycleHook.getDefault().awaitAfterLookup();
     }
 
     @Override
     public void awaitBeforeLookup() {
-        TestingLifecycleHook.Companion.getDefault().awaitBeforeLookup();
+        TestingLifecycleHook.getDefault().awaitBeforeLookup();
     }
 
     @NotNull
@@ -599,7 +600,7 @@ public class MyLifecycleHook implements TestingLifecycleHook {
         if (component instanceof BaseView) {
             return Arrays.asList(((BaseView) component).main);
         }
-        return TestingLifecycleHook.Companion.getDefault().getAllChildren(component);
+        return TestingLifecycleHook.getDefault().getAllChildren(component);
     }
 }
 ```

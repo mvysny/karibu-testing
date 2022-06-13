@@ -81,8 +81,10 @@ subprojects {
             }
         }
 
-        signing {
-            sign(publishing.publications["mavenJava"])
+        if (project.properties["signing.keyId"] != null) {
+            signing {
+                sign(publishing.publications["mavenJava"])
+            }
         }
     }
 

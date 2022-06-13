@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
@@ -11,14 +12,32 @@ import java.lang.reflect.Field
 import kotlin.test.fail
 
 /**
- * Emulates an user inputting something into the combo box, filtering items.  You can use [getSuggestionItems]
- * to retrieve those items and to verify that the filter on your data provider works properly.
+ * Emulates user inputting something into the combo box, filtering items. You should use [getSuggestionItems]
+ * to retrieve filtered items, in order to verify that the filter on your data provider works properly.
+ *
+ * Note: this function will not change the value of the combo box.
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     checkEditableByUser()
     val comboBoxFilterSlot: Field = ComboBox::class.java.getDeclaredField("filterSlot").apply { isAccessible = true }
     @Suppress("UNCHECKED_CAST")
     (comboBoxFilterSlot.get(this) as SerializableConsumer<String?>).accept(userInput)
+}
+
+/**
+ * Select an item in the combo box by [label]. Calls [setUserInput] to filter the items first, then
+ * calls [getSuggestionItems] to obtain filtered items, then selects the sole item that matches [label].
+ *
+ * Fails if the item is not found, or multiple items are found. Fails if the combo box is not editable.
+ */
+public fun <T> ComboBox<T>.selectByLabel(label: String) {
+    setUserInput(label)
+    val items: List<T> = getSuggestionItems().filter { itemLabelGenerator.apply(it) == label }
+    when {
+        items.isEmpty() -> fail("No item found with label '$label'")
+        items.size > 1 -> fail("Multiple items found with label '$label': $items")
+        else -> _value = items[0]
+    }
 }
 
 /**
@@ -67,8 +86,22 @@ public fun <T> Select<T>.getSuggestionItems(): List<T> = dataProvider._findAll()
  */
 public fun <T> Select<T>.getSuggestions(): List<String> {
     val items: List<T> = getSuggestionItems()
-    return when (itemLabelGenerator) {
-        null -> items.map { it.toString() }
-        else -> items.map { itemLabelGenerator.apply(it) }
+    val g: ItemLabelGenerator<T> = itemLabelGenerator ?: ItemLabelGenerator { it.toString() }
+    return items.map { g.apply(it) }
+}
+
+/**
+ * Select an item in the combo box by [label]. Calls [getSuggestionItems] to obtain filtered items,
+ * then selects the sole item that matches [label].
+ *
+ * Fails if the item is not found, or multiple items are found. Fails if the combo box is not editable.
+ */
+public fun <T> Select<T>.selectByLabel(label: String) {
+    val g: ItemLabelGenerator<T> = itemLabelGenerator ?: ItemLabelGenerator { it.toString() }
+    val items: List<T> = getSuggestionItems().filter { g.apply(it) == label }
+    when {
+        items.isEmpty() -> fail("No item found with label '$label'")
+        items.size > 1 -> fail("Multiple items found with label '$label': $items")
+        else -> _value = items[0]
     }
 }

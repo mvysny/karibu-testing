@@ -1062,10 +1062,15 @@ For example, you can call `comboBox.getSuggestions()`/`ComboBoxKt.getSuggestions
 of dropdown suggestions, formatted according to the current `ItemLabelGenerator`.
 
 You can also use `comboBox.setUserInput()`/`ComboBoxKt.setUserInput()` to simulate user typing into the ComboBox,
-filtering the suggestions. (Not available for Select since Select doesn't support user input)
+filtering the suggestions.  You should use `getSuggestionItems()`
+to retrieve filtered items, in order to verify that the filter on your data provider works properly.
+(Not available for Select since Select doesn't support user input)
 
 You can also use `comboBox._fireCustomValueSet()`/`ComboBoxKt._fireCustomValueSet()` to simulate user creating a
 new item in the ComboBox.
+
+Finally, call `comboBox.selectByLabel()`/`select.selectByLabel()` to select an item by its label,
+changing the value of the combobox/select. (Since Karibu-Testing 1.3.15)
 
 ### Support for ListBox/MultiSelectListBox
 

@@ -3,5 +3,5 @@ dependencies {
         exclude(group = "com.vaadin")
     }
     api("com.vaadin:vaadin-spring:12.2.0")
-    api("com.vaadin:vaadin:${properties["vaadin22_version"]}")
+    compileOnly("com.vaadin:vaadin:${properties["vaadin23_next_version"]}")
 }

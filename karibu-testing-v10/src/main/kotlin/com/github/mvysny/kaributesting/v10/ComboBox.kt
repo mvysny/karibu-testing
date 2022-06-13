@@ -2,11 +2,14 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
+import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.function.SerializableConsumer
 import java.lang.reflect.Field
 import kotlin.test.fail
@@ -34,8 +37,8 @@ public fun <T> ComboBox<T>.selectByLabel(label: String) {
     setUserInput(label)
     val items: List<T> = getSuggestionItems().filter { itemLabelGenerator.apply(it) == label }
     when {
-        items.isEmpty() -> fail("No item found with label '$label'")
-        items.size > 1 -> fail("Multiple items found with label '$label': $items")
+        items.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'")
+        items.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $items")
         else -> _value = items[0]
     }
 }
@@ -97,11 +100,15 @@ public fun <T> Select<T>.getSuggestions(): List<String> {
  * Fails if the item is not found, or multiple items are found. Fails if the combo box is not editable.
  */
 public fun <T> Select<T>.selectByLabel(label: String) {
-    val g: ItemLabelGenerator<T> = itemLabelGenerator ?: ItemLabelGenerator { it.toString() }
-    val items: List<T> = getSuggestionItems().filter { g.apply(it) == label }
+    selectByLabel(label, dataProvider, itemLabelGenerator ?: ItemLabelGenerator { it.toString() })
+}
+
+internal fun <T> HasValue<*, T>.selectByLabel(label: String, dataProvider: DataProvider<T, *>, itemLabelGenerator: ItemLabelGenerator<T>) {
+    val items = dataProvider._findAll()
+    val itemsWithLabel: List<T> = items.filter { itemLabelGenerator.apply(it) == label }
     when {
-        items.isEmpty() -> fail("No item found with label '$label'")
-        items.size > 1 -> fail("Multiple items found with label '$label': $items")
-        else -> _value = items[0]
+        itemsWithLabel.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available labels: ${items.map { itemLabelGenerator.apply(it) }}")
+        itemsWithLabel.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $itemsWithLabel")
+        else -> _value = itemsWithLabel[0]
     }
 }

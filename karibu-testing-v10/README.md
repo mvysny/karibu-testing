@@ -1212,6 +1212,7 @@ Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Gr
 * Call `radioButtonGroup._getRenderedComponent(item)` to obtain components rendered by
   the item renderer (`RadioButtonGroup.getItemRenderer()`) for given item (since KT 1.3.13). Alternatively call
   `radioButtonGroup.getItemRenderer().createComponent(item)`. Also see [#107](https://github.com/mvysny/karibu-testing/issues/107).
+* Call `radioButtonGroup.selectByLabel(item)` to select item with given label (since KT 1.3.15).
 
 ### Support for CheckboxGroup
 
@@ -1219,6 +1220,8 @@ Use `_expectNoDialogs()` to assert that there are no opened dialogs; for Java/Gr
 
 Call `checkboxGroup.getItemLabels()`/`CheckboxGroupKt.getItemLabels(checkboxGroup)` to retrieve
 the rendered items (items from the DataProvider passed through the item label provider).
+
+Call `checkboxGroup.selectByLabel("Item #1", "Item #3")` to select items with given labels (since KT 1.3.15).
 
 ### Support for Details
 

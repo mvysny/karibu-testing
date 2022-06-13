@@ -2,8 +2,10 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
+import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.data.provider.ListDataProvider
+import kotlin.test.expect
 
 @DynaTestDsl
 internal fun DynaNodeGroup.checkboxGroupTests() {
@@ -22,6 +24,20 @@ internal fun DynaNodeGroup.checkboxGroupTests() {
             expectList("item 1", "item 2", "item 3") {
                 cg.getItemLabels()
             }
+        }
+    }
+    group("selectByLabel()") {
+        test("empty") {
+            expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<?>(0 items)']: No item found with label(s) '[foo]'") {
+                CheckboxGroup<String>().selectByLabel("foo")
+            }
+        }
+        test("with itemLabelGenerator") {
+            val cg = CheckboxGroup<String>()
+            cg.setItems2("1", "2", "3")
+            cg.setItemLabelGenerator { "item $it" }
+            cg.selectByLabel("item 2")
+            expect(setOf("2")) { cg._value }
         }
     }
 }

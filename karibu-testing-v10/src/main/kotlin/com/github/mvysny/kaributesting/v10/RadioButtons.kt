@@ -1,17 +1,22 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
+import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.renderer.ComponentRenderer
 
 /**
  * Returns all item's captions.
  */
 public fun <T: Any> RadioButtonGroup<T>.getItemLabels(): List<String> {
+    val labelGenerator = itemLabelGenerator
+    return dataProvider._findAll().map { labelGenerator.apply(it) }
+}
+
+internal val <T> RadioButtonGroup<T>.itemLabelGenerator: ItemLabelGenerator<T> get() {
     val r = itemRenderer
-    return dataProvider._findAll().map {
-        r._getPresentationValue(it).toString()
-    }
+    return ItemLabelGenerator { r._getPresentationValue(it).toString() }
 }
 
 /**
@@ -22,3 +27,12 @@ public fun <T: Any> RadioButtonGroup<T>.getItemLabels(): List<String> {
  */
 public fun <T : Any> RadioButtonGroup<T>._getRenderedComponent(item: T): Component =
     itemRenderer.createComponent(item)
+
+/**
+ * Select an item in the radio button group by [label].
+ *
+ * Fails if the item is not found, or multiple items are found. Fails if the radio button group is not editable.
+ */
+public fun <T> RadioButtonGroup<T>.selectByLabel(label: String) {
+    selectByLabel(label, dataProvider, itemLabelGenerator)
+}

@@ -491,7 +491,7 @@ Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
 There are three ways to work around the look-up issue:
 
 1. Set `includeVirtualChildrenInTemplates` to true (`TestingLifecycleHookKt.setIncludeVirtualChildrenInTemplates(true)`) -
-   the easiest option but also may expose too much. Use at your own risk.
+   the easiest option but also may expose too much. Use at your own risk. Since Karibu-Testing 1.3.14.
 2. Manual workaround: publish your `@Id`-annotated fields as `public` or `internal` (Kotlin) or with package visibility (Java),
    then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
 3. Override `TestingLifecycleHook.getAllComponents()` to include fields from your templates.

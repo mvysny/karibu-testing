@@ -226,6 +226,9 @@ private fun <T> Iterable<(T) -> Boolean>.and(): (T) -> Boolean =
  * then its next sibling. Uses [TestingLifecycleHook.getAllChildren] to get the children.
  *
  * Returns [this] as the first item.
+ *
+ * This is a low-level API which doesn't run the [TestingLifecycleHook] lifecycle methods.
+ * Please consider using [find] instead: `component.find<Component>()`
  */
 public fun Component._walkAll(): Iterable<Component> = Iterable {
     DepthFirstTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }

@@ -63,6 +63,7 @@ public interface TestingLifecycleHook {
 
     /**
      * Provides all direct children of given component. May include virtual children.
+     * Only direct children are considered - don't return children of children.
      *
      * See [TestingLifecycleHookVaadin14Default.getAllChildren] for the default implementation.
      */
@@ -108,7 +109,6 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
      * Provides all direct children of given component. Provides workarounds for certain components:
      * * For [Grid.Column] the function will also return cell components nested in all headers and footers for that particular column.
      * * For [MenuItemBase] the function returns all items of a sub-menu.
-     * Only direct children are considered - don't return children of children.
      */
     override fun getAllChildren(component: Component): List<Component> = when {
         component is Grid<*> -> {

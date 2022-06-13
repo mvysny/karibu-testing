@@ -66,7 +66,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                     value = "some text"
                 }.toPrettyString()
             }
-            expect("Grid[<String>, dataprovider='ListDataProvider2{0 items}']") {
+            expect("Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']") {
                 Grid<String>(
                     String::class.java
                 ).apply { setItems2(listOf()) }.toPrettyString()
@@ -183,7 +183,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 setItems2(listOf())
             }
             expect("""
-└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
+└── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
     └── Column[header='Hello!']
 """.trim()) { grid.toPrettyTree().trim() }
         }
@@ -214,7 +214,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 setItems2(listOf())
             }
             expect("""
-└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
+└── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
     ├── TextField[label='Filter:', value='']
     └── Column[]""".trim()) { grid.toPrettyTree().trim() }
         }
@@ -229,7 +229,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 setItems2(listOf())
             }
             expect("""
-└── Grid[<String>, dataprovider='ListDataProvider2{0 items}']
+└── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
     ├── TextField[label='Filter:', value='']
     └── ColumnGroup[]
         ├── ColumnGroup[]

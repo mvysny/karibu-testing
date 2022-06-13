@@ -10,6 +10,8 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.data.provider.DataProvider
+import com.vaadin.flow.data.provider.ListDataProvider
 import java.util.*
 
 /**
@@ -130,7 +132,7 @@ public fun Component.toPrettyString(): String {
         list.add("<${this.beanType.simpleName}>")
     }
     if (this.dataProvider != null) {
-        list.add("dataprovider='${this.dataProvider}'")
+        list.add("dataprovider='${this.dataProvider!!.toPrettyString()}'")
     }
     element.attributeNames
         .filter { !dontDumpAttributes.contains(it) }
@@ -184,3 +186,12 @@ public var prettyStringHook: (component: Component, list: LinkedList<String>) ->
  * * `href` - there's special processing for [Anchor._href].
  */
 public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href")
+
+/**
+ * Formats a DataProvider.
+ */
+public fun DataProvider<*, *>.toPrettyString(): String = when {
+    javaClass.hasCustomToString() -> this.toString()
+    this is ListDataProvider<*> -> "${javaClass.simpleName}<${items.firstOrNull()?.javaClass?.simpleName ?: "?"}>(${items.size} items)"
+    else -> this.toString()
+}

@@ -243,7 +243,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._clickRenderer(2, "name")
             }
         }
@@ -253,7 +253,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addColumn(ComponentRenderer<Label, TestPerson> { _ -> Label() }).key = "name"
             }
-            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
             }
         }
@@ -265,7 +265,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
             }
-            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{11 items}'] column name uses NativeButtonRenderer which is not supported by this function") {
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column name uses NativeButtonRenderer which is not supported by this function") {
                 grid._getCellComponent(8, "name")
             }
         }
@@ -312,7 +312,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             setItems2(listOf())
         }
         expect("name") { grid._getColumnByKey("name").key }
-        expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider2{0 items}']: No such column with key 'foo'; available columns: [name, age]") {
+        expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<?>(0 items)']: No such column with key 'foo'; available columns: [name, age]") {
             grid._getColumnByKey("foo")
         }
     }
@@ -359,7 +359,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addItemClickListener { fail("Shouldn't be called") }
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._clickItem(2)
             }
         }
@@ -506,7 +506,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addItemDoubleClickListener { fail("Shouldn't be called") }
                 isEnabled = false
             }
-            expectThrows(IllegalStateException::class, "The Grid[DISABLED, <TestPerson>, dataprovider='ListDataProvider2{11 items}'] is not enabled") {
+            expectThrows(IllegalStateException::class, "The Grid[DISABLED, <TestPerson>, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._doubleClickItem(2)
             }
         }
@@ -678,12 +678,5 @@ fun <T> Grid<T>.setItems2(items: Collection<T>) {
     // Vaadin 15+ uses DataView and setItems() has been moved to HasDataView,
     // introducing binary incompatibility. We thus can't have a code which calls [setItems] since that
     // will not work with both Vaadin 14 and Vaadin 15+. This is a workaround.
-    dataProvider = ListDataProvider2(items)
-}
-
-/**
- * Need to have this class because of https://github.com/vaadin/flow/issues/8553
- */
-class ListDataProvider2<T>(items: Collection<T>): ListDataProvider<T>(items) {
-    override fun toString(): String = "ListDataProvider2{${items.size} items}"
+    dataProvider = ListDataProvider(items)
 }

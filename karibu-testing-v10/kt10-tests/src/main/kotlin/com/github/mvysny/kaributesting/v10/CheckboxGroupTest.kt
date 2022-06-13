@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.checkbox.CheckboxGroup
+import com.vaadin.flow.data.provider.ListDataProvider
 
 @DynaTestDsl
 internal fun DynaNodeGroup.checkboxGroupTests() {
@@ -28,5 +29,5 @@ internal fun DynaNodeGroup.checkboxGroupTests() {
 fun <T> CheckboxGroup<T>.setItems2(vararg items: T) {
     // workaround for java.lang.NoSuchMethodError: 'void com.vaadin.flow.component.listbox.MultiSelectListBox.setItems(java.util.Collection)'
     // the setItems() method has been moved in Vaadin 22+, from HasItems to HasListDataView
-    setDataProvider(ListDataProvider2(items.toList()))
+    setDataProvider(ListDataProvider(items.toList()))
 }

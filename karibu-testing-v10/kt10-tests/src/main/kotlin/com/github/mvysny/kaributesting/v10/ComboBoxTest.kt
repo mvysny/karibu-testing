@@ -6,6 +6,7 @@ import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.select.Select
+import com.vaadin.flow.data.provider.ListDataProvider
 import kotlin.test.expect
 
 @DynaTestDsl
@@ -98,11 +99,11 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
 
 fun <T> ComboBox<T>.setItems2(items: Collection<T>) {
     // this way it's also compatible with Vaadin 18.
-    setDataProvider(ListDataProvider2(items))
+    setDataProvider(ListDataProvider(items))
 }
 
 fun <T> Select<T>.setItems2(items: Collection<T>) {
     // this way it's also compatible with Vaadin 17:
     // https://github.com/vaadin/flow/issues/8831
-    dataProvider = ListDataProvider2(items)
+    dataProvider = ListDataProvider(items)
 }

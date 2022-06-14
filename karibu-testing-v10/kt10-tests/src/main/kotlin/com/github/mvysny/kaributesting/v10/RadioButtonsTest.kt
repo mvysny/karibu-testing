@@ -42,7 +42,14 @@ internal fun DynaNodeGroup.radioButtonTests() {
                 RadioButtonGroup<String>().selectByLabel("foo")
             }
         }
-        test("with itemLabelGenerator") {
+        test("fails on no match") {
+            val c = RadioButtonGroup<String>()
+            c.setItems2("1", "2", "3")
+            expectThrows<AssertionError>("RadioButtonGroup[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'foo'. Available items: [1, 2, 3]") {
+                c.selectByLabel("foo")
+            }
+        }
+        test("simple with itemLabelGenerator") {
             val cg = RadioButtonGroup<String>()
             cg.setItems2("1", "2", "3")
             cg.setRenderer(TextRenderer { "Item #$it" })

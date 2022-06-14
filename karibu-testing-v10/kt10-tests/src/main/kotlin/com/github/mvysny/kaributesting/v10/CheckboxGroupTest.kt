@@ -28,11 +28,18 @@ internal fun DynaNodeGroup.checkboxGroupTests() {
     }
     group("selectByLabel()") {
         test("empty") {
-            expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<?>(0 items)']: No item found with label(s) '[foo]'") {
+            expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<?>(0 items)']: No item found with label(s) '[foo]'. Available items: []") {
                 CheckboxGroup<String>().selectByLabel("foo")
             }
         }
-        test("with itemLabelGenerator") {
+        test("fails on no match") {
+            val c = CheckboxGroup<String>()
+            c.setItems2("1", "2", "3")
+            expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<String>(3 items)']: No item found with label(s) '[foo]'. Available items: [1, 2, 3]") {
+                c.selectByLabel("foo")
+            }
+        }
+        test("simple with itemLabelGenerator") {
             val cg = CheckboxGroup<String>()
             cg.setItems2("1", "2", "3")
             cg.setItemLabelGenerator { "item $it" }

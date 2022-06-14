@@ -22,20 +22,23 @@ public fun <T> CheckboxGroup<T>.selectByLabel(vararg labels: String) {
     selectByLabel(labels.toSet(), itemLabelGenerator)
 }
 
+/**
+ * Beware: the function will poll all items from the [dataProvider]. Use cautiously and only for small data providers.
+ */
 internal fun <T> HasValue<*, Set<T>>.selectByLabel(labels: Set<String>, itemLabelGenerator: ItemLabelGenerator<T>) {
-    val labelSet: Set<String> = labels.toSet()
-    val items: MutableMap<String, List<T>> = ((this as Component).dataProvider as DataProvider<T, *>)
+    // maps label to items that have the label
+    val items: Map<String, List<T>> = ((this as Component).dataProvider as DataProvider<T, *>)
         ._findAll()
         .groupBy { itemLabelGenerator.apply(it) }
-        .toMutableMap()
-    items.keys.retainAll(labelSet)
-    val e = items.entries.firstOrNull { it.value.size > 1 }
+    // select all items that have the label
+    val itemsWithLabels = items.filterKeys { key -> labels.contains(key) }
+    val e = itemsWithLabels.entries.firstOrNull { it.value.size > 1 }
     if (e != null) {
         fail("${toPrettyString()}: Multiple items found with label '${e.key}': ${e.value}")
     }
-    if (items.keys.size < labelSet.size) {
-        fail("${toPrettyString()}: No item found with label(s) '${labelSet.minus(items.keys)}'")
+    if (itemsWithLabels.keys.size < labels.size) {
+        fail("${toPrettyString()}: No item found with label(s) '${labels.minus(items.keys)}'. Available items: ${items.keys}")
     }
 
-    _value = items.values.flatten().toSet()
+    _value = itemsWithLabels.values.flatten().toSet()
 }

@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
+import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.ListDataProvider
@@ -52,8 +53,16 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 val cb = ComboBox<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
-                expectThrows<AssertionError>("No item found with label 'd'") {
+                expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: [aaa, bbb, ccc]") {
                     cb.selectByLabel("d")
+                }
+            }
+            test("fails on multiple match") {
+                val cb = ComboBox<String>().apply {
+                    setItems2(listOf("aaa", "aaa", "ccc"))
+                }
+                expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
+                    cb.selectByLabel("aaa")
                 }
             }
         }
@@ -89,8 +98,16 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
-                expectThrows<AssertionError>("No item found with label 'd'") {
+                expectThrows<AssertionError>("Select[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: [aaa, bbb, ccc]") {
                     cb.selectByLabel("d")
+                }
+            }
+            test("fails on multiple match") {
+                val cb = Select<String>().apply {
+                    setItems2(listOf("aaa", "aaa", "ccc"))
+                }
+                expectThrows<AssertionError>("Select[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
+                    cb.selectByLabel("aaa")
                 }
             }
         }

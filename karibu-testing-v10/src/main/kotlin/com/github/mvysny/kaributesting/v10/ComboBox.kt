@@ -37,7 +37,15 @@ public fun <T> ComboBox<T>.selectByLabel(label: String) {
     setUserInput(label)
     val items: List<T> = getSuggestionItems().filter { itemLabelGenerator.apply(it) == label }
     when {
-        items.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'")
+        items.isEmpty() -> {
+            val msg = buildString {
+                append("${this@selectByLabel.toPrettyString()}: No item found with label '$label'")
+                if (this@selectByLabel.dataProvider.isInMemory) {
+                    append(". Available items: ${this@selectByLabel.dataProvider._findAll()}")
+                }
+            }
+            fail(msg)
+        }
         items.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $items")
         else -> _value = items[0]
     }
@@ -100,14 +108,19 @@ public fun <T> Select<T>.getSuggestions(): List<String> {
  * Fails if the item is not found, or multiple items are found. Fails if the combo box is not editable.
  */
 public fun <T> Select<T>.selectByLabel(label: String) {
+    // it's OK to use selectByLabel(): Select's dataprovider is expected to hold small amount of data
+    // since Select doesn't offer any filtering capabilities.
     selectByLabel(label, dataProvider, itemLabelGenerator ?: ItemLabelGenerator { it.toString() })
 }
 
+/**
+ * Beware: the function will poll all items from the [dataProvider]. Use cautiously and only for small data providers.
+ */
 internal fun <T> HasValue<*, T>.selectByLabel(label: String, dataProvider: DataProvider<T, *>, itemLabelGenerator: ItemLabelGenerator<T>) {
     val items = dataProvider._findAll()
     val itemsWithLabel: List<T> = items.filter { itemLabelGenerator.apply(it) == label }
     when {
-        itemsWithLabel.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available labels: ${items.map { itemLabelGenerator.apply(it) }}")
+        itemsWithLabel.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available items: ${items.map { itemLabelGenerator.apply(it) }}")
         itemsWithLabel.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $itemsWithLabel")
         else -> _value = itemsWithLabel[0]
     }

@@ -226,6 +226,8 @@ public fun <T, F> HierarchicalDataProvider<T, F>._size(root: T? = null, filter: 
 private val _DataCommunicator_getDataProviderSize: Method =
     DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize").apply { isAccessible = true }
 
+public fun DataCommunicator<*>._size(): Int = _DataCommunicator_getDataProviderSize.invoke(this) as Int
+
 /**
  * Returns the number of items in this Grid.
  *
@@ -244,7 +246,7 @@ public fun Grid<*>._size(): Int {
     if (!_dataProviderSupportsSizeOp) {
         return _findAll().size
     }
-    return _DataCommunicator_getDataProviderSize.invoke(dataCommunicator) as Int
+    return dataCommunicator._size()
 }
 
 /**

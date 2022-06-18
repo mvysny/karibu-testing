@@ -18,4 +18,3 @@ kotlin {
 
 val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit
 configureBintray("karibu-testing-v23")
-

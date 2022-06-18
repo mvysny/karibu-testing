@@ -25,6 +25,8 @@ dependencies {
 }
 ```
 
+For Vaadin 23, use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
+
 > Note: obtain the newest version from the tag name above
 
 For Groovy, use `testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10-groovy:x.y.z")`
@@ -46,6 +48,8 @@ to your `pom.xml`:
     </dependencies>
 </project>
 ```
+
+For Vaadin 23, use `karibu-testing-v23` instead (starting with Karibu-Testing 1.3.16).
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 

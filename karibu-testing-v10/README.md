@@ -1031,7 +1031,8 @@ See `IronListKt` class for more details.
 ### Support for VirtualList
 
 Similar to Grid/IronList, but one column only, no sorting, no filtering, no header,
-good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3.16.
+good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3.16 and Vaadin 23; you need to use the
+`karibu-testing-v23` module.
 
 * You can retrieve a bean at particular index; for example `virtualList._get(0)` will return the first item (Kotlin, Groovy).
   Java: you need to `import static com.github.mvysny.kaributesting.v23.VirtualListsKt.*;`, then you can call `_get(virtualList, 0);`.

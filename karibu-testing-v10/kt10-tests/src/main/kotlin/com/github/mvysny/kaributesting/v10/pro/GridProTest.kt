@@ -4,8 +4,14 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.TestPerson
+import com.github.mvysny.kaributools.SemanticVersion
 import com.github.mvysny.kaributools.VaadinVersion
+import com.vaadin.flow.component.AbstractField
+import com.vaadin.flow.component.HasValueAndElement
+import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.gridpro.EditColumnConfigurator
 import com.vaadin.flow.component.gridpro.GridPro
+import com.vaadin.flow.component.gridpro.ItemUpdater
 import com.vaadin.flow.component.textfield.NumberField
 import kotlin.test.expect
 
@@ -48,8 +54,8 @@ internal fun DynaNodeGroup.gridProTestbatch() {
                 val grid = GridPro<TestPerson>(TestPerson::class.java)
                 grid.removeAllColumns()
                 val numberField = NumberField()
-                val col = grid.addEditColumn("age")
-                    .custom(numberField) { p, age -> p.age = age.toInt() }
+                val col: Grid.Column<TestPerson> = grid.addEditColumn("age")
+                    .custom2(numberField) { p, age -> p.age = age.toInt() }
                 val p = TestPerson("Foo", 45)
                 numberField.value = 3.15
                 grid._proedit(p) { col._customFlush() }
@@ -80,3 +86,16 @@ internal fun DynaNodeGroup.gridProTestbatch() {
 enum class MaritalStatus { Single, Married, Divorced, Widowed }
 
 data class TestProPerson(var name: String, var age: Int, var alive: Boolean = true, var status: MaritalStatus = MaritalStatus.Single)
+
+internal fun <T, V> EditColumnConfigurator<T>.custom2(
+    component: HasValueAndElement<*, V>,
+    itemUpdater: ItemUpdater<T, V>
+): Grid.Column<T> {
+    // Vaadin 23.1.1+ changed the method signature to custom(HasValueAndElement, ItemUpdater), need to use reflection
+    if (VaadinVersion.get >= SemanticVersion(23, 1, 1)) {
+        return EditColumnConfigurator::class.java
+            .getDeclaredMethod("custom", HasValueAndElement::class.java, ItemUpdater::class.java)
+            .invoke(this, component, itemUpdater) as Grid.Column<T>
+    }
+    return custom(component as AbstractField<*, V>, itemUpdater)
+}

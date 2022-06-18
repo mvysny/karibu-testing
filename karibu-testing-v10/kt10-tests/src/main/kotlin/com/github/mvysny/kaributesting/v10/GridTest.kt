@@ -81,6 +81,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         val grid = UI.getCurrent().grid<TestPerson>(dp) {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
+            isMultiSort = true
             sort(TestPerson::name.asc, TestPerson::age.desc)
         }
         expect("--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }

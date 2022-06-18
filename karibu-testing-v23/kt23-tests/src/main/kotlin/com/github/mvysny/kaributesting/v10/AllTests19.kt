@@ -28,4 +28,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
             dialog23_1tests()
         }
     }
+
+    group("VirtualList") {
+        virtualListTests()
+    }
 }

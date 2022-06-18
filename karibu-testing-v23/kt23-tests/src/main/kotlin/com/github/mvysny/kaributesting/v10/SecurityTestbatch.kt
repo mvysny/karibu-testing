@@ -2,7 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.karibudsl.v10.navigateToView
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.auth.AccessAnnotationChecker
 import com.vaadin.flow.server.auth.AnonymousAllowed
@@ -59,12 +59,12 @@ fun DynaNodeGroup.securityTests() {
         checker.enable()
         checker.setLoginView(LoginView::class.java)
         UI.getCurrent().addBeforeEnterListener(checker)
-        navigateToView<AdminView>()
+        navigateTo<AdminView>()
         _expectOne<LoginView>()
 
         currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
         currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
-        navigateToView<AdminView>()
+        navigateTo<AdminView>()
         _expectOne<AdminView>()
     }
 }

@@ -15,6 +15,7 @@ import com.vaadin.flow.component.listbox.ListBoxBase
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.treegrid.TreeGrid
+import com.vaadin.flow.data.binder.HasDataProvider
 import com.vaadin.flow.data.binder.HasItems
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
@@ -154,7 +155,8 @@ private val _DataCommunicator_fetchFromProvider: Method =
 
 private val _DataCommunicator_setPagingEnabled: Method? =
     DataCommunicator::class.java.declaredMethods.firstOrNull { it.name == "setPagingEnabled" }
-
+private val _DataCommunicator_isPagingEnabled: Method? =
+    DataCommunicator::class.java.declaredMethods.firstOrNull { it.name == "isPagingEnabled" }
 
 /**
  * Returns items in given range from this data communicator. Uses current Grid sorting.
@@ -165,8 +167,12 @@ private val _DataCommunicator_setPagingEnabled: Method? =
 public fun <T> DataCommunicator<T>.fetch(offset: Int, limit: Int): List<T> {
     require(limit <= _saneFetchLimit) { "Vaadin doesn't handle fetching of many items very well unfortunately. The sane limit is $_saneFetchLimit but you asked for $limit" }
 
-    // make sure the DataCommunicator is not in paged mode: https://github.com/mvysny/karibu-testing/issues/99
-    _DataCommunicator_setPagingEnabled?.invoke(this, false)
+    if (_DataCommunicator_setPagingEnabled != null && _DataCommunicator_isPagingEnabled != null) {
+        if (_DataCommunicator_isPagingEnabled.invoke(this) as Boolean) {
+            // make sure the DataCommunicator is not in paged mode: https://github.com/mvysny/karibu-testing/issues/99
+            _DataCommunicator_setPagingEnabled.invoke(this, false)
+        }
+    }
 
     @Suppress("UNCHECKED_CAST")
     val fetched: Stream<T> = _DataCommunicator_fetchFromProvider.invoke(this, offset, limit) as Stream<T>
@@ -283,10 +289,10 @@ public fun <T : Any> Grid<T>._clickRenderer(rowIndex: Int, columnKey: String) {
         } else {
             // don't try to do anything smart here since things will break silently for the customer as they upgrade Vaadin version
             // https://github.com/mvysny/karibu-testing/issues/67
-            fail("${this.toPrettyString()} column $columnKey: ComponentRenderer produced ${component.toPrettyString()} which is not a button nor a ClickNotifier - please use _getCellComponent() instead")
+            fail("${this.toPrettyString()} column key='$columnKey': ComponentRenderer produced ${component.toPrettyString()} which is not a button nor a ClickNotifier - please use _getCellComponent() instead")
         }
     } else {
-        fail("${this.toPrettyString()} column $columnKey has renderer $renderer which is not supported by this method")
+        fail("${this.toPrettyString()} column key='$columnKey' has renderer $renderer which is not supported by this method")
     }
 }
 
@@ -304,10 +310,10 @@ public fun <T : Any> Grid<T>._getCellComponent(
     val column: Grid.Column<T> = _getColumnByKey(columnKey)
     val renderer: Renderer<T>? = column.renderer
     if (renderer !is ComponentRenderer<*, *>) {
-        fail("${this.toPrettyString()} column $columnKey uses renderer $renderer but we expect a ComponentRenderer here")
+        fail("${this.toPrettyString()} column key='$columnKey' uses renderer $renderer but we expect a ComponentRenderer here")
     }
     if (renderer is NativeButtonRenderer<*>) {
-        fail("${this.toPrettyString()} column $columnKey uses NativeButtonRenderer which is not supported by this function")
+        fail("${this.toPrettyString()} column key='$columnKey' uses NativeButtonRenderer which is not supported by this function")
     }
     val item: T = _get(rowIndex)
     val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
@@ -744,16 +750,27 @@ public val <T> HasItems<T>.dataProvider: DataProvider<T, *>? get() = when (this)
  *
  * Works both with Vaadin 16 and Vaadin 17: Vaadin 17 components no longer implement HasItems.
  */
-public val Component.dataProvider: DataProvider<*, *>? get() = when (this) {
+public val Component.dataProvider: DataProvider<*, *>? get() = when {
     // until https://github.com/vaadin/flow/issues/6296 is resolved
-    is Grid<*> -> this.dataProvider
-    is IronList<*> -> this.dataProvider
-    is Select<*> -> this.dataProvider
-    is ListBoxBase<*, *, *> -> this.getDataProvider()
-    is RadioButtonGroup<*> -> this.dataProvider
-    is CheckboxGroup<*> -> this.dataProvider
-    is ComboBox<*> -> this.dataProvider
-    else -> null
+    this is Grid<*> -> this.dataProvider
+    this is IronList<*> -> this.dataProvider
+    this is Select<*> -> this.dataProvider
+    this is ListBoxBase<*, *, *> -> this.getDataProvider()
+    this is RadioButtonGroup<*> -> this.dataProvider
+    this is CheckboxGroup<*> -> this.dataProvider
+    this is ComboBox<*> -> this.dataProvider
+    else -> this.getDataProviderViaReflection()
+}
+
+private fun Component.getDataProviderViaReflection(): DataProvider<*, *>? {
+    if (this is HasDataProvider<*>) {
+        val mGetDataProvider: Method? =
+            this.javaClass.methods.firstOrNull { it.name == "getDataProvider" && it.parameterCount == 0 && it.returnType == DataProvider::class.java }
+        if (mGetDataProvider != null) {
+            return mGetDataProvider.invoke(this) as DataProvider<*, *>?
+        }
+    }
+    return null
 }
 
 /**

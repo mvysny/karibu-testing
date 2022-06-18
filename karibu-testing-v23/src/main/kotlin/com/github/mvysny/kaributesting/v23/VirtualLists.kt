@@ -1,8 +1,12 @@
 package com.github.mvysny.kaributesting.v23
 
 import com.github.mvysny.kaributesting.v10.*
+import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.virtuallist.VirtualList
+import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.renderer.Renderer
@@ -82,6 +86,36 @@ private val _VirtualList_renderer: Field = VirtualList::class.java.getDeclaredFi
  * Returns the renderer for this VirtualList.
  */
 public val <T> VirtualList<T>._renderer: Renderer<T> get() = _VirtualList_renderer.get(this) as Renderer<T>
+
+/**
+ * Performs a click on a [ClickableRenderer] in given [VirtualList] cell. Only supports the following scenarios:
+ * * [ClickableRenderer]
+ * * [ComponentRenderer] which renders a [Button] or a [ClickNotifier].
+ * @param rowIndex the row index, 0 or higher.
+ * @throws AssertionError if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
+ */
+public fun <T : Any> VirtualList<T>._clickRenderer(rowIndex: Int) {
+    checkEditableByUser()
+    val renderer: Renderer<T> = _renderer
+    val item: T = _get(rowIndex)
+    if (renderer is ClickableRenderer<*>) {
+        @Suppress("UNCHECKED_CAST")
+        (renderer as ClickableRenderer<T>).onClick(item)
+    } else if (renderer is ComponentRenderer<*, *>) {
+        val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+        if (component is Button) {
+            component._click()
+        } else if (component is ClickNotifier<*>) {
+            component._click()
+        } else {
+            // don't try to do anything smart here since things will break silently for the customer as they upgrade Vaadin version
+            // https://github.com/mvysny/karibu-testing/issues/67
+            fail("${this.toPrettyString()}: ComponentRenderer produced ${component.toPrettyString()} which is not a button nor a ClickNotifier - please use _getCellComponent() instead")
+        }
+    } else {
+        fail("${this.toPrettyString()} has renderer $renderer which is not supported by this method")
+    }
+}
 
 /**
  * Retrieves a component produced by [ComponentRenderer]. Fails if the

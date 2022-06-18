@@ -4,7 +4,6 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
-import com.github.mvysny.karibudsl.v10.navigateToView
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.span
 import com.github.mvysny.kaributools.get
@@ -27,7 +26,7 @@ internal fun DynaNodeGroup.navigatorTest() {
     afterEach { MockVaadin.tearDown() }
 
     test("navigation") {
-        navigateToView<TestingView>()
+        navigateTo<TestingView>()
         expect(TestingView::class.java) { currentView }
         expectView<TestingView>()
     }
@@ -39,7 +38,7 @@ internal fun DynaNodeGroup.navigatorTest() {
     }
 
     test("navigation to parametrized test") {
-        navigateToView(ParametrizedView::class, 5)
+        navigateTo(ParametrizedView::class, 5)
         expect(ParametrizedView::class.java) { currentView }
         expectView<ParametrizedView>()
         expect(5) { _get<ParametrizedView>().parameter }
@@ -71,7 +70,7 @@ internal fun DynaNodeGroup.navigatorTest() {
                 expect(null) { a }
                 a = e.postpone()
             }
-            navigateToView<TestingView>()
+            navigateTo<TestingView>()
             _expectNone<TestingView>()
             a!!.proceed()
             _expectOne<TestingView>()
@@ -84,17 +83,17 @@ internal fun DynaNodeGroup.navigatorTest() {
                 a = e.postpone()
                 Notification.show("postponing")
             }
-            navigateToView<TestingView>()
+            navigateTo<TestingView>()
             expectNotifications("postponing")
             a!!.proceed()
             expectNoNotifications()
         }
 
         test("dialog - stay on page") {
-            navigateToView<NavigationPostponeView>()
+            navigateTo<NavigationPostponeView>()
             _expectNone<Dialog>()
 
-            navigateToView<TestingView>()
+            navigateTo<TestingView>()
             //  the navigation should be postponed
             _expectOne<NavigationPostponeView>()
             _expectOne<Dialog>()
@@ -109,10 +108,10 @@ internal fun DynaNodeGroup.navigatorTest() {
         }
 
         test("dialog - leave") {
-            navigateToView<NavigationPostponeView>()
+            navigateTo<NavigationPostponeView>()
             _expectNone<Dialog>()
 
-            navigateToView<TestingView>()
+            navigateTo<TestingView>()
             //  the navigation should be postponed
             _expectOne<NavigationPostponeView>()
             _expectOne<Dialog>()

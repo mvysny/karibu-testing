@@ -4,9 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
-import com.github.mvysny.kaributools.VaadinVersion
-import com.github.mvysny.kaributools.caption
-import com.github.mvysny.kaributools.selectionMode
+import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -254,7 +252,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addColumn(ComponentRenderer<Label, TestPerson> { _ -> Label() }).key = "name"
             }
-            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column name: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name': ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
             }
         }
@@ -266,7 +264,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
             }
-            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column name uses NativeButtonRenderer which is not supported by this function") {
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name' uses NativeButtonRenderer which is not supported by this function") {
                 grid._getCellComponent(8, "name")
             }
         }

@@ -1286,6 +1286,11 @@ of whether the Details is opened/expanded or not. The button to expand/collapse 
 is implemented in JavaScript and thus it's impossible to click from Karibu-Testing; use
 `details.setOpened(true)` to expand/collapse the Details component.
 
+### Support for MessageInput/MessageList
+
+Call `messageInput._submit("Hello World")`/`MessagesKt._submut(mi, "Hello World")` to submit a new message
+(fire the `SubmitEvent`).
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

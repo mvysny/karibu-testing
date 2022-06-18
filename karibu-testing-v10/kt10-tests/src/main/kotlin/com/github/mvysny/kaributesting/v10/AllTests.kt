@@ -133,4 +133,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("Details") {
         detailsTests()
     }
+    group("Messages") {
+        messageTests()
+    }
 }

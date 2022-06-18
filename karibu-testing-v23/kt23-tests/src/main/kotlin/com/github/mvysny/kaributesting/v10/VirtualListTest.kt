@@ -163,14 +163,14 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("_getCellComponent") {
+    group("_getRowComponent") {
         test("fails with ClickableRenderer") {
             val vl: VirtualList<TestPerson> = VirtualList<TestPerson>().apply {
                 setRenderer(NativeButtonRenderer<TestPerson>("View") {})
                 setItems((0..10).map { TestPerson("name $it", it) })
             }
             expectThrows(AssertionError::class, "VirtualList[dataprovider='ListDataProvider<TestPerson>(11 items)'] uses NativeButtonRenderer which is not supported by this function") {
-                vl._getCellComponent(8)
+                vl._getRowComponent(8)
             }
         }
         test("ComponentRenderer with Button") {
@@ -184,7 +184,7 @@ internal fun DynaNodeGroup.virtualListTests() {
                 } })
                 setItems((0..10).map { TestPerson("name $it", it) })
             }
-            (vl._getCellComponent(8) as Button)._click()
+            (vl._getRowComponent(8) as Button)._click()
             expect(true) { called }
         }
         test("doesn't fail on disabled VirtualList") {
@@ -193,7 +193,7 @@ internal fun DynaNodeGroup.virtualListTests() {
                 setItems((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
             }
-            expect(true) { vl._getCellComponent(2) is Button }
+            expect(true) { vl._getRowComponent(2) is Button }
         }
     }
 

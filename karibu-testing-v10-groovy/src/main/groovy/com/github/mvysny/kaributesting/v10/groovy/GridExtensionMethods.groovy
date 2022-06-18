@@ -23,13 +23,8 @@ import com.vaadin.flow.function.ValueProvider
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FirstParam
-import groovy.transform.stc.SimpleType
-import kotlin.Unit
-import kotlin.jvm.functions.Function1
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-
-import static org.junit.jupiter.api.Assertions.fail
 
 /**
  * A set of basic extension methods for {@link Grid} and {@link TreeGrid}.

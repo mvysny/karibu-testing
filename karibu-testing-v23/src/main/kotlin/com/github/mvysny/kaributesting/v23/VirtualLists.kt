@@ -4,7 +4,6 @@ import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.virtuallist.VirtualList
 import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -123,7 +122,7 @@ public fun <T : Any> VirtualList<T>._clickRenderer(rowIndex: Int) {
  * @param rowIndex the row index, 0 or higher.
  * @throws IllegalStateException if the renderer is not [ComponentRenderer].
  */
-public fun <T : Any> VirtualList<T>._getCellComponent(rowIndex: Int): Component {
+public fun <T : Any> VirtualList<T>._getRowComponent(rowIndex: Int): Component {
     val renderer: Renderer<T> = _renderer
     if (renderer !is ComponentRenderer<*, *>) {
         fail("${this.toPrettyString()} uses renderer $renderer but we expect a ComponentRenderer here")

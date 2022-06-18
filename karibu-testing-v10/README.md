@@ -1028,6 +1028,57 @@ good for lazy list of items akin to Android's ListView.
 
 See `IronListKt` class for more details.
 
+### Support for VirtualList
+
+Similar to Grid/IronList, but one column only, no sorting, no filtering, no header,
+good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3.16.
+
+* You can retrieve a bean at particular index; for example `virtualList._get(0)` will return the first item (Kotlin, Groovy).
+  Java: you need to `import static com.github.mvysny.kaributesting.v23.VirtualListsKt.*;`, then you can call `_get(virtualList, 0);`.
+* You can check for the total amount of items shown in the list, by calling `virtualList._size()` (Kotlin, Groovy). Java: `_size(virtualList);`
+* You can obtain a full formatted row as seen by the user, by calling `virtualList._getFormattedRow(rowIndex)` - it will return that particular row as
+  `String`. In Java: `_getFormattedRow(virtualList, rowIndex)`
+* You can assert on the number of rows in the list, by calling `virtualList.expectRows(25)`. If there is a different amount of rows, the function will
+  fail and will dump first 10 rows of the list, so that you can see the actual contents of the ironList.
+  In Java: `expectRows(virtualList, 25)`
+* You can assert on a formatted output of particular row of the iron list: `virtualList.expectRow(rowIndex, "John Doe")`. If the row looks different,
+  the function will fail with a proper list dump.
+
+See `VirtualListsKt` class for more details.
+
+#### Clicking Renderers
+
+You can use `virtualList._clickRenderer(0, "edit")` to click a `NativeButtonRenderer`
+or a `Button`/`ClickNotifier` component produced by a `ComponentRenderer` (Java: `VirtualListsKt._clickRenderer(0, "edit")`).
+
+If your `ComponentRenderer` produces something else than a `Button` or a `ClickNotifier`,
+please use the `virtualList._getRowComponent()` function instead:
+
+Java:
+```java
+((Checkbox) VirtualListsKt._getRowComponent(virtualList, 0)).setValue(true);
+```
+
+Kotlin:
+```kotlin
+(virtualList._getRowComponent(0) as Checkbox)._value = true
+```
+
+Please see the `VirtualListsKt` class for more details.
+
+#### ComponentRenderer
+
+You can use the `virtualList._getRowComponent()` function to get the component produced
+by `ComponentRenderer`.
+
+If your `ComponentRenderer` produces a `HorizontalLayout` with buttons, you can first retrieve
+the layout, then use the `_get()` function to look up buttons within the layout:
+
+```kotlin
+val buttons = virtualList._getRowComponent(0) as HorizontalLayout
+buttons._get { id = "edit" } ._click()
+```
+
 ### Support for Upload
 
 An entire upload lifecycle is mocked properly. Simply call the following to mock-upload a file:

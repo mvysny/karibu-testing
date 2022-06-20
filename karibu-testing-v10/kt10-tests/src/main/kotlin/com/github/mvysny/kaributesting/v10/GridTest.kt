@@ -65,9 +65,9 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
         }
-        expect("--[Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
-        expect("--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { grid._dump(0 until 5) }
-        expect("--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n5: name 5, 5\n6: name 6, 6\n") {
+        expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
+        expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { grid._dump(0 until 5) }
+        expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n5: name 5, 5\n6: name 6, 6\n") {
             grid._dump(
                 0 until 20
             )
@@ -82,7 +82,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             isMultiSort = true
             sort(TestPerson::name.asc, TestPerson::age.desc)
         }
-        expect("--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
+        expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
 
     test("sort fails with an informative error message on missing column") {

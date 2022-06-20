@@ -34,12 +34,10 @@ internal fun DynaNodeGroup.virtualListTests() {
         val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
             setRenderer { "${it.name}, ${it.age}" }
         }
-        expect("--and 7 more\n") { vl._dump(0 until 0) }
-        expect("0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { vl._dump(0 until 5) }
-        expect("0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n5: name 5, 5\n6: name 6, 6\n") {
-            vl._dump(
-                0 until 20
-            )
+        expect("VirtualList[dataprovider='ListDataProvider<TestPerson>(7 items)']\n--and 7 more\n") { vl._dump(0 until 0) }
+        expect("VirtualList[dataprovider='ListDataProvider<TestPerson>(7 items)']\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { vl._dump(0 until 5) }
+        expect("VirtualList[dataprovider='ListDataProvider<TestPerson>(7 items)']\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n5: name 5, 5\n6: name 6, 6\n") {
+            vl._dump(0 until 20)
         }
     }
 

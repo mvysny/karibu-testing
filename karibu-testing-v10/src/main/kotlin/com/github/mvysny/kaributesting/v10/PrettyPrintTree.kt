@@ -12,6 +12,7 @@ import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.ListDataProvider
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import java.util.*
 
 /**
@@ -188,10 +189,18 @@ public var prettyStringHook: (component: Component, list: LinkedList<String>) ->
 public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href")
 
 /**
- * Formats a DataProvider.
+ * Pretty-prints a DataProvider.
  */
 public fun DataProvider<*, *>.toPrettyString(): String = when {
-    javaClass.hasCustomToString() -> this.toString()
-    this is ListDataProvider<*> -> "${javaClass.simpleName}<${items.firstOrNull()?.javaClass?.simpleName ?: "?"}>(${items.size} items)"
-    else -> this.toString()
+    javaClass.hasCustomToString() ->
+        this.toString()
+    this is ListDataProvider<*> ->
+        "${javaClass.simpleName}<${items.firstOrNull()?.javaClass?.simpleName ?: "?"}>(${items.size} items)"
+    this is HierarchicalDataProvider<*, *> && isInMemory ->
+        // _rowSequence() only lists expanded nodes; calculating size from it is not going to be accurate.
+        "${javaClass.simpleName}<${_rowSequence().firstOrNull()?.javaClass?.simpleName ?: "?"}>(? items)"
+    this !is HierarchicalDataProvider<*, *> && isInMemory ->
+        "${javaClass.simpleName}<${_findAll().firstOrNull()?.javaClass?.simpleName ?: "?"}>(${_findAll().size} items)"
+    else ->
+        this.javaClass.simpleName
 }

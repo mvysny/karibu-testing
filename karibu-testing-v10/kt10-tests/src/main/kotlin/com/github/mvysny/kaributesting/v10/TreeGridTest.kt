@@ -138,13 +138,15 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 addColumnFor(TestPerson::age)
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
             }
-            expect("""--[Name]-[Age]--
+            expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
+--[Name]-[Age]--
 0:     └── name 0, 0
 """) {
                 grid._dump()
             }
             grid.expandRecursively(roots, 10)
-            expect("""--[Name]-[Age]--
+            expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
+--[Name]-[Age]--
 0:     └── name 0, 0
 1:         └── name 1, 1
 2:             └── name 2, 2
@@ -167,13 +169,15 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                     else listOf<TestPerson>()
                 }
             }
-            expect("""--[Name]-[Age]--
+            expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
+--[Name]-[Age]--
 0:     └── name 0, 0
 """) {
                 grid._dump()
             }
             grid._expandAll()
-            expect("""--[Name]-[Age]--
+            expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
+--[Name]-[Age]--
 0:     └── name 0, 0
 1:         ├── name 0 0, 1
 2:         │   ├── name 0 0 0, 2

@@ -407,6 +407,7 @@ private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
  */
 @JvmOverloads
 public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..9): String = buildString {
+    append(toPrettyString()).append('\n')
     val visibleColumns: List<Grid.Column<T>> = columns.filter { it.isVisible }
     visibleColumns.map { "[${it.header2}]${getSortIndicator(it)}" }.joinTo(this, prefix = "--", separator = "-", postfix = "--\n")
     val dsIndices: IntRange

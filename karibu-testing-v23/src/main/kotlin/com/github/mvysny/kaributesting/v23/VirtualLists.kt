@@ -184,6 +184,7 @@ public fun <T : Any> VirtualList<T>.getPresentationValue(rowObject: T): Any? =
  */
 @JvmOverloads
 public fun <T : Any> VirtualList<T>._dump(rows: IntRange = 0..9): String = buildString {
+    append(toPrettyString()).append('\n')
     val dsIndices: IntRange
     val displayIndices: Set<Int>
     if (_dataProviderSupportsSizeOp) {

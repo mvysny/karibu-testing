@@ -55,7 +55,8 @@ fun DynaNodeGroup.grid19Testbatch() {
                     })
                 }
                 expect(
-                    """--[]--
+                    """Grid[<String>, dataprovider='CallbackDataProvider']
+--[]--
 0: a
 1: b
 2: c
@@ -73,7 +74,8 @@ fun DynaNodeGroup.grid19Testbatch() {
                     })
                 }
                 expect(
-                    """--[]--
+                    """Grid[<String>, dataprovider='CallbackDataProvider']
+--[]--
 0: 0
 1: 1
 2: 2

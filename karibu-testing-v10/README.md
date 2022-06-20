@@ -1253,6 +1253,12 @@ When testing a Vaadin Binder-based form, by default Flow Binder will throw a non
 To get more information in your tests, simply catch the `ValidationException` and throw a `RuntimeException`
 with a much more informative message obtained via `ValidationException.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(ex)`).
 
+Also (since Karibu-Testing 1.3.17):
+
+* Call `BinderValidationStatus.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(status)`) to obtain the better
+  message out of the binder validation status;
+* Call `BinderValidationStatus.expectValid()`/`Binder.expectValid()` (Java: `BinderUtilsKt.*`) to verify that the binder is in a valid state.
+
 ### Dialogs
 
 Use the `getAllDialogs()` global function to retrieve a list of all currently opened dialogs

@@ -50,7 +50,8 @@ will most probably look a bit differently than Karibu-Testing API though:
 
 * Karibu-Testing is Kotlin-first and uses the extension function mechanism heavily.
   Java has no extension functions though; we chose the mechanism of static methods (`LocatorJ` and others)
-  to make Karibu accessible in Java.
+  to make Karibu accessible in Java. While we do offer full support for Java (and a bit limited support for Groovy),
+  we will stay with the static methods solution for Java.
 * TestBench is Java-first and static methods are not offered via auto-complete IDE mechanism,
   leading to a sub-par experience. Therefore, Vaadin team chose the way of creating wrapper classes.
   That offers better IDE support in Java but requires a lot of effort creating and managing those wrapper

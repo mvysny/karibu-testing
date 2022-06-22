@@ -57,7 +57,7 @@ will most probably look a bit differently than Karibu-Testing API though:
   That offers better IDE support in Java but requires a lot of effort creating and managing those wrapper
   classes.
 
-At the moment Karibu-Testing classes are included in the Vaadin UI (as an implementation detail). However,
+At the moment Karibu-Testing classes are included in the Vaadin UI Unit-Testing library (as an implementation detail). However,
 this can change at any time.
 
 The development of both products will now happen independently. However, if the Vaadin guys

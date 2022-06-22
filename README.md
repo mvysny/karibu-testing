@@ -40,8 +40,10 @@ The library supports Kotlin, Java and Groovy (Groovy support for Vaadin 14+ only
 
 ## News: UI Unit-Testing is being added to TestBench!
 
-The Vaadin UI Unit-Testing idea, pioneered by Karibu-Testing, proved itself useful for many Vaadin users.
+The Vaadin UI Unit-Testing idea, pioneered by Karibu-Testing, proved useful for many Vaadin users.
 Vaadin recognized the effort and is adding official support for [UI unit-testing into TestBench](https://vaadin.com/docs/latest/tools/testbench/ui-unit-testing/overview).
+The Vaadin UI Unit-Testing is now available in alpha builds of TestBench for Vaadin 23.1.1;
+stable version will require at least Vaadin 23.2 (maybe higher).
 
 At the moment the Vaadin API is being prototyped and is not finalized. The Vaadin API
 will most probably look a bit differently than Karibu-Testing API though:

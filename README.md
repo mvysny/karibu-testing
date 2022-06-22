@@ -38,6 +38,28 @@ on how simple this library is.
 
 The library supports Kotlin, Java and Groovy (Groovy support for Vaadin 14+ only).
 
+## News: UI Unit-Testing is being added to TestBench!
+
+The Vaadin UI Unit-Testing idea, pioneered by Karibu-Testing, proved itself useful for many Vaadin users.
+Vaadin recognized the effort and is adding official support for [UI unit-testing into TestBench](https://vaadin.com/docs/latest/tools/testbench/ui-unit-testing/overview).
+
+At the moment the Vaadin API is being prototyped and is not finalized. The Vaadin API
+will most probably look a bit differently than Karibu-Testing API though:
+
+* Karibu-Testing is Kotlin-first and uses the extension function mechanism heavily.
+  Java has no extension functions though; we chose the mechanism of static methods (`LocatorJ` and others)
+  to make Karibu accessible in Java.
+* TestBench is Java-first and static methods are not offered via auto-complete IDE mechanism,
+  leading to a sub-par experience. Therefore, Vaadin team chose the way of creating wrapper classes.
+  That offers better IDE support in Java but requires a lot of effort creating and managing those wrapper
+  classes.
+
+At the moment Karibu-Testing classes are included in the Vaadin UI (as an implementation detail). However,
+this can change at any time.
+
+The development of both products will now happen independently. However, if the Vaadin guys
+have a lovely idea, please open a feature request so that we can steal those ideas :-D (Did you know that greatest artists steal?)
+  
 ## Getting Started / Main Documentation / Full Documentation
 
 ### Vaadin 14+

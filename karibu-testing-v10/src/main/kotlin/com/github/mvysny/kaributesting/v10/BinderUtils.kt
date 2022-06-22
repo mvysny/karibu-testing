@@ -6,6 +6,9 @@ import com.vaadin.flow.data.binder.*
 import kotlin.test.expect
 
 /**
+ * Formats the [BinderValidationStatus.getFieldValidationErrors] and [BinderValidationStatus.getBeanValidationErrors]
+ * in a nice way: shows the component caption (and ID if it's set), the value and the validation message.
+ *
  * Workaround for https://github.com/vaadin/flow/issues/7081
  */
 public val ValidationException.verboseMessage: String get() =
@@ -16,8 +19,12 @@ private fun getVerboseMessage(
     beanValidationErrors: List<ValidationResult>
 ): String {
     val fieldValidationErrorsString: String = fieldValidationErrors.joinToString(", ") {
-        val componentCaption: String = (it.field as Component).caption
-        "$componentCaption: ${it.status} ${it.message.orElse("")}, value='${it.field.getValue()}'"
+        val component = it.field as Component
+        var componentCaption: String = component.caption
+        if (!component.id_.isNullOrBlank()) {
+            componentCaption = "$componentCaption(#${component.id_})"
+        }
+        "$componentCaption: ${it.status} ${it.message.orElse("")}, value='${it.field.value}'"
     }
     val beanValidationErrorsString: String = beanValidationErrors.joinToString(", ") {
         "${it.errorLevel.orElse(null)}: ${it.errorMessage}"
@@ -25,13 +32,25 @@ private fun getVerboseMessage(
     return "field validation errors: [$fieldValidationErrorsString], bean validation errors: [$beanValidationErrorsString]"
 }
 
+/**
+ * Formats the [BinderValidationStatus.getFieldValidationErrors] and [BinderValidationStatus.getBeanValidationErrors]
+ * in a nice way: shows the component caption (and ID if it's set), the value and the validation message.
+ *
+ * Workaround for https://github.com/vaadin/flow/issues/7081
+ */
 public val BinderValidationStatus<*>.verboseMessage: String get() =
     getVerboseMessage(fieldValidationErrors, beanValidationErrors)
 
+/**
+ * Fails if this status is not valid ([isOk][BinderValidationStatus.isOk] returns false).
+ */
 public fun BinderValidationStatus<*>.expectValid() {
     expect(true, verboseMessage) { isOk }
 }
 
+/**
+ * Fails if this binder is not valid.
+ */
 public fun Binder<*>.expectValid() {
     validate().expectValid()
 }

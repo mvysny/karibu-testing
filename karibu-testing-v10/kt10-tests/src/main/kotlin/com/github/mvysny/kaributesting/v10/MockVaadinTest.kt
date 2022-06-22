@@ -14,6 +14,7 @@ import com.github.mvysny.kaributesting.v10.mock.MockService
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
+import com.github.mvysny.kaributools.navigateTo
 import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
@@ -23,6 +24,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
@@ -325,6 +327,30 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             _expectNone<WelcomeView>()
             _get<HelloWorldView>()
         }
+
+        test("page reload should create new view instance") {
+            navigateTo<HelloWorldView>()
+            val viewInstance = _get<HelloWorldView>()
+            UI.getCurrent().page.reload()
+            expect(false) { viewInstance === _get<HelloWorldView>() }
+        }
+
+        // https://github.com/mvysny/karibu-testing/issues/118
+        test("page reload should preserve the view instance on @PreserveOnRefresh") {
+            navigateTo<PreserveOnRefreshView>()
+            val viewInstance = _get<PreserveOnRefreshView>()
+            UI.getCurrent().page.reload()
+            expect(true) { viewInstance === _get<PreserveOnRefreshView>() }
+        }
+    }
+
+    test("ExtendedClientDetails") {
+        // by default they're null but a mock one can be retrieved.
+        expect(null) { UI.getCurrent().internals.extendedClientDetails }
+        lateinit var ecd: ExtendedClientDetails
+        UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
+        expect(false) { ecd.isTouchDevice }
+        expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
     }
 
     test("VaadinSession.close() must re-create the entire session and the UI") {
@@ -573,3 +599,7 @@ class ChildView : VerticalLayout()
 
 @RoutePrefix("parent")
 class ParentView : VerticalLayout(), RouterLayout
+
+@Route("preserveonrefresh")
+@PreserveOnRefresh
+class PreserveOnRefreshView : VerticalLayout()

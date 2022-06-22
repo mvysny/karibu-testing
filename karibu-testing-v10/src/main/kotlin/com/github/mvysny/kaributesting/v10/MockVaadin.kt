@@ -5,6 +5,7 @@ import com.github.mvysny.kaributesting.v10.mock.*
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.component.page.Page
 import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
@@ -12,6 +13,7 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import com.vaadin.flow.shared.communication.PushMode
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
@@ -395,11 +397,27 @@ private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent
     }
 }
 
-private class MockPage(ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
+private class MockPage(private val ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
     override fun reload() {
         // recreate the UI on reload(), to simulate browser's F5
         super.reload()
         MockVaadin.closeCurrentUI(true)
         MockVaadin.createUI(uiFactory, session)
+    }
+
+    override fun retrieveExtendedClientDetails(receiver: ExtendedClientDetailsReceiver) {
+        // construct mock ExtendedClientDetails then set it to ui.internals, which will cause
+        // super to call receiver straight away.
+        val constructor: Constructor<*> =
+            ExtendedClientDetails::class.java.declaredConstructors[0].apply {
+                isAccessible = true
+            }
+        val ecd: ExtendedClientDetails = constructor.newInstance(
+            "1920", "1080", "1846", "939", "1846", "939",
+            "10800000", "7200000", "3600000", "true", "Europe/Helsinki",
+            null, "false", "1.0", "ROOT-2521314-0.2626611481", "Linux x86_64"
+        ) as ExtendedClientDetails
+        ui.internals.extendedClientDetails = ecd
+        super.retrieveExtendedClientDetails(receiver)
     }
 }

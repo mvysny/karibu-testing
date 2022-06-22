@@ -9,6 +9,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.router.NotFoundException
+import com.vaadin.flow.router.PreserveOnRefresh
 import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
@@ -16,8 +17,14 @@ import test.app.MyRouteNotFoundError
 import kotlin.test.expect
 
 val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
-        TestingView::class.java, HelloWorldView::class.java, WelcomeView::class.java,
-        ParametrizedView::class.java, ChildView::class.java, NavigationPostponeView::class.java)
+    TestingView::class.java,
+    HelloWorldView::class.java,
+    WelcomeView::class.java,
+    ParametrizedView::class.java,
+    ChildView::class.java,
+    NavigationPostponeView::class.java,
+    PreserveOnRefreshView::class.java
+)
 val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
 
 @DynaTestDsl

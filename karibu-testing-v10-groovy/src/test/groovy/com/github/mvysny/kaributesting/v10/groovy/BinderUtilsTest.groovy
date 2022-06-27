@@ -1,7 +1,10 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.binder.ValidationException
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.AfterEach
@@ -22,5 +25,12 @@ class BinderUtilsTest {
     @Test
     void apiTest() {
         new ValidationException([], []).verboseMessage
+        new Binder<String>().assertValid()
+
+        def tf = new TextField()
+        tf.assertValid()
+        tf.invalid = true
+        tf.assertInvalid()
+        UI.getCurrent().assertAllFieldsValid()
     }
 }

@@ -1,6 +1,9 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BinderUtilsKt
+import com.github.mvysny.kaributesting.v10.HasValidationUtilsKt
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.binder.BinderValidationStatus
 import com.vaadin.flow.data.binder.ValidationException
@@ -26,10 +29,22 @@ class BinderUtils {
     }
 
     static void assertValid(@NotNull BinderValidationStatus<?> status) {
-        BinderUtilsKt.expectValid(status)
+        BinderUtilsKt._expectValid(status)
     }
 
     static void assertValid(@NotNull Binder<?> binder) {
-        BinderUtilsKt.expectValid(binder)
+        BinderUtilsKt._expectValid(binder)
+    }
+
+    static void assertValid(@NotNull HasValidation field) {
+        HasValidationUtilsKt._expectValid(field)
+    }
+
+    static void assertAllFieldsValid(@NotNull Component form) {
+        HasValidationUtilsKt._expectAllFieldsValid(form)
+    }
+
+    static void assertInvalid(@NotNull HasValidation field, @NotNull String expectedErrorMessage = "") {
+        HasValidationUtilsKt._expectInvalid(field, expectedErrorMessage)
     }
 }

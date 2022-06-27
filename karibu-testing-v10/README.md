@@ -1257,7 +1257,21 @@ Also (since Karibu-Testing 1.3.17):
 
 * Call `BinderValidationStatus.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(status)`) to obtain the better
   message out of the binder validation status;
-* Call `BinderValidationStatus.expectValid()`/`Binder.expectValid()` (Java: `BinderUtilsKt.*`) to verify that the binder is in a valid state.
+* Call `BinderValidationStatus._expectValid()`/`Binder._expectValid()` (Java: `BinderUtilsKt.*`) to verify that the binder is in a valid state.
+
+### Forms: Validation
+
+If a form uses Binder internally and exposes Binder, you can use the abovementioned functionality to test the
+validity on the binder itself. However, sometimes the binder is not exposed, or the form
+doesn't even use binder. In such cases please call (since Karibu-Testing 1.3.17):
+
+* `textField._expectValid()` to ensure that the field is valid;
+* `textField._expectInvalid("The number should be 0 or greater")` to ensure that
+  the field is invalid (when testing form responses to invalid values);
+* `form._expectAllFieldsValud()` to ensure all descendant fields which implement `HasValidation`
+  are valid.
+
+Java: static-import `HasValidationUtilsKt.*` to find these functions.
 
 ### Dialogs
 

@@ -136,4 +136,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("Messages") {
         messageTests()
     }
+    group("HasValidation") {
+        hasValidationTests()
+    }
 }

@@ -44,13 +44,13 @@ public val BinderValidationStatus<*>.verboseMessage: String get() =
 /**
  * Fails if this status is not valid ([isOk][BinderValidationStatus.isOk] returns false).
  */
-public fun BinderValidationStatus<*>.expectValid() {
+public fun BinderValidationStatus<*>._expectValid() {
     expect(true, verboseMessage) { isOk }
 }
 
 /**
  * Fails if this binder is not valid.
  */
-public fun Binder<*>.expectValid() {
-    validate().expectValid()
+public fun Binder<*>._expectValid() {
+    validate()._expectValid()
 }

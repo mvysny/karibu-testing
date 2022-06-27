@@ -10,7 +10,6 @@ import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.binder.ValidationException
 import javax.validation.constraints.NotNull
 import kotlin.test.expect
-import kotlin.test.fail
 
 private class Person(
         @field:NotNull var name: String? = null
@@ -43,7 +42,7 @@ internal fun DynaNodeGroup.binderTestbatch() {
             bind(binder).bind(Person::name)
         }
         expectThrows<AssertionError>("field validation errors: [Name:: ERROR must not be null, value=''], bean validation errors: []") {
-            binder.validate().expectValid()
+            binder.validate()._expectValid()
         }
     }
     test("Binder.expectValid()") {
@@ -52,7 +51,7 @@ internal fun DynaNodeGroup.binderTestbatch() {
             bind(binder).bind(Person::name)
         }
         expectThrows<AssertionError>("field validation errors: [Name:: ERROR must not be null, value=''], bean validation errors: []") {
-            binder.expectValid()
+            binder._expectValid()
         }
     }
 }

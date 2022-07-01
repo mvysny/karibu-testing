@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator
@@ -12,6 +13,7 @@ import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.function.SerializableConsumer
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import kotlin.test.fail
 
 /**
@@ -22,9 +24,24 @@ import kotlin.test.fail
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     checkEditableByUser()
-    val comboBoxFilterSlot: Field = ComboBox::class.java.getDeclaredField("filterSlot").apply { isAccessible = true }
-    @Suppress("UNCHECKED_CAST")
-    (comboBoxFilterSlot.get(this) as SerializableConsumer<String?>).accept(userInput)
+    if (VaadinVersion.get.isAtLeast(23, 2)) {
+        // sigh. Moved to ComboBoxDataController
+        val m = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase").getDeclaredMethod("getDataController")
+        m.isAccessible = true
+        // of type ComboBoxDataController
+        val dataController: Any = m.invoke(this)
+        val comboBoxFilterSlot: Field = Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController").getDeclaredField("filterSlot")
+        comboBoxFilterSlot.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val filterSlot = comboBoxFilterSlot.get(dataController) as SerializableConsumer<String?>
+        filterSlot.accept(userInput)
+    } else {
+        val comboBoxFilterSlot: Field = ComboBox::class.java.getDeclaredField("filterSlot")
+        comboBoxFilterSlot.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val filterSlot = comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
+        filterSlot.accept(userInput)
+    }
 }
 
 /**
@@ -67,9 +84,24 @@ private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLI
     field
 }
 
+private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val comboBoxBaseClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
+    m.isAccessible = true
+    m
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> getDataCommunicator(cb: ComboBox<T>): DataCommunicator<T>? = when {
+    VaadinVersion.get.isAtLeast(23, 2) ->
+        _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
+    else ->
+        _ComboBox_dataCommunicator.get(cb) as DataCommunicator<T>?
+}
+
 @Suppress("UNCHECKED_CAST")
 internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>
-    get() = _ComboBox_dataCommunicator.get(this) as DataCommunicator<T>?
+    get() = getDataCommunicator(this)
         ?: fail("${toPrettyString()}: items/dataprovider has not been set")
 
 /**

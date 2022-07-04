@@ -45,7 +45,7 @@ internal fun DynaNodeGroup.radioButtonTests() {
         test("fails on no match") {
             val c = RadioButtonGroup<String>()
             c.setItems2("1", "2", "3")
-            expectThrows<AssertionError>("RadioButtonGroup[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'foo'. Available items: [1, 2, 3]") {
+            expectThrows<AssertionError>("RadioButtonGroup[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'foo'. Available items: ['1'=>1, '2'=>2, '3'=>3]") {
                 c.selectByLabel("foo")
             }
         }

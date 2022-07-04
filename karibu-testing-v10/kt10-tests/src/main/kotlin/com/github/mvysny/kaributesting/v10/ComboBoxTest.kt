@@ -105,7 +105,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
-                expectThrows<AssertionError>("Select[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: [aaa, bbb, ccc]") {
+                expectThrows<AssertionError>("Select[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: ['aaa'=>aaa, 'bbb'=>bbb, 'ccc'=>ccc]") {
                     cb.selectByLabel("d")
                 }
             }

@@ -163,8 +163,10 @@ internal fun <T> HasValue<*, T>.selectByLabel(label: String, dataProvider: DataP
     val items = dataProvider._findAll()
     val itemsWithLabel: List<T> = items.filter { itemLabelGenerator.apply(it) == label }
     when {
-        itemsWithLabel.isEmpty() -> fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available items: ${items.map { itemLabelGenerator.apply(it) }}")
-        itemsWithLabel.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $itemsWithLabel")
+        itemsWithLabel.isEmpty() ->
+            fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available items: ${items.map { "'${itemLabelGenerator.apply(it)}'=>$it" }}")
+        itemsWithLabel.size > 1 ->
+            fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $itemsWithLabel")
         else -> _value = itemsWithLabel[0]
     }
 }

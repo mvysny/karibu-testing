@@ -7,6 +7,12 @@
 
 The Unit Testing library for [Vaadin](https://vaadin.com/).
 
+When building apps with Vaadin Flow, your app manipulates Vaadin components
+server-side, while the browser is just a mere "reflection" of
+the server-side state (The "reflection" part - state transfer from server to client - is handled by Vaadin Flow).
+To test your app, you want your tests to focus on the server-side where
+your logic resides, while "cutting off" the "unimportant" browser part.
+
 Karibu-Testing gives you the ability to call `UI.getCurrent()` straight from your JUnit
 test methods, and receive a
 meaningful result in the process. You can call `UI.navigate()` to navigate around in your app;

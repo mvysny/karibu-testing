@@ -28,8 +28,7 @@ public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
         // sigh. Moved to ComboBoxDataController
         val m = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase").getDeclaredMethod("getDataController")
         m.isAccessible = true
-        // of type ComboBoxDataController
-        val dataController: Any = m.invoke(this)
+        val dataController: /*ComboBoxDataController*/Any = m.invoke(this)
         val comboBoxFilterSlot: Field = Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController").getDeclaredField("filterSlot")
         comboBoxFilterSlot.isAccessible = true
         @Suppress("UNCHECKED_CAST")
@@ -49,16 +48,28 @@ public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
  * calls [getSuggestionItems] to obtain filtered items, then selects the sole item that matches [label].
  *
  * Fails if the item is not found, or multiple items are found. Fails if the combo box is not editable.
+ * @param bypassSetUserInput if false (default), the [setUserInput] is called to filter the items first.
+ * This has much higher performance on a large data set since it will perform the filtering in the
+ * data provider itself (in the backend rather than in-memory). However, if this does not work
+ * for some reason, set this to `true` to search in all items.
  */
-public fun <T> ComboBox<T>.selectByLabel(label: String) {
-    setUserInput(label)
-    val items: List<T> = getSuggestionItems().filter { itemLabelGenerator.apply(it) == label }
+@JvmOverloads
+public fun <T> ComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Boolean = false) {
+    val suggestionItems: List<T> = if (!bypassSetUserInput) {
+        setUserInput(label)
+        getSuggestionItems()
+    } else {
+        checkEditableByUser()
+        dataProvider._findAll()
+    }
+    val items: List<T> = suggestionItems.filter { itemLabelGenerator.apply(it) == label }
     when {
         items.isEmpty() -> {
             val msg = buildString {
                 append("${this@selectByLabel.toPrettyString()}: No item found with label '$label'")
                 if (this@selectByLabel.dataProvider.isInMemory) {
-                    append(". Available items: ${this@selectByLabel.dataProvider._findAll()}")
+                    val allItems: List<T> = this@selectByLabel.dataProvider._findAll()
+                    append(". Available items: ${allItems.map { "'${itemLabelGenerator.apply(it)}'=>$it" }}")
                 }
             }
             fail(msg)

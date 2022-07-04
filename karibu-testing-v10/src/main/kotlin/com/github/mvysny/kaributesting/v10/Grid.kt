@@ -51,6 +51,7 @@ public fun <T, F> DataProvider<T, F>._get(rowIndex: Int, sortOrders: List<QueryS
  * to given [filter] (null by default).
  * @return the list of items.
  */
+@JvmOverloads
 public fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> = listOf(), inMemorySorting: Comparator<T>? = null, filter: F? = null): List<T> {
     val fetched: Stream<T> = fetch(Query(0, Int.MAX_VALUE, sortOrders, inMemorySorting, filter))
     return fetched.toList()

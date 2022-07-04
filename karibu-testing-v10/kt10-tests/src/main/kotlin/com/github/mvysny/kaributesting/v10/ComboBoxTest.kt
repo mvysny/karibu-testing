@@ -42,29 +42,36 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
             }
         }
         group("selectByLabel") {
-            test("simple") {
-                val cb = ComboBox<String>().apply {
-                    setItems2(listOf("aaa", "bbb", "ccc"))
+            fun withBypassSetUserInput(bypassSetUserInput: Boolean) {
+                group("bypassSetUserInput=$bypassSetUserInput") {
+                    test("simple") {
+                        val cb = ComboBox<String>().apply {
+                            setItems2(listOf("aaa", "bbb", "ccc"))
+                        }
+                        cb.selectByLabel("aaa")
+                        expect("aaa") { cb._value }
+                    }
+                    test("fails on no match") {
+                        val cb = ComboBox<String>().apply {
+                            setItems2(listOf("aaa", "bbb", "ccc"))
+                        }
+                        expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: ['aaa'=>aaa, 'bbb'=>bbb, 'ccc'=>ccc]") {
+                            cb.selectByLabel("d")
+                        }
+                    }
+                    test("fails on multiple match") {
+                        val cb = ComboBox<String>().apply {
+                            setItems2(listOf("aaa", "aaa", "ccc"))
+                        }
+                        expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
+                            cb.selectByLabel("aaa")
+                        }
+                    }
                 }
-                cb.selectByLabel("aaa")
-                expect("aaa") { cb._value }
             }
-            test("fails on no match") {
-                val cb = ComboBox<String>().apply {
-                    setItems2(listOf("aaa", "bbb", "ccc"))
-                }
-                expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: [aaa, bbb, ccc]") {
-                    cb.selectByLabel("d")
-                }
-            }
-            test("fails on multiple match") {
-                val cb = ComboBox<String>().apply {
-                    setItems2(listOf("aaa", "aaa", "ccc"))
-                }
-                expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
-                    cb.selectByLabel("aaa")
-                }
-            }
+
+            withBypassSetUserInput(false)
+            withBypassSetUserInput(true)
         }
     }
 

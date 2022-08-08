@@ -65,14 +65,13 @@ public fun <T> ComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Bool
     val items: List<T> = suggestionItems.filter { itemLabelGenerator.apply(it) == label }
     when {
         items.isEmpty() -> {
-            val msg = buildString {
-                append("${this@selectByLabel.toPrettyString()}: No item found with label '$label'")
-                if (this@selectByLabel.dataProvider.isInMemory) {
-                    val allItems: List<T> = this@selectByLabel.dataProvider._findAll()
-                    append(". Available items: ${allItems.map { "'${itemLabelGenerator.apply(it)}'=>$it" }}")
-                }
+            val msg = StringBuilder()
+            msg.append("${toPrettyString()}: No item found with label '$label'")
+            if (dataProvider.isInMemory) {
+                val allItems: List<T> = dataProvider._findAll()
+                msg.append(". Available items: ${allItems.map { "'${itemLabelGenerator.apply(it)}'=>$it" }}")
             }
-            fail(msg)
+            fail(msg.toString())
         }
         items.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $items")
         else -> _value = items[0]

@@ -6,6 +6,7 @@ import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.MenuItemBase
+import com.vaadin.flow.component.contextmenu.SubMenuBase
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.menubar.MenuBar
@@ -127,8 +128,9 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             (headerComponents + footerComponents + editorComponents + children).distinct()
         }
         component is MenuItemBase<*, *, *> -> {
+            val items: List<Component> = (component.subMenu as SubMenuBase<*, *, *>).items
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
-            (component.children.toList() + component.subMenu.items).distinct()
+            (component.children.toList() + items).distinct()
         }
         component is MenuBar -> {
             // don't include virtual children since that would make the MenuItems appear two times.

@@ -902,7 +902,7 @@ contents of the Grid.
   In Java: `expectRows(grid, 25)`
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
-* Use `grid._clickItem(rowIndex)`/`GridKt._clickItem(grid, rowIndex)` to fire a listener added via `addItemClickListener()`.
+* Use `grid._clickItem(rowIndex)`/`GridKt._clickItem(grid, rowIndex)` to emulate user clicking on a grid row with a mouse.
 * Use `grid._doubleClickItem(rowIndex)`/`GridKt._doubleClickItem(grid, rowIndex)` to fire a listener added via `addItemDoubleClickListener()`.
 
 #### Clicking Renderers

@@ -558,8 +558,10 @@ public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
 }
 
 /**
- * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listeners registered via
- * [Grid.addItemClickListener].
+ * Emulates a click on a Grid's row:
+ * * Fires the [ItemClickEvent] event for given [rowIndex] which invokes all item click listeners registered via
+ *   [Grid.addItemClickListener].
+ * * May also fire [com.vaadin.flow.data.selection.SelectionEvent].
  * @param button the id of the pressed mouse button
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise
  * @param shiftKey `true` if the shift key was down when the event was fired, `false` otherwise
@@ -573,8 +575,10 @@ public fun <T : Any> Grid<T>._clickItem(rowIndex: Int, button: Int = 1, ctrlKey:
 }
 
 /**
- * Fires the [ItemClickEvent] event for given [rowIndex] and a [column] which invokes all item click listeners
- * registered via [Grid.addItemClickListener].
+ * Emulates a click on a Grid's row:
+ * * Fires the [ItemClickEvent] event for given [rowIndex] and a [column] which invokes all item click listeners
+ *   registered via [Grid.addItemClickListener].
+ * * May also fire [com.vaadin.flow.data.selection.SelectionEvent].
  * @param button the id of the pressed mouse button
  * @param column optional column to be clicked
  * @param ctrlKey `true` if the control key was down when the event was fired, `false` otherwise

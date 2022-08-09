@@ -52,13 +52,13 @@ public fun Upload._uploadInterrupt(fileName: String, mimeType: String = URLConne
 /**
  * Tests the "upload failed" scenario. First invokes [Upload.StartedEvent], then polls
  * [Upload.receiver] and closes it immediately without writing anything, then
- * fires [Upload.FailedEvent] and [Upload.FinishedEvent].
+ * fires [FailedEvent] with an [exception] as a reason and then [FinishedEvent].
  */
 @JvmOverloads
-public fun Upload._uploadFail(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName)) {
+public fun Upload._uploadFail(fileName: String, mimeType: String = URLConnection.guessContentTypeFromName(fileName), exception: Exception? = null) {
     checkEditableByUser()
     _fireEvent(Upload.StartedEvent(this, fileName, mimeType, 100L))
     receiver.receiveUpload(fileName, mimeType).use {  }
-    _fireEvent(Upload.FailedEvent(this, fileName, mimeType, 0L))
+    _fireEvent(Upload.FailedEvent(this, fileName, mimeType, 0L, exception))
     _fireEvent(Upload.FinishedEvent(this, fileName, mimeType, 0L))
 }

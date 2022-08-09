@@ -23,7 +23,6 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
-import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
@@ -60,7 +59,7 @@ public fun <T, F> DataProvider<T, F>._findAll(sortOrders: List<QuerySortOrder> =
 /**
  * Returns the item on given row. Fails if the row index is invalid. Uses current Grid sorting.
  *
- * For [TreeGrid] this returns the x-th displayed row; skips children of collapsed nodes.
+ * For [TreeGrid] this function returns the x-th displayed row; skips children of collapsed nodes.
  * Uses [_rowSequence].
  *
  * WARNING: Very slow operation for [TreeGrid].
@@ -800,6 +799,14 @@ public fun <T: Any> Grid<T>._select(item: T) {
     deselectAll()
     // fails properly if the Grid doesn't support selection.
     selectionModel.selectFromClient(item)
+}
+
+/**
+ * Clears the selection and select only item at given [index].
+ */
+public fun <T: Any> Grid<T>._selectRow(index: Int) {
+    checkEditableByUser()
+    _select(_get(index))
 }
 
 /**

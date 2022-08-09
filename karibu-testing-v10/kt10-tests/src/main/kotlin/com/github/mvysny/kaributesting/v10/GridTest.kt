@@ -626,7 +626,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     group("selection") {
-        test("single selection") {
+        test("_select") {
             val items = (0..10).map { TestPerson("name $it", it) }
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2(items)
@@ -641,6 +641,25 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid.selectionMode = Grid.SelectionMode.NONE
             expectThrows<IllegalStateException>("selection mode is currently set to NONE") {
                 grid._select(items[1])
+            }
+            expect(setOf()) { grid.selectedItems }
+        }
+
+        test("_selectRow") {
+            val items = (0..10).map { TestPerson("name $it", it) }
+            val grid = UI.getCurrent().grid<TestPerson> {
+                setItems2(items)
+            }
+            grid._selectRow(1)
+            expect(setOf(items[1])) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.MULTI
+            grid._selectRow(1)
+            expect(setOf(items[1])) { grid.selectedItems }
+
+            grid.selectionMode = Grid.SelectionMode.NONE
+            expectThrows<IllegalStateException>("selection mode is currently set to NONE") {
+                grid._selectRow(1)
             }
             expect(setOf()) { grid.selectedItems }
         }

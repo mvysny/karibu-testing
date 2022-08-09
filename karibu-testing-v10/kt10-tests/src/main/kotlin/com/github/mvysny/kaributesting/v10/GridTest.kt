@@ -16,9 +16,7 @@ import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.textfield.TextField
-import com.vaadin.flow.data.provider.ListDataProvider
-import com.vaadin.flow.data.provider.QuerySortOrder
-import com.vaadin.flow.data.provider.SortDirection
+import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
@@ -28,6 +26,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
+import java.util.stream.Stream
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -686,10 +685,75 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(items.toSet()) { grid.selectedItems }
         }
     }
+
+    // https://github.com/mvysny/karibu-testing/issues/124
+    group("non-pure column value providers") {
+        test("_get() caches values") {
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider())
+            val person = grid._get(2)
+            expect("name 2") { person.name } // sanity check
+            var person2 = grid._get(2)
+            expect(true) { person === person2 }
+            person2 = grid._get(2)
+            expect(true) { person === person2 }
+        }
+
+        test("_get() calls column valueproviders") {
+            // test the "lazy populator" use-case where column ValueProviders act like lazy bean populators.
+            // Weird, but allowed by Vaadin.
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
+                addColumn { it.age = -3; it.name }
+            }
+            val person = grid._get(2)
+            expect(-3, "person: $person") { person.age }
+        }
+
+        test("_get() calls column valueproviders at most once") {
+            // test the "lazy populator" use-case where column ValueProviders act like lazy bean populators.
+            // Weird, but allowed by Vaadin.
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
+                addColumn { it.age--; it.name }
+            }
+            var person = grid._get(2)
+            expect(1, "person: $person") { person.age }
+            person = grid._get(2)
+            expect(1, "person: $person") { person.age }
+        }
+
+        test("_selectRow() test") {
+            // test the use-case documented in https://github.com/mvysny/karibu-testing/issues/124
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
+                addColumn { it.age = -3; it.name }
+            }
+            grid.addSelectionListener { expect(-3) { it.firstSelectedItem.get().age } }
+            grid._selectRow(2)
+            grid._selectRow(4)
+        }
+    }
 }
 
 data class TestPerson(var name: String, var age: Int): Comparable<TestPerson> {
     override fun compareTo(other: TestPerson): Int = compareValuesBy(this, other, { it.name }, { it.age })
+}
+
+/**
+ * A data provider which provides fresh instances of [TestPerson] on every fetch.
+ */
+class PersonBackendDataProvider(val size: Int = 10) : AbstractBackEndDataProvider<TestPerson, Void>() {
+    init {
+        require(size >= 0) { "size $size must not be negative" }
+    }
+    override fun fetchFromBackEnd(query: Query<TestPerson, Void>): Stream<TestPerson> {
+        require(!query.filter.isPresent) { "query $query: filter is present but no filter is supported" }
+        require(query.offset >= 0) { "query $query: negative offset ${query.offset}" }
+        require(query.limit >= 0) { "query $query: negative limit ${query.limit}" }
+        if (query.offset >= size) { return listOf<TestPerson>().stream() }
+        val rows = query.offset until (query.offset + query.limit).coerceAtMost(size)
+        val result = rows.map { TestPerson("name $it", it) }
+        return result.stream()
+    }
+
+    override fun sizeInBackEnd(query: Query<TestPerson, Void>): Int = size
 }
 
 fun <T> Grid<T>.setItems2(items: Collection<T>) {

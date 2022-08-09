@@ -983,7 +983,7 @@ Therefore Karibu-Testing (since 1.3.13) introduces:
 
 * `grid._selectRow(2)` will deselects all items and selects given row number only, failing
   if the grid is not editable or it doesn't support selection. Make sure to use `grid.expectRow(2, ...)`
-   to make sure you're selecting the right row, to make test robust.
+   to make sure you're selecting the right row, to make test robust. Since Karibu 1.3.18.
 * If you have a bean instance, you can call `grid._select(item)` instead of `_selectRow()`
    which deselects all items and selects given item only. Java: `GridKt._select(grid, item)`.
 * `grid._selectAll()` only works with multi-select Grid; fails if the grid is not

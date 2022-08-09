@@ -106,10 +106,11 @@ class UploadTest : DynaTest({
         var startedCalled = false
         var failedCalled = false
         var finishedCalled = false
+        val exception = RuntimeException("simulated")
         upload.addFailedListener {
             expect("hello.txt") { it.filename }
             expect("text/plain") { it.mimeType }
-            expect(null) { it.reason }
+            expect(exception) { it.reason }
             failedCalled = true
         }
         upload.addStartedListener {
@@ -125,7 +126,10 @@ class UploadTest : DynaTest({
             expect("text/plain") { it.mimeType }
             finishedCalled = true
         }
-        upload._uploadFail("hello.txt")
+        upload._uploadFail(
+            fileName = "hello.txt",
+            exception = exception
+        )
         expect(true) { startedCalled }
         expect(true) { failedCalled }
         expect(true) { finishedCalled }

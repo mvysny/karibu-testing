@@ -4,6 +4,7 @@ import com.github.mvysny.kaributesting.v10.UploadKt
 import com.vaadin.flow.component.upload.Upload
 import groovy.transform.CompileStatic
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 /**
  * {@link Upload}-related utilities.
@@ -51,10 +52,12 @@ class UploadUtils {
      * Tests the "upload failed" scenario. First invokes
      * {@link com.vaadin.flow.component.upload.StartedEvent}, then polls
      * {@link Upload#getReceiver()} and closes it immediately without writing anything, then
-     * fires {@link com.vaadin.flow.component.upload.FailedEvent} and {@link com.vaadin.flow.component.upload.FinishedEvent}.
+     * fires {@link com.vaadin.flow.component.upload.FailedEvent} with an exception as a reason
+     * and then {@link com.vaadin.flow.component.upload.FinishedEvent}.
      */
     static void _uploadFail(@NotNull Upload self, @NotNull String fileName,
-                            @NotNull String mimeType = URLConnection.guessContentTypeFromName(fileName)) {
-        UploadKt._uploadFail(self, fileName, mimeType)
+                            @NotNull String mimeType = URLConnection.guessContentTypeFromName(fileName),
+                            @Nullable Exception exception = null) {
+        UploadKt._uploadFail(self, fileName, mimeType, exception)
     }
 }

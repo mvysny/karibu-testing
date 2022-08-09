@@ -903,7 +903,7 @@ contents of the Grid.
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
 * Use `grid._clickItem(rowIndex)`/`GridKt._clickItem(grid, rowIndex)` to emulate user clicking on a grid row with a mouse.
-  * *TreeGrid Note:* This function will not expand/collapse the item being clicked. Please call `TreeGrid.expand()/.collapse()` directly.
+  * *TreeGrid Note:* This function will **not** expand/collapse the item being clicked. Please call `TreeGrid.expand()/.collapse()` directly.
     See [Issue #121](https://github.com/mvysny/karibu-testing/issues/121) for more details.
 * Use `grid._doubleClickItem(rowIndex)`/`GridKt._doubleClickItem(grid, rowIndex)` to fire a listener added via `addItemDoubleClickListener()`.
 

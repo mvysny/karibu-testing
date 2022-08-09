@@ -723,11 +723,23 @@ internal fun DynaNodeGroup.gridTestbatch() {
         test("_selectRow() test") {
             // test the use-case documented in https://github.com/mvysny/karibu-testing/issues/124
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
+                // a column ValueProvider with a side-effect (non-pure function)
                 addColumn { it.age = -3; it.name }
             }
-            grid.addSelectionListener { expect(-3) { it.firstSelectedItem.get().age } }
+            var age: Int = -100
+            grid.addSelectionListener {
+                // _selectRow calls deselectAll() first.
+                if (it.firstSelectedItem.isPresent) {
+                    age = it.firstSelectedItem.get().age
+                }
+            }
             grid._selectRow(2)
+            // the selection listener should have received a cache version of the bean for which
+            // the column ValueProviders have been run. Verify that age is -3 as set by the column ValueProvider.
+            expect(-3) { age }
+            age = -100
             grid._selectRow(4)
+            expect(-3) { age }
         }
     }
 }

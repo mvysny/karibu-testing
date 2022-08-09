@@ -99,8 +99,27 @@ public fun <T : Any> Grid<T>._getOrNull(rowIndex: Int): T? {
             return null
         }
     }
-    val fetched: List<T> = _fetch(rowIndex, 1)
-    return fetched.firstOrNull()
+    val fetchedItems: List<T> = _fetch(rowIndex, 1)
+    val fetchedItem = fetchedItems.firstOrNull() ?: return null
+
+    // cache the item, to simulate the actual grid communication with its client-side
+    // counterpart. See https://github.com/mvysny/karibu-testing/issues/124 for more details.
+    return _getCached(fetchedItem)
+}
+
+private fun <T: Any> Grid<T>._getCached(bean: T): T {
+    val keyMapper = dataCommunicator.keyMapper
+    if (keyMapper.has(bean)) {
+        // return the cached version
+        return keyMapper.get(keyMapper.key(bean))!!
+    }
+
+    // there is no cached version. cache & return.
+    // first, run all column ValueProviders: if they're not pure, they could modify the bean
+    // or do something similarly crazy. See https://github.com/mvysny/karibu-testing/issues/124 for more details.
+    _getFormattedRow(bean)
+    keyMapper.key(bean) // stores the bean into the cache
+    return bean
 }
 
 /**

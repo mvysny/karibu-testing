@@ -129,6 +129,38 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
+    group("expectRowRegex()") {
+        test("simple") {
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+            }
+            grid.expectRowRegex(0, "name 0", "0")
+            grid.expectRowRegex(0, "name.*", "0")
+        }
+
+        test("failed expectRow message contains table dump") {
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider(1)) {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+            }
+            expectThrows(AssertionError::class, "Grid[<TestPerson>, dataprovider='PersonBackendDataProvider'] at 0: expected [name 1, 1] but got [name 0, 0]\nGrid[<TestPerson>, dataprovider='PersonBackendDataProvider']\n--[Name]-[Age]--\n0: name 0, 0") {
+                grid.expectRowRegex(0, "name 1", "1")
+            }
+        }
+
+        test("row out-of-bounds contains table dump") {
+            val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
+            val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+            }
+            expectThrows(AssertionError::class, "--[Name]-[Age]--\n0: name 0, 0") {
+                grid.expectRowRegex(3, "should fail", "should fail") // should fail
+            }
+        }
+    }
+
     test("renderers") {
         val grid = UI.getCurrent().grid<TestPerson> {
             addColumnFor(TestPerson::name)

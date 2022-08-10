@@ -23,6 +23,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
+import org.intellij.lang.annotations.RegExp
 import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
@@ -481,12 +482,28 @@ public fun Grid<*>.expectRows(count: Int) {
 
 /**
  * Asserts that this grid's [rowIndex] row is formatted as expected.
- * @param row the expected row formatting.
+ * @param row the expected row formatting, one value per every visible column. Must match the value returned by [_getFormattedRow].
  */
 public fun Grid<*>.expectRow(rowIndex: Int, vararg row: String) {
     val expected: List<String> = row.toList()
     val actual: List<String> = _getFormattedRow(rowIndex)
     if (expected != actual) {
+        throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
+    }
+}
+
+/**
+ * Asserts that this grid's [rowIndex] row is formatted as expected.
+ * @param row the expected row formatting, one regex for every visible column. Must match the value returned by [_getFormattedRow].
+ */
+public fun Grid<*>.expectRowRegex(rowIndex: Int, @RegExp vararg row: String) {
+    val expected: List<Regex> = row.map { it.toRegex() }
+    val actual: List<String> = _getFormattedRow(rowIndex)
+    var matches = expected.size == actual.size
+    if (matches) {
+        matches = expected.filterIndexed { index, regex -> !regex.matches(actual[index]) } .isEmpty()
+    }
+    if (!matches) {
         throw AssertionError("${this.toPrettyString()} at $rowIndex: expected $expected but got $actual\n${_dump()}")
     }
 }

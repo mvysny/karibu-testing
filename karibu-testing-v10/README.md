@@ -899,9 +899,11 @@ contents of the Grid.
   `List<String>`. In Java: `_getFormattedRow(grid, rowIndex)`
 * You can assert on the number of rows in a grid, by calling `grid.expectRows(25)`. If there is a different amount of rows, the function will
   fail and will dump first 10 rows of the grid, so that you can see the actual contents of the grid.
-  In Java: `expectRows(grid, 25)`
+  In Java: `GridKt.expectRows(grid, 25)`
 * You can assert on a formatted output of particular row of a grid: `grid.expectRow(rowIndex, "John Doe", "25")`. If the row looks different,
   the function will fail with a proper grid dump.
+  * There's also `expectRowRegex(2, "link 2", "http://foo/.*/questionnaire\.html")` which uses regexps. You can use this function over `expectRow()` when
+    the grid contains generated stuff: http links, REST links to database entities with primary keys etc. Since Karibu 1.3.18.
 * Use `grid._clickItem(rowIndex)`/`GridKt._clickItem(grid, rowIndex)` to emulate user clicking on a grid row with a mouse.
   * *TreeGrid Note:* This function will **not** expand/collapse the item being clicked. Please call `TreeGrid.expand()/.collapse()` directly.
     See [Issue #121](https://github.com/mvysny/karibu-testing/issues/121) for more details.

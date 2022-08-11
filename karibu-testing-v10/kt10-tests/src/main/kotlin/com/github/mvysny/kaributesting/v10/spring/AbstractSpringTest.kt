@@ -6,6 +6,7 @@ import com.github.mvysny.kaributesting.v10.ReviewsList
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
 import com.vaadin.flow.server.VaadinService
+import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinSession
 import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
@@ -21,6 +22,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.web.WebAppConfiguration
+import org.springframework.web.context.WebApplicationContext
 import kotlin.test.expect
 
 @ExtendWith(SpringExtension::class)
@@ -42,6 +44,19 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
         val servlet: SpringServlet =
             MockSpringServlet(routes, ctx, uiFactory)
         MockVaadin.setup(uiFactory, servlet)
+    }
+
+    @Test
+    fun testBasicEnv() {
+        // check correct vaadin instances
+        VaadinSession.getCurrent() as SpringVaadinSession
+        VaadinService.getCurrent() as SpringVaadinServletService
+
+        // check that the context is set: https://github.com/mvysny/karibu-testing/issues/128
+        expect(ctx) {
+            VaadinServlet.getCurrent().servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE)
+        }
+        expect<Class<*>>(MockSpringServlet::class.java) { VaadinServlet.getCurrent().javaClass }
     }
 
     @Test

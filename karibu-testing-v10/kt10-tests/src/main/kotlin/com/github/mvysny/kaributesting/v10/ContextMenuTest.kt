@@ -29,18 +29,37 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
-    test("click toggles isChecked") {
+    test("click checks isChecked") {
         var clicked = 0
+        var checkedOnClick = false
         lateinit var cm: ContextMenu
         lateinit var i: MenuItem
         UI.getCurrent().div {
             cm = contextMenu {
-                i = item("click me", { clicked++ }) { isCheckable = true }
+                i = item("click me", { clicked++; checkedOnClick = it.source.isChecked }) { isCheckable = true }
             }
         }
         cm._clickItemWithCaption("click me")
         expect(1) { clicked }
         expect(true) { i.isChecked }
+        expect(true) { checkedOnClick }
+    }
+
+    // https://github.com/mvysny/karibu-testing/issues/126
+    test("click unchecks isChecked") {
+        var clicked = 0
+        var checkedOnClick = true
+        lateinit var cm: ContextMenu
+        lateinit var i: MenuItem
+        UI.getCurrent().div {
+            cm = contextMenu {
+                i = item("click me", { clicked++; checkedOnClick = it.source.isChecked }) { isCheckable = true; isChecked = true }
+            }
+        }
+        cm._clickItemWithCaption("click me")
+        expect(1) { clicked }
+        expect(false) { i.isChecked }
+        expect(false) { checkedOnClick }
     }
 
     test("clicking menu item calls the 'menu open' listeners") {

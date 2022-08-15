@@ -104,7 +104,9 @@ private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
 }
 
 /**
- * Tries to click given menu item. Fails if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * Tries to click given menu item. [MenuItem.isChecked] is toggled if [MenuItem.isCheckable].
+ *
+ * Fails if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  *
  * Doesn't work for MenuItems nested in MenuBar.
@@ -120,17 +122,19 @@ public fun MenuItem._click() {
 }
 
 /**
- * Tries to click given menu item.
+ * Tries to click given menu item. [MenuItem.isChecked] is toggled if [MenuItem.isCheckable].
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 private fun MenuItem._click(parentMap: Map<MenuItemBase<*, *, *>, Component>) {
     checkMenuItemVisible(this, parentMap)
     checkMenuItemEnabled(this, parentMap)
-    _fireEvent(ClickEvent<MenuItem>(this, true, 0, 0, 0, 0, 1, 1, false, false, false, false))
+    // toggle the isChecked first, so that the click event receives the most current value.
+    // https://github.com/mvysny/karibu-testing/issues/126
     if (isCheckable) {
         isChecked = !isChecked
     }
+    _fireEvent(ClickEvent<MenuItem>(this, true, 0, 0, 0, 0, 1, 1, false, false, false, false))
 }
 
 /**

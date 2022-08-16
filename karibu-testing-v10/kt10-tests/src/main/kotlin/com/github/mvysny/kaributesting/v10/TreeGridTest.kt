@@ -137,6 +137,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
                 dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                _prepare()
             }
             expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
 --[Name]-[Age]--
@@ -168,6 +169,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                     if (it.age < 3) listOf(TestPerson("${it.name} 0", it.age + 1), TestPerson("${it.name} 1", it.age + 1))
                     else listOf<TestPerson>()
                 }
+                _prepare()
             }
             expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
 --[Name]-[Age]--

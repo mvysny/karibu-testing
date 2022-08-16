@@ -67,9 +67,10 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 }.toPrettyString()
             }
             expect("Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']") {
-                Grid<String>(
-                    String::class.java
-                ).apply { setItems2(listOf()) }.toPrettyString()
+                Grid<String>(String::class.java).apply {
+                    setItems2(listOf())
+                    _prepare()
+                }.toPrettyString()
             }
             expect("Column[header='My Header']") {
                 Grid<Any>().run {
@@ -181,6 +182,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 addColumn(karibuDslI18n).setHeader("Hello!")
                 setItems2(listOf())
+                _prepare()
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
@@ -212,6 +214,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 val col: Grid.Column<String> = addColumn(karibuDslI18n)
                 appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
                 setItems2(listOf())
+                _prepare()
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
@@ -227,6 +230,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 appendHeaderRow()
                 prependHeaderRow().join(col1, col2).setComponent(TextField("Filter:"))
                 setItems2(listOf())
+                _prepare()
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']

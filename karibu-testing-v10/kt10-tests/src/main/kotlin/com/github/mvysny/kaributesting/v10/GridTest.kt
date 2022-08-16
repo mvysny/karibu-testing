@@ -63,6 +63,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         val grid = UI.getCurrent().grid<TestPerson>(dp) {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
+            _prepare()
         }
         expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]-[Age]--\n--and 7 more\n") { grid._dump(0 until 0) }
         expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]-[Age]--\n0: name 0, 0\n1: name 1, 1\n2: name 2, 2\n3: name 3, 3\n4: name 4, 4\n--and 2 more\n") { grid._dump(0 until 5) }
@@ -80,6 +81,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumnFor(TestPerson::age)
             isMultiSort = true
             sort(TestPerson::name.asc, TestPerson::age.desc)
+            _prepare()
         }
         expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
@@ -143,6 +145,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider(1)) {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
+                _prepare()
             }
             expectThrows(AssertionError::class, "Grid[<TestPerson>, dataprovider='PersonBackendDataProvider'] at 0: expected [name 1, 1] but got [name 0, 0]\nGrid[<TestPerson>, dataprovider='PersonBackendDataProvider']\n--[Name]-[Age]--\n0: name 0, 0") {
                 grid.expectRowRegex(0, "name 1", "1")
@@ -272,6 +275,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 addColumn(NativeButtonRenderer<TestPerson>("View") { fail("Shouldn't be called") }).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 isEnabled = false
+                _prepare()
             }
             expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._clickRenderer(2, "name")
@@ -282,6 +286,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid = Grid<TestPerson>().apply {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addColumn(ComponentRenderer<Label, TestPerson> { _ -> Label() }).key = "name"
+                _prepare()
             }
             expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name': ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
@@ -294,6 +299,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
+                _prepare()
             }
             expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name' uses NativeButtonRenderer which is not supported by this function") {
                 grid._getCellComponent(8, "name")
@@ -340,6 +346,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
             setItems2(listOf())
+            _prepare()
         }
         expect("name") { grid._getColumnByKey("name").key }
         expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<?>(0 items)']: No such column with key 'foo'; available columns: [name, age]") {
@@ -388,6 +395,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addItemClickListener { fail("Shouldn't be called") }
                 isEnabled = false
+                _prepare()
             }
             expectThrows(IllegalStateException::class, "The Grid[DISABLED, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._clickItem(2)
@@ -535,6 +543,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 addItemDoubleClickListener { fail("Shouldn't be called") }
                 isEnabled = false
+                _prepare()
             }
             expectThrows(IllegalStateException::class, "The Grid[DISABLED, <TestPerson>, dataprovider='ListDataProvider<TestPerson>(11 items)'] is not enabled") {
                 grid._doubleClickItem(2)
@@ -805,4 +814,10 @@ fun <T> Grid<T>.setItems2(items: Collection<T>) {
     // introducing binary incompatibility. We thus can't have a code which calls [setItems] since that
     // will not work with both Vaadin 14 and Vaadin 15+. This is a workaround.
     dataProvider = ListDataProvider(items)
+}
+
+public fun Grid<*>._prepare() {
+    // remove attribute added by Vaadin 23.2.0.beta1, so that the _dump() function produces
+    // same results for all vaadin versions
+    element.removeAttribute("multi-sort-priority")
 }

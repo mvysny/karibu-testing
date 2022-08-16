@@ -53,6 +53,7 @@ fun DynaNodeGroup.grid19Testbatch() {
                             .skip(query.offset.toLong())
                             .limit(query.limit.toLong())
                     })
+                    _prepare()
                 }
                 expect(
                     """Grid[<String>, dataprovider='CallbackDataProvider']
@@ -72,6 +73,7 @@ fun DynaNodeGroup.grid19Testbatch() {
                             .skip(query.offset.toLong())
                             .limit(query.limit.toLong())
                     })
+                    _prepare()
                 }
                 expect(
                     """Grid[<String>, dataprovider='CallbackDataProvider']

@@ -826,6 +826,11 @@ checks the following points prior running the click listeners:
 
 The above approach works with Kotlin and Groovy. With Java, you simply call `_click(button)`.
 
+### Asserting On Status
+
+* `button._expectEnabled()`/`LocatorJ._assertEnabled(button)` makes sure that the component is enabled. (since KT 1.3.19)
+* `button._expectDisabled()`/`LocatorJ._assertDisabled(button)` makes sure that the component is disabled. (since KT 1.3.19)
+
 ### Changing values
 
 The `HasValue.setValue()` function succeeds even if the component in question is disabled or read-only. However, when we

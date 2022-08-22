@@ -7,6 +7,7 @@ import com.github.mvysny.kaributools.caption
 import com.github.mvysny.kaributools.placeholder
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
+import com.vaadin.flow.component.HasText
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
@@ -26,7 +27,7 @@ import java.util.function.Predicate
  * @property id the required [Component.getId]; if null, no particular id is matched.
  * @property caption the required [Component.caption]; if null, no particular caption is matched.
  * @property placeholder the required [Component.placeholder]; if null, no particular placeholder is matched.
- * @property text the [com.vaadin.flow.dom.Element.getText]
+ * @property text the [HasText.getText] or [com.vaadin.flow.dom.Element.getText]
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
  * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
  * @property classes if not null, the component must match all of these class names. Space-separated.
@@ -81,8 +82,8 @@ public class SearchSpec<T : Component>(
         if (!withoutClasses.isNullOrBlank()) p.add { component -> component.doesntHaveAnyClasses(withoutClasses!!) }
         if (!themes.isNullOrBlank()) p.add { component -> component.hasAllThemes(themes!!) }
         if (!withoutThemes.isNullOrBlank()) p.add { component -> component.notContainsThemes(withoutThemes!!) }
-        if (text != null) p.add { component -> component.element.text == text }
-        if (value != null) p.add { component -> (component as? HasValue<*, *>)?.getValue() == value }
+        if (text != null) p.add { component -> ((component as? HasText)?.text ?: component.element.text) == text }
+        if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }

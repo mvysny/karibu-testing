@@ -29,6 +29,18 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
+    test("simple click by ID") {
+        var clicked = 0
+        lateinit var cm: ContextMenu
+        UI.getCurrent().div {
+            cm = contextMenu {
+                item("click me", { clicked++ }) { setId("clickme") }
+            }
+        }
+        cm._clickItemWithID("clickme")
+        expect(1) { clicked }
+    }
+
     test("click checks isChecked") {
         var clicked = 0
         var checkedOnClick = false
@@ -83,8 +95,21 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 item("foo")
             }
         }
-        expectThrows(AssertionError::class, "No menu item with caption MenuItem[text='click me']") {
+        expectThrows(AssertionError::class, "No menu item with text='MenuItem[text='click me']'") {
             cm._clickItemWithCaption("MenuItem[text='click me']")
+        }
+    }
+
+    test("clicking non-existent menu by ID fails") {
+        lateinit var cm: ContextMenu
+        UI.getCurrent().div {
+            cm = contextMenu {
+                item("click me")
+                item("foo")
+            }
+        }
+        expectThrows(AssertionError::class, "No menu item with id='1'") {
+            cm._clickItemWithID("1")
         }
     }
 
@@ -92,7 +117,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
-                item("click me", { _ -> fail("shouldn't be called") }) {
+                item("click me", { fail("shouldn't be called") }) {
                     isEnabled = false
                 }
             }
@@ -106,7 +131,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
-                item("click me", { _ -> fail("shouldn't be called") }) {
+                item("click me", { fail("shouldn't be called") }) {
                     isVisible = false
                 }
             }
@@ -122,7 +147,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm = contextMenu {
                 item("menu") {
                     isEnabled = false
-                    item("click me", { _ -> fail("shouldn't be called") })
+                    item("click me", { fail("shouldn't be called") })
                 }
             }
         }
@@ -137,7 +162,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm = contextMenu {
                 item("menu") {
                     isVisible = false
-                    item("click me", { _ -> fail("shouldn't be called") })
+                    item("click me", { fail("shouldn't be called") })
                 }
             }
         }
@@ -151,7 +176,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         UI.getCurrent().div {
             isVisible = false
             cm = contextMenu {
-                item("click me", { _ -> fail("shouldn't be called") })
+                item("click me", { fail("shouldn't be called") })
             }
         }
         expectThrows(AssertionError::class, "Cannot click MenuItem[text='click me'] since it's attached to Div[INVIS] which is not effectively visible") {
@@ -165,7 +190,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         UI.getCurrent().div {
             isEnabled = false
             cm = contextMenu {
-                item("click me", { _ -> clicked++ })
+                item("click me", { clicked++ })
             }
         }
         cm._clickItemWithCaption("click me")

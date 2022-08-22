@@ -13,21 +13,40 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 /**
+ * Tries to find a menu item matching given spec and click it.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun HasMenuItems._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>) {
+    // fires ContextMenuOpenedListener to simulate menu opening
+    (this as Component).element.setProperty("opened", true)
+
+    val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
+    val predicate = searchSpec.toPredicate()
+    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull(predicate)
+            ?: fail("No menu item with ${searchSpec.toString().removePrefix("MenuItemBase and ")} in this menu:\n${(this as Component).toPrettyTree()}")
+    (item as MenuItem)._click(parentMap)
+
+    // fires ContextMenuOpenedListener to simulate menu closing
+    (this as Component).element.setProperty("opened", false)
+}
+
+/**
  * Tries to find a menu item with given caption and click it.
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 public fun HasMenuItems._clickItemWithCaption(caption: String) {
-    // fires ContextMenuOpenedListener to simulate menu opening
-    (this as Component).element.setProperty("opened", true)
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, text = caption))
+}
 
-    val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
-    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
-            ?: fail("No menu item with caption $caption in this menu:\n${(this as Component).toPrettyTree()}")
-    (item as MenuItem)._click(parentMap)
-
-    // fires ContextMenuOpenedListener to simulate menu closing
-    (this as Component).element.setProperty("opened", false)
+/**
+ * Tries to find a menu item with given [id][Component.setId] and click it.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun HasMenuItems._clickItemWithID(id: String) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, id = id))
 }
 
 /**
@@ -52,7 +71,6 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
     return when(this) {
         is ContextMenuBase<*, *, *> -> getItems()
         is SubMenuBase<*, *, *> -> getItems()
-        is MenuItemBase<*, *, *> -> getItems()
         else -> {
             // every HasMenuItems implementor has the getItems() method including the MenuBar.
             // can't use the MenuBar type directly though, to keep compatibility with Vaadin 13
@@ -74,7 +92,7 @@ public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridIte
     element.setProperty("opened", true)
 
     // notify the context menu dynamic item generator
-    dynamicContentHandler?.also { it ->
+    dynamicContentHandler?.also {
         val openMenu: Boolean = it.test(gridItem)
         if (!openMenu) {
             fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")

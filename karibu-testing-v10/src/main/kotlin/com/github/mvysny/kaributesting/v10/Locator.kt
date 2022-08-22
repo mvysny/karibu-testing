@@ -51,7 +51,7 @@ public class SearchSpec<T : Component>(
 ) {
 
     override fun toString(): String {
-        val list = mutableListOf<String>(if (clazz.simpleName.isBlank()) clazz.name else clazz.simpleName)
+        val list = mutableListOf<String>(clazz.simpleName.ifBlank { clazz.name })
         if (id != null) list.add("id='$id'")
         if (caption != null) list.add("caption='$caption'")
         if (placeholder != null) list.add("placeholder='$placeholder'")

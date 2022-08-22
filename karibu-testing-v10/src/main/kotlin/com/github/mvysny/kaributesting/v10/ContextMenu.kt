@@ -82,11 +82,29 @@ private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
 }
 
 /**
- * Tries to find a menu item with given caption and click it, passing in given [gridItem].
+ * Tries to find a menu item with given [id] and click it, passing in given [gridItem].
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun <T> GridContextMenu<T>._clickItemWithID(id: String, gridItem: T?) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, id = id), gridItem)
+}
+
+/**
+ * Tries to find a menu item with given [caption] and click it, passing in given [gridItem].
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
 public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, text = caption), gridItem)
+}
+
+/**
+ * Tries to find a menu item matching given [searchSpec] and click it, passing in given [gridItem].
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun <T> GridContextMenu<T>._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>, gridItem: T?) {
     // fires ContextMenuOpenedListener to simulate menu opening
     _setContextMenuTargetItemKey(gridItem)
     element.setProperty("opened", true)
@@ -100,8 +118,9 @@ public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridIte
     }
 
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
-    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull { it.getText() == caption }
-            ?: fail("No menu item with caption $caption in GridContextMenu:\n${toPrettyTree()}")
+    val predicate = searchSpec.toPredicate()
+    val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull(predicate)
+            ?: fail("No menu item with ${searchSpec.toString().removePrefix("MenuItemBase and ")} in GridContextMenu:\n${toPrettyTree()}")
     @Suppress("UNCHECKED_CAST")
     (item as GridMenuItem<T>)._click(gridItem)
 

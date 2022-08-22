@@ -209,6 +209,43 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithCaption("click me", "foo")
             expect("foo") { clicked }
         }
+        test("click by non-existing caption fails") {
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me", { fail("should not be called") })
+                }
+            }
+            expectThrows<AssertionError>("No menu item with text='non-existing' in GridContextMenu:\n" +
+                    "└── GridContextMenu[]\n" +
+                    "    └── GridMenuItem[text='click me']") {
+                cm._clickItemWithCaption("non-existing", "foo")
+            }
+        }
+        test("simple click by ID") {
+            lateinit var clicked: String
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me", { e -> clicked = e!! }) { setId("bar") }
+                }
+            }
+            cm._clickItemWithID("bar", "foo")
+            expect("foo") { clicked }
+        }
+        test("click by non-existing ID fails") {
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me", { fail("should not be called") })
+                }
+            }
+            expectThrows<AssertionError>("No menu item with id='non-existing' in GridContextMenu:\n" +
+                    "└── GridContextMenu[]\n" +
+                    "    └── GridMenuItem[text='click me']") {
+                cm._clickItemWithID("non-existing", "foo")
+            }
+        }
         test("click toggles isChecked") {
             lateinit var i: GridMenuItem<String>
             lateinit var cm: GridContextMenu<String>

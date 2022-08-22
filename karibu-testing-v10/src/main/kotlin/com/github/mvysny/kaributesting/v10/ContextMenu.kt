@@ -13,7 +13,7 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 /**
- * Tries to find a menu item matching given spec and click it.
+ * Tries to find a menu item matching given [searchSpec] and click it.
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
@@ -32,7 +32,7 @@ public fun HasMenuItems._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*
 }
 
 /**
- * Tries to find a menu item with given caption and click it.
+ * Tries to find a menu item with given [caption] and click it.
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
@@ -41,7 +41,7 @@ public fun HasMenuItems._clickItemWithCaption(caption: String) {
 }
 
 /**
- * Tries to find a menu item with given [id][Component.setId] and click it.
+ * Tries to find a menu item with given [id] and click it.
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */

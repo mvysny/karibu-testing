@@ -1159,7 +1159,9 @@ and retrieve them via getters. Then, it's very easy to click on a menu item; sim
 Kotlin, Groovy:
 ```kotlin
 contextMenu._clickItemWithCaption("Save")
+contextMenu._clickItemWithID("save")   // since KT 1.3.19
 gridContextMenu._clickItemWithCaption("Delete", person)
+gridContextMenu._clickItemWithID("delete", person)   // since KT 1.3.19
 ```
 
 Java:

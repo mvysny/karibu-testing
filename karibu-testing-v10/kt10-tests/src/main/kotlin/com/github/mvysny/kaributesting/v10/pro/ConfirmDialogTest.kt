@@ -2,11 +2,9 @@ package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10._expectNone
-import com.github.mvysny.kaributesting.v10._expectOne
-import com.github.mvysny.kaributesting.v10._get
+import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
+import com.vaadin.flow.component.html.Span
 import kotlin.test.expect
 import kotlin.test.fail
 
@@ -48,5 +46,31 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         _get<ConfirmDialog>()._fireReject()
         expect(true) { rejectCalled }
         _expectNone<ConfirmDialog>()  // make sure the ConfirmDialog is closed: https://github.com/mvysny/karibu-testing/issues/34
+    }
+
+    test("getText()") {
+        expect(null) { ConfirmDialog().getText() }
+        expect("Bar") { ConfirmDialog("Foo", "Bar", "Yes") {} .getText() }
+    }
+
+    test("getTextComponents()") {
+        expectList() { ConfirmDialog().getTextComponents() }
+        val dlg = ConfirmDialog()
+        val textSpan = Span("Foo")
+        dlg.setText(textSpan)
+        expectList(textSpan) { dlg.getTextComponents() }
+    }
+
+    test("getHeader()") {
+        expect(null) { ConfirmDialog().getHeader() }
+        expect("Foo") { ConfirmDialog("Foo", "Bar", "Yes") {} .getHeader() }
+    }
+
+    test("getHeaderComponents()") {
+        expectList() { ConfirmDialog().getHeaderComponents() }
+        val dlg = ConfirmDialog()
+        val textSpan = Span("Foo")
+        dlg.setHeader(textSpan)
+        expectList(textSpan) { dlg.getHeaderComponents() }
     }
 }

@@ -1697,6 +1697,10 @@ Kotlin:
 _get<ConfirmDialog>()._fireConfirm()
 _get<ConfirmDialog>()._fireCancel()
 _get<ConfirmDialog>()._fireReject()
+_get<ConfirmDialog>().getText()              // since KT 1.3.19
+_get<ConfirmDialog>().getTextComponents()    // since KT 1.3.19
+_get<ConfirmDialog>().getHeader()            // since KT 1.3.19
+_get<ConfirmDialog>().getHeaderComponents()  // since KT 1.3.19
 ```
 
 Groovy (since KT 1.1.21 / 1.2.1):

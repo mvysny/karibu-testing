@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 @CompileStatic
 class ConfirmDialogExtensionMethodsTest {
     @BeforeEach void setup() {
-        TestAssumptions.assumeTestable()
         MockVaadin.setup()
     }
     @AfterEach void teardown() { MockVaadin.tearDown() }

@@ -57,7 +57,6 @@ public val Component._isVisible: Boolean
 public val Component._text: String?
     get() = when (this) {
         is HasText -> text
-        is Text -> text   // workaround for https://github.com/vaadin/flow/issues/3606
         else -> null
     }
 
@@ -104,17 +103,21 @@ internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.
  *
  * Effectively a shortcut for [isEnabled] since it recursively checks that all ancestors
  * are also enabled (the "implicitly disabled" effect, see [HasEnabled.isEnabled] javadoc for more details).
+ *
+ * Deprecated; replace with [isEnabled].
  * @return false if this component or any of its parent is disabled.
  */
+@Deprecated("Deprecated since HasEnabled.isEnabled is essentially the same thing as isEffectivelyEnabled")
 public fun Component.isEffectivelyEnabled(): Boolean = isEnabled
 
 /**
- * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled.
+ * Checks whether this component is [HasEnabled.isEnabled]. All components not implementing [HasEnabled] are considered enabled
+ * unless their ascendant is disabled.
  */
 public val Component.isEnabled: Boolean
     get() = when (this) {
         is HasEnabled -> isEnabled
-        else -> true
+        else -> parent.orElse(null)?.isEnabled ?: true
     }
 
 /**
@@ -159,3 +162,23 @@ public fun Component._getVirtualChildren(): List<Component> =
     element.getVirtualChildren().map { it._findComponents() }.flatten()
 
 internal val InternalServerError.errorMessage: String get() = element.text
+
+/**
+ * Fails if this component is not [com.vaadin.flow.component.HasEnabled.isEnabled].
+ * Also fails when the parent is disabled.
+ */
+public fun Component._expectEnabled() {
+    if (!isEnabled) {
+        fail("${toPrettyString()} is not enabled")
+    }
+}
+
+/**
+ * Fails if this component is [com.vaadin.flow.component.HasEnabled.isEnabled].
+ * Always succeeds when the parent is disabled.
+ */
+public fun Component._expectDisabled() {
+    if (isEnabled) {
+        fail("${toPrettyString()} is not disabled")
+    }
+}

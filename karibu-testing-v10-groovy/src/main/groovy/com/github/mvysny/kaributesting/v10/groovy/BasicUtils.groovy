@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
 import com.github.mvysny.kaributesting.v10.ElementUtilsKt
+import com.github.mvysny.kaributesting.v10.LocatorKt
 import com.github.mvysny.kaributesting.v10.NotificationsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
 import com.github.mvysny.kaributools.ComponentUtilsKt
@@ -158,14 +159,17 @@ class BasicUtils {
     /**
      * Computes that this component and all of its parents are enabled.
      * @return false if this component or any of its parent is disabled.
+     * @deprecated replaced by {@link #isEnabled(com.vaadin.flow.component.Component)}.
      */
+    @Deprecated
     static boolean isEffectivelyEnabled(@NotNull Component self) {
         return BasicUtilsKt.isEffectivelyEnabled(self)
     }
 
     /**
      * Checks whether this component is {@link com.vaadin.flow.component.HasEnabled#isEnabled()}.
-     * All components not implementing {@link com.vaadin.flow.component.HasEnabled} are considered enabled.
+     * All components not implementing {@link com.vaadin.flow.component.HasEnabled} are considered enabled unless
+     * some of their ascendants is disabled.
      */
     static boolean isEnabled(@NotNull Component self) {
         return BasicUtilsKt.isEnabled(self)
@@ -257,5 +261,21 @@ class BasicUtils {
      */
     static List<Component> _getVirtualChildren(@NotNull Component self) {
         BasicUtilsKt._getVirtualChildren(self)
+    }
+
+    /**
+     * Fails if this component is not {@link com.vaadin.flow.component.HasEnabled#isEnabled()}.
+     * May succeed when the parent is disabled.
+     */
+    static void _expectEnabled(@NotNull Component self) {
+        BasicUtilsKt._expectEnabled(self)
+    }
+
+    /**
+     * Fails if this component is {@link com.vaadin.flow.component.HasEnabled#isEnabled()}.
+     * May succeed when the parent is disabled.
+     */
+    static void _expectDisabled(@NotNull Component self) {
+        BasicUtilsKt._expectDisabled(self)
     }
 }

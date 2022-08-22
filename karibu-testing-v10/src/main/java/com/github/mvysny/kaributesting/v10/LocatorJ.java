@@ -1,9 +1,6 @@
 package com.github.mvysny.kaributesting.v10;
 
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 
 import org.jetbrains.annotations.NotNull;
@@ -324,5 +321,21 @@ public class LocatorJ {
      */
     public static void _assertNoDialogs() {
         LocatorKt._expectNoDialogs();
+    }
+
+    /**
+     * Fails if given component is not {@link HasEnabled#isEnabled()}.
+     * May succeed when the parent is disabled.
+     */
+    public static void _assertEnabled(@NotNull Component component) {
+        BasicUtilsKt._expectEnabled(component);
+    }
+
+    /**
+     * Fails if given component is {@link HasEnabled#isEnabled()}.
+     * May succeed when the parent is disabled.
+     */
+    public static void _assertDisabled(@NotNull Component component) {
+        BasicUtilsKt._expectDisabled(component);
     }
 }

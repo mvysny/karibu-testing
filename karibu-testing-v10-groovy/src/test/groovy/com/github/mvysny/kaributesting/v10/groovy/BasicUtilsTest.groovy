@@ -46,9 +46,9 @@ class BasicUtilsTest {
         def button = new Button()
         button.setEnabled(false)
         button.expectNotEditableByUser()
+        button._expectDisabled()
         new Checkbox().element.getTextRecursively2()
         new Checkbox().element.getTextRecursively()
-        new Checkbox().isEffectivelyEnabled()
         new Checkbox().isEnabled()
         new TextField().placeholder
         new TextField().placeholder = ""
@@ -61,6 +61,7 @@ class BasicUtilsTest {
         new Icon().iconName
         new Icon().iconName = null
         new TextField()._getVirtualChildren()
+        new Button()._expectEnabled()
     }
 
     @Test void api2() {

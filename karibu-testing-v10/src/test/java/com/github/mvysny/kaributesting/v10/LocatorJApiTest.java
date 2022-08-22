@@ -72,6 +72,11 @@ public class LocatorJApiTest {
         _clickItem(new Grid<>(), 0);
         _doubleClickItem(new Grid<>(), 0);
         _clickRenderer(new Grid<>(), 0, "edit");
+
+        _assertEnabled(new Button());
+        final Button disabledButton = new Button();
+        disabledButton.setEnabled(false);
+        _assertDisabled(disabledButton);
     }
 
     public static class Person {}

@@ -3,8 +3,12 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
+import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
+import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.vaadin.flow.component.ClickEvent
+import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.TextField
@@ -97,6 +101,40 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
         f.addBlurListener { called = true }
         f._blur()
         expect(true) { called }
+    }
+
+    test("_expectEnabled") {
+        Button()._expectEnabled()
+        expectThrows<AssertionError>("Button[DISABLED] is not enabled") {
+            Button().apply { isEnabled = false } ._expectEnabled()
+        }
+        expectThrows<AssertionError>("Button[DISABLED] is not enabled") {
+            VerticalLayout().apply {
+                isEnabled = false
+                button { _expectEnabled() }
+            }
+        }
+        expectThrows<AssertionError>("Button[DISABLED] is not enabled") {
+            VerticalLayout().apply {
+                isEnabled = false
+                button { isEnabled = false; _expectEnabled() }
+            }
+        }
+    }
+
+    test("_expectDisabled") {
+        Button().apply { isEnabled = false } ._expectDisabled()
+        expectThrows<AssertionError>("Button[] is not disabled") {
+            Button()._expectDisabled()
+        }
+        VerticalLayout().apply {
+            isEnabled = false
+            button { _expectDisabled() }
+        }
+        VerticalLayout().apply {
+            isEnabled = false
+            button { isEnabled = false; _expectDisabled() }
+        }
     }
 }
 

@@ -24,5 +24,9 @@ class ConfirmDialogExtensionMethodsTest {
         new ConfirmDialog()._fireReject()
         new ConfirmDialog()._fireCancel()
         new ConfirmDialog()._fireConfirm()
+        new ConfirmDialog().getText()
+        new ConfirmDialog().getTextComponents()
+        new ConfirmDialog().getHeader()
+        new ConfirmDialog().getHeaderComponents()
     }
 }

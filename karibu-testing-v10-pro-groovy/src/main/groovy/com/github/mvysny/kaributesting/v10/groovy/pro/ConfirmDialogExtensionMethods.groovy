@@ -18,4 +18,20 @@ class ConfirmDialogExtensionMethods {
     static void _fireReject(@NotNull ConfirmDialog self) {
         ConfirmDialogKt._fireReject(self)
     }
+
+    static String getText(@NotNull ConfirmDialog self) {
+        ConfirmDialogKt.getText(self)
+    }
+
+    static String getTextComponents(@NotNull ConfirmDialog self) {
+        ConfirmDialogKt.getTextComponents(self)
+    }
+
+    static String getHeader(@NotNull ConfirmDialog self) {
+        ConfirmDialogKt.getHeader(self)
+    }
+
+    static String getHeaderComponents(@NotNull ConfirmDialog self) {
+        ConfirmDialogKt.getHeaderComponents(self)
+    }
 }

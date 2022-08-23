@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
+import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
 import kotlin.test.expect
 import kotlin.test.fail
@@ -72,5 +73,21 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         val textSpan = Span("Foo")
         dlg.setHeader(textSpan)
         expectList(textSpan) { dlg.getHeaderComponents() }
+    }
+
+    test("getHeaderText()") {
+        expect("") { ConfirmDialog().getHeaderText() }
+        expect("Foo") { ConfirmDialog("Foo", "Bar", "Yes") {} .getHeaderText() }
+        val dlg = ConfirmDialog()
+        dlg.setHeader(H2("Are you sure?"))
+        expect("Are you sure?") { dlg.getHeaderText() }
+    }
+
+    test("getTextRecursively()") {
+        expect("") { ConfirmDialog().getTextRecursively() }
+        expect("Bar") { ConfirmDialog("Foo", "Bar", "Yes") {} .getTextRecursively() }
+        val dlg = ConfirmDialog()
+        dlg.setText(H2("Important message"))
+        expect("Important message") { dlg.getTextRecursively() }
     }
 }

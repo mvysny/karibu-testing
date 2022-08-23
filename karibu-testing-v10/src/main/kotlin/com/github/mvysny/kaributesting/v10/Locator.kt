@@ -82,7 +82,7 @@ public class SearchSpec<T : Component>(
         if (!withoutClasses.isNullOrBlank()) p.add { component -> component.doesntHaveAnyClasses(withoutClasses!!) }
         if (!themes.isNullOrBlank()) p.add { component -> component.hasAllThemes(themes!!) }
         if (!withoutThemes.isNullOrBlank()) p.add { component -> component.notContainsThemes(withoutThemes!!) }
-        if (text != null) p.add { component -> ((component as? HasText)?.text ?: component.element.text) == text }
+        if (text != null) p.add { component -> component._text == text }
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()

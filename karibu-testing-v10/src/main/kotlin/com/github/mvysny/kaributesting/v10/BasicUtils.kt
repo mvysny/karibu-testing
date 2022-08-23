@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.getVirtualChildren
+import com.github.mvysny.kaributools.textRecursively2
 import com.vaadin.flow.component.*
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.InternalServerError
@@ -59,6 +60,11 @@ public val Component._text: String?
         is HasText -> text
         else -> null
     }
+
+/**
+ * Returns text contents of this node and all of its descendant nodes.
+ */
+public val Component._textRecursively: String get() = element.textRecursively2
 
 /**
  * Checks that a component is actually editable by the user:

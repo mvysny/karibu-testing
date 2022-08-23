@@ -27,5 +27,7 @@ class ConfirmDialogExtensionMethodsTest {
         new ConfirmDialog().getTextComponents()
         new ConfirmDialog().getHeader()
         new ConfirmDialog().getHeaderComponents()
+        new ConfirmDialog().getHeaderText()
+        new ConfirmDialog().getTextRecursively()
     }
 }

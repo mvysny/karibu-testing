@@ -1699,15 +1699,13 @@ Groovy: unsupported at the moment.
 
 [Vaadin Confirm Dialog](https://vaadin.com/components/vaadin-confirm-dialog)
 
+Clicking confirm/cancel/reject buttons:
+
 Kotlin:
 ```kotlin
 _get<ConfirmDialog>()._fireConfirm()
 _get<ConfirmDialog>()._fireCancel()
 _get<ConfirmDialog>()._fireReject()
-_get<ConfirmDialog>().getText()              // since KT 1.3.19
-_get<ConfirmDialog>().getTextComponents()    // since KT 1.3.19
-_get<ConfirmDialog>().getHeader()            // since KT 1.3.19
-_get<ConfirmDialog>().getHeaderComponents()  // since KT 1.3.19
 ```
 
 Groovy (since KT 1.1.21 / 1.2.1):
@@ -1720,6 +1718,21 @@ _get(ConfirmDialog)._fireReject()
 Java:
 ```java
 ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
+```
+
+Asserting against the header or body:
+```kotlin
+expect("Important message") { _get<ConfirmDialog>().getTextRecursively() }              // since KT 1.3.20
+expect("Are you sure?") { _get<ConfirmDialog>().getHeaderText() }              // since KT 1.3.20
+```
+
+Alternatively retrieve stuff set via `setText()/setHeader()` directly:
+
+```kotlin
+_get<ConfirmDialog>().getText()              // since KT 1.3.19
+_get<ConfirmDialog>().getTextComponents()    // since KT 1.3.19
+_get<ConfirmDialog>().getHeader()            // since KT 1.3.19
+_get<ConfirmDialog>().getHeaderComponents()  // since KT 1.3.19
 ```
 
 ## Security/Principal/isUserInRole

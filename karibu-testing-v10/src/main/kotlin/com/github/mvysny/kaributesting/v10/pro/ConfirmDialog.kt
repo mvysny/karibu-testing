@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.kaributesting.v10._fireEvent
+import com.github.mvysny.kaributesting.v10._text
+import com.github.mvysny.kaributesting.v10._textRecursively
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import kotlin.streams.toList
@@ -26,6 +28,13 @@ public fun ConfirmDialog._fireReject() {
 public fun ConfirmDialog.getText(): String? = element.getProperty("message")
 
 /**
+ * Returns the text set via [setText(String)][ConfirmDialog.setText].
+ * If that's null then retrieves recursive text contents of all [getTextComponents].
+ */
+public fun ConfirmDialog.getTextRecursively(): String =
+    getText() ?: getTextComponents().joinToString { it._textRecursively } .trim()
+
+/**
  * Returns all text components set via [setText(Component)][ConfirmDialog.setText].
  */
 public fun ConfirmDialog.getTextComponents(): List<Component> {
@@ -37,6 +46,13 @@ public fun ConfirmDialog.getTextComponents(): List<Component> {
  * Returns the text set via [setHeader(String)][ConfirmDialog.setHeader].
  */
 public fun ConfirmDialog.getHeader(): String? = element.getProperty("header")
+
+/**
+ * Returns the text set via [setHeader(String)][ConfirmDialog.setHeader];
+ * if that's null then retrieves recursive text contents of all [getHeaderComponents].
+ */
+public fun ConfirmDialog.getHeaderText(): String =
+    getHeader() ?: getHeaderComponents().joinToString { it._textRecursively } .trim()
 
 /**
  * Returns all header components set via [setHeader(Component)][ConfirmDialog.setHeader].

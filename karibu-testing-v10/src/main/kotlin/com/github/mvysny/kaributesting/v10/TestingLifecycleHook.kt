@@ -177,6 +177,16 @@ internal val Component.isTemplate: Boolean get() = this is PolymerTemplate<*> ||
 public var includeVirtualChildrenInTemplates: Boolean = false
 
 /**
+ * By default, Karibu fakes [MockPage.retrieveExtendedClientDetails]. However, it seems
+ * to interfere with Spring in some way, see [Issue #129](https://github.com/mvysny/karibu-testing/issues/129)
+ * for more details. To work around that ticket, set this to false.
+ *
+ * Turning this off will cause `@PreserveOnRefresh` not to work anymore, see [Issue #118](https://github.com/mvysny/karibu-testing/issues/118)
+ * for more details.
+ */
+public var fakeExtendedClientDetails: Boolean = true
+
+/**
  * Additional bits for Vaadin 23.1.
  */
 public open class TestingLifecycleHookVaadin23_1(public val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {

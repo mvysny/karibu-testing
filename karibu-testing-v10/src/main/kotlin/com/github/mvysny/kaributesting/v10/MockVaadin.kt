@@ -406,12 +406,15 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
     }
 
     override fun retrieveExtendedClientDetails(receiver: ExtendedClientDetailsReceiver) {
+        if (!fakeExtendedClientDetails) {
+            super.retrieveExtendedClientDetails(receiver)
+            return
+        }
+
         // construct mock ExtendedClientDetails then set it to ui.internals, which will cause
         // super to call receiver straight away.
-        val constructor: Constructor<*> =
-            ExtendedClientDetails::class.java.declaredConstructors[0].apply {
-                isAccessible = true
-            }
+        val constructor: Constructor<*> = ExtendedClientDetails::class.java.declaredConstructors[0]
+        constructor.isAccessible = true
         val ecd: ExtendedClientDetails = constructor.newInstance(
             "1920", "1080", "1846", "939", "1846", "939",
             "10800000", "7200000", "3600000", "true", "Europe/Helsinki",

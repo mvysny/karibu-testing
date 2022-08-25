@@ -344,13 +344,27 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    test("ExtendedClientDetails") {
-        // by default they're null but a mock one can be retrieved.
-        expect(null) { UI.getCurrent().internals.extendedClientDetails }
-        lateinit var ecd: ExtendedClientDetails
-        UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
-        expect(false) { ecd.isTouchDevice }
-        expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
+    group("ExtendedClientDetails") {
+        beforeEach { fakeExtendedClientDetails = true }
+        afterEach { fakeExtendedClientDetails = true }
+
+        test("proper retrieval") {
+            // by default they're null but a mock one can be retrieved.
+            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            lateinit var ecd: ExtendedClientDetails
+            UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
+            expect(false) { ecd.isTouchDevice }
+            expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
+        }
+
+        test("nothing is fetched when fakeExtendedClientDetails=false") {
+            fakeExtendedClientDetails = false
+            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            var ecd: ExtendedClientDetails? = null
+            UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it } // does nothing
+            expect(null) { ecd }
+            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+        }
     }
 
     test("VaadinSession.close() must re-create the entire session and the UI") {

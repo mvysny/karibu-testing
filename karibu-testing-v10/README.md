@@ -669,6 +669,15 @@ install those for you automatically, there's no need for you to do anything.
 `LitElement`-based components are supported. After all, from the server-side perspective
 they're just `Component`s since there's no `LitElement` server class.
 
+### PreserveOnRefresh
+
+The `@PreserveOnRefresh` annotation is supported since Karibu 1.3.17, see [Issue #118](https://github.com/mvysny/karibu-testing/issues/118)
+for details. In order for this to work, we faked the `ExtendedClientDetails` fetching which now also works correctly.
+
+However, looks that it broke Spring `RouteScope` [Issue #129](https://github.com/mvysny/karibu-testing/issues/129).
+Since Karibu 1.3.20 you can turn the `ExtendedClientDetails` faking off, by setting `fakeExtendedClientDetails`
+to `false` (Java: `TestingLifecycleHookKt.setFakeExtendedClientDetails(false)`).
+
 ## API
 
 ### Looking up components

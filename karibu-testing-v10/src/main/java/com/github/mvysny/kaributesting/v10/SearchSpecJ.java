@@ -35,7 +35,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required {@link BasicUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
+     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
      * @param caption
      * @return this
      */
@@ -57,7 +57,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required {@link BasicUtilsKt#getPlaceholder(Component)}; if {@code null}, no particular placeholder is matched.
+     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getPlaceholder(Component)}; if {@code null}, no particular placeholder is matched.
      * @param placeholder the placeholder
      * @return this
      */

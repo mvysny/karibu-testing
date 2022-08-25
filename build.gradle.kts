@@ -107,5 +107,11 @@ subprojects {
 
     configurations.implementation {
         exclude(module = "fusion-endpoint") // Vaadin 22: exclude fusion: it brings tons of dependencies (including swagger)
+
+        // Webjars are only needed when running in Vaadin 13 compatibility mode
+        listOf("com.vaadin.webjar", "org.webjars.bowergithub.insites",
+            "org.webjars.bowergithub.polymer", "org.webjars.bowergithub.polymerelements",
+            "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents")
+            .forEach { exclude(group = it) }
     }
 }

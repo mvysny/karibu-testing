@@ -47,7 +47,7 @@ class ConfirmDialogExtensionMethods {
      */
     @NotNull
     static String getTextRecursively(@NotNull ConfirmDialog self) {
-        ConfirmDialogKt.getTextRecursively(self)
+        ConfirmDialogKt._getText(self)
     }
 
     /**
@@ -56,6 +56,6 @@ class ConfirmDialogExtensionMethods {
      */
     @NotNull
     static String getHeaderText(@NotNull ConfirmDialog self) {
-        ConfirmDialogKt.getHeaderText(self)
+        ConfirmDialogKt._getHeader(self)
     }
 }

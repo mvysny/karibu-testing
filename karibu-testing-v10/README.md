@@ -1731,8 +1731,8 @@ ConfirmDialogKt._fireConfirm(_get(ConfirmDialog.class));
 
 Asserting against the header or body:
 ```kotlin
-expect("Important message") { _get<ConfirmDialog>().getTextRecursively() }              // since KT 1.3.20
-expect("Are you sure?") { _get<ConfirmDialog>().getHeaderText() }              // since KT 1.3.20
+expect("Important message") { _get<ConfirmDialog>()._getText() }              // since KT 1.3.20
+expect("Are you sure?") { _get<ConfirmDialog>()._getHeader() }              // since KT 1.3.20
 ```
 
 Alternatively retrieve stuff set via `setText()/setHeader()` directly:

@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.kaributesting.v10._fireEvent
-import com.github.mvysny.kaributesting.v10._text
 import com.github.mvysny.kaributesting.v10._textRecursively
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
@@ -31,7 +30,7 @@ public fun ConfirmDialog.getText(): String? = element.getProperty("message")
  * Returns the text set via [setText(String)][ConfirmDialog.setText].
  * If that's null then retrieves recursive text contents of all [getTextComponents].
  */
-public fun ConfirmDialog.getTextRecursively(): String =
+public fun ConfirmDialog._getText(): String =
     getText() ?: getTextComponents().joinToString { it._textRecursively } .trim()
 
 /**
@@ -51,7 +50,7 @@ public fun ConfirmDialog.getHeader(): String? = element.getProperty("header")
  * Returns the text set via [setHeader(String)][ConfirmDialog.setHeader];
  * if that's null then retrieves recursive text contents of all [getHeaderComponents].
  */
-public fun ConfirmDialog.getHeaderText(): String =
+public fun ConfirmDialog._getHeader(): String =
     getHeader() ?: getHeaderComponents().joinToString { it._textRecursively } .trim()
 
 /**

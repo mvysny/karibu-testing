@@ -75,19 +75,19 @@ internal fun DynaNodeGroup.confirmDialogTestbatch() {
         expectList(textSpan) { dlg.getHeaderComponents() }
     }
 
-    test("getHeaderText()") {
-        expect("") { ConfirmDialog().getHeaderText() }
-        expect("Foo") { ConfirmDialog("Foo", "Bar", "Yes") {} .getHeaderText() }
+    test("_getHeader()") {
+        expect("") { ConfirmDialog()._getHeader() }
+        expect("Foo") { ConfirmDialog("Foo", "Bar", "Yes") {} ._getHeader() }
         val dlg = ConfirmDialog()
         dlg.setHeader(H2("Are you sure?"))
-        expect("Are you sure?") { dlg.getHeaderText() }
+        expect("Are you sure?") { dlg._getHeader() }
     }
 
-    test("getTextRecursively()") {
-        expect("") { ConfirmDialog().getTextRecursively() }
-        expect("Bar") { ConfirmDialog("Foo", "Bar", "Yes") {} .getTextRecursively() }
+    test("_getText()") {
+        expect("") { ConfirmDialog()._getText() }
+        expect("Bar") { ConfirmDialog("Foo", "Bar", "Yes") {} ._getText() }
         val dlg = ConfirmDialog()
         dlg.setText(H2("Important message"))
-        expect("Important message") { dlg.getTextRecursively() }
+        expect("Important message") { dlg._getText() }
     }
 }

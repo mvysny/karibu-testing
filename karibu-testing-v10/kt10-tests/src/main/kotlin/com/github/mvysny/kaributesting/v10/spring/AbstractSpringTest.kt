@@ -65,7 +65,7 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
         VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService
 
-        // verify that the destroy listeners are called
+        // verify that the "destroy listeners" are called
         var called = 0
         (VaadinSession.getCurrent() as SpringVaadinSession).addDestroyListener { called++ }
         MockVaadin.tearDown()

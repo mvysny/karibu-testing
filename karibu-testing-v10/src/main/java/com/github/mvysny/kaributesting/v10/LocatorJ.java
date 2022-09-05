@@ -101,7 +101,7 @@ public class LocatorJ {
      * possible to call {@link #_fireValueChange(AbstractField, boolean)} with <code>fromClient=true</code> instead.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    public static <V, E extends HasValue.ValueChangeEvent<V>> void _setValue(@NotNull HasValue<E, V> receiver, @Nullable V value) {
+    public static <V> void _setValue(@NotNull HasValue<?, V> receiver, @Nullable V value) {
         HasValueUtilsKt.set_value(receiver, value);
     }
 

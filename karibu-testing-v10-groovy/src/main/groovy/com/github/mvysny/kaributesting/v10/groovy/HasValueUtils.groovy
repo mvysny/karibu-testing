@@ -31,7 +31,7 @@ class HasValueUtils {
      * possible to call {@link #_fireValueChange(AbstractField, boolean)} with <code>fromClient=true</code> instead.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    static <V, E extends HasValue.ValueChangeEvent<V>> void set_value(@NotNull HasValue<E, V> self, @Nullable V value) {
+    static <V> void set_value(@NotNull HasValue<?, V> self, @Nullable V value) {
         HasValueUtilsKt.set_value(self, value)
     }
 

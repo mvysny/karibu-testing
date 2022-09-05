@@ -14,7 +14,7 @@ import com.vaadin.flow.component.HasValue
  * possible to call [_fireValueChange] with `fromClient=true` instead.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-public var <V, E : HasValue.ValueChangeEvent<V>> HasValue<E, V>._value: V?
+public var <V> HasValue<*, V>._value: V?
     get() = value
     set(v) {
         (this as Component).checkEditableByUser()

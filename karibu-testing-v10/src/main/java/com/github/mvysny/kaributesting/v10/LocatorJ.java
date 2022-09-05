@@ -63,7 +63,7 @@ public class LocatorJ {
     }
 
     /**
-     * Finds a VISIBLE component in the current UI of given clazz which matches given spec. The receiver and all of its descendants are searched.
+     * Finds a VISIBLE component of given clazz which matches given spec. The receiver and all of its descendants are searched.
      * <p></p>
      * Example:
      * <code>import static com.github.karibu.testing.LocatorJ.*; _get(layout, TextField.class, spec -> spec.withCaption("Name:").withId("name"));</code>
@@ -134,6 +134,7 @@ public class LocatorJ {
      *
      * @return the list of matching components, may be empty.
      */
+    @NotNull
     public static <T extends Component> List<T> _find(@NotNull Class<T> clazz) {
         return LocatorKt._find(clazz, spec -> Unit.INSTANCE);
     }
@@ -143,6 +144,7 @@ public class LocatorJ {
      * @param clazz the requested type of returned components.
      * @return the list of matching components, may be empty.
      */
+    @NotNull
     public static <T extends Component> List<T> _find(@NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
         return LocatorKt._find(clazz, ss -> {
             spec.accept(new SearchSpecJ<>(ss));
@@ -156,6 +158,7 @@ public class LocatorJ {
      * @param clazz the requested type of returned components.
      * @return the list of matching components, may be empty.
      */
+    @NotNull
     public static <T extends Component> List<T> _find(@NotNull Component receiver, @NotNull Class<T> clazz) {
         return LocatorKt._find(receiver, clazz, spec -> Unit.INSTANCE);
     }
@@ -167,6 +170,7 @@ public class LocatorJ {
      * @param spec configures the search criteria.
      * @return the list of matching components, may be empty.
      */
+    @NotNull
     public static <T extends Component> List<T> _find(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
         return LocatorKt._find(receiver, clazz, ss -> {
             spec.accept(new SearchSpecJ<>(ss));
@@ -197,7 +201,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there are no VISIBLE components of given class. Given component and all of its descendants are searched.
+     * Expects that there are no VISIBLE components of given class. The receiver component and all of its descendants are searched.
      * @param receiver search this component and all of its descendants.
      * @param clazz the requested type of returned components.
      * @throws IllegalArgumentException if one or more components matched.
@@ -207,7 +211,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there are no VISIBLE components of given class matching given spec. Given component and all of its descendants are searched.
+     * Expects that there are no VISIBLE components of given class matching given spec. The receiver component and all of its descendants are searched.
      * @param receiver search this component and all of its descendants.
      * @param clazz the requested type of returned components.
      * @param spec configures the search criteria.
@@ -243,7 +247,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there is exactly one VISIBLE components of given class. Given component and all of its descendants are searched.
+     * Expects that there is exactly one VISIBLE components of given class. The receiver component and all of its descendants are searched.
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @throws AssertionError if none, or more than one components matched.
@@ -253,7 +257,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there is exactly one VISIBLE components of given class matching given spec. Given component and all of its descendants are searched.
+     * Expects that there is exactly one VISIBLE components of given class matching given spec. The receiver component and all of its descendants are searched.
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @param spec     allows you to add search criterion.
@@ -291,7 +295,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there are exactly {@code count} VISIBLE components of given class. Given component and all of its descendants are searched.
+     * Expects that there are exactly {@code count} VISIBLE components of given class. The receiver component and all of its descendants are searched.
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @param count this count of components must match
@@ -302,7 +306,7 @@ public class LocatorJ {
     }
 
     /**
-     * Expects that there are exactly {@code count} VISIBLE components of given class matching given spec. Given component and all of its descendants are searched.
+     * Expects that there are exactly {@code count} VISIBLE components of given class matching given spec. The receiver component and all of its descendants are searched.
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @param count this count of components must match

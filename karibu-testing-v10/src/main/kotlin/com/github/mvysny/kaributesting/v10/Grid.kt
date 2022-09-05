@@ -828,7 +828,8 @@ public fun <T> Editor<T>._editItem(item: T) {
 }
 
 /**
- * Clears the selection and select only given [item].
+ * Clears the selection and select only given [item]. Fails if the Grid
+ * doesn't support selection ([Grid.SelectionMode.NONE] is set).
  */
 public fun <T: Any> Grid<T>._select(item: T) {
     checkEditableByUser()
@@ -838,7 +839,8 @@ public fun <T: Any> Grid<T>._select(item: T) {
 }
 
 /**
- * Clears the selection and select only item at given [index].
+ * Clears the selection and select a single item at given [index]. Fails if the Grid
+ * doesn't support selection ([Grid.SelectionMode.NONE] is set).
  */
 public fun <T: Any> Grid<T>._selectRow(index: Int) {
     checkEditableByUser()

@@ -3,17 +3,16 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
-import com.github.mvysny.karibudsl.v10.button
-import com.github.mvysny.karibudsl.v10.iconButton
-import com.github.mvysny.karibudsl.v10.span
-import com.github.mvysny.karibudsl.v10.verticalLayout
+import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 
+@Suppress("DEPRECATION")
 @DynaTestDsl
 internal fun DynaNodeGroup.locatorAddonsTestbatch() {
 
@@ -39,6 +38,28 @@ internal fun DynaNodeGroup.locatorAddonsTestbatch() {
                 }
             }
             expect("foo bar") { _get<Button> { captionContains("foo") }.caption }
+        }
+    }
+
+    group("labelContains") {
+        test("fails when caption doesn't match") {
+            UI.getCurrent().button("foo")
+            expectThrows<AssertionError>("and labelContains('foo')") {
+                _get<Button> { labelContains("foo") }
+            }
+        }
+        test("succeeds when caption matches") {
+            UI.getCurrent().add(TextField("foo bar"))
+            _get<TextField> { labelContains("foo") }
+        }
+        test("picks proper component when caption matches") {
+            UI.getCurrent().apply {
+                verticalLayout {
+                    textField("foo bar")
+                    textField("baz")
+                }
+            }
+            expect("foo bar") { _get<TextField> { labelContains("foo") }.caption }
         }
     }
 

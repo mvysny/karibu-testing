@@ -4,6 +4,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.DepthFirstTreeIterator
 import com.github.mvysny.kaributools.caption
+import com.github.mvysny.kaributools.label
 import com.github.mvysny.kaributools.placeholder
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
@@ -25,9 +26,10 @@ import java.util.function.Predicate
  * for more details.
  * @property clazz the class of the component we are searching for.
  * @property id the required [Component.getId]; if null, no particular id is matched.
- * @property caption the required [Component.caption]; if null, no particular caption is matched.
+ * @property label the required [Component.label]; if null, no particular label is matched.
+ * @property caption the required [Component.caption]; if null, no particular caption is matched. Deprecated: use [text] for Buttons, [label] for everything else.
  * @property placeholder the required [Component.placeholder]; if null, no particular placeholder is matched.
- * @property text the [HasText.getText]
+ * @property text the [HasText.getText]; use for button's "caption"
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
  * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
  * @property classes if not null, the component must match all of these class names. Space-separated.
@@ -39,6 +41,8 @@ import java.util.function.Predicate
 public class SearchSpec<T : Component>(
         public val clazz: Class<T>,
         public var id: String? = null,
+        public var label: String? = null,
+        @Deprecated("Use 'text' for Buttons, 'label' for everything else")
         public var caption: String? = null,
         public var placeholder: String? = null,
         public var text: String? = null,
@@ -57,6 +61,7 @@ public class SearchSpec<T : Component>(
     override fun toString(): String {
         val list = mutableListOf<String>(clazz.simpleName.ifBlank { clazz.name })
         if (id != null) list.add("id='$id'")
+        if (label != null) list.add("label='$label'")
         if (caption != null) list.add("caption='$caption'")
         if (placeholder != null) list.add("placeholder='$placeholder'")
         if (text != null) list.add("text='$text'")
@@ -79,6 +84,7 @@ public class SearchSpec<T : Component>(
         val p = mutableListOf<(Component)->Boolean>()
         p.add { component -> clazz.isInstance(component)}
         if (id != null) p.add { component -> component.id_ == id }
+        if (label != null) p.add { component -> component.label == label }
         if (caption != null) p.add { component -> component.caption == caption }
         if (placeholder != null) p.add { component -> component.placeholder == placeholder }
         if (!classes.isNullOrBlank()) p.add { component -> component.hasAllClasses(classes!!) }

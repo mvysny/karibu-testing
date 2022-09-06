@@ -176,9 +176,9 @@ internal fun DynaNodeGroup.locatorTest() {
             }
         }
 
-        _get<TextField> { caption = "Type your name here:" }.value = "Baron Vladimir Harkonnen"
+        _get<TextField> { label = "Type your name here:" }.value = "Baron Vladimir Harkonnen"
         expectAfterLookupCalled()
-        _get<Button> { caption = "Click Me" }._click()
+        _get<Button> { text = "Click Me" }._click()
         expectAfterLookupCalled()
         expect("Thanks Baron Vladimir Harkonnen, it works!") { _get<Text>().text }
         expectAfterLookupCalled()
@@ -198,12 +198,12 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(false) { Button().apply { id_ = "a" } .matches { id = "a b" } }
         }
         test("caption") {
-            expect(true) { Button("click me").matches { caption = "click me" } }
-            expect(true) { TextField("name:").matches { caption = "name:" } }
+            expect(true) { Button("click me").matches { text = "click me" } }
+            expect(true) { TextField("name:").matches { label = "name:" } }
             expect(true) { Button("click me").matches { } }
             expect(true) { TextField("name:").matches { } }
-            expect(false) { Button("click me").matches { caption = "Click Me" } }
-            expect(false) { TextField("name:").matches { caption = "Name"} }
+            expect(false) { Button("click me").matches { text = "Click Me" } }
+            expect(false) { TextField("name:").matches { label = "Name"} }
         }
         test("placeholder") {
             expect(true) { TextField("name", "the name").matches { placeholder = "the name" } }
@@ -316,11 +316,11 @@ internal fun DynaNodeGroup.locatorTest() {
 
         test("spec") {
             expectThrows(AssertionError::class) {
-                Button("foo")._expectOne<Button> { caption = "bar" }
+                Button("foo")._expectOne<Button> { text = "bar" }
             }
             expectAfterLookupCalled()
             expectThrows(AssertionError::class) {
-                Button("foo")._expectOne(Button::class.java) { caption = "bar" }
+                Button("foo")._expectOne(Button::class.java) { text = "bar" }
             }
         }
     }
@@ -370,11 +370,11 @@ internal fun DynaNodeGroup.locatorTest() {
 
         test("spec") {
             expectThrows(AssertionError::class) {
-                Button("foo")._expect<Button> { caption = "bar" }
+                Button("foo")._expect<Button> { text = "bar" }
             }
             expectAfterLookupCalled()
             expectThrows(AssertionError::class) {
-                Button("foo")._expect(Button::class.java) { caption = "bar" }
+                Button("foo")._expect(Button::class.java) { text = "bar" }
             }
         }
     }

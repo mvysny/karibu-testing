@@ -21,7 +21,7 @@ internal fun DynaNodeGroup.formLayoutTest() {
                 textField()
             }
         }
-        f._expectOne<FormLayout.FormItem> { caption = "foo" }
+        f._expectOne<FormLayout.FormItem> { label = "foo" }
     }
 
     test("API test: field retrieval from FormItem") {
@@ -31,14 +31,14 @@ internal fun DynaNodeGroup.formLayoutTest() {
                 tf = textField()
             }
         }
-        expect(tf) { f._get<FormLayout.FormItem> { caption = "foo" } .field }
+        expect(tf) { f._get<FormLayout.FormItem> { label = "foo" } .field }
     }
 
     group("FormItem.field") {
         test("succeeds with one field and no label") {
             val tf = TextField()
             val f: FormLayout.FormItem = FormLayout().addFormItem(tf, "foo")
-            expect(tf) { f._get<FormLayout.FormItem> { caption = "foo" } .field }
+            expect(tf) { f._get<FormLayout.FormItem> { label = "foo" } .field }
         }
         test("fails with no field") {
             val f: FormLayout.FormItem = FormLayout().addFormItem(Label(), "foo")

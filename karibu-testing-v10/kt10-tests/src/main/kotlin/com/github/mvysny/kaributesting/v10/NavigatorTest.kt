@@ -100,7 +100,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             _expectNone<TestingView>()
 
             // cancel the navigation
-            _get<Button> { caption = "No" } ._click()
+            _get<Button> { text = "No" } ._click()
             // the navigation should have been canceled
             _expectOne<NavigationPostponeView>()
             _expectNone<Dialog>()
@@ -118,7 +118,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             _expectNone<TestingView>()
 
             // cancel the navigation
-            _get<Button> { caption = "Yes" } ._click()
+            _get<Button> { text = "Yes" } ._click()
             // the navigation should have proceeded
             _expectNone<NavigationPostponeView>()
             _expectNone<Dialog>()

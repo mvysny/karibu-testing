@@ -48,7 +48,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         ironListTestbatch()
     }
     group("locator addons") {
-        locatorAddonsTestbatch()
+        locatorAddonsTests()
     }
     group("locatorj") {
         locatorJTest()

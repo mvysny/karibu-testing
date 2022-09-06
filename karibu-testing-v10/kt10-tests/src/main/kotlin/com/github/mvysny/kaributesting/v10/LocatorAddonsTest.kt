@@ -14,7 +14,7 @@ import kotlin.test.expect
 
 @Suppress("DEPRECATION")
 @DynaTestDsl
-internal fun DynaNodeGroup.locatorAddonsTestbatch() {
+internal fun DynaNodeGroup.locatorAddonsTests() {
 
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }

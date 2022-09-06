@@ -53,7 +53,8 @@ public val Component._isVisible: Boolean
     }
 
 /**
- * Returns direct text contents (it doesn't peek into the child elements).
+ * Returns direct text contents (it doesn't peek into the child elements). If this component
+ * doesn't implement [HasText] then this returns null.
  */
 public val Component._text: String?
     get() = when (this) {

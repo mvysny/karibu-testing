@@ -330,6 +330,7 @@ public class LocatorJ {
     /**
      * Fails if given component is not {@link HasEnabled#isEnabled()}.
      * May succeed when the parent is disabled.
+     * @param component the component to check
      */
     public static void _assertEnabled(@NotNull Component component) {
         BasicUtilsKt._expectEnabled(component);
@@ -338,6 +339,7 @@ public class LocatorJ {
     /**
      * Fails if given component is {@link HasEnabled#isEnabled()}.
      * May succeed when the parent is disabled.
+     * @param component the component to check
      */
     public static void _assertDisabled(@NotNull Component component) {
         BasicUtilsKt._expectDisabled(component);

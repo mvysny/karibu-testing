@@ -27,7 +27,7 @@ import java.util.function.Predicate
  * @property id the required [Component.getId]; if null, no particular id is matched.
  * @property caption the required [Component.caption]; if null, no particular caption is matched.
  * @property placeholder the required [Component.placeholder]; if null, no particular placeholder is matched.
- * @property text the [HasText.getText] or [com.vaadin.flow.dom.Element.getText]
+ * @property text the [HasText.getText]
  * @property count expected count of matching components, defaults to `0..Int.MAX_VALUE`
  * @property value expected [com.vaadin.flow.component.HasValue.getValue]; if `null`, no particular value is matched.
  * @property classes if not null, the component must match all of these class names. Space-separated.
@@ -51,6 +51,9 @@ public class SearchSpec<T : Component>(
         public var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
+    /**
+     * Provides a nice summary of all rules set to this spec.
+     */
     override fun toString(): String {
         val list = mutableListOf<String>(clazz.simpleName.ifBlank { clazz.name })
         if (id != null) list.add("id='$id'")

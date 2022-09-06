@@ -136,7 +136,7 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * Adds an additional predicate which the component needs to match. Not null.
+     * Adds additional predicate which the component needs to match. Not null.
      * <p/>
      * Please remember to provide a proper {@link Object#toString()} for the predicate,
      * so that you'll get an informative error message on lookup failure.
@@ -149,7 +149,12 @@ public class SearchSpecJ<T extends Component> {
         return this;
     }
 
+    /**
+     * Provides a nice summary of all rules set to this spec.
+     * @return {@link SearchSpec#toString()}
+     */
     @Override
+    @NotNull
     public String toString() {
         return spec.toString();
     }
@@ -157,6 +162,7 @@ public class SearchSpecJ<T extends Component> {
     /**
      * Returns a predicate which matches components based on this spec. All rules are matched, except the {@link #withCount(int)} rule. The
      * rules are matched against given component only (not against its children).
+     * @return the predicate, with {@link Object#toString()} returning {@link SearchSpecJ#toString()}.
      */
     @NotNull
     public Predicate<Component> toPredicate() {

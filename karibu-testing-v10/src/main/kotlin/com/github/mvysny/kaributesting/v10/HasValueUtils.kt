@@ -29,7 +29,8 @@ public var <V> HasValue<*, V>._value: V?
  * @param fromClient defaults to true
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-public fun <C: AbstractField<C, V>, V> C._fireValueChange(fromClient: Boolean = true) {
+public fun <C: AbstractField<C, *>> C._fireValueChange(fromClient: Boolean = true) {
     checkEditableByUser()
-    _fireEvent(AbstractField.ComponentValueChangeEvent<C, V>(this, this, value, fromClient))
+    @Suppress("UNCHECKED_CAST")
+    _fireEvent(AbstractField.ComponentValueChangeEvent(this, this as HasValue<*, Any?>, value, fromClient))
 }

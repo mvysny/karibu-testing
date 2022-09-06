@@ -77,6 +77,9 @@ public class LocatorJApiTest {
         final Button disabledButton = new Button();
         disabledButton.setEnabled(false);
         _assertDisabled(disabledButton);
+
+        _fireValueChange(new TextField());
+        _fireValueChange(new TextField(), true);
     }
 
     public static class Person {}

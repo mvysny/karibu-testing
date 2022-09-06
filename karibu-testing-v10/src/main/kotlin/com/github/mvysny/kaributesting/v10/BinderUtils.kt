@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.caption
+import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.data.binder.*
 import kotlin.test.expect
@@ -20,7 +21,7 @@ private fun getVerboseMessage(
 ): String {
     val fieldValidationErrorsString: String = fieldValidationErrors.joinToString(", ") {
         val component = it.field as Component
-        var componentCaption: String = component.caption
+        var componentCaption: String = component.label.ifBlank { component._text } ?: ""
         if (!component.id_.isNullOrBlank()) {
             componentCaption = "$componentCaption(#${component.id_})"
         }

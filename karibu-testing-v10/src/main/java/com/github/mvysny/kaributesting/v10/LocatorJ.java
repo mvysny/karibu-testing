@@ -21,6 +21,7 @@ public class LocatorJ {
      * Finds a VISIBLE component of given type which matches given class. {@link UI#getCurrent()} all of its descendants are searched.
      *
      * @param clazz the component class
+     * @param <T> the component type
      * @return the only matching component, never null.
      * @throws IllegalArgumentException if no component matched, or if more than one component matches.
      */
@@ -38,6 +39,7 @@ public class LocatorJ {
      *
      * @param clazz the component must be of this class.
      * @param spec  allows you to add search criterion.
+     * @param <T> the component type
      * @return the only matching component, never null.
      * @throws IllegalArgumentException if no component matched, or if more than one component matches.
      */
@@ -54,6 +56,7 @@ public class LocatorJ {
      *
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component class
+     * @param <T> the component type
      * @return the only matching component, never null.
      * @throws IllegalArgumentException if no component matched, or if more than one component matches.
      */
@@ -71,6 +74,7 @@ public class LocatorJ {
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @param spec     allows you to add search criterion.
+     * @param <T> the component type
      * @return the only matching component, never null.
      * @throws IllegalArgumentException if no component matched, or if more than one component matches.
      */
@@ -99,6 +103,9 @@ public class LocatorJ {
      * return false indicating that the event came from the server. If this is not desired,
      * depending on your code, it may be
      * possible to call {@link #_fireValueChange(AbstractField, boolean)} with <code>fromClient=true</code> instead.
+     * @param receiver the component
+     * @param value the new value
+     * @param <V> the value type
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     public static <V> void _setValue(@NotNull HasValue<?, V> receiver, @Nullable V value) {
@@ -110,10 +117,12 @@ public class LocatorJ {
      * <p></p>
      * The event is only fired if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
+     * @param receiver the component, must be
      * @param fromClient whether the event comes from the client or not.
+     * @param <C> the type of the component
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver, boolean fromClient) {
+    public static <C extends AbstractField<C, ?>> void _fireValueChange(@NotNull C receiver, boolean fromClient) {
         HasValueUtilsKt._fireValueChange(receiver, fromClient);
     }
 
@@ -122,16 +131,18 @@ public class LocatorJ {
      * <p></p>
      * The event is only fired if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
+     * @param receiver the component, must be
+     * @param <C> the type of the component
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    public static <C extends AbstractField<C, V>, V> void _fireValueChange(@NotNull C receiver) {
+    public static <C extends AbstractField<C, ?>> void _fireValueChange(@NotNull C receiver) {
         _fireValueChange(receiver, true);
     }
 
     /**
      * Finds a list of VISIBLE components of given class. {@link UI#getCurrent()} and all of its descendants are searched.
      * @param clazz the requested type of returned components.
-     *
+     * @param <T> the type of components being returned.
      * @return the list of matching components, may be empty.
      */
     @NotNull
@@ -142,6 +153,7 @@ public class LocatorJ {
     /**
      * Finds a list of VISIBLE components of given class. {@link UI#getCurrent()} and all of its descendants are searched.
      * @param clazz the requested type of returned components.
+     * @param <T> the type of components being returned.
      * @return the list of matching components, may be empty.
      */
     @NotNull
@@ -156,6 +168,7 @@ public class LocatorJ {
      * Finds a list of VISIBLE components of given class. Given component and all of its descendants are searched.
      * @param receiver search this component and all of its descendants.
      * @param clazz the requested type of returned components.
+     * @param <T> the type of components being returned.
      * @return the list of matching components, may be empty.
      */
     @NotNull
@@ -168,6 +181,7 @@ public class LocatorJ {
      * @param receiver search this component and all of its descendants.
      * @param clazz the requested type of returned components.
      * @param spec configures the search criteria.
+     * @param <T> the type of components being returned.
      * @return the list of matching components, may be empty.
      */
     @NotNull
@@ -183,14 +197,15 @@ public class LocatorJ {
      * @param clazz the requested type of matched components.
      * @throws IllegalArgumentException if one or more components matched.
      */
-    public static <T extends Component> void _assertNone(@NotNull Class<T> clazz) {
+    public static void _assertNone(@NotNull Class<? extends Component> clazz) {
         LocatorKt._expectNone(clazz, spec -> Unit.INSTANCE);
     }
 
     /**
      * Expects that there are no VISIBLE components in the current UI of given class which matches spec. The {@link UI#getCurrent()} and all of its descendants are searched.
-     * @param clazz the requested type of matched components.
+     * @param clazz the type of the matching component.
      * @param spec configures the search criteria.
+     * @param <T> the type of the matching component.
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
@@ -203,18 +218,19 @@ public class LocatorJ {
     /**
      * Expects that there are no VISIBLE components of given class. The receiver component and all of its descendants are searched.
      * @param receiver search this component and all of its descendants.
-     * @param clazz the requested type of returned components.
+     * @param clazz the type of the matching component.
      * @throws IllegalArgumentException if one or more components matched.
      */
-    public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz) {
+    public static void _assertNone(@NotNull Component receiver, @NotNull Class<? extends Component> clazz) {
         LocatorKt._expectNone(receiver, clazz, ss -> Unit.INSTANCE);
     }
 
     /**
      * Expects that there are no VISIBLE components of given class matching given spec. The receiver component and all of its descendants are searched.
      * @param receiver search this component and all of its descendants.
-     * @param clazz the requested type of returned components.
+     * @param clazz the type of the matching component.
      * @param spec configures the search criteria.
+     * @param <T> the type of the matching component.
      * @throws IllegalArgumentException if one or more components matched.
      */
     public static <T extends Component> void _assertNone(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
@@ -227,9 +243,9 @@ public class LocatorJ {
     /**
      * Expects that there is exactly ono VISIBLE components in the current UI of given class. The {@link UI#getCurrent()} and all of its descendants are searched.
      * @param clazz    the component must be of this class.
-     * @throws AssertionError if none, or more than one components matched.
+     * @throws AssertionError if none, or more than one component matched.
      */
-    public static <T extends Component> void _assertOne(@NotNull Class<T> clazz) {
+    public static void _assertOne(@NotNull Class<? extends Component> clazz) {
         LocatorKt._expectOne(clazz, spec -> Unit.INSTANCE);
     }
 
@@ -237,7 +253,8 @@ public class LocatorJ {
      * Expects that there is exactly one VISIBLE components in the current UI of given class which matches spec. The {@link UI#getCurrent()} and all of its descendants are searched.
      * @param clazz    the component must be of this class.
      * @param spec     allows you to add search criterion.
-     * @throws AssertionError if none, or more than one components matched.
+     * @param <T> the component must be of this type.
+     * @throws AssertionError if none, or more than one component matched.
      */
     public static <T extends Component> void _assertOne(@NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
         LocatorKt._expectOne(clazz, ss -> {
@@ -250,9 +267,9 @@ public class LocatorJ {
      * Expects that there is exactly one VISIBLE components of given class. The receiver component and all of its descendants are searched.
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
-     * @throws AssertionError if none, or more than one components matched.
+     * @throws AssertionError if none, or more than one component matched.
      */
-    public static <T extends Component> void _assertOne(@NotNull Component receiver, @NotNull Class<T> clazz) {
+    public static void _assertOne(@NotNull Component receiver, @NotNull Class<? extends Component> clazz) {
         LocatorKt._expectOne(receiver, clazz, ss -> Unit.INSTANCE);
     }
 
@@ -261,7 +278,8 @@ public class LocatorJ {
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
      * @param spec     allows you to add search criterion.
-     * @throws AssertionError if none, or more than one components matched.
+     * @param <T> the component must be of this type.
+     * @throws AssertionError if none, or more than one component matched.
      */
     public static <T extends Component> void _assertOne(@NotNull Component receiver, @NotNull Class<T> clazz, @NotNull Consumer<SearchSpecJ<T>> spec) {
         LocatorKt._expectOne(receiver, clazz, ss -> {
@@ -276,7 +294,7 @@ public class LocatorJ {
      * @param count this count of components must match
      * @throws AssertionError if incorrect count of component matched.
      */
-    public static <T extends Component> void _assert(@NotNull Class<T> clazz, int count) {
+    public static void _assert(@NotNull Class<? extends Component> clazz, int count) {
         LocatorKt._expect(clazz, count, spec -> Unit.INSTANCE);
     }
 
@@ -285,6 +303,7 @@ public class LocatorJ {
      * @param clazz    the component must be of this class.
      * @param count this count of components must match
      * @param spec     allows you to add search criterion.
+     * @param <T> the component must be of this type.
      * @throws AssertionError if incorrect count of component matched.
      */
     public static <T extends Component> void _assert(@NotNull Class<T> clazz, int count, @NotNull Consumer<SearchSpecJ<T>> spec) {
@@ -301,7 +320,7 @@ public class LocatorJ {
      * @param count this count of components must match
      * @throws AssertionError if incorrect count of component matched.
      */
-    public static <T extends Component> void _assert(@NotNull Component receiver, @NotNull Class<T> clazz, int count) {
+    public static void _assert(@NotNull Component receiver, @NotNull Class<? extends Component> clazz, int count) {
         LocatorKt._expect(receiver, clazz, count, ss -> Unit.INSTANCE);
     }
 
@@ -311,6 +330,7 @@ public class LocatorJ {
      * @param clazz    the component must be of this class.
      * @param count this count of components must match
      * @param spec     allows you to add search criterion.
+     * @param <T> the component must be of this type.
      * @throws AssertionError if incorrect count of component matched.
      */
     public static <T extends Component> void _assert(@NotNull Component receiver, @NotNull Class<T> clazz, int count, @NotNull Consumer<SearchSpecJ<T>> spec) {

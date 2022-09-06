@@ -75,7 +75,8 @@ private object MockLitTemplateParserImpl : LitTemplateParserImpl() {
     override fun getSourcesFromTemplate(tag: String, url: String): String =
         MockNpmTemplateParser.mockGetSourcesFromTemplate(tag, url)
     // Vaadin 22.0.0.beta2+ adds a new `service` parameter, need to override that function as well.
-    open fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String =
+    @Suppress("NON_FINAL_MEMBER_IN_OBJECT")
+    open fun getSourcesFromTemplate(@Suppress("UNUSED_PARAMETER") service: VaadinService, tag: String, url: String): String =
         MockNpmTemplateParser.mockGetSourcesFromTemplate(tag, url)
 }
 

@@ -33,7 +33,7 @@ public class LocatorJ {
      * Finds a VISIBLE component in the current UI of given clazz which matches given spec. The {@link UI#getCurrent()} and all of its descendants are searched.
      * <p>
      * Example:
-     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(TextField.class, spec -> spec.withCaption("Name:").withId("name"));</code>
+     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));</code>
      * </p>
      *
      * @param clazz the component must be of this class.
@@ -66,7 +66,7 @@ public class LocatorJ {
      * Finds a VISIBLE component of given clazz which matches given spec. The receiver and all of its descendants are searched.
      * <p></p>
      * Example:
-     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(layout, TextField.class, spec -> spec.withCaption("Name:").withId("name"));</code>
+     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(layout, TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));</code>
      *
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.

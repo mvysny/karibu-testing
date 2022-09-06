@@ -14,11 +14,13 @@ import java.util.function.Predicate
 /**
  * Makes sure that the component's [Component.caption] contains given [substring].
  */
+@Suppress("DEPRECATION")
 @Deprecated("use 'labelContains()' or 'textContains()'")
 public fun <T : Component> SearchSpec<T>.captionContains(substring: String) {
     predicates.add(CaptionContainsPredicate(substring))
 }
 
+@Suppress("DEPRECATION")
 @Deprecated("use 'label' or 'text'")
 private data class CaptionContainsPredicate<T : Component>(val substring: String) : Predicate<T> {
     override fun test(t: T): Boolean = t.caption.contains(substring)

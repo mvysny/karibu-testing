@@ -70,7 +70,6 @@ public fun HasMenuItems._click(item: MenuItem) {
 private fun Component.getItems(): List<MenuItemBase<*, *, *>> {
     return when(this) {
         is ContextMenuBase<*, *, *> -> getItems()
-        is SubMenuBase<*, *, *> -> getItems()
         else -> {
             // every HasMenuItems implementor has the getItems() method including the MenuBar.
             // can't use the MenuBar type directly though, to keep compatibility with Vaadin 13
@@ -247,7 +246,7 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
         is GridContextMenu<*> -> Unit
         // e.g. MenuBar
         else -> expect(true, "Cannot click ${originalItem.toPrettyString()} since it's attached to ${parent.toPrettyString()} which is not effectively visible") {
-            parent.isEffectivelyEnabled()
+            parent.isEnabled
         }
     }
 }

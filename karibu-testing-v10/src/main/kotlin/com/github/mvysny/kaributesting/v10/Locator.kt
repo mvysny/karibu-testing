@@ -62,6 +62,7 @@ public class SearchSpec<T : Component>(
         val list = mutableListOf<String>(clazz.simpleName.ifBlank { clazz.name })
         if (id != null) list.add("id='$id'")
         if (label != null) list.add("label='$label'")
+        @Suppress("DEPRECATION")
         if (caption != null) list.add("caption='$caption'")
         if (placeholder != null) list.add("placeholder='$placeholder'")
         if (text != null) list.add("text='$text'")
@@ -79,12 +80,12 @@ public class SearchSpec<T : Component>(
      * Returns a predicate which matches components based on this spec. All rules are matched except the [count] rule. The
      * rules are matched against given component only (not against its children).
      */
-    @Suppress("UNCHECKED_CAST")
     public fun toPredicate(): (Component) -> Boolean {
         val p = mutableListOf<(Component)->Boolean>()
         p.add { component -> clazz.isInstance(component)}
         if (id != null) p.add { component -> component.id_ == id }
         if (label != null) p.add { component -> component.label == label }
+        @Suppress("DEPRECATION")
         if (caption != null) p.add { component -> component.caption == caption }
         if (placeholder != null) p.add { component -> component.placeholder == placeholder }
         if (!classes.isNullOrBlank()) p.add { component -> component.hasAllClasses(classes!!) }
@@ -93,6 +94,7 @@ public class SearchSpec<T : Component>(
         if (!withoutThemes.isNullOrBlank()) p.add { component -> component.notContainsThemes(withoutThemes!!) }
         if (text != null) p.add { component -> component._text == text }
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
+        @Suppress("UNCHECKED_CAST")
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
     }

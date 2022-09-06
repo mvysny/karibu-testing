@@ -200,7 +200,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val row1: HeaderRow = prependHeaderRow()
             row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
         }
-        _expectOne<TextField> { caption = "Bar" }
+        _expectOne<TextField> { label = "Bar" }
     }
 
     // tests https://github.com/mvysny/karibu-testing/issues/52
@@ -212,7 +212,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val row1: FooterRow = appendFooterRow()
             row1.join(row1.getCell(c1), row1.getCell(c2)).setComponent(TextField("Bar"))
         }
-        _expectOne<TextField> { caption = "Bar" }
+        _expectOne<TextField> { label = "Bar" }
     }
 
     test("lookup finds components in footer") {

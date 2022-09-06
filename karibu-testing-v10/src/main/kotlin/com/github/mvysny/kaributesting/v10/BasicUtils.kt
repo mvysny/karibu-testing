@@ -78,11 +78,11 @@ public val Component._textRecursively: String get() = element.textRecursively2
  */
 public fun Component.checkEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
-    val parentNullOrEnabled = !parent.isPresent || parent.get().isEffectivelyEnabled()
+    val parentNullOrEnabled = !parent.isPresent || parent.get().isEnabled
     if (parentNullOrEnabled) {
         check(isEnabled) { "The ${toPrettyString()} is not enabled" }
     }
-    check(isEffectivelyEnabled()) { "The ${toPrettyString()} is nested in a disabled component" }
+    check(isEnabled) { "The ${toPrettyString()} is nested in a disabled component" }
     if (this is HasValue<*, *>) {
         @Suppress("UNCHECKED_CAST")
         val hasValue = this as HasValue<HasValue.ValueChangeEvent<Any?>, Any?>

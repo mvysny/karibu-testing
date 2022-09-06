@@ -188,7 +188,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     test("lookup finds components in header") {
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
-        expect("Foo!") { grid._get<TextField>().caption }
+        expect("Foo!") { grid._get<TextField>().label }
     }
 
     // tests https://github.com/mvysny/karibu-testing/issues/52
@@ -218,7 +218,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     test("lookup finds components in footer") {
         val grid = Grid(TestPerson::class.java)
         grid.appendFooterRow().cells[0].setComponent(TextField("Foo!"))
-        expect("Foo!") { grid._get<TextField>().caption }
+        expect("Foo!") { grid._get<TextField>().label }
     }
 
     test("lookup skips empty slots in header") {
@@ -226,7 +226,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
         grid.appendHeaderRow().cells[0].component = null
         expect(null) { grid.appendHeaderRow().cells[0].component }
-        expect("Foo!") { grid._get<TextField>().caption }
+        expect("Foo!") { grid._get<TextField>().label }
     }
 
     group("click renderer") {

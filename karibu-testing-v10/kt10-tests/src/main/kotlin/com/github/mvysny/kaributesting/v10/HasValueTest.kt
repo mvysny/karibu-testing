@@ -40,7 +40,6 @@ internal fun DynaNodeGroup.hasValueTestbatch() {
 
         test("check box with parent disabled") {
             val layout = VerticalLayout().apply { isEnabled = false }
-            expect(false) { layout.isEffectivelyEnabled() }
             // Vaadin ignores the enabled flag and updates the value happily.
             expect(true) { layout.checkBox { value = true } .value }
             // However, calling _value will fail

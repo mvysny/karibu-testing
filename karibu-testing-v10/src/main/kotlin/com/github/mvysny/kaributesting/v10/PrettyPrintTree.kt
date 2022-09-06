@@ -91,8 +91,8 @@ public fun Component.toPrettyString(): String {
     if (label.isNotBlank()) {
         list.add("label='$label'")
     }
-    if (label != caption && caption.isNotBlank()) {
-        list.add("caption='$caption'")
+    if (this is Button && !text.isNullOrBlank()) {
+        list.add("caption='$text'")
     }
     if (!_text.isNullOrBlank() && this !is Button) {
         list.add("text='$_text'")

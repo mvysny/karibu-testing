@@ -87,6 +87,7 @@ enum class MaritalStatus { Single, Married, Divorced, Widowed }
 
 data class TestProPerson(var name: String, var age: Int, var alive: Boolean = true, var status: MaritalStatus = MaritalStatus.Single)
 
+@Suppress("UNCHECKED_CAST")
 internal fun <T, V> EditColumnConfigurator<T>.custom2(
     component: HasValueAndElement<*, V>,
     itemUpdater: ItemUpdater<T, V>

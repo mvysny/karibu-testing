@@ -38,8 +38,8 @@ internal fun DynaNodeGroup.buttonTestbatch() {
 
         test("button with parent disabled") {
             val layout = VerticalLayout().apply { isEnabled = false }
-            expect(false) { layout.isEffectivelyEnabled() }
-            expect(false) { layout.button().isEffectivelyEnabled() }
+            expect(false) { layout.isEnabled } // sanity check, to test that isEnabled works as intended
+            expect(false) { layout.button().isEnabled } // sanity check, to test that isEnabled works as intended
             // click() does not check for parent disabled state
             expectClickCount(layout.button(), 1) { click() }
             // however _click() will properly fail
@@ -77,7 +77,6 @@ internal fun DynaNodeGroup.buttonTestbatch() {
 
         test("Checkbox with parent disabled") {
             val layout = VerticalLayout().apply { isEnabled = false }
-            expect(false) { layout.isEffectivelyEnabled() }
             // click() does not check for parent disabled state
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Checkbox[DISABLED, value='false'] is nested in a disabled component") {

@@ -84,6 +84,7 @@ private val _VirtualList_renderer: Field = VirtualList::class.java.getDeclaredFi
 /**
  * Returns the renderer for this VirtualList.
  */
+@Suppress("UNCHECKED_CAST")
 public val <T> VirtualList<T>._renderer: Renderer<T> get() = _VirtualList_renderer.get(this) as Renderer<T>
 
 /**

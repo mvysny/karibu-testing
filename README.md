@@ -66,9 +66,13 @@ will most probably look a bit differently than Karibu-Testing API though:
 At the moment Karibu-Testing classes are included in the Vaadin UI Unit-Testing library (as an implementation detail). However,
 this can change at any time.
 
-The development of both products will now happen independently. However, if the Vaadin guys
-have a lovely idea, please open a feature request so that we can steal those ideas :-D (Did you know that greatest artists steal?)
-  
+The development of both products will now happen independently. If the Vaadin guys
+have a lovely idea, please open a feature request for Karibu so that we can steal those ideas :-D (Did you know that greatest artists steal?)
+
+**Important:** The development of Karibu-Testing will continue as usual; we will
+continue supporting both Vaadin 14 and 23, both Kotlin, Groovy and Java, and we will
+continue designing the API via the "extension functions" mechanism.
+
 ## Getting Started / Main Documentation / Full Documentation
 
 ### Vaadin 14+

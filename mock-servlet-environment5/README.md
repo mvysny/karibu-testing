@@ -1,9 +1,9 @@
 [![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/mock-servlet-environment/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/mock-servlet-environment)
 
-# A mock/fake servlet API implementation
+# A mock/fake servlet 5 API implementation
 
-This project implements all of the javax.servlet interfaces, allowing you to create a
+This project implements all of the jakarta.servlet interfaces, allowing you to create a
 mock servlet environment quickly.
 
 To start, just add the following lines into your Gradle `build.gradle` file:
@@ -13,7 +13,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    testImplementation("com.github.mvysny.kaributesting:mock-servlet-environment:x.y.z")
+    testImplementation("com.github.mvysny.kaributesting:mock-servlet-environment5:x.y.z")
 }
 ```
 
@@ -27,7 +27,7 @@ to your `pom.xml`:
 	<dependencies>
 		<dependency>
 			<groupId>com.github.mvysny.kaributesting</groupId>
-			<artifactId>mock-servlet-environment</artifactId>
+			<artifactId>mock-servlet-environment5</artifactId>
 			<version>x.y.z</version>
 			<scope>test</scope>
 		</dependency>

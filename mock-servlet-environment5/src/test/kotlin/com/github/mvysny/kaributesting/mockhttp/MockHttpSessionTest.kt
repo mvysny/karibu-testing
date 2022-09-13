@@ -7,7 +7,7 @@ import com.github.mvysny.dynatest.cloneBySerialization
 import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
 import java.io.Serializable
-import javax.servlet.http.HttpSession
+import jakarta.servlet.http.HttpSession
 import kotlin.test.expect
 
 class MockHttpSessionTest : DynaTest({

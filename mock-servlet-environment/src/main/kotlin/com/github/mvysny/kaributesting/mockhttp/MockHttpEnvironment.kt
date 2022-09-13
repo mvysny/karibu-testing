@@ -1,9 +1,7 @@
 package com.github.mvysny.kaributesting.mockhttp
 
-import java.security.Principal
 import java.util.*
 import javax.servlet.*
-import javax.servlet.http.HttpServletRequest
 
 public open class MockServletConfig(public val context: ServletContext) : ServletConfig {
 

@@ -1281,6 +1281,8 @@ Also (since Karibu-Testing 1.3.17):
 * Call `BinderValidationStatus.verboseMessage` (or `BinderUtilsKt.getVerboseMessage(status)`) to obtain the better
   message out of the binder validation status;
 * Call `BinderValidationStatus._expectValid()`/`Binder._expectValid()` (Java: `BinderUtilsKt.*`) to verify that the binder is in a valid state.
+* Call `BinderValidationStatus._expectInvalid()`/`Binder._expectInvalid()` (Java: `BinderUtilsKt.*`)
+  to assert that the binder is in an invalid state.
 
 ### Forms: Validation
 

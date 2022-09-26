@@ -17,8 +17,10 @@ import java.lang.reflect.Method
 import kotlin.test.fail
 
 /**
- * Emulates user inputting something into the combo box, filtering items. You should use [getSuggestionItems]
- * to retrieve filtered items, in order to verify that the filter on your data provider works properly.
+ * Emulates user inputting something into the combo box, filtering items.
+ *
+ * In order to verify that the filter on your data provider works properly,
+ * Use [getSuggestionItems] to retrieve filtered items,
  *
  * Note: this function will not change the value of the combo box.
  */

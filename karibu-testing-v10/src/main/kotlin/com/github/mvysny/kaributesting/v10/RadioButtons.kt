@@ -11,8 +11,13 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
  */
 public fun <T: Any> RadioButtonGroup<T>.getItemLabels(): List<String> {
     val labelGenerator = itemLabelGenerator
-    return dataProvider._findAll().map { labelGenerator.apply(it) }
+    return getItems().map { labelGenerator.apply(it) }
 }
+
+/**
+ * Returns all items in this [RadioButtonGroup].
+ */
+public fun <T: Any> RadioButtonGroup<T>.getItems(): List<T> = dataProvider._findAll()
 
 internal val <T> RadioButtonGroup<T>.itemLabelGenerator: ItemLabelGenerator<T> get() {
     val r = itemRenderer

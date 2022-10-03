@@ -1171,6 +1171,8 @@ to retrieve filtered items, in order to verify that the filter on your data prov
 Finally, call `msComboBox.selectByLabel()` to select an item by its label,
 changing the value of the combobox.
 
+Make sure to depend on `karibu-testing-v23` to gain access to these functions.
+
 ### Downloading Anchor/Image Contents
 
 Call `anchor._download()`/`DownloadKt._download(anchor)` to download contents of the `StreamResource` to which the Anchor points to.

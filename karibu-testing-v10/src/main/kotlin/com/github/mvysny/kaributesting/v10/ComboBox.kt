@@ -51,6 +51,9 @@ private val _ComboBoxDataController_filterSlot: Field by lazy(LazyThreadSafetyMo
     comboBoxFilterSlot
 }
 
+/**
+ * INTERNAL, DON'T USE. Only for Vaadin 23.2+. Calls `(this as ComboBoxBase).getDataController().filterSlot`.
+ */
 public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.combobox.ComboBoxBase*/Any): SerializableConsumer<String?> {
     require(VaadinVersion.get.isAtLeast(23, 2)) { "This only works for Vaadin 23.2 and higher but got ${VaadinVersion.get}" }
     val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
@@ -139,7 +142,8 @@ public fun <T> ComboBox<T>.getSuggestionItems(): List<T> =
     _dataCommunicator.fetchAll()
 
 /**
- * Fetches captions of items currently displayed in the suggestion box.
+ * Fetches captions of items currently displayed in the suggestion box. This list is filtered
+ * by any user input set via [setUserInput].
  */
 public fun <T> ComboBox<T>.getSuggestions(): List<String> {
     val items: List<T> = getSuggestionItems()

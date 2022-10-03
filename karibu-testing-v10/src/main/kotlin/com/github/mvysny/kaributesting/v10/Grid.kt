@@ -804,6 +804,11 @@ public val Component.dataProvider: DataProvider<*, *>? get() = when {
 }
 
 private fun Component.getDataProviderViaReflection(): DataProvider<*, *>? {
+    if (VaadinVersion.get.isAtLeast(23, 2)) {
+        if (_ComboBoxBase_Class.isInstance(this)) {
+            return _ComboBoxBase_23_2_dataProvider.invoke(this) as DataProvider<*, *>?
+        }
+    }
     if (this is HasDataProvider<*>) {
         val mGetDataProvider: Method? =
             this.javaClass.methods.firstOrNull { it.name == "getDataProvider" && it.parameterCount == 0 && it.returnType == DataProvider::class.java }
@@ -812,6 +817,16 @@ private fun Component.getDataProviderViaReflection(): DataProvider<*, *>? {
         }
     }
     return null
+}
+
+// since Vaadin 23.2
+private val _ComboBoxBase_Class: Class<*> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+}
+
+// since Vaadin 23.2
+private val _ComboBoxBase_23_2_dataProvider: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    _ComboBoxBase_Class.getDeclaredMethod("getDataProvider") // public
 }
 
 /**

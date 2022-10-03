@@ -32,4 +32,10 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     group("VirtualList") {
         virtualListTests()
     }
+
+    if (VaadinVersion.get.isAtLeast(23, 2)) {
+        group("MultiselectComboBox") {
+            multiselectComboBoxTests()
+        }
+    }
 }

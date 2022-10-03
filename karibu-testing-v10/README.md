@@ -1153,8 +1153,23 @@ changing the value of the combobox/select. (Since Karibu-Testing 1.3.15)
 
 (Since Karibu-Testing 1.3.9)
 
-Call `listBox.getRenderedItems()`/`ListBoxKt.getRenderedItems(listBox)` to retrieve
+Call `listBox.getRenderedItems()`/`MultiSelectComboBoxKt.getRenderedItems(listBox)` to retrieve
 the rendered items (items from the DataProvider passed through the item renderer).
+
+### Support for MultiSelectComboBox
+
+(Since Karibu-Testing 1.3.21)
+
+You can use static methods from `MultiSelectComboBoxUtils.kt` to assert on the state of the ComboBox or Select component.
+For example, you can call `msComboBox.getSuggestions()`/`MultiSelectComboBoxUtilsKt.getSuggestions()` to return the current list
+of dropdown suggestions, formatted according to the current `ItemLabelGenerator`.
+
+You can also use `msComboBox.setUserInput()`/`MultiSelectComboBoxUtilsKt.setUserInput()` to simulate user typing into the ComboBox,
+filtering the suggestions.  You should use `getSuggestionItems()`
+to retrieve filtered items, in order to verify that the filter on your data provider works properly.
+
+Finally, call `msComboBox.selectByLabel()` to select an item by its label,
+changing the value of the combobox.
 
 ### Downloading Anchor/Image Contents
 

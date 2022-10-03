@@ -20,9 +20,11 @@ import kotlin.test.fail
  * Emulates user inputting something into the combo box, filtering items.
  *
  * In order to verify that the filter on your data provider works properly,
- * Use [getSuggestionItems] to retrieve filtered items,
+ * use [getSuggestionItems] to retrieve filtered items.
  *
  * Note: this function will not change the value of the combo box.
+ * @param userInput emulate user typing something into the ComboBox, thus attempting
+ * to filter out items/search for an item. Pass in `null` to clear.
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     checkEditableByUser()
@@ -117,7 +119,8 @@ internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>
         ?: fail("${toPrettyString()}: items/dataprovider has not been set")
 
 /**
- * Fetches items currently displayed in the suggestion box.
+ * Fetches items currently displayed in the suggestion box. This list is filtered
+ * by any user input set via [setUserInput].
  */
 public fun <T> ComboBox<T>.getSuggestionItems(): List<T> =
     _dataCommunicator.fetchAll()

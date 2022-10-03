@@ -29,15 +29,7 @@ import kotlin.test.fail
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     checkEditableByUser()
     if (VaadinVersion.get.isAtLeast(23, 2)) {
-        // sigh. Moved to ComboBoxDataController
-        val m = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase").getDeclaredMethod("getDataController")
-        m.isAccessible = true
-        val dataController: /*ComboBoxDataController*/Any = m.invoke(this)
-        val comboBoxFilterSlot: Field = Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController").getDeclaredField("filterSlot")
-        comboBoxFilterSlot.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val filterSlot = comboBoxFilterSlot.get(dataController) as SerializableConsumer<String?>
-        filterSlot.accept(userInput)
+        getComboBoxBaseFilterSlot(this).accept(userInput)
     } else {
         val comboBoxFilterSlot: Field = ComboBox::class.java.getDeclaredField("filterSlot")
         comboBoxFilterSlot.isAccessible = true
@@ -45,6 +37,27 @@ public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
         val filterSlot = comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
         filterSlot.accept(userInput)
     }
+}
+
+private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val comboBoxBaseClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    val m = comboBoxBaseClass.getDeclaredMethod("getDataController")
+    m.isAccessible = true
+    m
+}
+private val _ComboBoxDataController_filterSlot: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val comboBoxFilterSlot: Field = Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController").getDeclaredField("filterSlot")
+    comboBoxFilterSlot.isAccessible = true
+    comboBoxFilterSlot
+}
+
+public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.combobox.ComboBoxBase*/Any): SerializableConsumer<String?> {
+    require(VaadinVersion.get.isAtLeast(23, 2)) { "This only works for Vaadin 23.2 and higher but got ${VaadinVersion.get}" }
+    val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
+
+    @Suppress("UNCHECKED_CAST")
+    val filterSlot = _ComboBoxDataController_filterSlot.get(dataController) as SerializableConsumer<String?>
+    return filterSlot
 }
 
 /**

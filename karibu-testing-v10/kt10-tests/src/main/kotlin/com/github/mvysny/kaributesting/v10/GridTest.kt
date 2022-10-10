@@ -80,19 +80,19 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
             isMultiSort = true
-            sort(TestPerson::name.asc, TestPerson::age.desc)
+            _sort(TestPerson::name.asc, TestPerson::age.desc)
             _prepare()
         }
         expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
 
-    test("sort fails with an informative error message on missing column") {
+    test("_sort fails with an informative error message on missing column") {
         // https://github.com/mvysny/karibu-testing/issues/97
         expectThrows(AssertionError::class, "No such column with key 'Last Name'; available columns: [name, age]") {
             UI.getCurrent().grid<TestPerson>() {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                sort(QuerySortOrder("Last Name", SortDirection.ASCENDING))
+                _sort(QuerySortOrder("Last Name", SortDirection.ASCENDING))
             }
         }
     }
@@ -329,16 +329,43 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("sorting") {
-        val grid = Grid<TestPerson>().apply {
-            addColumnFor(TestPerson::name)
-            addColumnFor(TestPerson::age)
-            setItems2((0..10).map { TestPerson("name $it", it) })
+    group("sorting") {
+        test("_sort") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._sort(TestPerson::age.desc)
+            expect((0..10).map { TestPerson("name $it", it) }
+                .reversed()) { grid._findAll() }
+            expect(10) { grid._get(0).age }
+            expect(0) { grid._get(10).age }
         }
-        grid.sort(TestPerson::age.desc)
-        expect((0..10).map { TestPerson("name $it", it) }.reversed()) { grid._findAll() }
-        expect(10) { grid._get(0).age }
-        expect(0) { grid._get(10).age }
+        test("_sortByKey") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._sortByKey("age", SortDirection.DESCENDING)
+            expect((0..10).map { TestPerson("name $it", it) }
+                .reversed()) { grid._findAll() }
+            expect(10) { grid._get(0).age }
+            expect(0) { grid._get(10).age }
+        }
+        test("_sortByHeader") {
+            val grid = Grid<TestPerson>().apply {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+            }
+            grid._sortByHeader("Age", SortDirection.DESCENDING)
+            expect((0..10).map { TestPerson("name $it", it) }
+                .reversed()) { grid._findAll() }
+            expect(10) { grid._get(0).age }
+            expect(0) { grid._get(10).age }
+        }
     }
 
     test("_getColumnByKey()") {
@@ -351,6 +378,19 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("name") { grid._getColumnByKey("name").key }
         expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<?>(0 items)']: No such column with key 'foo'; available columns: [name, age]") {
             grid._getColumnByKey("foo")
+        }
+    }
+
+    test("_getColumnByHeader()") {
+        val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
+            addColumnFor(TestPerson::name)
+            addColumnFor(TestPerson::age)
+            setItems2(listOf())
+            _prepare()
+        }
+        expect("name") { grid._getColumnByHeader("Name").key }
+        expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<?>(0 items)']: No such column with header 'foo'; available columns: [Name, Age]") {
+            grid._getColumnByHeader("foo")
         }
     }
 

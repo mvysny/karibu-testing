@@ -283,6 +283,13 @@ public fun <T> Grid<T>._getColumnByKey(columnKey: String): Grid.Column<T> = getC
         ?: throw AssertionError("${toPrettyString()}: No such column with key '$columnKey'; available columns: ${columns.mapNotNull { it.key }}")
 
 /**
+ * Gets a [Grid.Column] of this grid by its [columnKey].
+ * @throws AssertionError if no such column exists.
+ */
+public fun <T> Grid<T>._getColumnByHeader(header: String): Grid.Column<T> = columns.firstOrNull { it.header2 == header }
+    ?: throw AssertionError("${toPrettyString()}: No such column with header '$header'; available columns: ${columns.mapNotNull { it.header2 }}")
+
+/**
  * Performs a click on a [ClickableRenderer] in given [Grid] cell. Only supports the following scenarios:
  * * [ClickableRenderer]
  * * [ComponentRenderer] which renders a [Button] or a [ClickNotifier].
@@ -588,8 +595,33 @@ public fun FooterRow.getCell(key: String): FooterRow.FooterCell {
 /**
  * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
  */
+@Deprecated("Use _sort()")
 public fun <T> Grid<T>.sort(vararg sortOrder: QuerySortOrder) {
+    checkEditableByUser()
     sort(sortOrder.map { GridSortOrder(_getColumnByKey(it.sorted), it.direction) })
+}
+
+/**
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+ */
+public fun <T> Grid<T>._sort(vararg sortOrder: QuerySortOrder) {
+    checkEditableByUser()
+    sort(sortOrder.map { GridSortOrder(_getColumnByKey(it.sorted), it.direction) })
+}
+
+/**
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+ */
+public fun <T> Grid<T>._sortByKey(columnKey: String, direction: SortDirection) {
+    _sort(QuerySortOrder(columnKey, direction))
+}
+
+/**
+ * Sorts given grid. Affects [_findAll], [_get] and other data-fetching functions.
+ */
+public fun <T> Grid<T>._sortByHeader(header: String, direction: SortDirection) {
+    checkEditableByUser()
+    sort(listOf(GridSortOrder(_getColumnByHeader(header), direction)))
 }
 
 /**

@@ -989,6 +989,13 @@ the `DataProvider`'s fetching methods. However, the sorting is
 automatically applied by Karibu-Testing as if by the Grid itself,
 when you call Karibu-Testing's `GridKt` methods.
 
+Therefore, you can:
+
+* call `grid.sort()` directly, however that doesn't check whether grid is enabled, and you need to pass in Grid.Column which is annoying.
+* Easier is to call `grid._sort(Person::name.asc)` (Kotlin only)
+* Alternatively call `GridKt._sortByKey("name", SortDirection.ASCENDING)` from Java (since KT 1.3.22)
+* Alternatively call `GridKt._sortByHeader("Name", SortDirection.ASCENDING)` from Java (since KT 1.3.22)
+
 #### Selection
 
 The default API of `grid.select()` has a bunch of shortcomings making it unfit for

@@ -992,9 +992,9 @@ when you call Karibu-Testing's `GridKt` methods.
 Therefore, you can:
 
 * call `grid.sort()` directly, however that doesn't check whether grid is enabled, and you need to pass in Grid.Column which is annoying.
-* Easier is to call `grid._sort(Person::name.asc)` (Kotlin only)
-* Alternatively call `GridKt._sortByKey("name", SortDirection.ASCENDING)` from Java (since KT 1.3.22)
-* Alternatively call `GridKt._sortByHeader("Name", SortDirection.ASCENDING)` from Java (since KT 1.3.22)
+* Easier is to call `grid._sort(Person::name.asc)` (Kotlin only, since KT 1.3.22); or `grid.sort(Person::name.asc)` (Kotlin only)
+* Alternatively call `grid._sortByKey("name", SortDirection.ASCENDING)`/`GridKt._sortByKey(grid, "name", SortDirection.ASCENDING)` (since KT 1.3.22)
+* Alternatively call `GridKt._sortByHeader(grid, "Name", SortDirection.ASCENDING)` from Java (since KT 1.3.22)
 
 #### Selection
 

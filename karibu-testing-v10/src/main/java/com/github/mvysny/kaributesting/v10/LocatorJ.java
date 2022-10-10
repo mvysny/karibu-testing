@@ -364,4 +364,20 @@ public class LocatorJ {
     public static void _assertDisabled(@NotNull Component component) {
         BasicUtilsKt._expectDisabled(component);
     }
+
+
+    /**
+     * Checks that a component is actually editable by the user:
+     * <ul><li>The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
+     *   For the purpose of testing individual components not attached to the UI, a component may be considered visible even though it's not
+     *   currently nested in a UI.</li>
+     * <li>The component must be effectively enabled: it itself must be enabled, its parent must be enabled and all of its ascendants must be enabled.</li>
+     * <li>If the component is HasValue, it must not be HasValue.isReadOnly.</li>
+     * </ul>
+     * @param component the component to check
+     * @throws IllegalStateException if any of the above doesn't hold.
+     */
+    public static void assertEditableByUser(@NotNull Component component) {
+        BasicUtilsKt.checkEditableByUser(component);
+    }
 }

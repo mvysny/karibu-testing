@@ -1023,7 +1023,7 @@ methods which will in turn invoke the filters themselves.
 The same thing applies to Grid sorting: the `Grid.sort()` methods does not trigger
 the `DataProvider`'s fetching methods. However, the sorting is
 automatically applied by Karibu-Testing as if by the Grid itself,
-when you call Karibu-Testing's `GridKt` methods.
+when you call Karibu-Testing's `GridKt` data-fetching methods (such as `GridKt._get()`).
 
 Therefore, you can:
 

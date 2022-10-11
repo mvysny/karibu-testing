@@ -24,7 +24,7 @@ public fun Button._click() {
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
  * more details.
  */
-public fun <T: ClickNotifier<*>> T._click() {
+public fun <T : ClickNotifier<*>> T._click() {
     _checkClickable()
     serverClick()
 }
@@ -33,14 +33,14 @@ public fun <T: ClickNotifier<*>> T._click() {
  * Alias for [checkEditableByUser].
  */
 public fun Button._checkClickable() {
-    checkEditableByUser()
+    _expectEditableByUser()
 }
 
 /**
  * Alias for [checkEditableByUser].
  */
-public fun <T: ClickNotifier<*>> T._checkClickable() {
-    (this as Component).checkEditableByUser()
+public fun <T : ClickNotifier<*>> T._checkClickable() {
+    (this as Component)._expectEditableByUser()
 }
 
 /**

@@ -23,46 +23,46 @@ import kotlin.test.expect
 @DynaTestDsl
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
 
-    group("checkEditableByUser") {
+    group("_expectEditableByUser()") {
         test("disabled textfield fails") {
             expectThrows(java.lang.IllegalStateException::class, "The TextField[DISABLED, value=''] is not enabled") {
-                TextField().apply { isEnabled = false }.checkEditableByUser()
+                TextField().apply { isEnabled = false }._expectEditableByUser()
             }
         }
         test("invisible textfield fails") {
             expectThrows(java.lang.IllegalStateException::class, "The TextField[INVIS, value=''] is not effectively visible") {
-                TextField().apply { isVisible = false }.checkEditableByUser()
+                TextField().apply { isVisible = false }._expectEditableByUser()
             }
         }
         test("textfield in invisible layout fails") {
             expectThrows(java.lang.IllegalStateException::class, "The TextField[value=''] is not effectively visible") {
                 VerticalLayout().apply {
                     isVisible = false
-                    textField().also { it.checkEditableByUser() }
+                    textField().also { it._expectEditableByUser() }
                 }
             }
         }
         test("textfield succeeds") {
-            TextField().checkEditableByUser()
+            TextField()._expectEditableByUser()
         }
     }
 
     group("expectNotEditableByUser") {
         test("disabled textfield fails") {
-            TextField().apply { isEnabled = false }.expectNotEditableByUser()
+            TextField().apply { isEnabled = false }._expectNotEditableByUser()
         }
         test("invisible textfield fails") {
-            TextField().apply { isVisible = false }.expectNotEditableByUser()
+            TextField().apply { isVisible = false }._expectNotEditableByUser()
         }
         test("textfield in invisible layout fails") {
             VerticalLayout().apply {
                 isVisible = false
-                textField().also { it.expectNotEditableByUser() }
+                textField().also { it._expectNotEditableByUser() }
             }
         }
         test("textfield succeeds") {
             expectThrows(AssertionError::class, "The TextField[value=''] is editable") {
-                TextField().expectNotEditableByUser()
+                TextField()._expectNotEditableByUser()
             }
         }
     }

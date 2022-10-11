@@ -27,7 +27,10 @@ public fun Component._fireEvent(event: ComponentEvent<*>) {
  * @param eventData optional event data, defaults to an empty object.
  */
 @JvmOverloads
-public fun Component._fireDomEvent(eventType: String, eventData: JsonObject = Json.createObject()) {
+public fun Component._fireDomEvent(
+    eventType: String,
+    eventData: JsonObject = Json.createObject()
+) {
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
 
@@ -67,6 +70,11 @@ public val Component._text: String?
  */
 public val Component._textRecursively: String get() = element.textRecursively2
 
+@Deprecated("Replaced by _expectEditableByUser()")
+public fun Component.checkEditableByUser() {
+    _expectEditableByUser()
+}
+
 /**
  * Checks that a component is actually editable by the user:
  * * The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
@@ -76,7 +84,7 @@ public val Component._textRecursively: String get() = element.textRecursively2
  * * If the component is [HasValue], it must not be [HasValue.isReadOnly].
  * @throws IllegalStateException if any of the above doesn't hold.
  */
-public fun Component.checkEditableByUser() {
+public fun Component._expectEditableByUser() {
     check(isEffectivelyVisible()) { "The ${toPrettyString()} is not effectively visible - either it is hidden, or its ascendant is hidden" }
     val parentNullOrEnabled = !parent.isPresent || parent.get().isEnabled
     if (parentNullOrEnabled) {
@@ -90,20 +98,26 @@ public fun Component.checkEditableByUser() {
     }
 }
 
+@Deprecated("Replaced by _expectNotEditableByUser()")
+public fun Component.expectNotEditableByUser() {
+    _expectNotEditableByUser()
+}
+
 /**
  * Fails if the component is editable. See [checkEditableByUser] for more details.
  * @throws AssertionError if the component is editable.
  */
-public fun Component.expectNotEditableByUser() {
+public fun Component._expectNotEditableByUser() {
     try {
-        checkEditableByUser()
+        _expectEditableByUser()
         fail("The ${toPrettyString()} is editable")
     } catch (ex: IllegalStateException) {
         // okay
     }
 }
 
-internal fun Component.isEffectivelyVisible(): Boolean = _isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
+internal fun Component.isEffectivelyVisible(): Boolean =
+    _isVisible && (!parent.isPresent || parent.get().isEffectivelyVisible())
 
 /**
  * Computes whether this component and all of its parents are enabled.
@@ -132,13 +146,14 @@ public val Component.isEnabled: Boolean
  * rules are matched against given component only (not against its children).
  */
 public fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
-        SearchSpec(Component::class.java).apply { spec() }.toPredicate().invoke(this)
+    SearchSpec(Component::class.java).apply { spec() }.toPredicate()
+        .invoke(this)
 
 /**
  * Fires [FocusNotifier.FocusEvent] on the component, but only if it's editable.
  */
 public fun <T> T._focus() where T : Focusable<*>, T : Component {
-    checkEditableByUser()
+    _expectEditableByUser()
     _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
 }
 
@@ -146,7 +161,7 @@ public fun <T> T._focus() where T : Focusable<*>, T : Component {
  * Fires [BlurNotifier.BlurEvent] on the component, but only if it's editable.
  */
 public fun <T> T._blur() where T : Focusable<*>, T : Component {
-    checkEditableByUser()
+    _expectEditableByUser()
     _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
 }
 

@@ -17,7 +17,7 @@ import com.vaadin.flow.component.HasValue
 public var <V> HasValue<*, V>._value: V?
     get() = value
     set(v) {
-        (this as Component).checkEditableByUser()
+        (this as Component)._expectEditableByUser()
         value = v
     }
 
@@ -29,8 +29,15 @@ public var <V> HasValue<*, V>._value: V?
  * @param fromClient defaults to true
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-public fun <C: AbstractField<C, *>> C._fireValueChange(fromClient: Boolean = true) {
-    checkEditableByUser()
+public fun <C : AbstractField<C, *>> C._fireValueChange(fromClient: Boolean = true) {
+    _expectEditableByUser()
     @Suppress("UNCHECKED_CAST")
-    _fireEvent(AbstractField.ComponentValueChangeEvent(this, this as HasValue<*, Any?>, value, fromClient))
+    _fireEvent(
+        AbstractField.ComponentValueChangeEvent(
+            this,
+            this as HasValue<*, Any?>,
+            value,
+            fromClient
+        )
+    )
 }

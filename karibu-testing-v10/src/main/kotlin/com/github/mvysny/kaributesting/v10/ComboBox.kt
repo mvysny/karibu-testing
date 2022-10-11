@@ -27,26 +27,33 @@ import kotlin.test.fail
  * to filter out items/search for an item. Pass in `null` to clear.
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
-    checkEditableByUser()
+    _expectEditableByUser()
     if (VaadinVersion.get.isAtLeast(23, 2)) {
         getComboBoxBaseFilterSlot(this).accept(userInput)
     } else {
-        val comboBoxFilterSlot: Field = ComboBox::class.java.getDeclaredField("filterSlot")
+        val comboBoxFilterSlot: Field =
+            ComboBox::class.java.getDeclaredField("filterSlot")
         comboBoxFilterSlot.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val filterSlot = comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
+        val filterSlot =
+            comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
         filterSlot.accept(userInput)
     }
 }
 
 private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    val comboBoxBaseClass =
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
     val m = comboBoxBaseClass.getDeclaredMethod("getDataController")
     m.isAccessible = true
     m
 }
-private val _ComboBoxDataController_filterSlot: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxFilterSlot: Field = Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController").getDeclaredField("filterSlot")
+private val _ComboBoxDataController_filterSlot: Field by lazy(
+    LazyThreadSafetyMode.PUBLICATION
+) {
+    val comboBoxFilterSlot: Field =
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController")
+            .getDeclaredField("filterSlot")
     comboBoxFilterSlot.isAccessible = true
     comboBoxFilterSlot
 }
@@ -59,7 +66,8 @@ public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.c
     val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
 
     @Suppress("UNCHECKED_CAST")
-    val filterSlot = _ComboBoxDataController_filterSlot.get(dataController) as SerializableConsumer<String?>
+    val filterSlot =
+        _ComboBoxDataController_filterSlot.get(dataController) as SerializableConsumer<String?>
     return filterSlot
 }
 
@@ -74,15 +82,20 @@ public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.c
  * for some reason, set this to `true` to search in all items.
  */
 @JvmOverloads
-public fun <T> ComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Boolean = false) {
+public fun <T> ComboBox<T>.selectByLabel(
+    label: String,
+    bypassSetUserInput: Boolean = false
+) {
     val suggestionItems: List<T> = if (!bypassSetUserInput) {
         setUserInput(label)
         getSuggestionItems()
     } else {
-        checkEditableByUser()
+        _expectEditableByUser()
         dataProvider._findAll()
     }
-    val items: List<T> = suggestionItems.filter { itemLabelGenerator.apply(it) == label }
+    val items: List<T> =
+        suggestionItems.filter { itemLabelGenerator.apply(it) == label }
+
     when {
         items.isEmpty() -> {
             val msg = StringBuilder()
@@ -93,6 +106,7 @@ public fun <T> ComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Bool
             }
             fail(msg.toString())
         }
+
         items.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $items")
         else -> _value = items[0]
     }
@@ -103,7 +117,7 @@ public fun <T> ComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Bool
  * and allows custom values ([ComboBox.isAllowCustomValue] is true).
  */
 public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
-    checkEditableByUser()
+    _expectEditableByUser()
     check(isAllowCustomValue) { "${toPrettyString()} doesn't allow custom values" }
     _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
@@ -115,19 +129,22 @@ private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLI
 }
 
 private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    val comboBoxBaseClass =
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
     val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
     m.isAccessible = true
     m
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <T> getDataCommunicator(cb: ComboBox<T>): DataCommunicator<T>? = when {
-    VaadinVersion.get.isAtLeast(23, 2) ->
-        _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
-    else ->
-        _ComboBox_dataCommunicator.get(cb) as DataCommunicator<T>?
-}
+private fun <T> getDataCommunicator(cb: ComboBox<T>): DataCommunicator<T>? =
+    when {
+        VaadinVersion.get.isAtLeast(23, 2) ->
+            _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
+
+        else ->
+            _ComboBox_dataCommunicator.get(cb) as DataCommunicator<T>?
+    }
 
 @Suppress("UNCHECKED_CAST")
 internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>
@@ -161,7 +178,8 @@ public fun <T> Select<T>.getSuggestionItems(): List<T> = dataProvider._findAll()
  */
 public fun <T> Select<T>.getSuggestions(): List<String> {
     val items: List<T> = getSuggestionItems()
-    val g: ItemLabelGenerator<T> = itemLabelGenerator ?: ItemLabelGenerator { it.toString() }
+    val g: ItemLabelGenerator<T> =
+        itemLabelGenerator ?: ItemLabelGenerator { it.toString() }
     return items.map { g.apply(it) }
 }
 
@@ -174,20 +192,30 @@ public fun <T> Select<T>.getSuggestions(): List<String> {
 public fun <T> Select<T>.selectByLabel(label: String) {
     // it's OK to use selectByLabel(): Select's dataprovider is expected to hold small amount of data
     // since Select doesn't offer any filtering capabilities.
-    selectByLabel(label, dataProvider, itemLabelGenerator ?: ItemLabelGenerator { it.toString() })
+    selectByLabel(
+        label,
+        dataProvider,
+        itemLabelGenerator ?: ItemLabelGenerator { it.toString() })
 }
 
 /**
  * Beware: the function will poll all items from the [dataProvider]. Use cautiously and only for small data providers.
  */
-internal fun <T> HasValue<*, T>.selectByLabel(label: String, dataProvider: DataProvider<T, *>, itemLabelGenerator: ItemLabelGenerator<T>) {
+internal fun <T> HasValue<*, T>.selectByLabel(
+    label: String,
+    dataProvider: DataProvider<T, *>,
+    itemLabelGenerator: ItemLabelGenerator<T>
+) {
     val items = dataProvider._findAll()
-    val itemsWithLabel: List<T> = items.filter { itemLabelGenerator.apply(it) == label }
+    val itemsWithLabel: List<T> =
+        items.filter { itemLabelGenerator.apply(it) == label }
+
     when {
         itemsWithLabel.isEmpty() ->
             fail("${(this as Component).toPrettyString()}: No item found with label '$label'. Available items: ${items.map { "'${itemLabelGenerator.apply(it)}'=>$it" }}")
         itemsWithLabel.size > 1 ->
             fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $itemsWithLabel")
+
         else -> _value = itemsWithLabel[0]
     }
 }

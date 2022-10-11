@@ -2,8 +2,6 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
 import com.github.mvysny.kaributesting.v10.ElementUtilsKt
-import com.github.mvysny.kaributesting.v10.LocatorKt
-import com.github.mvysny.kaributesting.v10.NotificationsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
 import com.github.mvysny.kaributools.ComponentUtilsKt
 import com.github.mvysny.kaributools.IconName
@@ -15,7 +13,6 @@ import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
-import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
 import elemental.json.JsonObject
 import groovy.transform.CompileDynamic

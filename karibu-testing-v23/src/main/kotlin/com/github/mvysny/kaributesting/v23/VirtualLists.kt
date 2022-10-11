@@ -56,7 +56,8 @@ public val VirtualList<*>._dataProviderSupportsSizeOp: Boolean get() = dataCommu
 /**
  * Returns items in given range from VirtualList's data provider.
  */
-public fun <T> VirtualList<T>._fetch(offset: Int, limit: Int): List<T> = dataCommunicator.fetch(offset, limit)
+public fun <T> VirtualList<T>._fetch(offset: Int, limit: Int): List<T> =
+    dataCommunicator.fetch(offset, limit)
 
 public val VirtualList<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
 
@@ -79,13 +80,18 @@ public fun VirtualList<*>._size(): Int {
     return dataCommunicator._size()
 }
 
-private val _VirtualList_renderer: Field = VirtualList::class.java.getDeclaredField("renderer").apply { isAccessible = true }
+private val _VirtualList_renderer: Field =
+    VirtualList::class.java.getDeclaredField("renderer")
+        .apply { isAccessible = true }
 
 /**
  * Returns the renderer for this VirtualList.
  */
 @Suppress("UNCHECKED_CAST")
-public val <T> VirtualList<T>._renderer: Renderer<T> get() = _VirtualList_renderer.get(this) as Renderer<T>
+public val <T> VirtualList<T>._renderer: Renderer<T>
+    get() = _VirtualList_renderer.get(
+        this
+    ) as Renderer<T>
 
 /**
  * Performs a click on a [ClickableRenderer] in given [VirtualList] cell. Only supports the following scenarios:
@@ -95,14 +101,15 @@ public val <T> VirtualList<T>._renderer: Renderer<T> get() = _VirtualList_render
  * @throws AssertionError if the renderer is not [ClickableRenderer] nor [ComponentRenderer].
  */
 public fun <T : Any> VirtualList<T>._clickRenderer(rowIndex: Int) {
-    checkEditableByUser()
+    _expectEditableByUser()
     val renderer: Renderer<T> = _renderer
     val item: T = _get(rowIndex)
     if (renderer is ClickableRenderer<*>) {
         @Suppress("UNCHECKED_CAST")
         (renderer as ClickableRenderer<T>).onClick(item)
     } else if (renderer is ComponentRenderer<*, *>) {
-        val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+        val component: Component =
+            (renderer as ComponentRenderer<*, T>).createComponent(item)
         if (component is Button) {
             component._click()
         } else if (component is ClickNotifier<*>) {
@@ -132,7 +139,8 @@ public fun <T : Any> VirtualList<T>._getRowComponent(rowIndex: Int): Component {
         fail("${this.toPrettyString()} uses NativeButtonRenderer which is not supported by this function")
     }
     val item: T = _get(rowIndex)
-    val component: Component = (renderer as ComponentRenderer<*, T>).createComponent(item)
+    val component: Component =
+        (renderer as ComponentRenderer<*, T>).createComponent(item)
     return component
 }
 
@@ -184,34 +192,35 @@ public fun <T : Any> VirtualList<T>.getPresentationValue(rowObject: T): Any? =
  * ```
  */
 @JvmOverloads
-public fun <T : Any> VirtualList<T>._dump(rows: IntRange = 0..9): String = buildString {
-    append(toPrettyString()).append('\n')
-    val dsIndices: IntRange
-    val displayIndices: Set<Int>
-    if (_dataProviderSupportsSizeOp) {
-        dsIndices = 0 until _size()
-        displayIndices = rows.intersect(dsIndices)
-        for (i in displayIndices) {
-            append("$i: ${_getFormatted(i)}\n")
-        }
-        val andMore = dsIndices.size - displayIndices.size
-        if (andMore > 0) {
-            append("--and $andMore more\n")
-        }
-    } else {
-        var rowsOutputted = 0
-        for (i in rows) {
-            val row = _getFormattedOrNull(i) ?: break
-            append("$i: $row\n")
-            rowsOutputted++
-        }
-        if (rowsOutputted == rows.size) {
-            append("--and possibly more\n")
+public fun <T : Any> VirtualList<T>._dump(rows: IntRange = 0..9): String =
+    buildString {
+        append(toPrettyString()).append('\n')
+        val dsIndices: IntRange
+        val displayIndices: Set<Int>
+        if (_dataProviderSupportsSizeOp) {
+            dsIndices = 0 until _size()
+            displayIndices = rows.intersect(dsIndices)
+            for (i in displayIndices) {
+                append("$i: ${_getFormatted(i)}\n")
+            }
+            val andMore = dsIndices.size - displayIndices.size
+            if (andMore > 0) {
+                append("--and $andMore more\n")
+            }
         } else {
-            append("--\n")
+            var rowsOutputted = 0
+            for (i in rows) {
+                val row = _getFormattedOrNull(i) ?: break
+                append("$i: $row\n")
+                rowsOutputted++
+            }
+            if (rowsOutputted == rows.size) {
+                append("--and possibly more\n")
+            } else {
+                append("--\n")
+            }
         }
     }
-}
 
 /**
  * Asserts that this grid's provider returns given [count] of items. If not,

@@ -9,7 +9,7 @@ import java.lang.reflect.Field
  * the link is actually visible and enabled.
  */
 public fun Anchor._click() {
-    checkEditableByUser()
+    _expectEditableByUser()
     click()
 }
 
@@ -27,9 +27,10 @@ public fun Anchor.click() {
  * exists, use it, otherwise just return the contents of [Anchor.getHref].
  */
 private val _Anchor_disabledHref: Field? =
-    Anchor::class.java.declaredFields.firstOrNull { it.name == "disabledHref" } ?.apply {
-        isAccessible = true
-    }
+    Anchor::class.java.declaredFields.firstOrNull { it.name == "disabledHref" }
+        ?.apply {
+            isAccessible = true
+        }
 
 public var Anchor._href: String
     get() {

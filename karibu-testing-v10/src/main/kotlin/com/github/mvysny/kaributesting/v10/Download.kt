@@ -20,7 +20,7 @@ import kotlin.test.expect
  * more details.
  */
 public fun Anchor._download(): ByteArray {
-    checkEditableByUser()
+    _expectEditableByUser()
     return download()
 }
 
@@ -30,7 +30,10 @@ public fun Anchor._download(): ByteArray {
  */
 public fun Anchor.download(): ByteArray {
     val uri = href
-    expect(false, "href hasn't been set for ${this.toPrettyString()}") { uri.isNullOrBlank() }
+    expect(
+        false,
+        "href hasn't been set for ${this.toPrettyString()}"
+    ) { uri.isNullOrBlank() }
     return downloadResource(uri)
 }
 
@@ -40,7 +43,10 @@ public fun Anchor.download(): ByteArray {
  */
 public fun Image.download(): ByteArray {
     val uri = src
-    expect(false, "src hasn't been set for ${this.toPrettyString()}") { uri.isNullOrBlank() }
+    expect(
+        false,
+        "src hasn't been set for ${this.toPrettyString()}"
+    ) { uri.isNullOrBlank() }
     return downloadResource(uri)
 }
 
@@ -50,21 +56,32 @@ public fun Image.download(): ByteArray {
  */
 public fun downloadResource(uri: String): ByteArray {
     require(!uri.isBlank()) { "uri is blank" }
-    val s: AbstractStreamResource? = VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri)).orElse(null)
-    expect(true, "No such StreamResource registered: '$uri'. Available resources: ${VaadinSession.getCurrent().resourceRegistry.resources.keys}") {
+    val s: AbstractStreamResource? =
+        VaadinSession.getCurrent().resourceRegistry.getResource(URI(uri))
+            .orElse(null)
+    expect(
+        true,
+        "No such StreamResource registered: '$uri'. Available resources: ${VaadinSession.getCurrent().resourceRegistry.resources.keys}"
+    ) {
         s != null
     }
-    expect(true, "Only StreamResources are supported but got $s") { s is StreamResource }
+    expect(
+        true,
+        "Only StreamResources are supported but got $s"
+    ) { s is StreamResource }
     val bout = ByteArrayOutputStream()
     (s as StreamResource).writer.accept(bout, VaadinSession.getCurrent())
     return bout.toByteArray()
 }
 
-private val resField: Field = StreamResourceRegistry::class.java.getDeclaredField("res").apply { isAccessible = true }
+private val resField: Field =
+    StreamResourceRegistry::class.java.getDeclaredField("res")
+        .apply { isAccessible = true }
 
 /**
  * Retrieves current list of resources mappings from this registry.
  */
 @Suppress("UNCHECKED_CAST")
-public val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource> get() =
-    resField.get(this) as Map<URI, AbstractStreamResource>
+public val StreamResourceRegistry.resources: Map<URI, AbstractStreamResource>
+    get() =
+        resField.get(this) as Map<URI, AbstractStreamResource>

@@ -11,7 +11,7 @@ import com.vaadin.flow.router.RouterLink
  * more details.
  */
 public fun RouterLink._click() {
-    checkEditableByUser()
+    _expectEditableByUser()
     click()
 }
 

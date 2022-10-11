@@ -7,7 +7,7 @@ import kotlin.test.expect
  * Fires the [AbstractLogin.LoginEvent].
  */
 public fun AbstractLogin._login(username: String, password: String) {
-    checkEditableByUser()
+    _expectEditableByUser()
     _fireEvent(AbstractLogin.LoginEvent(this, true, username, password))
 }
 
@@ -15,7 +15,10 @@ public fun AbstractLogin._login(username: String, password: String) {
  * Fires the [AbstractLogin.ForgotPasswordEvent].
  */
 public fun AbstractLogin._forgotPassword() {
-    checkEditableByUser()
-    expect(true, "isForgotPasswordButtonVisible is false") { isForgotPasswordButtonVisible }
+    _expectEditableByUser()
+    expect(
+        true,
+        "isForgotPasswordButtonVisible is false"
+    ) { isForgotPasswordButtonVisible }
     _fireEvent(AbstractLogin.ForgotPasswordEvent(this, true))
 }

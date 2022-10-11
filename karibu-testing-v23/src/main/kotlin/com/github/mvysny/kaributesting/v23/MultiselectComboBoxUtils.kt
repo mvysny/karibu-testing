@@ -18,7 +18,7 @@ import kotlin.test.fail
  * to filter out items/search for an item. Pass in `null` to clear.
  */
 public fun <T> MultiSelectComboBox<T>.setUserInput(userInput: String?) {
-    checkEditableByUser()
+    _expectEditableByUser()
     getComboBoxBaseFilterSlot(this).accept(userInput)
 }
 
@@ -33,15 +33,19 @@ public fun <T> MultiSelectComboBox<T>.setUserInput(userInput: String?) {
  * for some reason, set this to `true` to search in all items.
  */
 @JvmOverloads
-public fun <T> MultiSelectComboBox<T>.selectByLabel(label: String, bypassSetUserInput: Boolean = false) {
+public fun <T> MultiSelectComboBox<T>.selectByLabel(
+    label: String,
+    bypassSetUserInput: Boolean = false
+) {
     val suggestionItems: List<T> = if (!bypassSetUserInput) {
         setUserInput(label)
         getSuggestionItems()
     } else {
-        checkEditableByUser()
+        _expectEditableByUser()
         dataProvider._findAll()
     }
-    val items: List<T> = suggestionItems.filter { itemLabelGenerator.apply(it) == label }
+    val items: List<T> =
+        suggestionItems.filter { itemLabelGenerator.apply(it) == label }
     when {
         items.isEmpty() -> {
             val msg = StringBuilder()
@@ -52,6 +56,7 @@ public fun <T> MultiSelectComboBox<T>.selectByLabel(label: String, bypassSetUser
             }
             fail(msg.toString())
         }
+
         items.size > 1 -> fail("${(this as Component).toPrettyString()}: Multiple items found with label '$label': $items")
         else -> {
             val value = _value!!.toMutableSet()
@@ -62,14 +67,16 @@ public fun <T> MultiSelectComboBox<T>.selectByLabel(label: String, bypassSetUser
 }
 
 private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    val comboBoxBaseClass =
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
     val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
     m.isAccessible = true
     m
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <T> getDataCommunicator(cb: MultiSelectComboBox<T>): DataCommunicator<T>? = _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
+private fun <T> getDataCommunicator(cb: MultiSelectComboBox<T>): DataCommunicator<T>? =
+    _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
 
 @Suppress("UNCHECKED_CAST")
 internal val <T> MultiSelectComboBox<T>._dataCommunicator: DataCommunicator<T>

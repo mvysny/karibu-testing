@@ -171,6 +171,7 @@ class MyUITest : DynaTest({
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
     beforeEach { MockVaadin.setup(routes) }
+    afterEach { MockVaadin.tearDown() }
 })
 ```
 Java, Groovy:
@@ -188,6 +189,11 @@ public class MyUITest {
     public void setupVaadin() {
         MockVaadin.setup(routes);
     }
+    
+    @AfterEach
+    public void tearDownVaadin() {
+        MockVaadin.tearDown();
+    }
 }
 ```
 
@@ -204,6 +210,8 @@ class MyUITest : DynaTest({
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
     beforeEach { MockVaadin.setup(routes) }
+    afterEach { MockVaadin.tearDown() }
+
     test("simple UI test") {
         val main = UI.getCurrent().children.findFirst().get() as MainView
         expect(2) { main.children.count() }
@@ -224,6 +232,11 @@ public class MyUITest {
     @BeforeEach
     public void setupVaadin() {
         MockVaadin.setup(routes);
+    }
+
+    @AfterEach
+    public void tearDownVaadin() {
+        MockVaadin.tearDown();
     }
     
     @Test
@@ -281,6 +294,7 @@ class MainViewTest: DynaTest({
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
     beforeEach { MockVaadin.setup(routes) }
+    afterEach { MockVaadin.tearDown() }
 
     test("test greeting") {
         // simulate a button click as if clicked by the user
@@ -308,6 +322,11 @@ public class MyUITest {
         MockVaadin.setup(routes);
     }
 
+    @AfterEach
+    public void tearDownVaadin() {
+        MockVaadin.tearDown();
+    }
+
     @Test
     public void testGreeting() {
         // simulate a button click as if clicked by the user
@@ -333,6 +352,11 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;
     @BeforeEach
     void setupVaadin() {
         MockVaadin.setup(routes)
+    }
+
+    @AfterEach
+    void tearDownVaadin() {
+        MockVaadin.tearDown()
     }
 
     @Test
@@ -392,6 +416,8 @@ class MyUITest : DynaTest({
     lateinit var routes: Routes
     beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
     beforeEach { MockVaadin.setup(routes) }
+    afterEach { MockVaadin.tearDown() }
+  
     test("simple test") {
         // navigate to the "Categories" list route.
         navigateTo("categories")
@@ -421,6 +447,11 @@ public class MyUITest {
         MockVaadin.setup(routes);
     }
 
+    @AfterEach
+    void tearDownVaadin() {
+        MockVaadin.tearDown();
+    }
+
     @Test
     public void testGreeting() {
         // navigate to the "Categories" list route.
@@ -448,6 +479,11 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*
     @BeforeEach
     void setupVaadin() {
         MockVaadin.setup(routes)
+    }
+
+    @AfterEach
+    void tearDownVaadin() {
+        MockVaadin.tearDown()
     }
 
     @Test

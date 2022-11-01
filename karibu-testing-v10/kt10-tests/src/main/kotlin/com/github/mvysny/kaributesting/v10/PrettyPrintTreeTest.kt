@@ -60,7 +60,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             expect("TextField[#25, value='']") {
                 TextField().apply { id_ = "25" }.toPrettyString()
             }
-            expect("Button[caption='click me']") { Button("click me").toPrettyString() }
+            expect("Button[text='click me']") { Button("click me").toPrettyString() }
             expect("TextArea[label='label', value='some text']") {
                 TextArea("label").apply {
                     value = "some text"

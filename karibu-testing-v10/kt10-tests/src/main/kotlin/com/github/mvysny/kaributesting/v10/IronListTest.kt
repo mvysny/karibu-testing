@@ -81,7 +81,7 @@ internal fun DynaNodeGroup.ironListTestbatch() {
             val il = IronList<TestPerson>()
             il.dataProvider = dp
             il.setRenderer(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
-            il.expectRow(0, "Button[caption='name 0']")
+            il.expectRow(0, "Button[text='name 0']")
         }
         test("LocalDateRenderer") {
             val dp = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })

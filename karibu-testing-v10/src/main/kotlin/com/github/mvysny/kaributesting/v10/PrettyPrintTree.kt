@@ -91,10 +91,7 @@ public fun Component.toPrettyString(): String {
     if (label.isNotBlank()) {
         list.add("label='$label'")
     }
-    if (this is Button && !text.isNullOrBlank()) {
-        list.add("caption='$text'")
-    }
-    if (!_text.isNullOrBlank() && this !is Button) {
+    if (!_text.isNullOrBlank()) {
         list.add("text='$_text'")
     }
     if (this is HasValue<*, *>) {

@@ -85,7 +85,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
             }
-            vl.expectRow(0, "Button[caption='name 0']")
+            vl.expectRow(0, "Button[text='name 0']")
         }
         test("LocalDateRenderer") {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })

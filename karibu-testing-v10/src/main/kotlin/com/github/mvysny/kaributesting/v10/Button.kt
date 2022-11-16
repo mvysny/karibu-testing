@@ -9,16 +9,6 @@ import com.vaadin.flow.component.button.Button
 import kotlin.test.fail
 
 /**
- * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
- * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
- * more details.
- */
-public fun Button._click() {
-    _checkClickable()
-    click()
-}
-
-/**
  * Clicks the component implementing the [ClickNotifier] interface,
  * but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
@@ -26,7 +16,11 @@ public fun Button._click() {
  */
 public fun <T : ClickNotifier<*>> T._click() {
     _checkClickable()
-    serverClick()
+    if (this is Button) {
+        this.click()
+    } else {
+        serverClick()
+    }
 }
 
 /**

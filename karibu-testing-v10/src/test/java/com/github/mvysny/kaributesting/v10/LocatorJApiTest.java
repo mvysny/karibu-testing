@@ -4,6 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -54,6 +55,7 @@ public class LocatorJApiTest {
         _assert(new VerticalLayout(), TextField.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
 
         _click(new Button());
+        _click(new Icon());
         _setValue(new TextField(), "John");
         _fireValueChange(new TextField());
 

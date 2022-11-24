@@ -8,6 +8,7 @@ import com.github.mvysny.kaributools.caption
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
@@ -84,12 +85,14 @@ internal fun DynaNodeGroup.locatorAddonsTests() {
             expect("foo bar") { _get<Span> { textContains("foo") }.text }
         }
     }
-    group("buttonIconIs") {
+    group("iconIs") {
         test("smoke") {
             UI.getCurrent().button("iconless")
             val btn: Button = UI.getCurrent().iconButton(VaadinIcon.VAADIN_H.create())
             UI.getCurrent().iconButton(VaadinIcon.HOURGLASS.create())
-            expect(btn) { _get<Button> { buttonIconIs(VaadinIcon.VAADIN_H) } }
+            val ic = UI.getCurrent().icon(VaadinIcon.ABACUS)
+            expect(btn) { _get<Button> { iconIs(VaadinIcon.VAADIN_H) } }
+            expect(ic) { _get<Icon> { iconIs(VaadinIcon.ABACUS) } }
         }
     }
 }

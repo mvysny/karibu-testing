@@ -2,12 +2,10 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.IconName
 import com.github.mvysny.kaributools.caption
-import com.github.mvysny.kaributools.iconName
 import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasText
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import java.util.function.Predicate
 
@@ -51,25 +49,31 @@ private data class TextContainsPredicate<T : HasText>(val substring: String) : P
     override fun toString() = "textContains('$substring')"
 }
 
-/**
- * Makes sure that [Button.getIcon] is of given [collection] and matches the [iconName].
- */
+@Deprecated("replaced by iconIs()")
 public fun <T: Button> SearchSpec<T>.buttonIconIs(collection: String, iconName: String) {
-    predicates.add(ButtonIconIsPredicate(IconName(collection, iconName)))
+    iconIs(collection, iconName)
+}
+
+@Deprecated("replaced by iconIs()")
+public fun <T: Button> SearchSpec<T>.buttonIconIs(vaadinIcon: VaadinIcon) {
+    iconIs(vaadinIcon)
 }
 
 /**
- * Makes sure that [Button.getIcon] is given [vaadinIcon].
+ * Makes sure that [_iconName] is of given [collection] and matches the [iconName].
  */
-public fun <T: Button> SearchSpec<T>.buttonIconIs(vaadinIcon: VaadinIcon) {
-    predicates.add(ButtonIconIsPredicate(IconName.of(vaadinIcon)))
+public fun <T: Component> SearchSpec<T>.iconIs(collection: String, iconName: String) {
+    predicates.add(IconIsPredicate(IconName(collection, iconName)))
 }
 
-private data class ButtonIconIsPredicate<T: Button>(val iconName: IconName) : Predicate<T> {
-    override fun test(t: T): Boolean {
-        val icon: Icon = t.icon as? Icon ?: return false
-        return icon.iconName == iconName
+/**
+ * Makes sure that [_iconName] is given [vaadinIcon].
+ */
+public fun <T: Component> SearchSpec<T>.iconIs(vaadinIcon: VaadinIcon) {
+    predicates.add(IconIsPredicate(IconName.of(vaadinIcon)))
+}
 
-    }
-    override fun toString() = "buttonIconIs($iconName)"
+private data class IconIsPredicate<T: Component>(val iconName: IconName) : Predicate<T> {
+    override fun test(t: T): Boolean = t._iconName == iconName
+    override fun toString() = "iconIs($iconName)"
 }

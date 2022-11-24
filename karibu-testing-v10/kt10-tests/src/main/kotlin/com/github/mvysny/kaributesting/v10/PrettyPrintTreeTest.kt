@@ -103,7 +103,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             expect("TextField[label='foobar', value='']") {
                 TextField("foobar").toPrettyString()
             }
-            expect("Icon[@icon='vaadin:abacus']") {
+            expect("Icon[icon='vaadin:abacus']") {
                 VaadinIcon.ABACUS.create().toPrettyString()
             }
             expect("Button[icon='vaadin:abacus', @theme='icon']") {

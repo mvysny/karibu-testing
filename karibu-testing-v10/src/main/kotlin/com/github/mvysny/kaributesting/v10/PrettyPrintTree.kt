@@ -5,10 +5,8 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValidation
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.Html
-import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.ListDataProvider
@@ -119,8 +117,8 @@ public fun Component.toPrettyString(): String {
     if (this is Anchor) {
         list.add("href='$_href'")
     }
-    if (this is Button && icon is Icon) {
-        list.add("icon='${(icon as Icon).iconName}'")
+    if (_iconName != null) {
+        list.add("icon='$_iconName'")
     }
     if (this is Html) {
         val outerHtml: String = this.element.outerHTML.trim().replace(Regex("\\s+"), " ")
@@ -182,8 +180,9 @@ public var prettyStringHook: (component: Component, list: LinkedList<String>) ->
  * * `disabled` - dumped separately as "DISABLED" string.
  * * `id` - dumped as Component.id
  * * `href` - there's special processing for [Anchor._href].
+ * * `icon` - shown via [_iconName].
  */
-public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href")
+public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href", "icon")
 
 /**
  * Pretty-prints a DataProvider.

@@ -2,16 +2,14 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.DepthFirstTreeIterator
-import com.github.mvysny.kaributools.caption
-import com.github.mvysny.kaributools.label
-import com.github.mvysny.kaributools.placeholder
+import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasStyle
 import com.vaadin.flow.component.HasText
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
@@ -36,6 +34,7 @@ import java.util.function.Predicate
  * @property withoutClasses if not null, the component must NOT match any of these class names. Space-separated.
  * @property themes if not null, the component must have all theme names defined. Space-separated
  * @property withoutThemes if not null, the component must NOT have any of the theme names defined. Space-separated
+ * @property icon if not null, the component must have given [_iconName].
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
  */
 public class SearchSpec<T : Component>(
@@ -52,6 +51,7 @@ public class SearchSpec<T : Component>(
         public var withoutClasses: String? = null,
         public var themes: String? = null,
         public var withoutThemes: String? = null,
+        public var icon: IconName? = null,
         public var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
@@ -70,6 +70,7 @@ public class SearchSpec<T : Component>(
         if (!withoutClasses.isNullOrBlank()) list.add("withoutClasses='$withoutClasses'")
         if (!themes.isNullOrBlank()) list.add("themes='$themes'")
         if (!withoutThemes.isNullOrBlank()) list.add("withoutThemes='$withoutThemes'")
+        if (icon != null) list.add("icon='$icon'")
         if (value != null) list.add("value=$value")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
@@ -94,9 +95,24 @@ public class SearchSpec<T : Component>(
         if (!withoutThemes.isNullOrBlank()) p.add { component -> component.notContainsThemes(withoutThemes!!) }
         if (text != null) p.add { component -> component._text == text }
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
+        if (icon != null) p.add { component -> component._iconName == icon }
         @Suppress("UNCHECKED_CAST")
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()
+    }
+
+    /**
+     * Makes sure that [_iconName] is of given [collection] and matches the [iconName].
+     */
+    public fun iconIs(collection: String, iconName: String) {
+        this.icon = IconName(collection, iconName)
+    }
+
+    /**
+     * Makes sure that [_iconName] is given [vaadinIcon].
+     */
+    public fun iconIs(vaadinIcon: VaadinIcon) {
+        this.icon = IconName.of(vaadinIcon)
     }
 }
 

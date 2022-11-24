@@ -190,7 +190,7 @@ public class SearchSpecJ<T extends Component> {
      */
     @NotNull
     public SearchSpecJ<T> withIcon(@NotNull String collection, @NotNull String iconName) {
-        LocatorAddonsKt.iconIs(spec, collection, iconName);
+        spec.iconIs(collection, iconName);
         return this;
     }
 
@@ -201,7 +201,7 @@ public class SearchSpecJ<T extends Component> {
      */
     @NotNull
     public SearchSpecJ<T> withIcon(@NotNull VaadinIcon vaadinIcon) {
-        LocatorAddonsKt.iconIs(spec, vaadinIcon);
+        spec.iconIs(vaadinIcon);
         return this;
     }
 }

@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10;
 import com.vaadin.flow.component.Component;
 
 import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -179,5 +180,28 @@ public class SearchSpecJ<T extends Component> {
                 return toString;
             }
         };
+    }
+
+    /**
+     * Only matches component with given icon. Only works for Button and Icon.
+     * @param collection
+     * @param iconName
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withIcon(@NotNull String collection, @NotNull String iconName) {
+        LocatorAddonsKt.iconIs(spec, collection, iconName);
+        return this;
+    }
+
+    /**
+     * Only matches component with given icon. Only works for Button and Icon.
+     * @param vaadinIcon the icon to match
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withIcon(@NotNull VaadinIcon vaadinIcon) {
+        LocatorAddonsKt.iconIs(spec, vaadinIcon);
+        return this;
     }
 }

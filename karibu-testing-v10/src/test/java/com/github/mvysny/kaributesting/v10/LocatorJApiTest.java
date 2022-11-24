@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -47,6 +48,8 @@ public class LocatorJApiTest {
         _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
         _assertOne(new Button(), TextField.class);
         _assertOne(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo").withoutClasses("current"));
+        _assertOne(new Icon(VaadinIcon.ABACUS), Icon.class, spec -> spec.withIcon(VaadinIcon.ABACUS));
+        _assertOne(new Button(VaadinIcon.ABACUS.create()), Button.class, spec -> spec.withIcon(VaadinIcon.ABACUS));
 
         _assert(Label.class, 2);
         _assert(Label.class, 3, spec -> spec.withCaption("Name:").withId("foo"));

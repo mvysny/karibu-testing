@@ -826,6 +826,19 @@ java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching Text
 	at org.test.MyUITest$1$2.invoke(MyUITest.kt:12)
 ```
 
+#### SearchSpec/SearchSpecJ
+
+All lookup functions will give you an instance of `SearchSpec` (Kotlin/Groovy) or `SearchSpecJ` (Java) where you
+narrow down your search:
+
+* `id` - matches component with given id
+* `label` - matches `HasLabel.getLabel()`; doesn't match components that don't have a label
+* `placeholder` - matches placeholder of given field; doesn't match components that don't have a placeholder
+* `classes`/`withoutClasses` - matches components that either has all of given classes, and/or don't have all of given classes
+* `themes`/`withoutThemes` - same thing, but with themes
+* `text` - matches `HasText.getText()`; doesn't match components that don't implement `HasText`
+* `icon` - matches components with given icon (only Button and Icon)
+
 ### Useful Tips
 
 * You should generally prefer `_get<Grid>()` over `_find<Grid>().get(0)`. If there are two or more Grids,

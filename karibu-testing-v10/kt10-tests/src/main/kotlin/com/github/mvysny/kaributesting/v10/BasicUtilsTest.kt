@@ -19,6 +19,7 @@ import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.Route
 import elemental.json.Json
 import kotlin.test.expect
+import kotlin.test.fail
 
 @DynaTestDsl
 internal fun DynaNodeGroup.basicUtilsTestbatch() {
@@ -84,6 +85,13 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             div.addClickListener { e -> event = e }
             div._fireDomEvent("click", Json.createObject().apply { put("event.screenX", 20.0) })
             expect(20) { event.screenX }
+        }
+        test("fails for non-editable component") {
+            val div = Div().apply { isVisible = false }
+            div.element.addEventListener("click") { fail("should not be called") }
+            expectThrows<IllegalStateException>("The Div[INVIS] is not effectively visible") {
+                div._fireDomEvent("click")
+            }
         }
     }
 

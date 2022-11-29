@@ -22,7 +22,7 @@ public fun Component._fireEvent(event: ComponentEvent<*>) {
 }
 
 /**
- * Fires a DOM event on this component.
+ * Fires a DOM event on this component. Checks whether the component is [_expectEditableByUser].
  * @param eventType the event type, e.g. "click"
  * @param eventData optional event data, defaults to an empty object.
  */
@@ -31,6 +31,7 @@ public fun Component._fireDomEvent(
     eventType: String,
     eventData: JsonObject = Json.createObject()
 ) {
+    _expectEditableByUser()
     element._fireDomEvent(DomEvent(element, eventType, eventData))
 }
 

@@ -15,7 +15,7 @@ dependencies {
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 
     // to have the class autodiscovery functionality
-    implementation("io.github.classgraph:classgraph:4.8.149")
+    implementation("io.github.classgraph:classgraph:4.8.151")
 }
 
 kotlin {

@@ -65,8 +65,8 @@ fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
         test("false") {
             // okay, apparently LitTemplate lists its children as regular children (and not virtual children). whatever.
             val form = MyForm()
-            expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._find<Component>().toSet() }
-            expect(form.emailField) { form._get<EmailField>() }
+            expect(setOf(form)) { form._find<Component>().toSet() }
+            form._expectNone<EmailField>()
         }
         test("true") {
             includeVirtualChildrenInTemplates = true

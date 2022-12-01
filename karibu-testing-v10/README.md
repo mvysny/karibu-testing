@@ -12,7 +12,8 @@ Compatibility chart:
 | 1.2.0+ (unmaintained)    | Java 1.8+ | Vaadin 16-18 |
 | 1.2.3+ (unmaintained)    | Java 1.8+ | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16-18 |
 | 1.2.11+                  | Java 1.8+ | Vaadin 14 (only 14.3+) in (p)npm mode; Vaadin 18-19+ |
-| **1.3.0+ (recommended)** | Java 1.8+ | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19+ |
+| **1.3.0+ (recommended)** | Java 1.8+ | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19-23 |
+| 2.0.0+                   | Java 17+  | Vaadin 24+ |
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

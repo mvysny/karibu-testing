@@ -8,10 +8,10 @@ import com.github.mvysny.karibudsl.v10.bind
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.binder.ValidationException
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotNull
 import kotlin.test.expect
 
-private class Person(
+class Person(
         @field:NotNull var name: String? = null
 )
 

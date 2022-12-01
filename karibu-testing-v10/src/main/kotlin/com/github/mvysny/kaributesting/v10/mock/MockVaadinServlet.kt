@@ -8,8 +8,8 @@ import com.vaadin.flow.server.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 /**
  * Makes sure that [routes] are properly registered, and that [MockService]

@@ -2,7 +2,6 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.kaributools.VaadinVersion
 
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
@@ -23,19 +22,15 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
         renderers22Tests()
     }
 
-    if (VaadinVersion.get.isAtLeast(23, 1)) {
-        group("Dialogs 23.1+ tests") {
-            dialog23_1tests()
-        }
+    group("Dialogs 23.1+ tests") {
+        dialog23_1tests()
     }
 
     group("VirtualList") {
         virtualListTests()
     }
 
-    if (VaadinVersion.get.isAtLeast(23, 2)) {
-        group("MultiselectComboBox") {
-            multiselectComboBoxTests()
-        }
+    group("MultiselectComboBox") {
+        multiselectComboBoxTests()
     }
 }

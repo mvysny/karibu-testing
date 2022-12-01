@@ -17,7 +17,7 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
-import javax.servlet.ServletContext
+import jakarta.servlet.ServletContext
 import kotlin.test.expect
 
 public object MockVaadin {

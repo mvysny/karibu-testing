@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10.spring
 
-import com.github.mvysny.dynatest.jvmVersion
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
@@ -11,7 +10,6 @@ import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
 import com.vaadin.flow.spring.SpringVaadinSession
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -37,8 +35,6 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
 
     @BeforeEach
     fun setup() {
-        assumeTrue(vaadinVersion < 23 || jvmVersion >= 11, "Vaadin 23+ only supports JDK 11+")
-
         val uiFactory: () -> MockedUI = { MockedUI() }
         val servlet: SpringServlet =
             MockSpringServlet(routes, ctx, uiFactory)

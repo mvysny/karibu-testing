@@ -10,7 +10,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
  * Returns all item's captions.
  */
 public fun <T: Any> RadioButtonGroup<T>.getItemLabels(): List<String> {
-    val labelGenerator = itemLabelGenerator
+    val labelGenerator = _itemLabelGenerator
     return getItems().map { labelGenerator.apply(it) }
 }
 
@@ -19,7 +19,7 @@ public fun <T: Any> RadioButtonGroup<T>.getItemLabels(): List<String> {
  */
 public fun <T: Any> RadioButtonGroup<T>.getItems(): List<T> = dataProvider._findAll()
 
-internal val <T> RadioButtonGroup<T>.itemLabelGenerator: ItemLabelGenerator<T> get() {
+internal val <T> RadioButtonGroup<T>._itemLabelGenerator: ItemLabelGenerator<T> get() {
     val r = itemRenderer
     return ItemLabelGenerator { r._getPresentationValue(it).toString() }
 }
@@ -39,5 +39,5 @@ public fun <T : Any> RadioButtonGroup<T>._getRenderedComponent(item: T): Compone
  * Fails if the item is not found, or multiple items are found. Fails if the radio button group is not editable.
  */
 public fun <T> RadioButtonGroup<T>.selectByLabel(label: String) {
-    selectByLabel(label, dataProvider, itemLabelGenerator)
+    selectByLabel(label, dataProvider, _itemLabelGenerator)
 }

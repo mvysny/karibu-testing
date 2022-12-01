@@ -11,7 +11,7 @@ import elemental.json.Json
 import elemental.json.JsonObject
 import java.io.File
 import java.lang.reflect.Method
-import javax.servlet.ServletContext
+import jakarta.servlet.ServletContext
 
 public object MockVaadinHelper {
     @JvmStatic

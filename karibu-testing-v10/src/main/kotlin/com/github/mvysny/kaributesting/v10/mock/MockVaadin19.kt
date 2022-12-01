@@ -9,7 +9,7 @@ import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.LookupServletContainerInitializer
 import elemental.json.Json
 import elemental.json.JsonObject
-import javax.servlet.ServletContext
+import jakarta.servlet.ServletContext
 
 /**
  * Makes sure to call LookupInitializer (present in Vaadin 19+).

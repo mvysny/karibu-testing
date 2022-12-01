@@ -3,7 +3,7 @@ package com.github.mvysny.kaributesting.v10;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinResponse;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -10,9 +10,9 @@ import com.vaadin.flow.server.auth.ViewAccessChecker
 import org.myapp.AdminView
 import org.myapp.LoginView
 import java.security.Principal
-import javax.annotation.security.DenyAll
-import javax.annotation.security.PermitAll
-import javax.annotation.security.RolesAllowed
+import jakarta.annotation.security.DenyAll
+import jakarta.annotation.security.PermitAll
+import jakarta.annotation.security.RolesAllowed
 import kotlin.test.expect
 
 /**

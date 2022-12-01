@@ -82,7 +82,7 @@ Karibu-Testing is compatible with any Vaadin 14+ version (14, 15, 16, 17, 18, 19
 
 ### Vaadin 8
 
-**>>>See [The main Karibu-Testing documentation for Vaadin 8](karibu-testing-v8) <<<**. Karibu-Testing is compatible with any Vaadin 8.x version.
+**>>>See [The main Karibu-Testing documentation for Vaadin 8](tree/1.3.x/karibu-testing-v8) <<<**. Karibu-Testing is compatible with any Vaadin 8.x version.
 
 ## Why Unit-testing?
 

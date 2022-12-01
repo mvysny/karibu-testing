@@ -1,4 +1,4 @@
-include("karibu-testing-v8",
+include(
         "karibu-testing-v10",
         "karibu-testing-v10-groovy",
         "karibu-testing-v10-pro-groovy",

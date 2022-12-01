@@ -1,7 +1,7 @@
 include(
         "karibu-testing-v10",
-//        "karibu-testing-v10-groovy",
-//        "karibu-testing-v10-pro-groovy",
+        "karibu-testing-v10-groovy",
+        "karibu-testing-v10-pro-groovy",
         "mock-servlet-environment5",
         "karibu-testing-v10-spring",
         "karibu-testing-v10:kt10-tests",

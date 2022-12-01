@@ -2,7 +2,6 @@ package com.github.mvysny.kaributesting.v10.spring
 
 import com.github.mvysny.dynatest.jvmVersion
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10.ReviewsList
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
 import com.vaadin.flow.server.VaadinService
@@ -70,14 +69,6 @@ abstract class AbstractSpringTest(val vaadinVersion: Int) {
         (VaadinSession.getCurrent() as SpringVaadinSession).addDestroyListener { called++ }
         MockVaadin.tearDown()
         expect(1) { called }
-    }
-
-    /**
-     * Tests for https://github.com/mvysny/karibu-testing/issues/65
-     */
-    @Test
-    fun testPolymerTemplateComponent() {
-        ReviewsList()
     }
 
     @AfterEach

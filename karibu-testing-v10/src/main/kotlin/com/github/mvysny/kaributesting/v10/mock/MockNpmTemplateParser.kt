@@ -14,17 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * * a local filesystem (`frontend/`)
  * * from classpath `META-INF/resources/frontend/`
  */
-public class MockNpmTemplateParser : NpmTemplateParser() {
-
-    /**
-     * Vaadin 19 and 14.6+ modified the getSourcesFromTemplate() function by adding the "service" parameter.
-     * So much for backwards compatibility.
-     *
-     * Must be open in order to override the fun from Vaadin 19.
-     */
-    override fun getSourcesFromTemplate(service: VaadinService, tag: String, url: String): String {
-        return mockGetSourcesFromTemplate(tag, url)
-    }
+public class MockNpmTemplateParser {
 
     public companion object {
         /**

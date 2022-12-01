@@ -3,7 +3,6 @@ package com.github.mvysny.kaributesting.v10.mock
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.littemplate.LitTemplateParser
 import com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl
-import com.vaadin.flow.component.polymertemplate.TemplateParser
 import com.vaadin.flow.di.Instantiator
 import com.vaadin.flow.i18n.I18NProvider
 import com.vaadin.flow.server.VaadinService
@@ -15,8 +14,6 @@ import net.bytebuddy.matcher.ElementMatchers
  * Makes sure to load [MockNpmTemplateParser].
  */
 public open class MockInstantiator(public val delegate: Instantiator) : Instantiator by delegate {
-    override fun getTemplateParser(): TemplateParser = MockNpmTemplateParser()
-
     public companion object {
         @JvmStatic
         public fun create(delegate: Instantiator): Instantiator {
@@ -98,24 +95,8 @@ public class MockInstantiatorV18(delegate: Instantiator): MockInstantiator(deleg
     override fun <T : Any?> getOrCreate(type: Class<T>): T = when (type) {
         LitTemplateParser.LitTemplateParserFactory::class.java ->
             MockLitTemplateParserFactory as T
-        classNpmTemplateParserFactory ->
-            classMockNpmTemplateParserFactory.getConstructor().newInstance() as T
         else -> super.getOrCreate(type)
     }
 
     override fun getI18NProvider(): I18NProvider? = delegate.i18NProvider
-
-    private companion object {
-        /**
-         * The `TemplateParser.TemplateParserFactory` class.
-         */
-        private val classNpmTemplateParserFactory: Class<*> =
-                Class.forName("com.vaadin.flow.component.polymertemplate.TemplateParser${'$'}TemplateParserFactory")
-
-        /**
-         * The `TemplateParser.TemplateParserFactory` class returning [MockNpmTemplateParser].
-         */
-        private val classMockNpmTemplateParserFactory: Class<*> =
-                ByteBuddyUtils.overrideMethod(classNpmTemplateParserFactory, "createParser") { MockNpmTemplateParser() }
-    }
 }

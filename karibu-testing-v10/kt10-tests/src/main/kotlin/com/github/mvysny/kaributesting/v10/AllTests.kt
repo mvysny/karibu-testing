@@ -61,9 +61,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("mock vaadin") {
         mockVaadinTest()
     }
-    group("polymer template") {
-        polymerTemplateTest()
-    }
     group("pretty print tree") {
         prettyPrintTreeTest()
     }

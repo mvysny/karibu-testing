@@ -6,9 +6,6 @@ import com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl
 import com.vaadin.flow.di.Instantiator
 import com.vaadin.flow.i18n.I18NProvider
 import com.vaadin.flow.server.VaadinService
-import net.bytebuddy.ByteBuddy
-import net.bytebuddy.implementation.MethodCall
-import net.bytebuddy.matcher.ElementMatchers
 
 /**
  * Makes sure to load [MockNpmTemplateParser].
@@ -27,20 +24,6 @@ public open class MockInstantiator(public val delegate: Instantiator) : Instanti
             // starting from 14.5.0.alpha2 the LitTemplateParser machinery is supported
             return MockInstantiatorV14_6_0(delegate)
         }
-    }
-}
-
-private object ByteBuddyUtils {
-    /**
-     * Subclasses [baseClass] and overrides [methodName] which will now return [withResult].
-     */
-    fun overrideMethod(baseClass: Class<*>, methodName: String, withResult: ()->Any?): Class<*> {
-        return ByteBuddy().subclass(baseClass)
-                .method(ElementMatchers.named(methodName))
-                .intercept(MethodCall.call(withResult))
-                .make()
-                .load(ByteBuddyUtils::class.java.classLoader)
-                .loaded
     }
 }
 

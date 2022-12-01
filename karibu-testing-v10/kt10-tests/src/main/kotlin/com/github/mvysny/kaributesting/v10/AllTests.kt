@@ -44,9 +44,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("tree grid") {
         treeGridTestbatch()
     }
-    group("iron list") {
-        ironListTestbatch()
-    }
     group("locator addons") {
         locatorAddonsTests()
     }

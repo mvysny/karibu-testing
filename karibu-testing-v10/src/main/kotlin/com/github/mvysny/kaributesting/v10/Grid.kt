@@ -10,7 +10,6 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.grid.*
 import com.vaadin.flow.component.grid.editor.Editor
-import com.vaadin.flow.component.ironlist.IronList
 import com.vaadin.flow.component.listbox.ListBoxBase
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.select.Select
@@ -939,22 +938,6 @@ public fun <T> TreeGrid<T>._expandAll(depth: Int = 100) {
 }
 
 /**
- * Returns the data provider currently set to this [HasItems].
- */
-public val <T> HasItems<T>.dataProvider: DataProvider<T, *>?
-    get() = when (this) {
-        // until https://github.com/vaadin/flow/issues/6296 is resolved
-        is Grid<T> -> this.dataProvider
-        is IronList<T> -> this.dataProvider
-        is Select<T> -> this.dataProvider
-        is ListBoxBase<*, T, *> -> this.getDataProvider()
-        is RadioButtonGroup<T> -> this.dataProvider
-        is CheckboxGroup<T> -> this.dataProvider
-        is ComboBox<T> -> this.dataProvider
-        else -> null
-    }
-
-/**
  * Returns the data provider currently set to this Component.
  *
  * Works both with Vaadin 16 and Vaadin 17: Vaadin 17 components no longer implement HasItems.
@@ -963,7 +946,6 @@ public val Component.dataProvider: DataProvider<*, *>?
     get() = when {
         // until https://github.com/vaadin/flow/issues/6296 is resolved
         this is Grid<*> -> this.dataProvider
-        this is IronList<*> -> this.dataProvider
         this is Select<*> -> this.dataProvider
         this is ListBoxBase<*, *, *> -> this.getDataProvider()
         this is RadioButtonGroup<*> -> this.dataProvider

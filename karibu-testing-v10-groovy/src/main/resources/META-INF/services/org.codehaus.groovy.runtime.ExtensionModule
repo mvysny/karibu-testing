@@ -15,6 +15,5 @@ extensionClasses = com.github.mvysny.kaributesting.v10.groovy.ButtonUtils,\
   com.github.mvysny.kaributesting.v10.groovy.GridExtensionMethods,\
   com.github.mvysny.kaributesting.v10.groovy.MockVaadinExtensionMethods,\
   com.github.mvysny.kaributesting.v10.groovy.FormLayoutUtils,\
-  com.github.mvysny.kaributesting.v10.groovy.IronListUtils,\
   com.github.mvysny.kaributesting.v10.groovy.ListBoxUtils,\
   com.github.mvysny.kaributesting.v10.groovy.CheckboxGroupUtils

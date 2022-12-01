@@ -9,6 +9,7 @@ import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.contextmenu.SubMenuBase
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.dom.Element
@@ -156,7 +157,7 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
     }
 }
 
-internal val Component.isTemplate: Boolean get() = this is PolymerTemplate<*> || this.javaClass.name == "com.vaadin.flow.component.littemplate.LitTemplate"
+internal val Component.isTemplate: Boolean get() = this is PolymerTemplate<*> || this is LitTemplate
 
 /**
  * [PolymerTemplate]s and LitTemplates are a bit tricky.

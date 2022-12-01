@@ -4,6 +4,6 @@ dependencies {
     }
     api("com.github.mvysny.karibudsl:karibu-dsl-v23:${properties["karibudsl11_version"]}")
     api(project(":karibu-testing-v23"))
-    api("com.vaadin:vaadin-spring:12.2.0")
+    api("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
     compileOnly("com.vaadin:vaadin:${properties["vaadin23_next_version"]}")
 }

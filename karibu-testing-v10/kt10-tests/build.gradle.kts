@@ -13,7 +13,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web:2.3.0.RELEASE") {
         exclude(group = "ch.qos.logback")
     }
-    api("com.vaadin:vaadin-spring:12.2.0")
+    api("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
     api(project(":karibu-testing-v10-spring"))
 
     // for testing out the NPM template loading from META-INF/resources/frontend/

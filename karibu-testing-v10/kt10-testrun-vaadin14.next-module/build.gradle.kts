@@ -5,5 +5,5 @@ dependencies {
         exclude(group = "com.github.appreciated")
     }
 
-    testImplementation("com.vaadin:vaadin-spring:12.3.3")
+    testImplementation("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
 }

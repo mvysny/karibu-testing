@@ -1,8 +1,6 @@
 package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser.Companion.customLoaders
-import com.vaadin.flow.component.polymertemplate.NpmTemplateParser
-import com.vaadin.flow.server.VaadinService
 import java.io.File
 import java.lang.RuntimeException
 import java.net.URL

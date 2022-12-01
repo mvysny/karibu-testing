@@ -10,8 +10,6 @@ import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.icon.VaadinIcon
-import com.vaadin.flow.component.littemplate.LitTemplate
-import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.util.*
 import java.util.function.Predicate

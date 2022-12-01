@@ -10,7 +10,7 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
     implementation("jakarta.el:jakarta.el-api:5.0.1")
 
-    api("com.vaadin:vaadin:${properties["vaadin14_version"]}")
+    api("com.vaadin:vaadin:${properties["vaadin24_version"]}")
 
     api("org.springframework.boot:spring-boot-starter-test:3.0.0") {
         exclude(group = "ch.qos.logback")

@@ -5,6 +5,7 @@ import com.github.mvysny.kaributools.component
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.contextmenu.SubMenuBase
 import com.vaadin.flow.component.dialog.Dialog
@@ -249,12 +250,6 @@ public open class TestingLifecycleHookVaadin23_1(public val delegate: TestingLif
  */
 public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
 
-private val _ConfirmDialog_Class: Class<*>? = try {
-    Class.forName("com.vaadin.flow.component.confirmdialog.ConfirmDialog")
-} catch (e: ClassNotFoundException) { null }
-private val _ConfirmDialog_isOpened: Method? =
-    _ConfirmDialog_Class?.getMethod("isOpened")
-
 /**
  * Checks whether given [component] is a dialog and needs to be removed from the UI.
  * See [cleanupDialogs] for more info.
@@ -263,8 +258,8 @@ private fun isDialogAndNeedsRemoval(component: Component): Boolean {
     if (component is Dialog && !component.isOpened) {
         return true
     }
-    // also support ConfirmDialog. But be careful - this is a Pro component and may not be on classpath.
-    if (_ConfirmDialog_Class != null && _ConfirmDialog_isOpened != null && _ConfirmDialog_Class.isInstance(component) && !(_ConfirmDialog_isOpened.invoke(component) as Boolean)) {
+    // also support ConfirmDialog. Since Vaadin 24 it's no longer a Pro component.
+    if (component is ConfirmDialog && !component.isOpened) {
         return true
     }
     return false

@@ -1,5 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
+import _getDialogFooterChildren
+import _getDialogHeaderChildren
 import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.component
 import com.github.mvysny.kaributools.walk
@@ -76,13 +78,7 @@ public interface TestingLifecycleHook {
          * A default lifecycle hook that works well with all Vaadin versions.
          */
         @JvmStatic
-        public val default: TestingLifecycleHook get() {
-            var hook: TestingLifecycleHook = TestingLifecycleHookVaadin14Default()
-            if (VaadinVersion.get.isAtLeast(23, 1)) {
-                hook = TestingLifecycleHookVaadin23_1(hook)
-            }
-            return hook
-        }
+        public val default: TestingLifecycleHook get() = TestingLifecycleHookVaadin14Default()
     }
 }
 
@@ -151,6 +147,10 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             // which would clash with Grid.Column later on
             component.children.toList()
         }
+        component is Dialog -> {
+            // https://github.com/mvysny/karibu-testing/issues/115
+            component._getDialogHeaderChildren() + (component.children.toList() + component._getVirtualChildren()).distinct() + component._getDialogFooterChildren()
+        }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
         else -> (component.children.toList() + component._getVirtualChildren()).distinct()
@@ -186,62 +186,6 @@ public var includeVirtualChildrenInTemplates: Boolean = false
  * for more details.
  */
 public var fakeExtendedClientDetails: Boolean = true
-
-/**
- * Additional bits for Vaadin 23.1.
- */
-public open class TestingLifecycleHookVaadin23_1(public val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private val dialogHeaderFooter_rootField =
-        Class.forName("com.vaadin.flow.component.dialog.Dialog${'$'}DialogHeaderFooter").getDeclaredField("root")
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private val dialog_getHeader =
-        Dialog::class.java.getDeclaredMethod("getHeader")
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private val dialog_getFooter =
-        Dialog::class.java.getDeclaredMethod("getFooter")
-
-    init {
-        dialogHeaderFooter_rootField.isAccessible = true
-    }
-
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private fun getChildrenOfDialogHeaderOrFooter(dialogHeaderFooter: Any): List<Component> {
-        val root = dialogHeaderFooter_rootField.get(dialogHeaderFooter) as Element
-        return root.children.map { it.component.orElse(null) } .toList().filterNotNull()
-    }
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private fun getDialogHeaderChildren(dlg: Dialog): List<Component> {
-        val header = dialog_getHeader.invoke(dlg)
-        return getChildrenOfDialogHeaderOrFooter(header)
-    }
-    /**
-     * Vaadin 23.1 added Dialog.footer and header
-     */
-    private fun getDialogFooterChildren(dlg: Dialog): List<Component> {
-        val header = dialog_getFooter.invoke(dlg)
-        return getChildrenOfDialogHeaderOrFooter(header)
-    }
-
-    override fun getAllChildren(component: Component): List<Component> {
-        var list = delegate.getAllChildren(component)
-        if (component is Dialog) {
-            // https://github.com/mvysny/karibu-testing/issues/115
-            list = getDialogHeaderChildren(component) + list + getDialogFooterChildren(component)
-        }
-        return list
-    }
-}
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),

@@ -147,13 +147,7 @@ private fun <T : Any> Grid<T>._getCached(bean: T): T {
  * if not. Returns true for Vaadin 14.
  */
 public val Grid<*>._dataProviderSupportsSizeOp: Boolean
-    get() {
-        if (VaadinVersion.get.major < 19) {
-            return true
-        }
-        val m = DataCommunicator::class.java.getDeclaredMethod("isDefinedSize")
-        return m.invoke(dataCommunicator) as Boolean
-    }
+    get() = dataCommunicator.isDefinedSize
 
 /**
  * Returns items in given range from Grid's data provider. Uses current Grid sorting.
@@ -280,12 +274,7 @@ public fun <T, F> HierarchicalDataProvider<T, F>._size(
 ): Int =
     _rowSequence(root, filter = filter).count()
 
-private val _DataCommunicator_getDataProviderSize: Method =
-    DataCommunicator::class.java.getDeclaredMethod("getDataProviderSize")
-        .apply { isAccessible = true }
-
-public fun DataCommunicator<*>._size(): Int =
-    _DataCommunicator_getDataProviderSize.invoke(this) as Int
+public fun DataCommunicator<*>._size(): Int = dataProviderSize
 
 /**
  * Returns the number of items in this Grid.

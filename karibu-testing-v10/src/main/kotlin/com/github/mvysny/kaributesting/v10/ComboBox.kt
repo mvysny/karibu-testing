@@ -29,17 +29,7 @@ import kotlin.test.fail
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     _expectEditableByUser()
-    if (VaadinVersion.get.isAtLeast(23, 2)) {
-        getComboBoxBaseFilterSlot(this).accept(userInput)
-    } else {
-        val comboBoxFilterSlot: Field =
-            ComboBox::class.java.getDeclaredField("filterSlot")
-        comboBoxFilterSlot.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val filterSlot =
-            comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
-        filterSlot.accept(userInput)
-    }
+    getComboBoxBaseFilterSlot(this).accept(userInput)
 }
 
 private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
@@ -61,7 +51,6 @@ private val _ComboBoxDataController_filterSlot: Field by lazy(
  * INTERNAL, DON'T USE. Only for Vaadin 23.2+. Calls `(this as ComboBoxBase).getDataController().filterSlot`.
  */
 public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.combobox.ComboBoxBase*/Any): SerializableConsumer<String?> {
-    require(VaadinVersion.get.isAtLeast(23, 2)) { "This only works for Vaadin 23.2 and higher but got ${VaadinVersion.get}" }
     val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
 
     @Suppress("UNCHECKED_CAST")

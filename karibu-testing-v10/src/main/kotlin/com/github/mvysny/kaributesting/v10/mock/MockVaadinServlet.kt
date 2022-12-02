@@ -27,19 +27,6 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         return super.createDeploymentConfiguration()
     }
 
-    override fun createDeploymentConfiguration(initParameters: Properties): DeploymentConfiguration {
-        // make sure that Vaadin 14+ starts in npm mode even with `frontend/` and `flow-build-info.json` missing.
-        // this check is required for testing a jar module with Vaadin 14 components.
-        if (VaadinVersion.get.major == 14) {
-            initParameters.remove(
-                DeploymentConfigurationFactory::class.java.getDeclaredField(
-                    "DEV_MODE_ENABLE_STRATEGY"
-                ).get(null)
-            )
-        }
-        return super.createDeploymentConfiguration(initParameters)
-    }
-
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
         val service: VaadinServletService = MockService(this, deploymentConfiguration, uiFactory)
         service.init()
@@ -48,22 +35,10 @@ public open class MockVaadinServlet @JvmOverloads constructor(
     }
 }
 
-private val _VaadinServlet_getService: Method =
-    VaadinServlet::class.java.getDeclaredMethod("getService")
-
 /**
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
-internal val VaadinServlet.serviceSafe: VaadinServletService? get() {
-    // we need to use the reflection. The problem is that the signature
-    // of the method differs between Vaadin versions:
-    //
-    // Vaadin 14.6: getService() returns VaadinService
-    // Vaadin 20+: getService() returns VaadinServletService
-    //
-    // calling the method directly will cause MethodNotFoundError on Vaadin 20+
-    return _VaadinServlet_getService.invoke(this) as VaadinServletService?
-}
+internal val VaadinServlet.serviceSafe: VaadinServletService? get() = service
 
 /**
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66

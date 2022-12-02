@@ -45,16 +45,6 @@ public object MockVaadinHelper {
         // no need to optimize this method; the output is cached in VaadinMeta.flowBuildInfo
         checkVaadinSupportedByKaribuTesting()
 
-        if (VaadinVersion.get.isAtLeast(19)) {
-            return MockVaadin19.getTokenFileFromClassloader()
-        }
-
-        // Vaadin 14.6+
-        // Use DeploymentConfigurationFactory.getTokenFileFromClassloader(Class, VaadinContext)
-        val m: Method = DeploymentConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", Class::class.java, VaadinContext::class.java)
-        m.isAccessible = true
-        val ctx: VaadinContext = createMockVaadinContext()
-        val json: String = m.invoke(null, null, ctx) as String? ?: return null
-        return Json.parse(json)
+        return MockVaadin19.getTokenFileFromClassloader()
     }
 }

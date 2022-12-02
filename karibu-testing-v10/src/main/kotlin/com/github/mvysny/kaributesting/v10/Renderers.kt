@@ -36,16 +36,11 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
         val component: Component = createComponent(rowObject)
         component.toPrettyString()
     }
-    this::class.simpleName == "LitRenderer" -> {
+    this is LitRenderer -> {
         // LitRenderer re-declares private members
         val templateProperty = this::class.java.getDeclaredField("templateExpression")
         templateProperty.isAccessible = true
         val templateExpression = templateProperty.get(this) as String
-
-        val valueProvidersProperty = this::class.java.getDeclaredField("valueProviders")
-        valueProvidersProperty.isAccessible = true
-        val valueProviders = valueProvidersProperty.get(this) as Map<String, ValueProvider<T, *>>
-
         val renderedLitTemplateHtml: String = renderLitTemplate(templateExpression, valueProviders, rowObject)
         Jsoup.parse(renderedLitTemplateHtml).textRecursively
     }

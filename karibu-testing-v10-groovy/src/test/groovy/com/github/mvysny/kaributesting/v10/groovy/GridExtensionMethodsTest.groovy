@@ -2,14 +2,11 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributools.VaadinVersion
-import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
-import com.vaadin.flow.data.renderer.BasicRenderer
-import com.vaadin.flow.data.renderer.ClickableRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.renderer.NumberRenderer
 import com.vaadin.flow.data.renderer.TemplateRenderer
@@ -71,10 +68,6 @@ class GridExtensionMethodsTest {
 
         grid.appendHeaderRow().getCell("foo")
         grid.appendFooterRow().getCell("foo")
-        if (VaadinVersion.INSTANCE.getGet().major < 24) {
-            grid.appendHeaderRow().getCell("foo").renderer
-            grid.appendFooterRow().getCell("foo").renderer
-        }
         grid.appendHeaderRow().getCell("foo").component
         grid.appendFooterRow().getCell("foo").component
 

@@ -2,15 +2,11 @@ package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.mockhttp.MockContext
 import com.github.mvysny.kaributesting.v10.VaadinMeta
-import com.github.mvysny.kaributools.VaadinVersion
-import com.vaadin.flow.server.DeploymentConfigurationFactory
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinServletContext
-import elemental.json.Json
 import elemental.json.JsonObject
 import java.io.File
-import java.lang.reflect.Method
 import jakarta.servlet.ServletContext
 
 public object MockVaadinHelper {
@@ -24,11 +20,6 @@ public object MockVaadinHelper {
             val tokenFile: File = File.createTempFile("flow-build-info", "json")
             tokenFile.writeText("{}")
             servlet.servletContext.setInitParameter("vaadin.frontend.token.file", tokenFile.absolutePath)
-        }
-
-        if (VaadinVersion.get.isAtLeast(14, 6) && VaadinVersion.get.isExactly(14)) {
-            // otherwise DeploymentConfigurationFactory.verifyMode() will fail for Vaadin 14.6+
-            servlet.servletContext.setInitParameter("compatibilityMode", "false")
         }
     }
 

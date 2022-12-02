@@ -1,4 +1,3 @@
-import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.dom.Element
@@ -26,17 +25,11 @@ private fun getChildrenOfDialogHeaderOrFooter(dialogHeaderFooter: Any): List<Com
  * Vaadin 23.1 added Dialog.footer and header
  */
 public fun Dialog._getDialogHeaderChildren(): List<Component> {
-    if (!VaadinVersion.get.isAtLeast(23, 1)) {
-        return listOf()
-    }
     return getChildrenOfDialogHeaderOrFooter(this.header)
 }
 /**
  * Vaadin 23.1 added Dialog.footer and header
  */
 public fun Dialog._getDialogFooterChildren(): List<Component> {
-    if (!VaadinVersion.get.isAtLeast(23, 1)) {
-        return listOf()
-    }
     return getChildrenOfDialogHeaderOrFooter(footer)
 }

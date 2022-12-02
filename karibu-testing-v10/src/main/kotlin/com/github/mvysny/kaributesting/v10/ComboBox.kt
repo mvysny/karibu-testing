@@ -2,7 +2,6 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator

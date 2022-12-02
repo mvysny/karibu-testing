@@ -37,16 +37,7 @@ public object MockVaadin19 {
             } catch (ex: ClassNotFoundException) {}
         }
 
-        val vaadinVersion = VaadinVersion.get.major
-        if (vaadinVersion >= 19) {
-            tryLoad("com.vaadin.flow.component.polymertemplate.rpc.PolymerPublishedEventRpcHandler")
-        }
-        if (vaadinVersion in 19..20) {
-            tryLoad("com.vaadin.flow.server.frontend.fusion.EndpointGeneratorTaskFactoryImpl")
-        }
-        if (vaadinVersion >= 21) {
-            tryLoad("com.vaadin.fusion.frontend.EndpointGeneratorTaskFactoryImpl")
-        }
+        tryLoad("com.vaadin.fusion.frontend.EndpointGeneratorTaskFactoryImpl")
         loaderInitializer.onStartup(loaders, ctx)
 
         // verify that the Lookup has been set
@@ -102,6 +93,6 @@ internal val VaadinMeta.hasLookup: Boolean
 internal fun checkVaadinSupportedByKaribuTesting() {
     if (!VaadinMeta.hasLookup) {
         // this Vaadin has no Lookup support => unsupported
-        throw RuntimeException("Karibu-Testing 1.3+ only support Vaadin 19+ and Vaadin 14 (only 14.6+) but the project uses Vaadin ${VaadinVersion.get}. Please try Karibu-Testing 1.2.x instead.")
+        throw RuntimeException("Karibu-Testing 2+ only support Vaadin 24+ but the project uses Vaadin ${VaadinVersion.get}. Please try Karibu-Testing 1.2.x instead.")
     }
 }

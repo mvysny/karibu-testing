@@ -681,17 +681,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 }
             }
 
-            // the test itself. Vaadin 22+ fails with
-            // BindingException: An exception has been thrown inside binding logic for the field element [checked='false', indeterminate='false']
-            // older Vaadin fails directly with ClassCastException: java.lang.String cannot be cast to
-            if (VaadinVersion.get.major >= 22) {
-                expectThrows(RuntimeException::class, "An exception has been thrown inside binding logic") {
-                    grid.editor._editItem(TestPerson("name 0", 0))
-                }
-            } else {
-                expectThrows(ClassCastException::class, "java.lang.String cannot be cast to") {
-                    grid.editor._editItem(TestPerson("name 0", 0))
-                }
+            expectThrows(RuntimeException::class, "An exception has been thrown inside binding logic") {
+                grid.editor._editItem(TestPerson("name 0", 0))
             }
         }
         test("closing editor fires the event") {

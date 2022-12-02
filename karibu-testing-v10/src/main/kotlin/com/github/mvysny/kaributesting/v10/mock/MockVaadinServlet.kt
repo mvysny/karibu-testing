@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10.mock
 
 import com.github.mvysny.kaributesting.v10.*
-import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*

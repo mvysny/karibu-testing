@@ -165,19 +165,7 @@ public fun <T> Grid<T>._fetch(offset: Int, limit: Int): List<T> = when (this) {
 }
 
 public val DataCommunicator<*>._saneFetchLimit: Int
-    get() =
-        if (VaadinVersion.get.major in 17..18) {
-            // don't use Int.MAX_VALUE otherwise Vaadin 17 will integer-overflow:
-            // https://github.com/vaadin/flow/issues/8828
-            // don't use "Int.MAX_VALUE - 100" otherwise Vaadin 17 will stack-overflow.
-            1000
-        } else if (VaadinVersion.get.major >= 19) {
-            // don't use high value otherwise Vaadin 19+ will calculate negative limit and will pass it to SizeVerifier,
-            // failing instantly.
-            Int.MAX_VALUE / 1000
-        } else {
-            Int.MAX_VALUE
-        }
+    get() = Int.MAX_VALUE / 1000
 
 public val Grid<*>._saneFetchLimit: Int get() = dataCommunicator._saneFetchLimit
 

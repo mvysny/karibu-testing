@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.littemplate.LitTemplateParser
 import com.vaadin.flow.component.littemplate.internal.LitTemplateParserImpl
 import com.vaadin.flow.di.Instantiator
@@ -16,39 +15,9 @@ public open class MockInstantiator(public val delegate: Instantiator) : Instanti
         public fun create(delegate: Instantiator): Instantiator {
             checkVaadinSupportedByKaribuTesting()
 
-            if (VaadinVersion.get.major >= 19) {
-                return MockInstantiatorV18(delegate)
-            }
-
-            // Vaadin 14.6+
-            // starting from 14.5.0.alpha2 the LitTemplateParser machinery is supported
-            return MockInstantiatorV14_6_0(delegate)
+            return MockInstantiatorV18(delegate)
         }
     }
-}
-
-/**
- * Used for Vaadin 14 (only Vaadin 14.6+). In order to load [MockNpmTemplateParser] and also hook into the
- * LitTemplateParser, we need to provide custom implementations of the `TemplateParserFactory`
- * class and the `LitTemplateParserFactory` class.
- */
-public class MockInstantiatorV14_6_0(delegate: Instantiator): MockInstantiator(delegate) {
-
-    init {
-        check(
-            VaadinVersion.get.major == 14 && VaadinVersion.get.isAtLeast(14, 6)) {
-            "Unsupported Vaadin version: ${VaadinVersion.get}"
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any?> getOrCreate(type: Class<T>): T = when (type) {
-        LitTemplateParser.LitTemplateParserFactory::class.java ->
-            MockLitTemplateParserFactory as T
-        else -> super.getOrCreate(type)
-    }
-
-    override fun getI18NProvider(): I18NProvider? = delegate.i18NProvider
 }
 
 private object MockLitTemplateParserImpl : LitTemplateParserImpl() {

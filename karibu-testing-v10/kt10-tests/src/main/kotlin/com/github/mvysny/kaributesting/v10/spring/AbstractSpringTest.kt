@@ -26,7 +26,7 @@ import kotlin.test.expect
 @SpringBootTest
 @WebAppConfiguration
 @DirtiesContext
-abstract class AbstractSpringTest(val vaadinVersion: Int) {
+abstract class AbstractSpringTest {
 
     private val routes: Routes = Routes()
 

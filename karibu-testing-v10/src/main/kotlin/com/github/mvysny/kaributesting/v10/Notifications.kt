@@ -57,9 +57,4 @@ public fun clearNotifications() {
  */
 public fun Notification._close() {
     close()
-    // removeFromParent() stopped working since Vaadin 23.0.10+
-    // See https://github.com/mvysny/karibu-testing/issues/113
-    if (VaadinVersion.get <= SemanticVersion(23, 0, 9)) {
-        removeFromParent()
-    }
 }

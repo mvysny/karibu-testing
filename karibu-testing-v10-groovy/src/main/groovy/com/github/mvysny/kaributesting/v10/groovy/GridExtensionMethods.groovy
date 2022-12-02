@@ -289,16 +289,6 @@ class GridExtensionMethods {
         GridKt.getCell(self, key)
     }
 
-    @Nullable
-    static Renderer<?> getRenderer(@NotNull HeaderRow.HeaderCell self) {
-        GridUtilsKt.getRenderer(self)
-    }
-
-    @Nullable
-    static Renderer<?> getRenderer(@NotNull FooterRow.FooterCell self) {
-        GridUtilsKt.getRenderer(self)
-    }
-
     /**
      * Returns or sets the component in grid's footer cell.
      * Returns <code>null</code> if the cell contains String, something else than a component or nothing at all.

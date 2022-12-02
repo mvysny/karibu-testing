@@ -78,8 +78,8 @@ public object MockVaadin {
      */
     @JvmStatic
     public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinVersion.get.isAtLeast(14, 3)) {
-            "Karibu-Testing only works with Vaadin 14.3.0+ but you're using ${VaadinVersion.get}"
+        check(VaadinVersion.get.isAtLeast(24)) {
+            "Karibu-Testing 2.x only works with Vaadin 24+ but you're using ${VaadinVersion.get}"
         }
         check(!VaadinMeta.isCompatibilityMode)
 

@@ -7,6 +7,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.combobox.ComboBoxBase
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
@@ -42,9 +43,7 @@ public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
 }
 
 private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataController")
+    val m = ComboBoxBase::class.java.getDeclaredMethod("getDataController")
     m.isAccessible = true
     m
 }
@@ -122,29 +121,15 @@ public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
 
-private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator")
-    field.isAccessible = true
-    field
-}
-
 private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
+    val m = ComboBoxBase::class.java.getDeclaredMethod("getDataCommunicator")
     m.isAccessible = true
     m
 }
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> getDataCommunicator(cb: ComboBox<T>): DataCommunicator<T>? =
-    when {
-        VaadinVersion.get.isAtLeast(23, 2) ->
             _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
-
-        else ->
-            _ComboBox_dataCommunicator.get(cb) as DataCommunicator<T>?
-    }
 
 @Suppress("UNCHECKED_CAST")
 internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>

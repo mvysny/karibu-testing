@@ -6,6 +6,8 @@ import com.vaadin.flow.di.Lookup
 import com.vaadin.flow.di.LookupInitializer
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServletContext
+import com.vaadin.flow.server.startup.ApplicationConfigurationFactory
+import com.vaadin.flow.server.startup.DefaultApplicationConfigurationFactory
 import com.vaadin.flow.server.startup.LookupServletContainerInitializer
 import elemental.json.Json
 import elemental.json.JsonObject
@@ -80,11 +82,10 @@ public object MockVaadin19 {
 
         // this thing only works with Vaadin 19+
         val ctx: VaadinContext = MockVaadinHelper.createMockVaadinContext()
-        val acf = lookup(ctx, Class.forName("com.vaadin.flow.server.startup.ApplicationConfigurationFactory"))
+        val acf = lookup(ctx, ApplicationConfigurationFactory::class.java)
         checkNotNull(acf) { "ApplicationConfigurationFactory is null" }
-        val dacfClass = Class.forName("com.vaadin.flow.server.startup.DefaultApplicationConfigurationFactory")
-        if (dacfClass.isInstance(acf)) {
-            val m = dacfClass.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
+        if (acf is DefaultApplicationConfigurationFactory) {
+            val m = DefaultApplicationConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
             m.isAccessible = true
             val json = m.invoke(acf, ctx) as String? ?: return null
             return Json.parse(json)

@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v23
 
 import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.combobox.ComboBoxBase
 import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.data.provider.DataCommunicator
 import java.lang.reflect.Method
@@ -66,17 +67,15 @@ public fun <T> MultiSelectComboBox<T>.selectByLabel(
     }
 }
 
-private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
+private val _ComboBox_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val m = ComboBoxBase::class.java.getDeclaredMethod("getDataCommunicator")
     m.isAccessible = true
     m
 }
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> getDataCommunicator(cb: MultiSelectComboBox<T>): DataCommunicator<T>? =
-    _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
+    _ComboBox_dataCommunicator.invoke(cb) as DataCommunicator<T>?
 
 @Suppress("UNCHECKED_CAST")
 internal val <T> MultiSelectComboBox<T>._dataCommunicator: DataCommunicator<T>

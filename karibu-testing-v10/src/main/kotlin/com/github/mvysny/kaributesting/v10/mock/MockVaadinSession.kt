@@ -4,8 +4,6 @@ import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinSession
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * A Vaadin Session with one important difference:

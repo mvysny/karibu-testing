@@ -12,8 +12,10 @@ import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.PreserveOnRefresh
 import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinContext
+import com.vaadin.flow.server.VaadinSession
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import test.app.MyRouteNotFoundError
+import java.lang.Boolean
 import kotlin.test.expect
 
 val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
@@ -74,7 +76,7 @@ fun DynaNodeGroup.routesTestBatch() {
     test("MockRouteNotFoundError is called when the route doesn't exist, and it fails immediately with an informative error message") {
         val routes: Routes = Routes().autoDiscoverViews("com.github")
         MockVaadin.setup(routes)
-        expectThrows(NotFoundException::class, "No route found for 'A_VIEW_THAT_DOESNT_EXIST': Couldn't find route for 'A_VIEW_THAT_DOESNT_EXIST'\nAvailable routes:") {
+        expectThrows(NotFoundException::class, "No route found for 'A_VIEW_THAT_DOESNT_EXIST'\nAvailable routes:") {
             UI.getCurrent().navigate("A_VIEW_THAT_DOESNT_EXIST")
         }
     }

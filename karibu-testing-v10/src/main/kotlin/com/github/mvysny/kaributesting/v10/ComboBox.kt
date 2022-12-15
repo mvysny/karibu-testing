@@ -7,7 +7,6 @@ import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.ComboBoxBase
-import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.data.provider.DataProvider
@@ -106,7 +105,7 @@ public fun <T> ComboBox<T>.selectByLabel(
 public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _expectEditableByUser()
     check(isAllowCustomValue) { "${toPrettyString()} doesn't allow custom values" }
-    _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
+    _fireEvent(ComboBoxBase.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
 }
 
 private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {

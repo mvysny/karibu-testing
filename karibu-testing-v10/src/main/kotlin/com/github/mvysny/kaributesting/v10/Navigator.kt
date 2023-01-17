@@ -18,16 +18,13 @@ public val currentPath: String? get() =
     UI.getCurrent()?.internals?.activeViewLocation?.pathWithQueryParameters
 
 /**
- * Returns the current view class. Returns null if the [UI.getCurrent] is null, or no such view
- * can not be found in the registry.
+ * Resolves route for given [path].
+ * @param path e.g. `my/view?foo=bar`
  */
-public val currentView: Class<out Component>? get() {
-    var path: String = (currentPath ?: return null).trim('/')
-    // no other way but to scan the route registry: https://github.com/vaadin/flow/issues/4565
-
-    // remove any query parameters
-    path = path.substringBefore('?')
-    val registry: RouteRegistry = UI.getCurrent().internals.router.registry
+public fun resolveRoute(path: String): Class<out Component>? {
+    // trim & remove any query parameters
+    val path = path.trim('/').substringBefore('?')
+    val registry: RouteRegistry = currentUI.internals.router.registry
     val segments: List<String> = path.split('/')
     for (prefix: Int in segments.size downTo 1) {
         val p: String = segments.subList(0, prefix).joinToString("/")
@@ -41,11 +38,17 @@ public val currentView: Class<out Component>? get() {
 }
 
 /**
+ * Returns the current view class.
+ */
+public val currentView: Class<out Component>
+    get() = currentUI.internals.activeRouterTargetsChain.first().javaClass.asSubclass(Component::class.java)
+
+/**
  * Expects that given [view] is the currently displayed view.
  */
-public fun <V: Component> expectView(view: Class<V>) {
+public fun expectView(view: Class<out Component>) {
     @Suppress("UNCHECKED_CAST")
-    expect(view) { currentView }
+    expect(view, "current path: '$currentPath'") { currentView }
 }
 
 /**

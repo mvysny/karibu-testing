@@ -11,7 +11,7 @@ defaultTasks("clean", "build")
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "2.0.1"
+    version = "2.0.2-SNAPSHOT"
     repositories {
         mavenCentral()
         maven(url = "https://maven.vaadin.com/vaadin-addons")

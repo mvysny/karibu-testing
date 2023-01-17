@@ -27,18 +27,21 @@ internal fun DynaNodeGroup.navigatorTest() {
 
     test("navigation") {
         navigateTo<TestingView>()
+        expect("testing") { currentPath }
         expect(TestingView::class.java) { currentView }
         expectView<TestingView>()
     }
 
     test("navigation using navigateTo()") {
         navigateTo("testing")
+        expect("testing") { currentPath }
         expect(TestingView::class.java) { currentView }
         expectView<TestingView>()
     }
 
     test("navigation to parametrized test") {
         navigateTo(ParametrizedView::class, 5)
+        expect("params/5") { currentPath }
         expect(ParametrizedView::class.java) { currentView }
         expectView<ParametrizedView>()
         expect(5) { _get<ParametrizedView>().parameter }
@@ -49,6 +52,7 @@ internal fun DynaNodeGroup.navigatorTest() {
 
     test("navigation to parametrized test using navigateTo()") {
         navigateTo("params/5")
+        expect("params/5") { currentPath }
         expect(ParametrizedView::class.java) { currentView }
         expectView<ParametrizedView>()
         expect(5) { _get<ParametrizedView>().parameter }
@@ -56,6 +60,7 @@ internal fun DynaNodeGroup.navigatorTest() {
 
     test("query parameters using navigateTo()") {
         navigateTo("params/5?foo=bar")
+        expect("params/5?foo=bar") { currentPath }
         expect(5) { _get<ParametrizedView>().parameter }
         expect("bar") { _get<ParametrizedView>().qp["foo"] }
         expect(ParametrizedView::class.java) { currentView }
@@ -123,6 +128,25 @@ internal fun DynaNodeGroup.navigatorTest() {
             _expectNone<NavigationPostponeView>()
             _expectNone<Dialog>()
             _expectOne<TestingView>()
+        }
+    }
+
+    group("History") {
+        test("replaceState() doesn't affect currentPath") {
+            // also see https://github.com/mvysny/karibu-testing/issues/138
+            navigateTo<TestingView>()
+            expect("testing") { currentPath }
+            currentUI.page.history.replaceState(null, "params/5")
+            expect("testing") { currentPath }
+            expect(TestingView::class.java) { currentView }
+        }
+        test("pushState() doesn't affect currentPath") {
+            // also see https://github.com/mvysny/karibu-testing/issues/138
+            navigateTo<TestingView>()
+            expect("testing") { currentPath }
+            currentUI.page.history.pushState(null, "params/5")
+            expect("testing") { currentPath }
+            expect(TestingView::class.java) { currentView }
         }
     }
 }

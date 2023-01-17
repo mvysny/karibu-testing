@@ -6,17 +6,21 @@ import com.vaadin.flow.server.RouteRegistry
 import kotlin.test.expect
 
 /**
- * Returns the browser's current path. Returns null if there is no current UI.
+ * Returns the browser's current path, including query parameters and all.
+ * For example, for `http://localhost:8080/my/view?foo=bar` returns `my/view?foo=bar`.
+ * Returns null if there is no current UI.
  */
-public val currentPath: String? get() {
-    return UI.getCurrent()?.internals?.activeViewLocation?.pathWithQueryParameters
-}
+public val currentPath: String? get() =
+    UI.getCurrent()?.internals?.activeViewLocation?.pathWithQueryParameters
 
 /**
- * Returns the current view
+ * Returns the current view class. Returns null if the [UI.getCurrent] is null, or no such view
+ * can not be found in the registry.
  */
 public val currentView: Class<out Component>? get() {
     var path: String = (currentPath ?: return null).trim('/')
+    // no other way but to scan the route registry: https://github.com/vaadin/flow/issues/4565
+
     // remove any query parameters
     path = path.substringBefore('?')
     val registry: RouteRegistry = UI.getCurrent().internals.router.registry

@@ -112,7 +112,7 @@ However, soon you will hit the limit:
 * Your components will probably start to fail at some point if they'll use `UI.getCurrent()` or `VaadinSession.getCurrent()`, since that will
   just return `null`;
 * Your views can't perform a navigation because the `RouteRegistry` has not been populated. Vaadin Flow can
-  auto-populate route registry only when running inside of a servlet container. 
+  autopopulate route registry only when running inside servlet container. 
 
 In order to fix that, we need to mock the Vaadin environment properly.
 This is where the `karibu-testing` library comes handy - it provides you with means of mocking the Vaadin environment.
@@ -405,7 +405,7 @@ A typical app will consist of multiple views. You can test the views of such app
   Because of that, you can simply call the navigation from your tests to perform the navigation to the view, for example
   `navigateTo("books")`.
 
-Typically Flow will rely on Servlet container to auto-discover all routes. However, with browserless tests there is no servlet container and
+Typically, Flow will rely on Servlet container to auto-discover all routes. However, with browserless tests there is no servlet container and
 nobody will discover the `@Route`s automatically. That's why Karibu-Testing library provides means to discover those views, in the form of
 the `autoDiscoverViews()` function. All you need to do in your tests is
 to call this function before all tests:
@@ -507,6 +507,12 @@ automatically within the current UI, including optional query parameters:
 * `foo/25` - any view with parameters
 * `foo/25?token=bar` - any view with parameters and query parameters
 * `?token=foo` - the root view with query parameters
+
+Call
+
+* `currentPath`/`NavigatorKt.currentPath` to obtain the browser's current path, including query parameters and all.
+   For example, for `http://localhost:8080/my/view?foo=bar` returns `my/view?foo=bar`.
+* `currentView`/`NavigatorKt.currentView` returns the class of the current view.
 
 ### Polymer Templates / Lit Templates
 

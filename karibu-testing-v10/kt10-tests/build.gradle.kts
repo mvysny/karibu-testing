@@ -21,7 +21,7 @@ dependencies {
     api("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
     api(project(":karibu-testing-v10-spring"))
 
-    // to test that EnhancedDialog's components are discovered properly
+    // don't test EnhancedDialog: it's deprecated and doesn't work with Vaadin 24: https://vaadin.com/directory/component/enhanced-dialog
     // Issue: https://github.com/mvysny/karibu-testing/issues/85
-    implementation("com.vaadin.componentfactory:enhanced-dialog:1.0.4")
+//    implementation("com.vaadin.componentfactory:enhanced-dialog:1.0.4")
 }

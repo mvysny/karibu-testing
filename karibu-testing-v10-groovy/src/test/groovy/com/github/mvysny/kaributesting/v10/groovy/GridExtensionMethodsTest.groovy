@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.ListDataProvider
@@ -9,7 +8,6 @@ import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.renderer.NumberRenderer
-import com.vaadin.flow.data.renderer.TemplateRenderer
 import com.vaadin.flow.function.ValueProvider
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.AfterEach
@@ -58,8 +56,6 @@ class GridExtensionMethodsTest {
         grid._getColumnByKey("foo").getPresentationValue("a")
 
         new NumberRenderer<Number>(ValueProvider.identity() as ValueProvider, NumberFormat.getInstance()).getValueProvider2()
-        TemplateRenderer.of("a").renderTemplate("a")
-        TemplateRenderer.of("a").template
 
         grid._getColumnByKey("foo").header2
         grid.dump()

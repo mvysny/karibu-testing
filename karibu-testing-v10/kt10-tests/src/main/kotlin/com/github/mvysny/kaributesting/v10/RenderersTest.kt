@@ -4,7 +4,6 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.data.renderer.ComponentRenderer
-import com.vaadin.flow.data.renderer.TemplateRenderer
 import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.function.SerializableFunction
 import kotlin.test.expect
@@ -20,11 +19,6 @@ internal fun DynaNodeGroup.renderersTests() {
         expect("Span[text='Item #25']") {
             val r =
                 ComponentRenderer<Span, Int>(SerializableFunction { Span("Item #$it") })
-            r._getPresentationValue(25)
-        }
-        expect("Item #25") {
-            val r = TemplateRenderer.of<Int>("<div>[[item.foo]]</div>")
-                .withProperty("foo") { "Item #$it" }
             r._getPresentationValue(25)
         }
     }

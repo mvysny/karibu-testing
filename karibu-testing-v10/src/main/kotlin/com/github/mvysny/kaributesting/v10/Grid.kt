@@ -24,6 +24,7 @@ import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
 import org.intellij.lang.annotations.RegExp
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
@@ -414,6 +415,16 @@ public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>
     return _getFormattedRow(rowObject)
 }
 
+private val _ColumnPathRenderer_provider: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    val f = ColumnPathRenderer::class.java.getDeclaredField("provider")
+    f.isAccessible = true
+    f
+}
+
+@Suppress("UNCHECKED_CAST")
+public val <T> ColumnPathRenderer<T>.valueProvider: ValueProvider<T, *>
+    get() = _ColumnPathRenderer_provider.get(this) as ValueProvider<T, *>
+
 /**
  * Returns the output of renderer set for this column for given [rowObject] formatted as close as possible
  * to the client-side output, using [Grid.Column.renderer].
@@ -422,11 +433,7 @@ public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>
 public fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     val renderer: Renderer<T> = this.renderer
     if (renderer is ColumnPathRenderer) {
-        val valueProviders: MutableMap<String, ValueProvider<T, *>> =
-            renderer.valueProviders
-        val valueProvider: ValueProvider<T, *> = valueProviders[_internalId]
-            ?: return null
-        val value: Any? = valueProvider.apply(rowObject)
+        val value: Any? = renderer.valueProvider.apply(rowObject)
         return value.toString()
     }
     return renderer._getPresentationValue(rowObject)

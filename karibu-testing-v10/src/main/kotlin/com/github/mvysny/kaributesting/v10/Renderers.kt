@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.template
 import com.github.mvysny.kaributools.textRecursively
 import com.github.mvysny.kaributools.valueProvider
 import com.vaadin.flow.component.Component
@@ -21,10 +20,6 @@ private val _BasicRenderer_getFormattedValue: Method by lazy(LazyThreadSafetyMod
  * to the client-side output.
  */
 public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
-    this is TemplateRenderer<T> -> {
-        val renderedTemplateHtml: String = this.renderTemplate(rowObject)
-        Jsoup.parse(renderedTemplateHtml).textRecursively
-    }
     this is BasicRenderer<T, *> -> {
         val value: Any? = this.valueProvider.apply(rowObject)
         _BasicRenderer_getFormattedValue.invoke(this, value) as String?
@@ -45,19 +40,6 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
         Jsoup.parse(renderedLitTemplateHtml).textRecursively
     }
     else -> null
-}
-
-/**
- * Renders the template for given [item]
- */
-public fun <T> TemplateRenderer<T>.renderTemplate(item: T): String {
-    var template: String = this.template
-    this.valueProviders.forEach { (k: String, v: ValueProvider<T, *>) ->
-        if (template.contains("[[item.$k]]")) {
-            template = template.replace("[[item.$k]]", v.apply(item).toString())
-        }
-    }
-    return template
 }
 
 public fun <T> renderLitTemplate(template: String, valueProviders: Map<String, ValueProvider<T, *>>, item: T): String {

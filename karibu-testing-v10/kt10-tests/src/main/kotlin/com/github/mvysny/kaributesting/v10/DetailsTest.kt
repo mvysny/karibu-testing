@@ -2,16 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.karibudsl.v10.text
-import com.vaadin.componentfactory.EnhancedDialog
-import com.vaadin.flow.component.UI
-import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.details.Details
-import com.vaadin.flow.component.dialog.Dialog
-import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Span
-import com.vaadin.flow.component.textfield.TextField
-import kotlin.test.expect
 
 @DynaTestDsl
 internal fun DynaNodeGroup.detailsTests() {

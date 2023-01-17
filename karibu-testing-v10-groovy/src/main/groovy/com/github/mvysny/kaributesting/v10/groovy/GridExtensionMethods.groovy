@@ -17,7 +17,6 @@ import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
 import com.vaadin.flow.data.renderer.BasicRenderer
 import com.vaadin.flow.data.renderer.Renderer
-import com.vaadin.flow.data.renderer.TemplateRenderer
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
 import groovy.transform.CompileStatic
@@ -222,14 +221,6 @@ class GridExtensionMethods {
     @NotNull
     static <T, V> ValueProvider<T, V> getValueProvider2(@NotNull BasicRenderer<T, V> self) {
         com.github.mvysny.kaributools.RenderersKt.getValueProvider(self)
-    }
-
-    /**
-     * Renders the template for given <code>item</code>.
-     */
-    @NotNull
-    static <T> String renderTemplate(@NotNull TemplateRenderer<T> self, @NotNull T item) {
-        RenderersKt.renderTemplate(self, item)
     }
 
     @NotNull

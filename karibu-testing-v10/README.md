@@ -517,6 +517,8 @@ Call
 
 ### Polymer Templates / Lit Templates
 
+> Note: Polymer Templates has been removed from Vaadin 24 and are no longer supported in Karibu-Testing 2.0.0+
+
 Testing PolymerTemplates/LitTemplates with Karibu is a bit tricky.
 The purpose of PolymerTemplates is to move as much code as possible to the
 client-side, while Karibu is designed to test server-side code only. The child components are either

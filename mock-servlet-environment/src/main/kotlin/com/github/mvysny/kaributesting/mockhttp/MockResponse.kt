@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse
 public open class MockResponse : HttpServletResponse {
     override fun encodeURL(url: String): String = url
 
+    @Deprecated("Deprecated in Java")
     override fun encodeUrl(url: String): String = encodeURL(url)
 
     public val headers: ConcurrentHashMap<String, Array<String>> = ConcurrentHashMap<String, Array<String>>()
@@ -32,6 +33,7 @@ public open class MockResponse : HttpServletResponse {
 
     public fun findCookie(name: String): Cookie? = cookies.firstOrNull { it.name == name }
 
+    @Deprecated("Deprecated in Java")
     override fun encodeRedirectUrl(url: String): String = encodeRedirectURL(url)
 
     override fun flushBuffer() {
@@ -115,6 +117,7 @@ public open class MockResponse : HttpServletResponse {
         _status = sc
     }
 
+    @Deprecated("Deprecated in Java")
     override fun setStatus(sc: Int, sm: String?) {
         _status = sc
     }

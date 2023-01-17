@@ -39,6 +39,7 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun getContentLengthLong(): Long = -1
 
+    @Deprecated("Deprecated in Java")
     override fun getRealPath(path: String?): String {
         throw UnsupportedOperationException("not implemented")
     }
@@ -94,6 +95,7 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
      */
     override fun getLocalPort(): Int = MockHttpEnvironment.localPort
 
+    @Deprecated("Deprecated in Java")
     override fun isRequestedSessionIdFromUrl(): Boolean = false
 
     override fun getServletContext(): ServletContext = session.servletContext

@@ -54,6 +54,7 @@ public open class MockHttpSession(
 
     override fun getMaxInactiveInterval(): Int = maxInactiveInterval
 
+    @Deprecated("Deprecated in Java")
     override fun getSessionContext(): HttpSessionContext? = null
 
     override fun getAttribute(name: String): Any? {
@@ -61,6 +62,7 @@ public open class MockHttpSession(
         return attributes[name]
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getValue(name: String): Any? = getAttribute(name)
 
     override fun getAttributeNames(): Enumeration<String> {
@@ -68,6 +70,7 @@ public open class MockHttpSession(
         return attributes.keys()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getValueNames(): Array<String> = attributeNames.toList().toTypedArray()
 
     override fun setAttribute(name: String, value: Any?) {
@@ -75,6 +78,7 @@ public open class MockHttpSession(
         attributes.putOrRemove(name, value)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun putValue(name: String, value: Any?) {
         setAttribute(name, value)
     }
@@ -84,6 +88,7 @@ public open class MockHttpSession(
         attributes.remove(name)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun removeValue(name: String) {
         removeAttribute(name)
     }

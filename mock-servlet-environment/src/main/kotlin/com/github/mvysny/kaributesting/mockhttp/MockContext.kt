@@ -15,6 +15,7 @@ import javax.servlet.descriptor.JspConfigDescriptor
 import kotlin.collections.HashMap
 
 public open class MockContext : ServletContext, Serializable {
+    @Deprecated("Deprecated in Java")
     override fun getServlet(name: String): Servlet? {
         // this method is deprecated since servlet spec 2.1 and should always return null.
         // see javadoc for more details.
@@ -95,6 +96,7 @@ public open class MockContext : ServletContext, Serializable {
         log.error(msg)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun log(exception: Exception, msg: String) {
         log.error(msg, exception)
     }
@@ -123,6 +125,7 @@ public open class MockContext : ServletContext, Serializable {
         throw UnsupportedOperationException("not implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getServletNames(): Enumeration<String> = Collections.emptyEnumeration()
 
     override fun getDefaultSessionTrackingModes(): Set<SessionTrackingMode> = setOf(SessionTrackingMode.COOKIE, SessionTrackingMode.URL)
@@ -252,6 +255,7 @@ public open class MockContext : ServletContext, Serializable {
         throw UnsupportedOperationException("not implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getServlets(): Enumeration<Servlet> = Collections.emptyEnumeration()
 
     override fun getEffectiveMinorVersion(): Int = 0

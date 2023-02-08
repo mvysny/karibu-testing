@@ -25,46 +25,106 @@ internal fun DynaNodeGroup.navigatorTest() {
     beforeEach { MockVaadin.setup(routes) }
     afterEach { MockVaadin.tearDown() }
 
-    test("navigation") {
-        navigateTo<TestingView>()
-        expect("testing") { currentPath }
-        expect(TestingView::class.java) { currentView }
-        expectView<TestingView>()
-    }
+    group("currentView") {
+        test("simple view") {
+            navigateTo<TestingView>()
+            expect(TestingView::class.java) { currentView }
+        }
 
-    test("navigation using navigateTo()") {
-        navigateTo("testing")
-        expect("testing") { currentPath }
-        expect(TestingView::class.java) { currentView }
-        expectView<TestingView>()
-    }
+        test("navigation to parametrized test") {
+            navigateTo(ParametrizedView::class, 5)
+            expect(ParametrizedView::class.java) { currentView }
+        }
 
-    test("navigation to parametrized test") {
-        navigateTo(ParametrizedView::class, 5)
-        expect("params/5") { currentPath }
-        expect(ParametrizedView::class.java) { currentView }
-        expectView<ParametrizedView>()
-        expect(5) { _get<ParametrizedView>().parameter }
-        expectThrows(AssertionError::class) {
+        test("navigation to view nested in a router layout") {
+            navigateTo<ChildView>()
+            expect(ChildView::class.java) { currentView }
+        }
+        test("query parameters using navigateTo()") {
+            navigateTo("params/5?foo=bar")
+            expect(ParametrizedView::class.java) { currentView }
+        }
+    }
+    group("expectView") {
+        test("simple view") {
+            navigateTo<TestingView>()
             expectView<TestingView>()
+            expectThrows(AssertionError::class) {
+                expectView<ParametrizedView>()
+            }
+        }
+
+        test("navigation to parametrized test") {
+            navigateTo(ParametrizedView::class, 5)
+            expectThrows(AssertionError::class) {
+                expectView<TestingView>()
+            }
+        }
+
+        test("navigation to view nested in a router layout") {
+            navigateTo<ChildView>()
+            expectView<ChildView>()
+        }
+
+        test("query parameters using navigateTo()") {
+            navigateTo("params/5?foo=bar")
+            expectView<ParametrizedView>()
         }
     }
 
-    test("navigation to parametrized test using navigateTo()") {
-        navigateTo("params/5")
-        expect("params/5") { currentPath }
-        expect(ParametrizedView::class.java) { currentView }
-        expectView<ParametrizedView>()
-        expect(5) { _get<ParametrizedView>().parameter }
+    group("navigation") {
+        test("navigation") {
+            navigateTo<TestingView>()
+            expect("testing") { currentPath }
+            expectView<TestingView>()
+        }
+
+        test("navigation using navigateTo()") {
+            navigateTo("testing")
+            expect("testing") { currentPath }
+            expectView<TestingView>()
+        }
+
+        test("navigation to parametrized test") {
+            navigateTo(ParametrizedView::class, 5)
+            expect(5) { _get<ParametrizedView>().parameter }
+        }
+
+        test("navigation to parametrized test using navigateTo()") {
+            navigateTo("params/5")
+            expect("params/5") { currentPath }
+            expect(ParametrizedView::class.java) { currentView }
+            expectView<ParametrizedView>()
+            expect(5) { _get<ParametrizedView>().parameter }
+        }
+
+        test("query parameters using navigateTo()") {
+            navigateTo("params/5?foo=bar")
+            expect(5) { _get<ParametrizedView>().parameter }
+            expect("bar") { _get<ParametrizedView>().qp["foo"] }
+        }
     }
 
-    test("query parameters using navigateTo()") {
-        navigateTo("params/5?foo=bar")
-        expect("params/5?foo=bar") { currentPath }
-        expect(5) { _get<ParametrizedView>().parameter }
-        expect("bar") { _get<ParametrizedView>().qp["foo"] }
-        expect(ParametrizedView::class.java) { currentView }
-        expectView<ParametrizedView>()
+    group("currentPath") {
+        test("simple view") {
+            navigateTo<TestingView>()
+            expect("testing") { currentPath }
+        }
+
+        test("navigation to parametrized test") {
+            navigateTo(ParametrizedView::class, 5)
+            expect("params/5") { currentPath }
+        }
+
+        test("navigation to view nested in a router layout") {
+            navigateTo<ChildView>()
+            expect("parent/child") { currentPath }
+        }
+
+        test("query parameters using navigateTo()") {
+            navigateTo("params/5?foo=bar")
+            expect("params/5?foo=bar") { currentPath }
+        }
     }
 
     // tests for https://github.com/mvysny/karibu-testing/issues/34

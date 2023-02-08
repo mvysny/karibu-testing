@@ -9,6 +9,10 @@ plugins {
 
 defaultTasks("clean", "build")
 
+if (JavaVersion.current() < JavaVersion.VERSION_17) {
+    throw GradleException("Karibu-Testing 2+ requires JDK 17; current JDK is ${JavaVersion.current()}")
+}
+
 allprojects {
     group = "com.github.mvysny.kaributesting"
     version = "2.0.2-SNAPSHOT"

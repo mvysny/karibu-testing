@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import _getDialogFooterChildren
-import _getDialogHeaderChildren
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -78,8 +76,7 @@ public interface TestingLifecycleHook {
 }
 
 /**
- * The default implementation of [TestingLifecycleHook] that works for all Vaadin versions.
- * See [TestingLifecycleHookVaadin23_1] for additional bits for Vaadin 23.1.
+ * The default implementation of [TestingLifecycleHook] that works for all Vaadin 24+ versions.
  */
 public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
     /**
@@ -141,10 +138,6 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             // don't include virtual children since that would include the header/footer components
             // which would clash with Grid.Column later on
             component.children.toList()
-        }
-        component is Dialog -> {
-            // https://github.com/mvysny/karibu-testing/issues/115
-            component._getDialogHeaderChildren() + (component.children.toList() + component._getVirtualChildren()).distinct() + component._getDialogFooterChildren()
         }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85

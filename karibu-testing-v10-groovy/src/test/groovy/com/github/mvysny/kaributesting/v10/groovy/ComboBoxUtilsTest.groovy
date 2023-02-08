@@ -35,10 +35,10 @@ class ComboBoxUtilsTest {
         comboWithObjects.setItems([new Object()])
         items = comboWithObjects.getSuggestions()
         def selectWithStrings = new Select<String>()
-        selectWithStrings.setItems([].stream() as Stream<String>)
+        selectWithStrings.setItems([])
         items = selectWithStrings.getSuggestionItems()
         def selectWithObjects = new Select<Object>()
-        selectWithObjects.setItems([].stream() as Stream<Object>)
+        selectWithObjects.setItems([])
         items = selectWithObjects.getSuggestions()
     }
 }

@@ -35,7 +35,7 @@ class GridExtensionMethodsTest {
         abcDataProvider._findAll()
         abcDataProvider._findAll(["length".asc])
         def grid = new Grid<String>(String, false)
-        grid.setItems(["a", "b"].stream())
+        grid.setItems(["a", "b"])
         grid._get(0)
         grid._fetch(0, 1)
         grid.dataCommunicator.fetch(0, 1)

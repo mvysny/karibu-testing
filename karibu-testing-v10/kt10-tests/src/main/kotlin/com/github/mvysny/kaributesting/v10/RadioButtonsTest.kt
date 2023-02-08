@@ -60,6 +60,5 @@ internal fun DynaNodeGroup.radioButtonTests() {
 }
 
 fun <T> RadioButtonGroup<T>.setItems2(vararg items: T) {
-    // this way it's also compatible with Vaadin 18.
-    dataProvider = ListDataProvider(items.toList())
+    setItems(items.toList())
 }

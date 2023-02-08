@@ -94,7 +94,7 @@ internal fun DynaNodeGroup.virtualListTests() {
                     .withLocale(Locale("fi", "FI"))
                 // use this constructor: the non-deprecated one isn't available in Vaadin 22
                 @Suppress("DEPRECATION")
-                setRenderer(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, formatter))
+                setRenderer(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
             }
             vl.expectRow(0, "1.3.2019")
         }

@@ -932,7 +932,7 @@ public val Component.dataProvider: DataProvider<*, *>?
         // until https://github.com/vaadin/flow/issues/6296 is resolved
         this is Grid<*> -> this.dataProvider
         this is Select<*> -> this.dataProvider
-        this is ListBoxBase<*, *, *> -> this.getDataProvider()
+        this is ListBoxBase<*, *, *> -> this.dataProvider
         this is RadioButtonGroup<*> -> this.dataProvider
         this is CheckboxGroup<*> -> this.dataProvider
         this is ComboBoxBase<*, *, *> -> this.dataProvider

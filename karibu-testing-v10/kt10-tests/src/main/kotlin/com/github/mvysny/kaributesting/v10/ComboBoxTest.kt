@@ -122,12 +122,9 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
 }
 
 fun <T> ComboBox<T>.setItems2(items: Collection<T>) {
-    // this way it's also compatible with Vaadin 18.
-    setDataProvider(ListDataProvider(items))
+    setItems(items)
 }
 
 fun <T> Select<T>.setItems2(items: Collection<T>) {
-    // this way it's also compatible with Vaadin 17:
-    // https://github.com/vaadin/flow/issues/8831
-    dataProvider = ListDataProvider(items)
+    setItems(items)
 }

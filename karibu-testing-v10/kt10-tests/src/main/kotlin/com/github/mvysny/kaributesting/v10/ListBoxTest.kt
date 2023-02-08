@@ -50,7 +50,5 @@ private fun DynaNodeGroup.tests(component: () -> ListBoxBase<*, String, *>) {
 }
 
 fun <T> ListBoxBase<*, T, *>.setItems2(vararg items: T) {
-    // workaround for java.lang.NoSuchMethodError: 'void com.vaadin.flow.component.listbox.MultiSelectListBox.setItems(java.util.Collection)'
-    // the setItems() method has been moved in Vaadin 22+, from HasItems to HasListDataView
-    setDataProvider(ListDataProvider(items.toList()))
+    setItems(items.toList())
 }

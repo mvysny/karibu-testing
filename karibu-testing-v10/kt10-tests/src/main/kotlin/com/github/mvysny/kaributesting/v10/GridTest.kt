@@ -172,7 +172,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
                     .withLocale(Locale("fi", "FI"))
-            addColumn(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, formatter))
+            addColumn(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
         }
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         grid.expectRow(0, "name 0", "View", "Button[text='name 0']", "1.3.2019")

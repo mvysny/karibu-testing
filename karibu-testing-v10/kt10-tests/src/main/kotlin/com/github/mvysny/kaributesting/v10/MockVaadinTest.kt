@@ -15,7 +15,6 @@ import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributools.navigateTo
-import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text
@@ -65,7 +64,6 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinSession.getCurrent().browser.locale != null }
             expect(false) { VaadinSession.getCurrent().browser.isIPhone }
             expect(true) { VaadinSession.getCurrent().browser.isFirefox }
-            expect(false) { VaadinSession.getCurrent().browser.isTooOldToFunctionProperly }
             expect(false) { VaadinSession.getCurrent().browser.isChrome }
             expect(false) { VaadinSession.getCurrent().browser.isChromeOS }
             expect(false) { VaadinSession.getCurrent().browser.isAndroid }

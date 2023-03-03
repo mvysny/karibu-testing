@@ -139,4 +139,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("HasValidation") {
         hasValidationTests()
     }
+    group("Tabs") {
+        tabsTestbatch()
+    }
 }

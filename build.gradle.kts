@@ -19,6 +19,11 @@ allprojects {
     }
 }
 
+if (JavaVersion.current() > JavaVersion.VERSION_11 && gradle.startParameter.taskNames.contains("publish")) {
+    throw GradleException("Release Karibu-Testing 1.x with JDK 11 or lower; current JDK is ${JavaVersion.current()}")
+    // otherwise Kotlin will use Stream.toList() from JDK 15+, which will cause Karibu not working on JDK 14-
+}
+
 subprojects {
     apply {
         plugin("maven-publish")

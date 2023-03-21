@@ -179,10 +179,10 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun getAttributeNames(): Enumeration<String> = attributes.keys()
 
-    override fun getRemoteAddr(): String = "127.0.0.1"
+    override fun getRemoteAddr(): String = MockHttpEnvironment.remoteAddr
 
     override fun getHeaders(name: String): Enumeration<String> {
-        val h = headers.get(name)
+        val h = headers[name]
         return if (h == null) Collections.emptyEnumeration() else Collections.enumeration(h)
     }
 

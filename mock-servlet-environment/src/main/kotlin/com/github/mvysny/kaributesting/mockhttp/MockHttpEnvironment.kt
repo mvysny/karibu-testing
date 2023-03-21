@@ -40,6 +40,11 @@ public object MockHttpEnvironment {
     public var remotePort: Int = 8080
 
     /**
+     * [MockRequest.getRemoteAddr]
+     */
+    public var remoteAddr: String = "127.0.0.1"
+
+    /**
      * [MockRequest.getAuthType]
      */
     public var authType: String? = null

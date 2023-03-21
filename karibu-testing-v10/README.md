@@ -1657,6 +1657,22 @@ Java:
 assertEquals("bar", UtilsKt.getMock(VaadinResponse.getCurrent()).getCookie("foo").getValue());
 ```
 
+## WebBrowser
+
+The `VaadinSession.getCurrent().getWebBrowser()` is populated when the UI is mocked.
+If you need to change one of the fields of the `WebBrowser` class, you can
+either change the fields directly via reflection, or you modify the values returned by `CurrentRequest`.
+To achieve that, modify `MockVaadin.mockRequestFactory`
+closure to create and initialize the MockRequest, then change:
+
+* `WebBrowser.secureConnection`: `MockHttpEnvironment.isSecure`
+* `WebBrowser.locale`: `MockRequest.localeInt`
+* `WebBrowser.address`: `MockHttpEnvironment.remoteAddr` (since KT 1.3.24)
+* `WebBrowser.browserApplication` and `WebBrowser.browserDetails`: it's enough to modify
+  `MockVaadin.userAgent`, you don't have to modify `mockRequestFactory`.
+
+Don't forget to call `MockVaadin.mock()` in order to apply the new values.
+
 ## Notifications
 
 Testing notifications is easy - just take advantage of the `expectNotifications()`,

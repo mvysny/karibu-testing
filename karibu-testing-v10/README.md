@@ -26,7 +26,8 @@ dependencies {
 }
 ```
 
-For Vaadin 23, use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
+For additional support for **Vaadin 23** (e.g. support for testing Vaadin 23 components such as `VirtualList`
+and `MultiselectComboBox`), use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
 
 > Note: obtain the newest version from the tag name above
 
@@ -50,7 +51,8 @@ to your `pom.xml`:
 </project>
 ```
 
-For Vaadin 23, use `karibu-testing-v23` instead (starting with Karibu-Testing 1.3.16).
+For additional support for **Vaadin 23** (e.g. support for testing Vaadin 23 components such as `VirtualList`
+and `MultiselectComboBox`), use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
 
@@ -1124,7 +1126,7 @@ See `IronListKt` class for more details.
 
 Similar to Grid/IronList, but one column only, no sorting, no filtering, no header,
 good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3.16 and Vaadin 23; you need to use the
-`karibu-testing-v23` module.
+`karibu-testing-v23` Maven dependency - see the top of this page for more information.
 
 * You can retrieve a bean at particular index; for example `virtualList._get(0)` will return the first item (Kotlin, Groovy).
   Java: you need to `import static com.github.mvysny.kaributesting.v23.VirtualListsKt.*;`, then you can call `_get(virtualList, 0);`.
@@ -1242,7 +1244,8 @@ to retrieve filtered items, in order to verify that the filter on your data prov
 Finally, call `msComboBox.selectByLabel()` to select an item by its label,
 changing the value of the combobox.
 
-Make sure to depend on `karibu-testing-v23` to gain access to these functions.
+Make sure to depend on `karibu-testing-v23` Maven dependency to gain access to these functions
+- see the top of this page for more information.
 
 ### Downloading Anchor/Image Contents
 
@@ -1533,6 +1536,30 @@ which requires Servlet Container to be up and running, yet Karibu-Testing doesn'
 start any Servlet Container. See [Issue #47](https://github.com/mvysny/karibu-testing/issues/47)
 for more details. The workaround is to [Manually Authenticate User with Spring Security](https://www.baeldung.com/manually-set-user-authentication-spring-security),
 before navigating to a view. 
+
+To add Karibu-Testing spring integration pack into your app, add the following dependencies to your project's `pom.xml`:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.github.mvysny.kaributesting</groupId>
+        <artifactId>karibu-testing-v10-spring</artifactId>
+        <version>1.3.23</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.github.mvysny.kaributesting</groupId>
+        <artifactId>karibu-testing-v23</artifactId>
+        <version>1.3.23</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+The first dependency will add the Karibu-Testing core jar (`karibu-testing-v10`) and a Spring integration
+jar on top of that (`karibu-testing-v10-spring`); the second dependency
+will add additional support for testing Vaadin 23 components such as `VirtualList`
+and `MultiselectComboBox`.
 
 ## Plugging into the testing lifecycle
 

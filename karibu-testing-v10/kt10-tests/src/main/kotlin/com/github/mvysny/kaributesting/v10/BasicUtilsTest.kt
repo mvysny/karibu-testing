@@ -144,6 +144,20 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             button { isEnabled = false; _expectDisabled() }
         }
     }
+
+    test("_expectNotReadOnly") {
+        TextField()._expectNotReadOnly()
+        expectThrows<AssertionError>("TextField[RO, value=''] is read-only") {
+            TextField().apply { isReadOnly = true } ._expectNotReadOnly()
+        }
+    }
+
+    test("_expectReadOnly") {
+        TextField().apply { isReadOnly = true } ._expectReadOnly()
+        expectThrows<AssertionError>("TextField[value=''] is not read-only") {
+            TextField()._expectReadOnly()
+        }
+    }
 }
 
 @Route("testing")

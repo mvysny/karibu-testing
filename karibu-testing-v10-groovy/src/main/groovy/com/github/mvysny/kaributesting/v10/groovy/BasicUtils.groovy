@@ -8,6 +8,7 @@ import com.github.mvysny.kaributools.IconName
 import com.github.mvysny.kaributools.IconUtilsKt
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.ComponentEvent
+import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
@@ -274,5 +275,19 @@ class BasicUtils {
      */
     static void _expectDisabled(@NotNull Component self) {
         BasicUtilsKt._expectDisabled(self)
+    }
+
+    /**
+     * Fails if given component is not {@link com.vaadin.flow.component.HasValue#isReadOnly() read-only}.
+     */
+    static void _expectReadOnly(@NotNull HasValue self) {
+        BasicUtilsKt._expectReadOnly(self)
+    }
+
+    /**
+     * Fails if given component is {@link HasValue#isReadOnly() read-only}.
+     */
+    static void _expectNotReadOnly(@NotNull HasValue self) {
+        BasicUtilsKt._expectNotReadOnly(self)
     }
 }

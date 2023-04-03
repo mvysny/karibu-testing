@@ -205,3 +205,21 @@ public fun Component._expectDisabled() {
         fail("${toPrettyString()} is not disabled")
     }
 }
+
+/**
+ * Fails if this component is not [read-only][HasValue.isReadOnly].
+ */
+public fun HasValue<*, *>._expectReadOnly() {
+    if (!isReadOnly) {
+        fail("${(this as Component).toPrettyString()} is not read-only")
+    }
+}
+
+/**
+ * Fails if this component is [read-only][HasValue.isReadOnly].
+ */
+public fun HasValue<*, *>._expectNotReadOnly() {
+    if (isReadOnly) {
+        fail("${(this as Component).toPrettyString()} is read-only")
+    }
+}

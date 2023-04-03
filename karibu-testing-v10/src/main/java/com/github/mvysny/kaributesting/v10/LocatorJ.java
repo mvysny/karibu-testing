@@ -365,7 +365,6 @@ public class LocatorJ {
         BasicUtilsKt._expectDisabled(component);
     }
 
-
     /**
      * Checks that a component is actually editable by the user:
      * <ul><li>The component must be effectively visible: it itself must be visible, its parent must be visible and all of its ascendants must be visible.
@@ -379,5 +378,21 @@ public class LocatorJ {
      */
     public static void assertEditableByUser(@NotNull Component component) {
         BasicUtilsKt.checkEditableByUser(component);
+    }
+
+    /**
+     * Fails if given component is not {@link HasValue#isReadOnly() read-only}.
+     * @param component the component to check
+     */
+    public static void _assertReadOnly(@NotNull HasValue<?, ?> component) {
+        BasicUtilsKt._expectReadOnly(component);
+    }
+
+    /**
+     * Fails if given component is {@link HasValue#isReadOnly() read-only}.
+     * @param component the component to check
+     */
+    public static void _assertNotReadOnly(@NotNull HasValue<?, ?> component) {
+        BasicUtilsKt._expectNotReadOnly(component);
     }
 }

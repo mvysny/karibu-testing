@@ -897,6 +897,8 @@ The above approach works with Kotlin and Groovy. With Java, you simply call `_cl
 
 * `button._expectEnabled()`/`LocatorJ._assertEnabled(button)` makes sure that the component is enabled. (since KT 1.3.19)
 * `button._expectDisabled()`/`LocatorJ._assertDisabled(button)` makes sure that the component is disabled. (since KT 1.3.19)
+* `textField._expectReadOnly()`/`LocatorJ._assertReadOnly(textField)` makes sure that a field is read-only. (since KT 1.3.24)
+* `textField._expectNotReadOnly()`/`LocatorJ._assertNotReadOnly(textField)` makes sure that a field is not read-only. (since KT 1.3.24)
 
 ### Changing values
 

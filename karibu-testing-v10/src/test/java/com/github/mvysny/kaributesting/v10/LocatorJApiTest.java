@@ -82,6 +82,10 @@ public class LocatorJApiTest {
         final Button disabledButton = new Button();
         disabledButton.setEnabled(false);
         _assertDisabled(disabledButton);
+        _assertNotReadOnly(new TextField());
+        final TextField readOnlyTF = new TextField();
+        readOnlyTF.setReadOnly(true);
+        _assertReadOnly(readOnlyTF);
 
         _fireValueChange(new TextField());
         _fireValueChange(new TextField(), true);

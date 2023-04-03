@@ -53,11 +53,11 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
             }
             fireShortcut(Key.KEY_A)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.CONTROL)
+            fireShortcut(Key.KEY_A, Key.CONTROL)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.CONTROL, KeyModifier.ALT)
+            fireShortcut(Key.KEY_A, Key.CONTROL, Key.ALT)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.ALT)
+            fireShortcut(Key.KEY_A, Key.ALT)
             expect(true) { clicked }
         }
 
@@ -82,11 +82,11 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
             expect(false) { clicked }
             fireShortcut(Key.SPACE)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.CONTROL)
+            fireShortcut(Key.SPACE, Key.CONTROL)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.CONTROL, KeyModifier.ALT)
+            fireShortcut(Key.SPACE, Key.CONTROL, Key.ALT)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.ALT)
+            fireShortcut(Key.SPACE, Key.ALT)
             expect(true) { clicked }
         }
     }
@@ -113,11 +113,11 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
             Shortcuts.addShortcutListener(currentUI, Command { clicked = true }, Key.KEY_A, KeyModifier.values()[2] /*ALT*/)
             fireShortcut(Key.KEY_A)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.CONTROL)
+            fireShortcut(Key.KEY_A, Key.CONTROL)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.CONTROL, KeyModifier.ALT)
+            fireShortcut(Key.KEY_A, Key.CONTROL, Key.ALT)
             expect(false) { clicked }
-            fireShortcut(Key.KEY_A, KeyModifier.ALT)
+            fireShortcut(Key.KEY_A, Key.ALT)
             expect(true) { clicked }
         }
 
@@ -136,11 +136,11 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
             expect(false) { clicked }
             fireShortcut(Key.SPACE)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.CONTROL)
+            fireShortcut(Key.SPACE, Key.CONTROL)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.CONTROL, KeyModifier.ALT)
+            fireShortcut(Key.SPACE, Key.CONTROL, Key.ALT)
             expect(false) { clicked }
-            fireShortcut(Key.SPACE, KeyModifier.ALT)
+            fireShortcut(Key.SPACE, Key.ALT)
             expect(true) { clicked }
         }
     }

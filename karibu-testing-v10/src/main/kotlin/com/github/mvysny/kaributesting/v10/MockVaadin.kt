@@ -27,7 +27,16 @@ public object MockVaadin {
     private val strongRefUI = ThreadLocal<UI>()
     private val strongRefReq = ThreadLocal<VaadinRequest>()
     private val strongRefRes = ThreadLocal<VaadinResponse>()
-    private val lastNavigation = ThreadLocal<Location>()
+
+    /**
+     * When closing UI via [MockVaadin.closeCurrentUI], the UI location is remembered here.
+     *
+     * The reason is: when reloading the page via [Page.reload], the current UI is closed
+     * and a new one is opened; the new one needs to preserve the location of the old one.
+     *
+     * See [MockPage.reload] for more details.
+     */
+    private val lastUILocation = ThreadLocal<Location>()
 
     /**
      * Mocks Vaadin for the current test method:
@@ -101,7 +110,7 @@ public object MockVaadin {
      */
     public fun closeCurrentUI(fireUIDetach: Boolean) {
         val ui: UI = UI.getCurrent() ?: return
-        lastNavigation.set(ui.internals.activeViewLocation)
+        lastUILocation.set(ui.internals.activeViewLocation)
         if (ui.isClosing && ui.internals.session != null) {
             ui._close()
         }
@@ -127,7 +136,7 @@ public object MockVaadin {
             service.fireServiceDestroyListeners(ServiceDestroyEvent(service))
             VaadinService.setCurrent(null)
         }
-        lastNavigation.remove()
+        lastUILocation.remove()
     }
 
     private fun clearVaadinInstances(fireUIDetach: Boolean) {
@@ -236,9 +245,9 @@ public object MockVaadin {
         session.service.fireUIInitListeners(ui)
 
         // navigate to the initial page
-        if (lastNavigation.get() != null) {
-            UI.getCurrent().internals.router.navigate(UI.getCurrent(), lastNavigation.get()!!, NavigationTrigger.PROGRAMMATIC)
-            lastNavigation.remove()
+        if (lastUILocation.get() != null) {
+            UI.getCurrent().internals.router.navigate(UI.getCurrent(), lastUILocation.get()!!, NavigationTrigger.PROGRAMMATIC)
+            lastUILocation.remove()
         } else {
             if (UI.getCurrent().internals.router.registry.getNavigationTarget("").isPresent) {
                 UI.getCurrent().navigate("")

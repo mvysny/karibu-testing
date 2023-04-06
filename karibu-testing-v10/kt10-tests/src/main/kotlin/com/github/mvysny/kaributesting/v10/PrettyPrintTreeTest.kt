@@ -72,17 +72,24 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                     _prepare()
                 }.toPrettyString()
             }
-            expect("Column[header='My Header']") {
+            expect("Column[header='My Header', flexGrow=1]") {
                 Grid<Any>().run {
                     addColumn { it }.apply {
                         header2 = "My Header"
                     }
                 }.toPrettyString()
             }
-            expect("Column[header='My Header', key='foo']") {
+            expect("Column[header='My Header', key='foo', flexGrow=1]") {
                 Grid<Any>().run {
                     addColumn { it }.apply {
                         header2 = "My Header"; key = "foo"
+                    }
+                }.toPrettyString()
+            }
+            expect("Column[header='My Header', key='foo', resizable, autoWidth, sortable, flexGrow=2]") {
+                Grid<Any>().run {
+                    addColumn { it }.apply {
+                        header2 = "My Header"; key = "foo"; isResizable = true; this.width = "256px"; this.isAutoWidth = true; this.flexGrow = 2; this.isSortable = true
                     }
                 }.toPrettyString()
             }
@@ -186,7 +193,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             }
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
-    └── Column[header='Hello!']
+    └── Column[header='Hello!', sortable, flexGrow=1]
 """.trim()) { grid.toPrettyTree().trim() }
         }
 
@@ -219,7 +226,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
             expect("""
 └── Grid[<String>, dataprovider='ListDataProvider<?>(0 items)']
     ├── TextField[label='Filter:', value='']
-    └── Column[]""".trim()) { grid.toPrettyTree().trim() }
+    └── Column[sortable, flexGrow=1]""".trim()) { grid.toPrettyTree().trim() }
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/37
@@ -237,9 +244,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
     ├── TextField[label='Filter:', value='']
     └── ColumnGroup[]
         ├── ColumnGroup[]
-        │   └── Column[header='foo']
+        │   └── Column[header='foo', sortable, flexGrow=1]
         └── ColumnGroup[]
-            └── Column[header='bar']""".trim()) { grid.toPrettyTree().trim() }
+            └── Column[header='bar', sortable, flexGrow=1]""".trim()) { grid.toPrettyTree().trim() }
         }
     }
 }

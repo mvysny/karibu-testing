@@ -110,6 +110,10 @@ public fun Component.toPrettyString(): String {
         if (!this.key.isNullOrBlank()) {
             list.add("key='${this.key}'")
         }
+        if (this.isResizable) list.add("resizable")
+        if (this.isAutoWidth) list.add("autoWidth")
+        if (this.isSortable) list.add("sortable")
+        list.add("flexGrow=${this.flexGrow}")
     }
     if (!placeholder.isNullOrBlank()) {
         list.add("placeholder='$placeholder'")

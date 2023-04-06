@@ -1054,3 +1054,16 @@ public fun <T> Grid<T>._selectAll() {
     clientSelectAllMethod.isAccessible = true
     clientSelectAllMethod.invoke(selectionModel)
 }
+
+/**
+ * Simulates user resizing column to [newWidth] pixels. Fires [ColumnResizeEvent] and updates [Grid.Column.setWidth].
+ * You can use [_getColumnByKey] to lookup column by key.
+ */
+public fun <T> Grid<T>._fireColumnResizedEvent(column: Grid.Column<T>, newWidth: Int) {
+    require(column.grid == this) { "Column ${column.toPrettyString()} is from grid ${column.grid.toPrettyString()} but this grid is ${toPrettyString()}" }
+    require(newWidth >= 0) { "The width must be 0 or higher but was $newWidth" }
+    require(column.isResizable) { "The column ${column.toPrettyString()} is not resizable" }
+    val id = column._internalId
+    column.setWidth("${newWidth}px")
+    _fireEvent(ColumnResizeEvent(this, true, id))
+}

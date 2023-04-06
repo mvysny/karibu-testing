@@ -73,6 +73,15 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
             withBypassSetUserInput(false)
             withBypassSetUserInput(true)
         }
+        group("_fireCustomValueSet") {
+            test("smoke") {
+                val cb = ComboBox<String>().apply {
+                    setItems2(listOf("aaa", "bbb", "ccc"))
+                    isAllowCustomValue = true
+                }
+                cb._fireCustomValueSet("ddd")
+            }
+        }
     }
 
     group("Select") {

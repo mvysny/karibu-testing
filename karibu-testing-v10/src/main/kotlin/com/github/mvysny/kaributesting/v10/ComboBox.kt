@@ -4,6 +4,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.ComponentEvent
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
@@ -112,6 +113,14 @@ public fun <T> ComboBox<T>.selectByLabel(
     }
 }
 
+private val _ComboBoxBase: Class<*>? by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    try {
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    } catch (e: ClassNotFoundException) {
+        null
+    }
+}
+
 /**
  * Simulates the user creating a custom item. Only works if the field is editable by the user
  * and allows custom values ([ComboBox.isAllowCustomValue] is true).
@@ -119,7 +128,14 @@ public fun <T> ComboBox<T>.selectByLabel(
 public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _expectEditableByUser()
     check(isAllowCustomValue) { "${toPrettyString()} doesn't allow custom values" }
-    _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
+    if (_ComboBoxBase != null) {
+        val eventClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase${'$'}CustomValueSetEvent")
+        val event = eventClass.constructors[0].newInstance(this, true, userInput)
+        _fireEvent(event as ComponentEvent<*>)
+    } else {
+        // Older Vaadin API uses GeneratedVaadinComboBox
+        _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
+    }
 }
 
 private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {

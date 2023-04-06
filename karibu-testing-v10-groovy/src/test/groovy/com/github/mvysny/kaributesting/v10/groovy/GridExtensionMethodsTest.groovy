@@ -20,7 +20,6 @@ import java.text.NumberFormat
  * Merely a test of the API. No need to test the implementation, it is thoroughly tested elsewhere.
  * @author mavi
  */
-@CompileStatic
 class GridExtensionMethodsTest {
     @BeforeEach void setup() {
         MockVaadin.setup()
@@ -79,5 +78,8 @@ class GridExtensionMethodsTest {
         new TreeGrid<String>()._expandAll()
 
         grid._getColumnByKey("foo")._internalId
+
+        grid.getColumnByKey("foo").setResizable(true)
+        grid._fireColumnResizedEvent(grid.getColumnByKey("foo"), 125)
     }
 }

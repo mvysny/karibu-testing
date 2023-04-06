@@ -407,4 +407,13 @@ class GridExtensionMethods {
     static <T> void _editItem(@NotNull Editor<T> self, T item) {
         GridKt._editItem(self, item)
     }
+
+    /**
+     * Simulates user resizing column to `newWidth` pixels. Fires {@link com.vaadin.flow.component.grid.ColumnResizeEvent}
+     * and updates {@link Grid.Column#setWidth(java.lang.String)}. You can use {@link #_getColumnByKey(com.vaadin.flow.component.grid.Grid, java.lang.String)}
+     * to lookup column by key.
+     */
+    static <T> void _fireColumnResizedEvent(@NotNull Grid<T> self, @NotNull Grid.Column<T> column, int newWidth) {
+        GridKt._fireColumnResizedEvent(self, column, newWidth)
+    }
 }

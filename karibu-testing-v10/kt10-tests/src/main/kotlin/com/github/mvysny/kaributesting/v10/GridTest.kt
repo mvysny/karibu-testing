@@ -9,6 +9,8 @@ import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.grid.ColumnReorderEvent
+import com.vaadin.flow.component.grid.ColumnResizeEvent
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
@@ -813,6 +815,23 @@ internal fun DynaNodeGroup.gridTestbatch() {
             age = -100
             grid._selectRow(4)
             expect(-3) { age }
+        }
+    }
+
+    group("_fireColumnResizedEvent") {
+        test("smoke") {
+            lateinit var column: Grid.Column<TestPerson>
+            val grid = UI.getCurrent().grid<TestPerson> {
+                column = columnFor(TestPerson::name) {
+                    isResizable = true
+                }
+            }
+            lateinit var event: ColumnResizeEvent<TestPerson>
+            grid.addColumnResizeListener { event = it }
+            grid._fireColumnResizedEvent(column, 250)
+            expect(true) { event.isFromClient }
+            expect(column) { event.resizedColumn }
+            expect("250px") { column.width }
         }
     }
 }

@@ -3,11 +3,11 @@ plugins {
 }
 
 dependencies {
-    api("org.codehaus.groovy:groovy:3.0.13")
+    api("org.codehaus.groovy:groovy:3.0.17")
     // IDEA language injections
-    api("com.intellij:annotations:12.0")
+    api("org.jetbrains:annotations:24.0.1")
 
-    // don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
+    // 1. don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     compileOnly("com.vaadin:vaadin-core:${properties["vaadin24_version"]}")

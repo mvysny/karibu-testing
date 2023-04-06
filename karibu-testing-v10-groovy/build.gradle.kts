@@ -7,11 +7,12 @@ dependencies {
     // IDEA language injections
     api("org.jetbrains:annotations:24.0.1")
 
-    // don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
+    // 1. don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
-    compileOnly("com.vaadin:vaadin-core:${properties["vaadin23_version"]}")
-    testImplementation("com.vaadin:vaadin-core:${properties["vaadin23_version"]}")
+    // 2. Keep Vaadin 22 dependency: Vaadin 23 requires Java11+
+    compileOnly("com.vaadin:vaadin-core:${properties["vaadin22_version"]}")
+    testImplementation("com.vaadin:vaadin-core:${properties["vaadin22_version"]}")
 
     api(project(":karibu-testing-v10"))
 

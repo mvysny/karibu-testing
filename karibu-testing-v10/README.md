@@ -1090,6 +1090,12 @@ Java: `GridKt._editItem(grid.getEditor(), item)`.
 
 > Note: for this API to work, the Grid must be attached to an UI.
 
+#### Resizing Grid Columns
+
+Call `grid._fireColumnResizedEvent(column, 150)` (Java: `GridKt._fireColumnResizedEvent(grid, column, 150);`)
+to simulate user resizing a column in the grid. The `isFromClient` will be `true`
+and the new width will be stored in the `column` as `150px`.
+
 #### TreeGrid
 
 All of the functions mentioned above also work on a TreeGrid. The index of a row is essentially

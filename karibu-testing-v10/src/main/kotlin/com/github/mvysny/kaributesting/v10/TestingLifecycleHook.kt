@@ -1,8 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import _getDialogFooterChildren
-import _getDialogHeaderChildren
-import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.component
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
@@ -14,7 +11,6 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
-import com.vaadin.flow.dom.Element
 import java.lang.reflect.Method
 import kotlin.streams.toList
 

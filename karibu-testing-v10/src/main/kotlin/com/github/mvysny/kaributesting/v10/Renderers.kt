@@ -44,6 +44,7 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
 
         val valueProvidersProperty = this::class.java.getDeclaredField("valueProviders")
         valueProvidersProperty.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
         val valueProviders = valueProvidersProperty.get(this) as Map<String, ValueProvider<T, *>>
 
         val renderedLitTemplateHtml: String = renderLitTemplate(templateExpression, valueProviders, rowObject)

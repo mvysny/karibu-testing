@@ -23,9 +23,9 @@ public val currentPath: String? get() =
  */
 public fun resolveRoute(path: String): Class<out Component>? {
     // trim & remove any query parameters
-    val path = path.trim('/').substringBefore('?')
+    val trimmedPath = path.trim('/').substringBefore('?')
     val registry: RouteRegistry = currentUI.internals.router.registry
-    val segments: List<String> = path.split('/')
+    val segments: List<String> = trimmedPath.split('/')
     for (prefix: Int in segments.size downTo 1) {
         val p: String = segments.subList(0, prefix).joinToString("/")
         val s: List<String> = segments.subList(prefix, segments.size)

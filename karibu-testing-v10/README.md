@@ -1103,8 +1103,8 @@ Utility functions:
 
 You can use the calls above to assert on the status of the column, for example:
 
-* `expect(false) { grid._getColumnByKey("delete").isVisible }` may make sure that the currently logged-in user can't delete stuff.
-  Java: `assertFalse(GridKt._getColumnByKey(grid, "delete"));`
+* `expect(false) { grid._getColumnByKey(columnKey).isVisible }` asserts that a column with key `columnKey` is not visible.
+  Java: `assertFalse(GridKt._getColumnByKey(grid, columnKey));`
 
 #### Resizing Grid Columns
 

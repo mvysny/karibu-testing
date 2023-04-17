@@ -41,6 +41,7 @@ public fun <T> CheckboxGroup<T>.selectByLabel(vararg labels: String) {
  */
 internal fun <T> HasValue<*, Set<T>>.selectByLabel(labels: Set<String>, itemLabelGenerator: ItemLabelGenerator<T>) {
     // maps label to items that have the label
+    @Suppress("UNCHECKED_CAST")
     val items: Map<String, List<T>> = ((this as Component).dataProvider as DataProvider<T, *>)
         ._findAll()
         .groupBy { itemLabelGenerator.apply(it) }

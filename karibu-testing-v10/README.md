@@ -1093,6 +1093,19 @@ Java: `GridKt._editItem(grid.getEditor(), item)`.
 
 > Note: for this API to work, the Grid must be attached to an UI.
 
+#### Grid Columns
+
+Utility functions:
+
+* `grid._getColumnByKey(String)` looks up a column by its key, failing with a clean informative message
+  if the column is not found. Java: `GridKt._getColumnByKey(grid, String)`
+* Alternatively, if the columns have no keys set, you can locate a column by its header text: `grid._getColumnByHeader(String)`.
+
+You can use the calls above to assert on the status of the column, for example:
+
+* `expect(false) { grid._getColumnByKey("delete").isVisible }` may make sure that the currently logged-in user can't delete stuff.
+  Java: `assertFalse(GridKt._getColumnByKey(grid, "delete"));`
+
 #### Resizing Grid Columns
 
 Call `grid._fireColumnResizedEvent(column, 150)` (Java: `GridKt._fireColumnResizedEvent(grid, column, 150);`)

@@ -125,10 +125,10 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
         }
         throw NotFoundException(message).apply { initCause(parameter.caughtException) }
     }
+}
 
-    private fun RouteData.toPrettyString(): String {
-        val template = template
-        val path: String = if (template.isNullOrBlank()) "<root>" else "/$template"
-        return "${navigationTarget.simpleName} at '$path'"
-    }
+internal fun RouteData.toPrettyString(): String {
+    val template = template
+    val path: String = if (template.isNullOrBlank()) "<root>" else "/$template"
+    return "${navigationTarget.simpleName} at '$path'"
 }

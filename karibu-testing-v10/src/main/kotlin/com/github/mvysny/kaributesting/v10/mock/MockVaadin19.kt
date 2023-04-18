@@ -49,7 +49,6 @@ public object MockVaadin19 {
      * @return the instance of `com.vaadin.flow.di.Lookup`.
      */
     public fun verifyHasLookup(ctx: ServletContext): Lookup {
-        check(VaadinMeta.hasLookup) { "Lookup is only available in Vaadin 19+ and 14.6+" }
         val lookup: Any? = ctx.getAttribute("com.vaadin.flow.di.Lookup")
         checkNotNull(lookup) {
             "The context doesn't contain the Vaadin 19 Lookup class. Available attributes: " + ctx.attributeNames.toList()
@@ -85,14 +84,9 @@ public object MockVaadin19 {
     }
 }
 
-// only Vaadin 19+ and Vaadin 14.6+ (but not Vaadin 15-18) has Lookup
-internal val VaadinMeta.hasLookup: Boolean
-    get() = VaadinVersion.get.isAtLeast(19) ||
-            (VaadinVersion.get.isAtLeast(14,6) && VaadinVersion.get.isExactly(14))
-
 internal fun checkVaadinSupportedByKaribuTesting() {
-    if (!VaadinMeta.hasLookup) {
+    if (!VaadinVersion.get.isAtLeast(24)) {
         // this Vaadin has no Lookup support => unsupported
-        throw RuntimeException("Karibu-Testing 2+ only support Vaadin 24+ but the project uses Vaadin ${VaadinVersion.get}. Please try Karibu-Testing 1.2.x instead.")
+        throw RuntimeException("Karibu-Testing 2+ only support Vaadin 24+ but the project uses Vaadin ${VaadinVersion.get}. Please try Karibu-Testing 1.3.x instead.")
     }
 }

@@ -239,7 +239,7 @@ public object MockVaadin {
         }
         ui.internals.session = session
         UI.setCurrent(ui)
-        ui.doInit(request, 1)
+        ui.doInit(request, 1, "ROOT-1")
         strongRefUI.set(ui)
 
         session.addUI(ui)

@@ -2,7 +2,6 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributools.serverClick
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
@@ -18,7 +17,9 @@ import kotlin.test.fail
  */
 public fun <T : ClickNotifier<*>> T._click() {
     _checkClickable()
-    // fire both DOM click event, and the ClickNotifier higher-level event: https://github.com/mvysny/karibu-testing/issues/151
+    // Fire the DOM click event. That will both call the 'click' DOM event listeners,
+    // and also causes Vaadin Flow to fire the ClickNotifier
+    // higher-level event from its internal handling code. Requested by: https://github.com/mvysny/karibu-testing/issues/151
     (this as Component)._fireDomClickEvent()
 }
 

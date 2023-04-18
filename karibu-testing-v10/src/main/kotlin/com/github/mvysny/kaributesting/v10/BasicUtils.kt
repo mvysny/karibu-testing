@@ -36,6 +36,32 @@ public fun Component._fireDomEvent(
 }
 
 /**
+ * Adds [com.vaadin.flow.component.button.Button.click] functionality to all [ClickNotifier]s. This function directly calls
+ * all click listeners, thus it avoids the roundtrip to client and back. It even works with browserless testing.
+ * @param fromClient see [ComponentEvent.isFromClient], defaults to true.
+ * @param button see [ClickEvent.getButton], defaults to 0.
+ * @param clickCount see [ClickEvent.getClickCount], defaults to 1.
+ */
+public fun Component._fireDomClickEvent(
+    button: Int = 0,
+    clickCount: Int = 1,
+    shiftKey: Boolean = false,
+    ctrlKey: Boolean = false,
+    altKey: Boolean = false,
+    metaKey: Boolean = false
+) {
+    val json = Json.createObject().apply {
+        put("event.button", Json.create(button.toDouble()))
+        put("event.detail", Json.create(clickCount.toDouble()))
+        put("event.shiftKey", Json.create(shiftKey))
+        put("event.ctrlKey", Json.create(ctrlKey))
+        put("event.altKey", Json.create(altKey))
+        put("event.metaKey", Json.create(metaKey))
+    }
+    _fireDomEvent("click", json)
+}
+
+/**
  * The same as [Component.getId] but without Optional.
  *
  * Workaround for https://github.com/vaadin/flow/issues/664

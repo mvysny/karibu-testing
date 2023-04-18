@@ -949,6 +949,11 @@ Note that `Component._fireDomEvent()` will fail if the component is not editable
 On the other hand, the `Element._fireDomEvent()`/`ElementUtilsKt._fireDomEvent(Element)` will always fire the event,
 regardless of the visibility of the associated component.
 
+Additional info:
+
+* Call `Component._fireDomClickEvent()` to fire the "click" DOM event; Java: `BasicUtilsKt._fireDomClickEvent()`
+* The `_click()` utility function will fire both DOM "click" events, and the ClickNotifier higher-level event.
+
 #### Notifying `@DomEvent` listeners
 
 Using the above technique it's possible to also fire higher-level events annotated

@@ -6,7 +6,6 @@ import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
-import java.util.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
@@ -37,40 +36,14 @@ public open class MockVaadinServlet @JvmOverloads constructor(
 /**
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
-internal val VaadinServlet.serviceSafe: VaadinServletService? get() = service
+internal fun createVaadinServletRequest(request: HttpServletRequest, service: VaadinService): VaadinServletRequest =
+    VaadinServletRequest(request, service as VaadinServletService)
 
 /**
  * Workaround for https://github.com/mvysny/karibu-testing/issues/66
  */
-internal fun createVaadinServletRequest(request: HttpServletRequest, service: VaadinService): VaadinServletRequest {
-    // we need to use the reflection. The problem is that the signature
-    // of the constructor differs between Vaadin versions:
-    //
-    // Vaadin 14.6: VaadinServletRequest(HttpServletRequest, VaadinServletService)
-    // Vaadin 20+: VaadinServletRequest(HttpServletRequest, VaadinService)
-    //
-    // calling the constructor directly will cause MethodNotFoundError.
-    val constructor: Constructor<*> =
-        VaadinServletRequest::class.java.declaredConstructors.first { it.parameterCount == 2 }
-    return constructor.newInstance(request, service) as VaadinServletRequest
-}
-
-private val _VaadinServletResponse_constructor: Constructor<*> =
-    VaadinServletResponse::class.java.declaredConstructors.first { it.parameterCount == 2 }
-
-/**
- * Workaround for https://github.com/mvysny/karibu-testing/issues/66
- */
-internal fun createVaadinServletResponse(response: HttpServletResponse, service: VaadinService): VaadinServletResponse {
-    // we need to use the reflection. The problem is that the signature
-    // of the constructor differs between Vaadin versions:
-    //
-    // Vaadin 14.6: VaadinServletResponse(HttpServletResponse, VaadinServletService)
-    // Vaadin 20+: VaadinServletResponse(HttpServletResponse, VaadinService)
-    //
-    // calling the constructor directly will cause MethodNotFoundError.
-    return _VaadinServletResponse_constructor.newInstance(response, service) as VaadinServletResponse
-}
+internal fun createVaadinServletResponse(response: HttpServletResponse, service: VaadinService): VaadinServletResponse =
+    VaadinServletResponse(response, service as VaadinServletService)
 
 private val _WebBrowser_constructor: Constructor<WebBrowser> =
     WebBrowser::class.java.getDeclaredConstructor(VaadinRequest::class.java).apply {

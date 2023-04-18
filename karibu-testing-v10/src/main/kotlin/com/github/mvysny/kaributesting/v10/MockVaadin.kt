@@ -96,7 +96,7 @@ public object MockVaadin {
             val ctx: ServletContext = MockVaadinHelper.createMockContext()
             servlet.init(MockServletConfig(ctx))
         }
-        val service: VaadinServletService = checkNotNull(servlet.serviceSafe)
+        val service: VaadinServletService = checkNotNull(servlet.service)
         check(service.router != null) { "$servlet failed to call VaadinServletService.init() in createServletService()" }
         VaadinService.setCurrent(service)
 

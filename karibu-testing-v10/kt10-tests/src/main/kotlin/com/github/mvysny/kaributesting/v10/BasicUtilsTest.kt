@@ -94,6 +94,18 @@ internal fun DynaNodeGroup.basicUtilsTestbatch() {
             }
         }
     }
+    test("_fireDomClickEvent") {
+        val div = Div()
+        lateinit var event: ClickEvent<Div>
+        div.addClickListener { e -> event = e }
+        div._fireDomClickEvent(2, 3, true, true, true, true)
+        expect(2) { event.button }
+        expect(3) { event.clickCount }
+        expect(true) { event.isShiftKey }
+        expect(true) { event.isCtrlKey }
+        expect(true) { event.isAltKey }
+        expect(true) { event.isMetaKey }
+    }
 
     test("_focus") {
         val f = TextField()

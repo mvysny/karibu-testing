@@ -1106,6 +1106,8 @@ You can use the calls above to assert on the status of the column, for example:
 * `expect(false) { grid._getColumnByKey(columnKey).isVisible }` asserts that a column with key `columnKey` is not visible.
   Java: `assertFalse(GridKt._getColumnByKey(grid, columnKey));`
 
+To assert that a column doesn't exist: `assertNull(grid.getColumnByKey(key))`.
+
 #### Resizing Grid Columns
 
 Call `grid._fireColumnResizedEvent(column, 150)` (Java: `GridKt._fireColumnResizedEvent(grid, column, 150);`)

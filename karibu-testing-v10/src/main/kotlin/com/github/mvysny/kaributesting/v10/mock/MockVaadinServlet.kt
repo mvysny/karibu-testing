@@ -6,8 +6,6 @@ import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 
 /**
  * Makes sure that [routes] are properly registered, and that [MockService]
@@ -32,18 +30,6 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         return service
     }
 }
-
-/**
- * Workaround for https://github.com/mvysny/karibu-testing/issues/66
- */
-internal fun createVaadinServletRequest(request: HttpServletRequest, service: VaadinService): VaadinServletRequest =
-    VaadinServletRequest(request, service as VaadinServletService)
-
-/**
- * Workaround for https://github.com/mvysny/karibu-testing/issues/66
- */
-internal fun createVaadinServletResponse(response: HttpServletResponse, service: VaadinService): VaadinServletResponse =
-    VaadinServletResponse(response, service as VaadinServletService)
 
 private val _WebBrowser_constructor: Constructor<WebBrowser> =
     WebBrowser::class.java.getDeclaredConstructor(VaadinRequest::class.java).apply {

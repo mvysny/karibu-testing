@@ -142,4 +142,7 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     group("Tabs") {
         tabsTestbatch()
     }
+    group("Icon") {
+        iconTests()
+    }
 }

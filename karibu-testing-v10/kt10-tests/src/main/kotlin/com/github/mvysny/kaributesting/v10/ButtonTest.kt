@@ -98,7 +98,10 @@ internal fun DynaNodeGroup.buttonTestbatch() {
 fun DynaNodeGroup.clickTest(componentName: String, hasEnabled: Boolean, componentProvider: () -> ClickNotifier<*>) {
     fun <T : ClickNotifier<*>> expectClickCount(button: T, clickCount: Int) {
         var clicked = 0
-        button.addClickListener { if (++clicked > clickCount) fail("Clicked more than $clickCount times") }
+        button.addClickListener { e ->
+            if (++clicked > clickCount) fail("Clicked more than $clickCount times")
+            expect(true) { e.isFromClient }
+        }
         button._click()
         expect(clickCount) { clicked }
     }
@@ -111,7 +114,7 @@ fun DynaNodeGroup.clickTest(componentName: String, hasEnabled: Boolean, componen
         test("_click() also fires DOM Event") {
             val c = componentProvider()
             var domClicked = 0
-            (c as HasElement).element.addEventListener("click") { domClicked++ }
+            (c as HasElement).element.addEventListener("click") {domClicked++ }
             c._click()
             expect(1) { domClicked }
             expectClickCount(c, 1)

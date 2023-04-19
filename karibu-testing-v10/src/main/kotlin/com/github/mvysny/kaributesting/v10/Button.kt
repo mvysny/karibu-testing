@@ -5,13 +5,15 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.ComponentEvent
 import kotlin.test.fail
 
 /**
  * Performs a "browser" click on the component. Clicks the component,
  * but only if it is actually possible to do so by the user. If the button is read-only or disabled, it throws an exception.
  *
- * Notifies both [ClickNotifier] listeners and the DOM "click" event listeners.
+ * Notifies both [ClickNotifier] listeners and the DOM "click" event listeners;
+ * [ComponentEvent.isFromClient] will return true.
  * @throws IllegalArgumentException if the button was not visible, not enabled, read-only. See [_checkClickable] for
  * more details.
  */

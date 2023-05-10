@@ -12,13 +12,13 @@ dependencies {
 
     api("com.vaadin:vaadin:${properties["vaadin24_version"]}")
 
-    api("org.springframework.boot:spring-boot-starter-test:3.0.0") {
+    api("org.springframework.boot:spring-boot-starter-test:3.0.4") {
         exclude(group = "ch.qos.logback")
     }
-    api("org.springframework.boot:spring-boot-starter-web:3.0.0") {
+    api("org.springframework.boot:spring-boot-starter-web:3.0.4") {
         exclude(group = "ch.qos.logback")
     }
-    api("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
+    api("com.vaadin:vaadin-spring:${properties["vaadin24_version"]}")
     api(project(":karibu-testing-v10-spring"))
 
     // don't test EnhancedDialog: it's deprecated and doesn't work with Vaadin 24: https://vaadin.com/directory/component/enhanced-dialog

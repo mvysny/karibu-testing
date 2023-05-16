@@ -8,8 +8,10 @@ import com.vaadin.flow.server.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
+import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.jvm.Throws
 
 /**
  * Makes sure that [routes] are properly registered, and that [MockService]
@@ -22,6 +24,7 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         public val uiFactory: () -> UI = { MockedUI() }
 ) : VaadinServlet() {
 
+    @Throws(ServletException::class)
     override fun createDeploymentConfiguration(): DeploymentConfiguration {
         MockVaadinHelper.mockFlowBuildInfo(this)
         return super.createDeploymentConfiguration()
@@ -40,6 +43,7 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         return super.createDeploymentConfiguration(initParameters)
     }
 
+    @Throws(ServiceException::class)
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
         val service: VaadinServletService = MockService(this, deploymentConfiguration, uiFactory)
         service.init()

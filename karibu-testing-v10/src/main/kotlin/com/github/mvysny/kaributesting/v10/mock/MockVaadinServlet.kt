@@ -4,6 +4,7 @@ import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*
+import jakarta.servlet.ServletException
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
@@ -18,11 +19,13 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         public val uiFactory: () -> UI = { MockedUI() }
 ) : VaadinServlet() {
 
+    @Throws(ServletException::class)
     override fun createDeploymentConfiguration(): DeploymentConfiguration {
         MockVaadinHelper.mockFlowBuildInfo(this)
         return super.createDeploymentConfiguration()
     }
 
+    @Throws(ServiceException::class)
     override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
         val service: VaadinServletService = MockService(this, deploymentConfiguration, uiFactory)
         service.init()

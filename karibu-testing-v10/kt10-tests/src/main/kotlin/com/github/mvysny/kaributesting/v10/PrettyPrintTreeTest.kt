@@ -20,6 +20,7 @@ import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
@@ -140,6 +141,9 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 val testSpan = Span("hi")
                 TextField().prefixComponent = testSpan
                 testSpan.toPrettyString()
+            }
+            expect("Tab[label='foo', Tab{foo}]") {
+                Tab("foo").toPrettyString()
             }
         }
         group("notifications") {

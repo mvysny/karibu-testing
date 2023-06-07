@@ -156,5 +156,9 @@ public val VaadinContext.context: ServletContext get() = (this as VaadinServletC
 
 public val Servlet.isInitialized: Boolean get() = servletConfig != null
 
+/**
+ * Checks whether the class overrides [Object.toString]. If yes, it's expected that
+ * the overriden version provides an informative insight into the object state.
+ */
 internal fun Class<*>.hasCustomToString(): Boolean =
     getMethod("toString").declaringClass != java.lang.Object::class.java

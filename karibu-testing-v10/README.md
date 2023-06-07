@@ -6,15 +6,15 @@
 Compatibility chart:
 
 | Karibu-Testing version | Maintained | Supported Java                                                    | Supported Vaadin version                             |
-|-----------------------|-------------|-------------------------------------------------------------------|------------------------------------------------------|
-| 1.0.x                 | no          | Java 1.8+                                                         | Vaadin 10, Vaadin 11, Vaadin 12                      |
-| 1.1.x                 | no          | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 (bower mode, deprecated)        |
-| 1.2.0+                | no          | Java 1.8+                                                         | Vaadin 16-18                                         |
-| 1.2.3+                | no          | Java 1.8+                                                         | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16-18  |
-| 1.2.11+               | no          | Java 1.8+                                                         | Vaadin 14 (only 14.3+) in (p)npm mode; Vaadin 18-19+ |
-| **1.3.x**             | yes         | Java 1.8+                                                         | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19-23  |
-| 2.0.x                 | no          | Java 17+                                                          | Vaadin 24.0+                                         |
-| 2.1.x                 | yes         | Java 17+                                                          | Vaadin 24.1+                                         |
+|------------------------|-------------|-------------------------------------------------------------------|------------------------------------------------------|
+| 1.0.x                  | no          | Java 1.8+                                                         | Vaadin 10, Vaadin 11, Vaadin 12                      |
+| 1.1.x                  | no          | [Java 1.8-11](https://github.com/mvysny/karibu-testing/issues/31) | Vaadin 13, Vaadin 14 (bower mode, deprecated)        |
+| 1.2.0+                 | no          | Java 1.8+                                                         | Vaadin 16-18                                         |
+| 1.2.3+                 | no          | Java 1.8+                                                         | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16-18  |
+| 1.2.11+                | no          | Java 1.8+                                                         | Vaadin 14 (only 14.3+) in (p)npm mode; Vaadin 18-19+ |
+| **1.3.x**              | yes         | Java 1.8+                                                         | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19-23  |
+| 2.0.x                  | no          | Java 17+                                                          | Vaadin 24.0+                                         |
+| **2.1.x**              | yes         | Java 17+                                                          | Vaadin 24.1+                                         |
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

@@ -2,11 +2,10 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.karibudsl.v10.VaadinDsl
-import com.github.mvysny.karibudsl.v10.init
+import com.github.mvysny.karibudsl.v23.item
+import com.github.mvysny.karibudsl.v23.route
+import com.github.mvysny.karibudsl.v23.sideNav
 import com.github.mvysny.kaributesting.v23._click
-import com.vaadin.flow.component.Component
-import com.vaadin.flow.component.HasComponents
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.sidenav.SideNav
@@ -14,7 +13,6 @@ import com.vaadin.flow.component.sidenav.SideNavItem
 import org.myapp.AdminView
 import org.myapp.LoginView
 import org.myapp.routes
-import kotlin.reflect.KClass
 import kotlin.test.expect
 
 @DynaTestDsl
@@ -61,59 +59,4 @@ fun DynaNodeGroup.sideNavTests() {
         expect("SideNavItem[@path='login', label='foo']") { SideNavItem("foo", LoginView::class.java).toPrettyString() }
         expect("SideNavItem[@path='admin', label='bar']") { SideNavItem("bar", "admin").toPrettyString() }
     }
-}
-
-@VaadinDsl
-public fun (@VaadinDsl HasComponents).sideNav(
-    label: String? = null,
-    block: (@VaadinDsl SideNav).() -> Unit = {}
-): SideNav =
-    init(SideNav(label), block)
-
-@VaadinDsl
-public fun (@VaadinDsl SideNav).route(
-    routeClass: KClass<out Component>,
-    icon: VaadinIcon? = null,
-    block: (@VaadinDsl SideNavItem).() -> Unit = {}
-): SideNavItem {
-    val item = SideNavItem(routeClass.java.simpleName, routeClass.java, icon?.create())
-    block(item)
-    addItem(item)
-    return item
-}
-
-@VaadinDsl
-public fun (@VaadinDsl SideNav).item(
-    title: String,
-    path: String? = null,
-    block: (@VaadinDsl SideNavItem).() -> Unit = {}
-): SideNavItem {
-    val item = SideNavItem(title, path)
-    block(item)
-    addItem(item)
-    return item
-}
-
-@VaadinDsl
-public fun (@VaadinDsl SideNavItem).route(
-    routeClass: KClass<out Component>,
-    icon: VaadinIcon? = null,
-    block: (@VaadinDsl SideNavItem).() -> Unit = {}
-): SideNavItem {
-    val item = SideNavItem(routeClass.java.simpleName, routeClass.java, icon?.create())
-    block(item)
-    addItem(item)
-    return item
-}
-
-@VaadinDsl
-public fun (@VaadinDsl SideNavItem).item(
-    title: String,
-    path: String? = null,
-    block: (@VaadinDsl SideNavItem).() -> Unit = {}
-): SideNavItem {
-    val item = SideNavItem(title, path)
-    block(item)
-    addItem(item)
-    return item
 }

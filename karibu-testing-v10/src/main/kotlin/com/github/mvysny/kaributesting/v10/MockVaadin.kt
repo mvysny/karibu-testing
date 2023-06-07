@@ -205,7 +205,6 @@ public object MockVaadin {
         session.configuration = service.deploymentConfiguration
 
         VaadinSession.setCurrent(session)
-        session.setAttribute(UI.SERVER_ROUTING, true)
         strongRefSession.set(session)
         session.browser = WebBrowser(request)
         checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }

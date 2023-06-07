@@ -8,6 +8,8 @@ import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.sidenav.SideNav
+import com.vaadin.flow.component.sidenav.SideNavItem
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
@@ -153,6 +155,12 @@ public fun Component.toPrettyString(): String {
         if (!this.isOpened) {
             list.add("CLOSED")
         }
+    }
+    if (this is SideNav) {
+        list.add("label='$label'")
+    }
+    if (this is SideNavItem) {
+        list.add("label='$label'")
     }
     if (this.javaClass.hasCustomToString()) {
         // by default Vaadin components do not introduce toString() at all;

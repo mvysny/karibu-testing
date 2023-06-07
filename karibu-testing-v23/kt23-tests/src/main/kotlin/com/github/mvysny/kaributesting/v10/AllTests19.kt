@@ -33,4 +33,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     group("MultiselectComboBox") {
         multiselectComboBoxTests()
     }
+
+    group("SideNav") {
+        sideNavTests()
+    }
 }

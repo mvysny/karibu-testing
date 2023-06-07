@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.label
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -10,6 +11,8 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.menubar.MenuBar
+import com.vaadin.flow.component.sidenav.SideNav
+import com.vaadin.flow.component.sidenav.SideNavItem
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
@@ -65,6 +68,8 @@ public interface TestingLifecycleHook {
      * See [TestingLifecycleHookVaadin14Default.getAllChildren] for the default implementation.
      */
     public fun getAllChildren(component: Component): List<Component>
+
+    public fun getLabel(component: Component): String?
 
     public companion object {
         /**
@@ -142,6 +147,12 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
         else -> (component.children.toList() + component._getVirtualChildren()).distinct()
+    }
+
+    override fun getLabel(component: Component): String? = when (component) {
+        is SideNav -> component.label
+        is SideNavItem -> component.label
+        else -> component.label
     }
 }
 

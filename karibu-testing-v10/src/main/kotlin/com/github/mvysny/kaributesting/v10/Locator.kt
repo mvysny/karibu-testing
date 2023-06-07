@@ -83,7 +83,7 @@ public class SearchSpec<T : Component>(
         val p = mutableListOf<(Component)->Boolean>()
         p.add { component -> clazz.isInstance(component)}
         if (id != null) p.add { component -> component.id_ == id }
-        if (label != null) p.add { component -> component.label == label }
+        if (label != null) p.add { component -> testingLifecycleHook.getLabel(component) == label }
         @Suppress("DEPRECATION")
         if (caption != null) p.add { component -> component.caption == caption }
         if (placeholder != null) p.add { component -> component.placeholder == placeholder }

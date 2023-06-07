@@ -43,6 +43,12 @@ fun DynaNodeGroup.sideNavTests() {
         _expectOne<SideNavItem> { label = "AdminView" }
     }
 
+    test("lookup2") {
+        UI.getCurrent().sideNav("label23")
+        _expectOne<SideNav> { label = "label23" }
+        _expectNone<SideNav> { label = "label22" }
+    }
+
     test("click()") {
         SideNavItem("foo", LoginView::class.java)._click()
         _expectOne<LoginView>()

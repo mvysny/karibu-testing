@@ -88,7 +88,8 @@ public fun Component.toPrettyString(): String {
     if (!isEnabled) {
         list.add("DISABLED")
     }
-    if (label.isNotBlank()) {
+    val label = testingLifecycleHook.getLabel(this)
+    if (!label.isNullOrBlank()) {
         list.add("label='$label'")
     }
     if (!_text.isNullOrBlank()) {
@@ -155,12 +156,6 @@ public fun Component.toPrettyString(): String {
         if (!this.isOpened) {
             list.add("CLOSED")
         }
-    }
-    if (this is SideNav) {
-        list.add("label='$label'")
-    }
-    if (this is SideNavItem) {
-        list.add("label='$label'")
     }
     if (this.javaClass.hasCustomToString()) {
         // by default Vaadin components do not introduce toString() at all;

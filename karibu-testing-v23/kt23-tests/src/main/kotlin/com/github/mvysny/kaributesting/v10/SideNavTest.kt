@@ -56,7 +56,7 @@ fun DynaNodeGroup.sideNavTests() {
 
     test("toPrettyString()") {
         expect("SideNav[label='label']") { SideNav("label").toPrettyString() }
-        expect("SideNavItem[@path='login', label='foo']") { SideNavItem("foo", LoginView::class.java).toPrettyString() }
-        expect("SideNavItem[@path='admin', label='bar']") { SideNavItem("bar", "admin").toPrettyString() }
+        expect("SideNavItem[label='foo', @path='login']") { SideNavItem("foo", LoginView::class.java).toPrettyString() }
+        expect("SideNavItem[label='bar', @path='admin']") { SideNavItem("bar", "admin").toPrettyString() }
     }
 }

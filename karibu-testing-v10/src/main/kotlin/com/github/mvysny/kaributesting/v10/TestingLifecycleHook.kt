@@ -69,6 +69,15 @@ public interface TestingLifecycleHook {
      */
     public fun getAllChildren(component: Component): List<Component>
 
+    /**
+     * Returns the label of the component. According to the [official recommendation](https://github.com/vaadin/flow-components/issues/5129), only Vaadin
+     * fields should implement [com.vaadin.flow.component.HasLabel]. However, for testing purposes
+     * it's convenient to be able to look up also Tab and SideNavItem by their labels (and possibly other components as well,
+     * including your own custom components). That's exactly what this function is for - to retrieve the
+     * label from components other than [com.vaadin.flow.component.HasLabel].
+     *
+     * The default implementation only covers the Vaadin built-in components.
+     */
     public fun getLabel(component: Component): String?
 
     public companion object {

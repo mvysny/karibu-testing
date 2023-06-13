@@ -202,8 +202,8 @@ public class MyUITest {
 ```
 
 > **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest)
-testing framework which runs on top of JUnit5. You can of course use whichever
-testing library you prefer.
+> testing framework which runs on top of JUnit5. You can of course use whichever
+> testing library you prefer.
 
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `MainView` (since our
 simple testing app uses `MainView` as the root route):
@@ -261,7 +261,7 @@ all listeners are done; we can check that the click listener was run and it had 
 of the template, by examining the value of `ExampleTemplate`.
 
 > Note: as you'll learn later on, neither `Button.click()` nor `setValue()` will check for whether the component is enabled or not.
-Therefore it's important to use `button._click()` and `textField._value = "foo"` instead (Java: `_click(button)` and `_setValue(textField, "foo")`).
+> Therefore it's important to use `button._click()` and `textField._value = "foo"` instead (Java: `_click(button)` and `_setValue(textField, "foo")`).
 
 Obtaining the `Button` in this simple project is easy - it's the first child of the `MainView`
 so we can simply call `children.findFirst().get() as Button` to obtain the button.
@@ -879,6 +879,24 @@ everything added to the list will be pretty-printed by the `toPrettyString()` fu
 
 For example if your custom component has an icon, you can add the following item to the list:
 `list.add("icon='$icon'")`.
+
+### Pretty-Printing the component tree programmatically
+
+In order to obtain the pretty-printed component tree programmatically (e.g. you want to learn how
+the current UI looks like, or perhaps you want to include the tree in your assertion message), simply call:
+
+Kotlin/Groovy:
+
+```kotlin
+println(layout.toPrettyTree())
+println(UI.getCurrent().toPrettyTree())
+```
+
+Java:
+```java
+System.out.println(PrettyPrintTreeKt.toPrettyTree(layout));
+System.out.println(PrettyPrintTreeKt.toPrettyTree(UI.getCurrent()));
+```
 
 ### Clicking Buttons
 

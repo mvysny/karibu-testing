@@ -518,6 +518,18 @@ Call
    For example, for `http://localhost:8080/my/view?foo=bar` returns `my/view?foo=bar`.
 * `currentView`/`NavigatorKt.currentView` returns the class of the current view.
 
+#### MockRouteNotFoundError vs. RouteNotFoundError
+
+The `NotFoundException` is thrown by Vaadin when either the code or the browser tries to navigate to a route which
+doesn't exist (not registered via `@Route`). By default, Vaadin offers a `RouteNotFoundError` page which
+"catches" this exception and provides an informative page with a list of all routes (only in dev mode; see
+[Router Exception Handling](https://vaadin.com/docs/latest/routing/exceptions) for more info).
+
+That's great for development; for tests, it's better to throw the exception eagerly instead, so that the test
+will fail with an informative exception. That's exactly what `MockRouteNotFoundError` does: it
+replaces `RouteNotFoundError` and throws the `NotFoundException` navigation exception in its constructor,
+which then bubbles out and makes the test fail.
+
 ### Polymer Templates / Lit Templates
 
 > Note: Polymer Templates has been removed from Vaadin 24 and are no longer supported in Karibu-Testing 2.0.0+

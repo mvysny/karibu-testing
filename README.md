@@ -10,7 +10,7 @@ The Unit Testing library for [Vaadin](https://vaadin.com/).
 When building apps with Vaadin Flow, your app manipulates Vaadin components
 server-side, while the browser is just a mere "reflection" of
 the server-side state. For example, setting the `Button`'s caption to "Foo" updates the `Button`'s
-state server-side; Vaadin flow then automatically applies the change in the browser-side `<vaadin-button>` element.
+state server-side; Vaadin Flow then automatically applies the change in the browser-side `<vaadin-button>` element.
 This happens automatically, behind-the-scenes; this is tested by the Vaadin company and doesn't need to be
 tested by your app. Therefore, to test your app, you can leave out the "unimportant" browser part: you
 want your tests to focus on the server-side where your logic resides.

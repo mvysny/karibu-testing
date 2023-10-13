@@ -36,10 +36,23 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
+     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getLabel(Component)}; if {@code null}, no particular label is matched.
+     * @param label
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withLabel(@Nullable String label) {
+        spec.setLabel(label);
+        return this;
+    }
+
+    /**
      * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
      * @param caption
      * @return this
+     * @deprecated Use 'text' for Buttons, 'label' for everything else
      */
+    @Deprecated(forRemoval = true)
     @NotNull
     public SearchSpecJ<T> withCaption(@Nullable String caption) {
         spec.setCaption(caption);

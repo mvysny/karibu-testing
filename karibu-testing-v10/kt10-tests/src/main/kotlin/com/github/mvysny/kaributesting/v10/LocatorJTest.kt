@@ -9,6 +9,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
@@ -26,13 +27,13 @@ internal fun DynaNodeGroup.locatorJTest() {
     group("_get") {
         test("FailsOnNoComponents UI") {
             expectThrows(AssertionError::class) {
-                LocatorJ._get(Label::class.java)
+                LocatorJ._get(TextField::class.java)
             }
         }
 
         test("FailsOnNoComponents") {
             expectThrows(AssertionError::class) {
-                LocatorJ._get(Button(), Label::class.java)
+                LocatorJ._get(Button(), TextField::class.java)
             }
         }
 
@@ -47,7 +48,7 @@ internal fun DynaNodeGroup.locatorJTest() {
         test("selects self") {
             val button = Button("foo")
             expect(button) { LocatorJ._get(button, Button::class.java) }
-            expect(button) { LocatorJ._get(button, Button::class.java) { it.withCaption("foo") } }
+            expect(button) { LocatorJ._get(button, Button::class.java) { it.withText("foo") } }
         }
 
         test("ReturnsNested") {
@@ -65,7 +66,7 @@ internal fun DynaNodeGroup.locatorJTest() {
 
     group("_expectNone") {
         test("succeeds on no matched components") {
-            LocatorJ._assertNone(Button(), Label::class.java)
+            LocatorJ._assertNone(Button(), TextField::class.java)
         }
 
         test("fails when multiple components match") {
@@ -88,13 +89,13 @@ internal fun DynaNodeGroup.locatorJTest() {
     group("_expectOne") {
         test("FailsOnNoComponents UI") {
             expectThrows(AssertionError::class) {
-                LocatorJ._assertOne(Label::class.java)
+                LocatorJ._assertOne(TextField::class.java)
             }
         }
 
         test("FailsOnNoComponents") {
             expectThrows(AssertionError::class) {
-                LocatorJ._assertOne(Button(), Label::class.java)
+                LocatorJ._assertOne(Button(), TextField::class.java)
             }
         }
 
@@ -117,16 +118,16 @@ internal fun DynaNodeGroup.locatorJTest() {
 
     group("_expect") {
         test("FailsOnNoComponents UI") {
-            expectThrows(AssertionError::class) { LocatorJ._assert(Label::class.java, 1) }
+            expectThrows(AssertionError::class) { LocatorJ._assert(Button::class.java, 1) }
         }
 
         test("FailsOnNoComponents") {
-            expectThrows(AssertionError::class) { LocatorJ._assert(Button(), Label::class.java, 1) }
+            expectThrows(AssertionError::class) { LocatorJ._assert(Button(), TextField::class.java, 1) }
         }
 
         test("matching 0 components works") {
-            LocatorJ._assert(Label::class.java, 0)
-            LocatorJ._assert(Button(), Label::class.java, 0)
+            LocatorJ._assert(NativeLabel::class.java, 0)
+            LocatorJ._assert(Button(), NativeLabel::class.java, 0)
         }
 
         test("fails when the count is wrong") {
@@ -149,10 +150,10 @@ internal fun DynaNodeGroup.locatorJTest() {
 
         test("spec") {
             expectThrows(AssertionError::class) {
-                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withText("bar") }
             }
             expectThrows(AssertionError::class) {
-                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withText("bar") }
             }
         }
     }
@@ -169,12 +170,12 @@ internal fun DynaNodeGroup.locatorJTest() {
             expect(false) { Button().apply { id_ = "a" } .matches { withId("a b") } }
         }
         test("caption") {
-            expect(true) { Button("click me").matches { withCaption("click me") } }
-            expect(true) { TextField("name:").matches { withCaption("name:") } }
+            expect(true) { Button("click me").matches { withText("click me") } }
+            expect(true) { TextField("name:").matches { withLabel("name:") } }
             expect(true) { Button("click me").matches { } }
             expect(true) { TextField("name:").matches { } }
-            expect(false) { Button("click me").matches { withCaption("Click Me") } }
-            expect(false) { TextField("name:").matches { withCaption("Name") } }
+            expect(false) { Button("click me").matches { withText("Click Me") } }
+            expect(false) { TextField("name:").matches { withLabel("Name") } }
         }
         test("placeholder") {
             expect(true) { TextField("name").apply { placeholder = "the name" } .matches { withPlaceholder("the name") } }

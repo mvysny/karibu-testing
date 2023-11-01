@@ -61,25 +61,25 @@ subprojects {
                     this.artifactId = artifactId
                     version = project.version.toString()
                     pom {
-                        description.set("Karibu Testing, support for browserless Vaadin testing in Kotlin")
-                        name.set(artifactId)
-                        url.set("https://github.com/mvysny/karibu-testing")
+                        description = "Karibu Testing, support for browserless Vaadin testing in Kotlin"
+                        name = artifactId
+                        url = "https://github.com/mvysny/karibu-testing"
                         licenses {
                             license {
-                                name.set("The Apache Software License, Version 2.0")
-                                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                distribution.set("repo")
+                                name = "The Apache Software License, Version 2.0"
+                                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                                distribution = "repo"
                             }
                         }
                         developers {
                             developer {
-                                id.set("mavi")
-                                name.set("Martin Vysny")
-                                email.set("martin@vysny.me")
+                                id = "mavi"
+                                name = "Martin Vysny"
+                                email = "martin@vysny.me"
                             }
                         }
                         scm {
-                            url.set("https://github.com/mvysny/karibu-testing")
+                            url = "https://github.com/mvysny/karibu-testing"
                         }
                     }
 

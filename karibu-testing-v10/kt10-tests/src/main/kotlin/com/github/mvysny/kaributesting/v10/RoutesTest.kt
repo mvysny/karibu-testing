@@ -41,8 +41,9 @@ fun DynaNodeGroup.routesTestBatch() {
     }
 
     test("calling autoDiscoverViews() multiple times won't fail") {
-        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
-        expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+        repeat(5) {
+            expect(allViews) { Routes().autoDiscoverViews("com.github").routes }
+        }
     }
 
     // https://github.com/mvysny/karibu-testing/issues/50

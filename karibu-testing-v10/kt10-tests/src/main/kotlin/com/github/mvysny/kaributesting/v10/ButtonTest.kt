@@ -4,8 +4,6 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
-import com.github.mvysny.karibudsl.v10.checkBox
-import com.github.mvysny.karibudsl.v10.icon
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasElement
@@ -22,7 +20,6 @@ import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.html.UnorderedList
 import com.vaadin.flow.component.icon.Icon
-import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexLayout
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -45,8 +42,9 @@ internal fun DynaNodeGroup.buttonTestbatch() {
         }
 
         test("disabled button") {
-            // click() does not check for disabled state
-            expectClickCount(Button().apply { isEnabled = false }, 1) { click() }
+            // click() does not check for disabled state. Actually, in Vaadin 24.2.2+ it does, and the event is not fired.
+            // doesn't matter - you should always use _click()
+//            expectClickCount(Button().apply { isEnabled = false }, 0) { click() }
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Button[DISABLED] is not enabled") {
                 expectClickCount(Button().apply { isEnabled = false }, 0) { _click() }
@@ -57,8 +55,9 @@ internal fun DynaNodeGroup.buttonTestbatch() {
             val layout = VerticalLayout().apply { isEnabled = false }
             expect(false) { layout.isEnabled } // sanity check, to test that isEnabled works as intended
             expect(false) { layout.button().isEnabled } // sanity check, to test that isEnabled works as intended
-            // click() does not check for parent disabled state
-            expectClickCount(layout.button(), 1) { click() }
+            // click() does not check for parent disabled state. Actually, in Vaadin 24.2.2+ it does, and the event is not fired.
+            // doesn't matter - you should always use _click()
+//            expectClickCount(layout.button(), 1) { click() }
             // however _click() will properly fail
             expectThrows(IllegalStateException::class, "The Button[DISABLED] is nested in a disabled component") {
                 expectClickCount(layout.button(), 0) { _click() }

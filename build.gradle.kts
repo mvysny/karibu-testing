@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
     `maven-publish`
     signing
 }
@@ -20,6 +20,7 @@ allprojects {
         mavenCentral()
         maven(url = "https://maven.vaadin.com/vaadin-addons")
         maven(url = "https://maven.vaadin.com/vaadin-prereleases/")
+        maven(url = "https://repo.spring.io/milestone")
     }
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "17"

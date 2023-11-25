@@ -18,7 +18,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web:3.0.4") {
         exclude(group = "ch.qos.logback")
     }
-    api("com.vaadin:vaadin-spring:${properties["vaadin24_version"]}")
+    api("com.vaadin:vaadin-spring:${properties["vaadin24_version_spring"]}")
     api(project(":karibu-testing-v10-spring"))
 
     // don't test EnhancedDialog: it's deprecated and doesn't work with Vaadin 24: https://vaadin.com/directory/component/enhanced-dialog

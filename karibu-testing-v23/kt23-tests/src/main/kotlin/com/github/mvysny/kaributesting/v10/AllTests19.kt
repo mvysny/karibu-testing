@@ -37,4 +37,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
     group("SideNav") {
         sideNavTests()
     }
+
+    group("Tabs+TabSheet") {
+        tabsTests()
+    }
 }

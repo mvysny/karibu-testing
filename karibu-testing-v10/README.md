@@ -1484,6 +1484,12 @@ is implemented in JavaScript and thus it's impossible to click from Karibu-Testi
 Call `messageInput._submit("Hello World")`/`MessagesKt._submut(mi, "Hello World")` to submit a new message
 (fire the `SubmitEvent`).
 
+### Support for TabSheet/Tabs
+
+Call `Tab._select()` to select given tab (Java: `TabsKt._select(tab)`) (since Karibu-Testing 2.1.1, depend on `karibu-testing-v23` or higher).
+The `_select()` function will not allow you to select a disabled or invisible tab and will fail with an informative
+error message. This function works with tabs both nested in `Tabs` and in `TabSheet`.
+
 ## Adding support for custom search criteria
 
 > *Note*: this feature is unsupported for Java since Java lacks extension methods.

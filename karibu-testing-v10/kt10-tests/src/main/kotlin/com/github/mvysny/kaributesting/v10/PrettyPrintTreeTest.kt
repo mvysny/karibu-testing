@@ -143,6 +143,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 testSpan.toPrettyString()
             }
             expect("Tab[label='foo', Tab{foo}]") {
+                // The trailing Tab{foo} comes from the custom Tab.toString()
                 Tab("foo").toPrettyString()
             }
         }

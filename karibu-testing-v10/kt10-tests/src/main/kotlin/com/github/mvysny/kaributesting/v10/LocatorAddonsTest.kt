@@ -5,11 +5,8 @@ import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.caption
-import com.vaadin.flow.component.Component
-import com.vaadin.flow.component.HasComponents
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -98,11 +95,4 @@ internal fun DynaNodeGroup.locatorAddonsTests() {
             expect(ic) { _get<Icon> { iconIs(VaadinIcon.ABACUS) } }
         }
     }
-}
-
-// todo replace this with iconButton DSL from Karibu-DSL when released for Vaadin 24
-@VaadinDsl
-private fun (@VaadinDsl HasComponents).iconButton(icon: Component, block: (@VaadinDsl Button).() -> Unit = {}): Button = button(icon = icon) {
-    addThemeVariants(ButtonVariant.LUMO_ICON)
-    block()
 }

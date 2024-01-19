@@ -120,9 +120,7 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun getParameterNames(): Enumeration<String> = Collections.enumeration(parameters.keys)
 
-    override fun authenticate(response: HttpServletResponse?): Boolean {
-        throw UnsupportedOperationException("not implemented")
-    }
+    override fun authenticate(response: HttpServletResponse): Boolean = MockHttpEnvironment.authenticator(response)
 
     override fun getPathTranslated(): String {
         throw UnsupportedOperationException("not implemented")
@@ -130,9 +128,8 @@ public open class MockRequest(private var session: HttpSession) : HttpServletReq
 
     override fun getIntHeader(name: String): Int = getHeader(name)?.toInt() ?: -1
 
-    override fun changeSessionId(): String {
-        throw UnsupportedOperationException("not implemented")
-    }
+    override fun changeSessionId(): String =
+        (session as MockHttpSession).changeSessionId()
 
     override fun getAsyncContext(): AsyncContext {
         throw IllegalStateException("async not supported in mock environment")

@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.mockhttp
 
 import java.util.*
 import jakarta.servlet.*
+import jakarta.servlet.http.HttpServletResponse
 
 public open class MockServletConfig(public val context: ServletContext) : ServletConfig {
 
@@ -53,4 +54,9 @@ public object MockHttpEnvironment {
      * [MockRequest.isSecure]
      */
     public var isSecure: Boolean = false
+
+    /**
+     * [MockRequest.authenticate]
+     */
+    public var authenticator: (HttpServletResponse) -> Boolean = { throw UnsupportedOperationException("not implemented. Set MockHttpEnvironment.authenticator to override") }
 }

@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpSessionContext
  * A standalone implementation of the [HttpSession] interface.
  */
 public open class MockHttpSession(
-        private val sessionId: String,
+        private var sessionId: String,
         private val servletContext: ServletContext,
         private val creationTime: Long,
         private var maxInactiveInterval: Int
@@ -123,10 +123,16 @@ public open class MockHttpSession(
         private val sessionIdGenerator = AtomicInteger()
         public fun create(ctx: ServletContext): MockHttpSession =
             MockHttpSession(
-                sessionIdGenerator.incrementAndGet().toString(),
+                generateSessionId(),
                 ctx,
                 System.currentTimeMillis(),
                 30
             )
+        private fun generateSessionId(): String = sessionIdGenerator.incrementAndGet().toString()
+    }
+
+    public fun changeSessionId(): String {
+        sessionId = generateSessionId()
+        return sessionId
     }
 }

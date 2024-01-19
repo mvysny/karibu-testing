@@ -85,4 +85,8 @@ class MockRequestTest : DynaTest({
         request.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(true) { request.isUserInRole("foo") }
     }
+
+    test("changeSessionId()") {
+        expect(false) { request.session.id == request.changeSessionId() }
+    }
 })

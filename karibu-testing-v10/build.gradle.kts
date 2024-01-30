@@ -4,8 +4,8 @@ dependencies {
     //   npm mode and exclude all webjars.
     // - depend on "vaadin" instead of just "vaadin-core", to bring in Grid Pro.
     // - depend on the lowest Vaadin (Vaadin 14 LTS)
-    compileOnly("com.vaadin:vaadin:${properties["vaadin24_version"]}")
-    testImplementation("com.vaadin:vaadin:${properties["vaadin24_version"]}")
+    compileOnly(libs.vaadin24)
+    testImplementation(libs.vaadin24)
 
     api(project(":mock-servlet-environment5"))
     api(libs.kaributools)

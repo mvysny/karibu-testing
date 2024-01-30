@@ -9,8 +9,8 @@ dependencies {
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     // depend on vaadin instead of vaadin-core, to bring in Confirm Dialog and Grid Pro.
-    compileOnly("com.vaadin:vaadin:${properties["vaadin24_version"]}")
-    testImplementation("com.vaadin:vaadin:${properties["vaadin24_version"]}")
+    compileOnly(libs.vaadin24)
+    testImplementation(libs.vaadin24)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.slf4j.simple)

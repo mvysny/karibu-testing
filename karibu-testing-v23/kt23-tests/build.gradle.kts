@@ -7,6 +7,6 @@ dependencies {
     }
 
     api(project(":karibu-testing-v23"))
-    api("com.vaadin:vaadin-spring:${properties["vaadin24_version_spring"]}")
-    compileOnly("com.vaadin:vaadin:${properties["vaadin24_version"]}")
+    api(libs.vaadinspring24)
+    compileOnly(libs.vaadin24)
 }

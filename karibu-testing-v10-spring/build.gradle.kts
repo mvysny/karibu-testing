@@ -1,6 +1,6 @@
 dependencies {
     api(project(":karibu-testing-v10"))
-    compileOnly("com.vaadin:vaadin-spring:${properties["vaadin24_version_spring"]}")
+    compileOnly(libs.vaadinspring24)
 }
 
 @Suppress("UNCHECKED_CAST")

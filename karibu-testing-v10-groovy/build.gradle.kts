@@ -15,8 +15,8 @@ dependencies {
 
     api(project(":karibu-testing-v10"))
 
-    implementation("org.junit.jupiter:junit-jupiter-api:${properties["junit5_version"]}")
-    testImplementation("org.junit.jupiter:junit-jupiter:${properties["junit5_version"]}")
+    implementation(libs.junit.jupiterapi)
+    testImplementation(libs.junit.jupiter)
     api(kotlin("test"))
     testImplementation(libs.slf4j.simple)
 }

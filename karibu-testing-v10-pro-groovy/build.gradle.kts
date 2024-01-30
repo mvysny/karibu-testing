@@ -12,7 +12,7 @@ dependencies {
     compileOnly("com.vaadin:vaadin:${properties["vaadin24_version"]}")
     testImplementation("com.vaadin:vaadin:${properties["vaadin24_version"]}")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:${properties["junit5_version"]}")
+    testImplementation(libs.junit.jupiter)
     testImplementation(libs.slf4j.simple)
 }
 

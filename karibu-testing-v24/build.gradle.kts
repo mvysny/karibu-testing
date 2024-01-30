@@ -4,7 +4,7 @@ dependencies {
     api(project(":karibu-testing-v23"))
 
     testImplementation(libs.dynatest)
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    testImplementation(libs.slf4j.simple)
 }
 
 kotlin {

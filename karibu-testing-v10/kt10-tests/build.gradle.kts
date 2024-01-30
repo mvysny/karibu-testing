@@ -3,7 +3,7 @@ dependencies {
 
     // for testing purposes
     api(libs.dynatest)
-    api("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    api(libs.slf4j.simple)
     api("com.github.mvysny.karibudsl:karibu-dsl:${properties["karibudsl11_version"]}") {
         exclude(module = "javax.el")
     }

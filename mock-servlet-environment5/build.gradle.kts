@@ -1,10 +1,10 @@
 dependencies {
-    api("jakarta.servlet:jakarta.servlet-api:5.0.0")
+    api(libs.jakarta.servlet)
     api(kotlin("stdlib-jdk8"))
-    implementation("org.slf4j:slf4j-api:${properties["slf4j_version"]}")
+    implementation(libs.slf4j.api)
 
     testImplementation(libs.dynatest)
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    testImplementation(libs.slf4j.simple)
 }
 
 kotlin {

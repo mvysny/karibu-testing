@@ -18,7 +18,7 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api:${properties["junit5_version"]}")
     testImplementation("org.junit.jupiter:junit-jupiter:${properties["junit5_version"]}")
     api(kotlin("test"))
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    testImplementation(libs.slf4j.simple)
 }
 
 @Suppress("UNCHECKED_CAST")

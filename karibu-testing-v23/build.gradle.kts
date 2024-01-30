@@ -10,7 +10,7 @@ dependencies {
     api("com.github.mvysny.karibu-tools:karibu-tools-23:${properties["karibu_tools_version"]}")
 
     testImplementation(libs.dynatest)
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    testImplementation(libs.slf4j.simple)
 }
 
 kotlin {

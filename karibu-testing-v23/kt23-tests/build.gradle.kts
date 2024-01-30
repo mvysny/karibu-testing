@@ -2,7 +2,7 @@ dependencies {
     api(project(":karibu-testing-v10:kt10-tests")) {
         exclude(group = "com.vaadin")
     }
-    api("com.github.mvysny.karibudsl:karibu-dsl-v23:${properties["karibudsl11_version"]}") {
+    api(libs.karibudsl23) {
         exclude(module = "javax.el")
     }
 

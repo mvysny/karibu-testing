@@ -2,11 +2,14 @@
 dynatest = "0.24"
 slf4j = "2.0.9"
 kaributools = "0.18"
+karibudsl = "2.0.1"
 
 [libraries]
 dynatest = { module = "com.github.mvysny.dynatest:dynatest", version.ref = "dynatest" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 jakarta-servlet = "jakarta.servlet:jakarta.servlet-api:5.0.0"
-kaributools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref="kaributools" }
-kaributools23 = { module = "com.github.mvysny.karibu-tools:karibu-tools-23", version.ref="kaributools" }
+kaributools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref = "kaributools" }
+kaributools23 = { module = "com.github.mvysny.karibu-tools:karibu-tools-23", version.ref = "kaributools" }
+karibudsl = { module = "com.github.mvysny.karibudsl:karibu-dsl", version.ref = "karibudsl" }
+karibudsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.ref = "karibudsl" }

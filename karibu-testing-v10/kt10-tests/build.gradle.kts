@@ -4,7 +4,7 @@ dependencies {
     // for testing purposes
     api(libs.dynatest)
     api(libs.slf4j.simple)
-    api("com.github.mvysny.karibudsl:karibu-dsl:${properties["karibudsl11_version"]}") {
+    api(libs.karibudsl) {
         exclude(module = "javax.el")
     }
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")

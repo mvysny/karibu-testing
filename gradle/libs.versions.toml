@@ -1,0 +1,5 @@
+[versions]
+dynatest = "0.24"
+
+[libraries]
+dynatest = { module = "com.github.mvysny.dynatest:dynatest", version.ref = "dynatest" }

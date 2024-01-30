@@ -3,7 +3,7 @@ dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation("org.slf4j:slf4j-api:${properties["slf4j_version"]}")
 
-    testImplementation("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
+    testImplementation(libs.dynatest)
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 }
 

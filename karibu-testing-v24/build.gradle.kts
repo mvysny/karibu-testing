@@ -3,7 +3,7 @@ dependencies {
     testImplementation("com.vaadin:vaadin:${properties["vaadin24_version"]}")
     api(project(":karibu-testing-v23"))
 
-    testImplementation("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
+    testImplementation(libs.dynatest)
     testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
 }
 

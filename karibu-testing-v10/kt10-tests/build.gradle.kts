@@ -2,7 +2,7 @@ dependencies {
     api(project(":karibu-testing-v10"))
 
     // for testing purposes
-    api("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
+    api(libs.dynatest)
     api("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
     api("com.github.mvysny.karibudsl:karibu-dsl:${properties["karibudsl11_version"]}") {
         exclude(module = "javax.el")

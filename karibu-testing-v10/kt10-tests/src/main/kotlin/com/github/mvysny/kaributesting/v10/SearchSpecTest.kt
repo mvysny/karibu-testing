@@ -2,7 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.karibudsl.v10.DateRangePopup
+import com.github.mvysny.kaributools.LabelWrapper
 import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Text
@@ -61,9 +61,9 @@ internal fun DynaNodeGroup.searchSpecTest() {
         expect(false) { spec.toPredicate()(RadioButtonGroup<Int>().apply { label = "bar" }) }
         expect(false) { spec.toPredicate()(RadioButtonGroup<Int>()) }
         // tests CustomField
-        expect(true) { spec.toPredicate()(DateRangePopup().apply { label = "foo" }) }
-        expect(false) { spec.toPredicate()(DateRangePopup().apply { label = "bar" }) }
-        expect(false) { spec.toPredicate()(DateRangePopup()) }
+        expect(true) { spec.toPredicate()(LabelWrapper("foo")) }
+        expect(false) { spec.toPredicate()(LabelWrapper("bar")) }
+        expect(false) { spec.toPredicate()(LabelWrapper("")) }
 
         expect(true) { spec.toPredicate()(Input().apply { label = "foo" }) }
         expect(false) { spec.toPredicate()(Input().apply { label = "bar" }) }
@@ -106,9 +106,9 @@ internal fun DynaNodeGroup.searchSpecTest() {
         expect(false) { spec.toPredicate()(RadioButtonGroup<Int>().apply { label = "bar" }) }
         expect(false) { spec.toPredicate()(RadioButtonGroup<Int>()) }
         // tests CustomField
-        expect(true) { spec.toPredicate()(DateRangePopup().apply { label = "foo" }) }
-        expect(false) { spec.toPredicate()(DateRangePopup().apply { label = "bar" }) }
-        expect(false) { spec.toPredicate()(DateRangePopup()) }
+        expect(true) { spec.toPredicate()(LabelWrapper("foo")) }
+        expect(false) { spec.toPredicate()(LabelWrapper(label = "bar")) }
+        expect(false) { spec.toPredicate()(LabelWrapper("")) }
 
         expect(true) { spec.toPredicate()(Input().apply { label = "foo" }) }
         expect(false) { spec.toPredicate()(Input().apply { label = "bar" }) }

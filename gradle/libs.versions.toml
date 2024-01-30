@@ -1,8 +1,8 @@
 [versions]
 dynatest = "0.24"
 slf4j = "2.0.9"
-kaributools = "0.18"
-karibudsl = "2.0.1"
+kaributools = "0.19"
+karibudsl = "2.1.2"
 
 [libraries]
 dynatest = { module = "com.github.mvysny.dynatest:dynatest", version.ref = "dynatest" }

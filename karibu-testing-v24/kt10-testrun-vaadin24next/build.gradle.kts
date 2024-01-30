@@ -1,5 +1,5 @@
 dependencies {
-    testImplementation("com.vaadin:vaadin:${properties["vaadin24next_version"]}")
-    testImplementation("com.vaadin:vaadin-spring:${properties["vaadin24next_version_spring"]}")
+    testImplementation(libs.vaadin24next)
+    testImplementation(libs.vaadinspring24next)
     testImplementation(project(":karibu-testing-v23:kt23-tests"))
 }

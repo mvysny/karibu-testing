@@ -24,3 +24,6 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 vaadin24 = { module = "com.vaadin:vaadin", version.ref = "vaadin24" }
 vaadincore24 = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24" }
 vaadinspring24 = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24_spring" }
+vaadin24next = { module = "com.vaadin:vaadin", version.ref = "vaadin24next" }
+vaadincore24next = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24next" }
+vaadinspring24next = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }

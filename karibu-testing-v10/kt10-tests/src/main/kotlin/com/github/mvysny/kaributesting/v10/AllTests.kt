@@ -113,7 +113,10 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         npmPolymerTemplateTestBatch(isModuleTest)
     }
     group("dialog") {
-        dialogTestbatch()
+        dialogTests()
+    }
+    group("Composite") {
+        compositeTests()
     }
     group("radio button") {
         radioButtonTests()

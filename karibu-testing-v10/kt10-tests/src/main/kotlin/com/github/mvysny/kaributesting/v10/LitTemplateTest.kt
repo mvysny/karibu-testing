@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dependency.JsModule
@@ -72,6 +73,21 @@ fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
             val form = MyForm()
             expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._find<Component>().toSet() }
             expect(form.emailField) { form._get<EmailField>() }
+        }
+
+        group("Composite") {
+            class CompositeForm : Composite<MyForm>()
+            test("false") {
+                val form = CompositeForm()
+                expect(setOf(form, form.content)) { form._find<Component>().toSet() }
+                form._expectNone<EmailField>()
+            }
+            test("true") {
+                includeVirtualChildrenInTemplates = true
+                val form = CompositeForm()
+                expect(setOf(form, form.content, form.content.emailField, form.content.firstNameField, form.content.lastNameField)) { form._find<Component>().toSet() }
+                expect(form.content.emailField) { form._get<EmailField>() }
+            }
         }
     }
 }

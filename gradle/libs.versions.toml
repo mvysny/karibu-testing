@@ -1,6 +1,6 @@
 [versions]
 dynatest = "0.24"
-slf4j = "2.0.9"
+slf4j = "2.0.11"
 kaributools = "0.19"
 karibudsl = "2.1.2"
 junit5 = "5.9.3"

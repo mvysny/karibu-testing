@@ -1,6 +1,6 @@
 dependencies {
-    compileOnly(libs.vaadin24)
-    testImplementation(libs.vaadin24)
+    compileOnly(libs.vaadin.v24.all)
+    testImplementation(libs.vaadin.v24.all)
     api(project(":karibu-testing-v23"))
 
     testImplementation(libs.dynatest)

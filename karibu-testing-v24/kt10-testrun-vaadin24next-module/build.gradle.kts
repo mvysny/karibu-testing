@@ -1,6 +1,6 @@
 dependencies {
-    testImplementation(libs.vaadin24next)
-    testImplementation(libs.vaadinspring24next)
+    testImplementation(libs.vaadin.v24next.all)
+    testImplementation(libs.vaadin.v24next.spring)
     testImplementation(project(":karibu-testing-v23:kt23-tests")) {
         exclude(group = "com.github.appreciated")
     }

@@ -21,9 +21,9 @@ karibudsl = { module = "com.github.mvysny.karibudsl:karibu-dsl", version.ref = "
 karibudsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.ref = "karibudsl" }
 junit-jupiterapi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
-vaadin24 = { module = "com.vaadin:vaadin", version.ref = "vaadin24" }
-vaadincore24 = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24" }
-vaadinspring24 = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24_spring" }
-vaadin24next = { module = "com.vaadin:vaadin", version.ref = "vaadin24next" }
-vaadincore24next = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24next" }
-vaadinspring24next = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }
+vaadin-v24-all = { module = "com.vaadin:vaadin", version.ref = "vaadin24" }
+vaadin-v24-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24" }
+vaadin-v24-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24_spring" }
+vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin24next" }
+vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24next" }
+vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }

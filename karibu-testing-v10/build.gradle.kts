@@ -15,7 +15,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 
     // to have the class autodiscovery functionality
-    implementation("io.github.classgraph:classgraph:4.8.151")
+    implementation(libs.classgraph)
 }
 
 kotlin {

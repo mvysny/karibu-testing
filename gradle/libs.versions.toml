@@ -1,5 +1,4 @@
 [versions]
-dynatest = "0.24"
 slf4j = "2.0.11"
 kaributools = "0.19"
 karibudsl = "2.1.2"
@@ -11,7 +10,7 @@ vaadin24next = "24.4.0.alpha2"
 vaadin24next_spring = "24.4.0.alpha2"
 
 [libraries]
-dynatest = { module = "com.github.mvysny.dynatest:dynatest", version.ref = "dynatest" }
+dynatest = "com.github.mvysny.dynatest:dynatest:0.24"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 jakarta-servlet = "jakarta.servlet:jakarta.servlet-api:5.0.0"
@@ -27,3 +26,6 @@ vaadin-v24-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin
 vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin24next" }
 vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24next" }
 vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }
+classgraph = "io.github.classgraph:classgraph:4.8.151"
+jetbrains-annotations = "org.jetbrains:annotations:24.0.1"
+groovy = "org.codehaus.groovy:groovy:3.0.17"

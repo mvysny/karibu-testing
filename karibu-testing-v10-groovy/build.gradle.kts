@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    api("org.codehaus.groovy:groovy:3.0.17")
+    api(libs.groovy)
     // IDEA language injections
-    api("org.jetbrains:annotations:24.0.1")
+    api(libs.jetbrains.annotations)
 
     // 1. don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the

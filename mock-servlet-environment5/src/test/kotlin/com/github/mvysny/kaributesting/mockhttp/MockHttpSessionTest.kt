@@ -37,6 +37,9 @@ class MockHttpSessionTest : DynaTest({
     }
 
     group("invalidate") {
+        beforeGroup { MockHttpEnvironment.strictSessionValidityChecks = true }
+        afterGroup { MockHttpEnvironment.strictSessionValidityChecks = false }
+
         test("smoke") {
             session.invalidate()
             expect(false) { (session as MockHttpSession).isValid }
@@ -48,11 +51,10 @@ class MockHttpSessionTest : DynaTest({
             }
         }
         test("getAttribute() succeeds on invalidated session") {
-            // Yup, I know this breaks the contract. See MockHttpSession.getAttribute() for more details.
             session.invalidate()
-//            expectThrows(IllegalStateException::class) {
+            expectThrows(IllegalStateException::class) {
                 session.getAttribute("foo")
-//            }
+            }
         }
         test("getId() succeeds on invalidated session") {
             session.invalidate()

@@ -5,7 +5,6 @@ package com.github.mvysny.kaributesting.mockhttp
 import java.io.Serializable
 import java.util.Enumeration
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 import jakarta.servlet.ServletContext
@@ -22,9 +21,10 @@ public open class MockHttpSession(
         private var maxInactiveInterval: Int
 ) : HttpSession, Serializable {
     private val attributes = ConcurrentHashMap<String, Any>()
-    private val valid = AtomicBoolean(true)
+    @Volatile
+    private var valid = true
 
-    public val isValid: Boolean get() = valid.get()
+    public val isValid: Boolean get() = valid
 
     public constructor(session: HttpSession) : this(session.id, session.servletContext, session.lastAccessedTime, session.maxInactiveInterval) {
         copyAttributes(session)
@@ -62,8 +62,9 @@ public open class MockHttpSession(
         // However, Spring's SecurityContextLogoutHandler calls getContext() on logout after invalidating the session,
         // which goes to VaadinAwareSecurityContextHolderStrategy.getContext() which then calls getAttribute() on the session.
 
-        // Since it apparently works in other servlet containers, we'll disable the check.
-        //checkValid()
+        // Since it apparently works in other servlet containers, we'll disable the check by default. See MockHttpEnvironment.strictSessionValidityChecks
+        // for more details.
+        checkValid()
         return attributes[name]
     }
 
@@ -83,8 +84,9 @@ public open class MockHttpSession(
         // However, Spring's SecurityContextLogoutHandler invalidates the session then
         // calls HttpSessionSecurityContextRepository.saveContextInHttpSession() which then calls setAttribute() on the session.
 
-        // Since it apparently works in other servlet containers, we'll disable the check.
-        //checkValid()
+        // Since it apparently works in other servlet containers, we'll disable the check by default. See MockHttpEnvironment.strictSessionValidityChecks
+        // for more details.
+        checkValid()
         attributes.putOrRemove(name, value)
     }
 
@@ -112,7 +114,7 @@ public open class MockHttpSession(
 
     override fun invalidate() {
         checkValid()
-        valid.set(false)
+        valid = false
     }
 
     override fun isNew(): Boolean {
@@ -121,7 +123,7 @@ public open class MockHttpSession(
     }
 
     private fun checkValid() {
-        if (!isValid) {
+        if (!isValid && MockHttpEnvironment.strictSessionValidityChecks) {
             throw IllegalStateException("invalidated: $this")
         }
     }

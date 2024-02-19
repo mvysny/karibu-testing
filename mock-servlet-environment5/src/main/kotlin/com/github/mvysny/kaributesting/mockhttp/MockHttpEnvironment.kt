@@ -59,4 +59,16 @@ public object MockHttpEnvironment {
      * [MockRequest.authenticate]
      */
     public var authenticator: (HttpServletResponse) -> Boolean = { throw UnsupportedOperationException("not implemented. Set MockHttpEnvironment.authenticator to override") }
+
+    /**
+     * According to the servlet spec, HttpSession functions should fail on an invalidated session.
+     * However, apparently the servlet containers do not take this check too seriously since existing Spring Security servlet-related
+     * code apparently works and is happily reading and writing http session attributes on an invalidated session.
+     *
+     * Therefore this setting defaults to false which disables all session invalidity checks. Turn this
+     * to true, to make [MockHttpSession] behave according to the spec.
+     *
+     * See [MockHttpSession.getAttribute] implementation for more details.
+     */
+    public var strictSessionValidityChecks: Boolean = false
 }

@@ -145,18 +145,20 @@ and compatibility with all latest Vaadin versions is checked on every commit.
 
 A list of a very simple example projects that employ Karibu Testing:
 
-* Vaadin 8 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
-* Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
-* Vaadin 21 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu10-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 24 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu-helloworld-application](https://github.com/mvysny/karibu10-helloworld-application)
+* Vaadin 24 + Java + Spring Security + Maven: [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
+* Vaadin 24 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
+* Vaadin 24 + JOOQ + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-jooq)
+* Vaadin 24 + JDBI-ORM + Maven + Junit5: [jdbi-orm-vaadin-crud-demo](https://github.com/mvysny/jdbi-orm-vaadin-crud-demo)
+* Vaadin 24 + Vaadin-on-Kotlin + Gradle + DynaTest: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
+* Vaadin 24 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
+* Vaadin 23 + Spring Boot + Java + Maven + JUnit 5: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
 * Vaadin 14 + Java + Maven + JUnit 5: [skeleton-starter-kt](https://github.com/mvysny/skeleton-starter-kt)
 * Vaadin 14 + Java + Maven + JUnit 5: [vaadin10-sqldataprovider-example](https://github.com/mvysny/vaadin10-sqldataprovider-example)
-* Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
-* Vaadin 21 + Spring Boot + Java + Maven + JUnit 5: [t-shirt-shop-example](https://github.com/mvysny/t-shirt-shop-example)
-* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Bookstore Example](https://github.com/mvysny/bookstore-vok)
-* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Beverage Buddy VoK](https://github.com/mvysny/beverage-buddy-vok)
-* Vaadin 14 + Vaadin-on-Kotlin + Gradle + DynaTest: [Vaadin Kotlin PWA](https://github.com/mvysny/vaadin-kotlin-pwa)
 * Vaadin 14 + Java + Quarkus + Maven: [vaadin-quarkus](https://github.com/mvysny/vaadin-quarkus) (also check the `v19` branch for Vaadin 19).
-* Vaadin 21 + Java + Spring Security + Maven: [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
+* Vaadin 8 + Kotlin + Gradle + [DynaTest](https://github.com/mvysny/dynatest): [karibu8-helloworld-application](https://github.com/mvysny/karibu-helloworld-application)
+* Vaadin 8 + Java + Maven + JUnit 5: [vaadin8-sqldataprovider-example](https://github.com/mvysny/vaadin8-sqldataprovider-example)
+* Vaadin 8 + Spring Boot + Java + Maven + JUnit 4: [karibu-testing-spring](https://github.com/mvysny/karibu-testing-spring)
 
 ## Limitations
 

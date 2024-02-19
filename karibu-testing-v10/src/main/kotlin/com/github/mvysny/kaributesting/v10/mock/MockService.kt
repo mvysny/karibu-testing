@@ -28,4 +28,5 @@ public open class MockService(servlet: VaadinServlet,
     override fun getMainDivId(session: VaadinSession?, request: VaadinRequest?): String = "ROOT-1"
     override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this, uiFactory)
     override fun getInstantiator(): Instantiator = MockInstantiator.create(super.getInstantiator())
+    override fun getDeploymentConfiguration(): DeploymentConfiguration = FakeDeploymentConfiguration(super.getDeploymentConfiguration())
 }

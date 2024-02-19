@@ -4,9 +4,11 @@ import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper;
 import com.github.mvysny.kaributesting.v10.Routes;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.function.DeploymentConfiguration;
+import com.vaadin.flow.server.Constants;
 import com.vaadin.flow.server.ServiceException;
 import com.vaadin.flow.server.VaadinServletContext;
 import com.vaadin.flow.server.VaadinServletService;
+import com.vaadin.flow.server.frontend.FrontendUtils;
 import com.vaadin.flow.spring.SpringServlet;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +17,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
+
+import java.io.File;
 
 /**
  * Makes sure that the {@link #routes} are properly registered,
@@ -39,6 +43,8 @@ public class MockSpringServlet extends SpringServlet {
     @Override
     protected DeploymentConfiguration createDeploymentConfiguration() throws ServletException {
         MockVaadinHelper.mockFlowBuildInfo(this);
+        // workaround for https://github.com/vaadin/flow/issues/18682
+        System.setProperty(Constants.VAADIN_PREFIX + FrontendUtils.PARAM_FRONTEND_DIR, new File(FrontendUtils.DEFAULT_FRONTEND_DIR).getAbsolutePath());
         return super.createDeploymentConfiguration();
     }
 

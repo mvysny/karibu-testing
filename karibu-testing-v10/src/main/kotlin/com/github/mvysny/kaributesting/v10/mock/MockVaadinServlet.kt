@@ -4,7 +4,9 @@ import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.server.*
+import com.vaadin.flow.server.frontend.FrontendUtils
 import jakarta.servlet.ServletException
+import java.io.File
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
@@ -22,6 +24,8 @@ public open class MockVaadinServlet @JvmOverloads constructor(
     @Throws(ServletException::class)
     override fun createDeploymentConfiguration(): DeploymentConfiguration {
         MockVaadinHelper.mockFlowBuildInfo(this)
+        // workaround for https://github.com/vaadin/flow/issues/18682
+        System.setProperty(Constants.VAADIN_PREFIX + FrontendUtils.PARAM_FRONTEND_DIR, File(FrontendUtils.DEFAULT_FRONTEND_DIR).absolutePath)
         return super.createDeploymentConfiguration()
     }
 

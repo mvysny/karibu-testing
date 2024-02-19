@@ -4,10 +4,10 @@ kaributools = "0.19"
 karibudsl = "2.1.2"
 junit5 = "5.9.3"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "24.3.3"
-vaadin24_spring = "24.3.3"
-vaadin24next = "24.4.0.alpha2"
-vaadin24next_spring = "24.4.0.alpha2"
+vaadin24 = "24.3.5"
+vaadin24_spring = "24.3.5"
+vaadin24next = "24.4.0.alpha4"
+vaadin24next_spring = "24.4.0.alpha4"
 
 [libraries]
 dynatest = "com.github.mvysny.dynatest:dynatest:0.24"

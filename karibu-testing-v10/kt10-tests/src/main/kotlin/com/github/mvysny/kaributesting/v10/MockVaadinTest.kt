@@ -10,10 +10,7 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
 import com.github.mvysny.karibudsl.v10.verticalLayout
-import com.github.mvysny.kaributesting.v10.mock.MockService
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
-import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
-import com.github.mvysny.kaributesting.v10.mock.MockedUI
+import com.github.mvysny.kaributesting.v10.mock.*
 import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.DetachEvent
@@ -539,6 +536,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 override fun isAtmosphereAvailable(): Boolean = false
                 override fun getMainDivId(session: VaadinSession, request: VaadinRequest): String = "ROOT-1"
                 override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this) { MockedUI() }
+                override fun getDeploymentConfiguration(): DeploymentConfiguration = FakeDeploymentConfiguration(super.getDeploymentConfiguration())
             }
             MockVaadin.tearDown()
             MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {

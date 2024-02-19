@@ -47,11 +47,12 @@ class MockHttpSessionTest : DynaTest({
                 session.invalidate()
             }
         }
-        test("getAttribute() fails on invalidated session") {
+        test("getAttribute() succeeds on invalidated session") {
+            // Yup, I know this breaks the contract. See MockHttpSession.getAttribute() for more details.
             session.invalidate()
-            expectThrows(IllegalStateException::class) {
+//            expectThrows(IllegalStateException::class) {
                 session.getAttribute("foo")
-            }
+//            }
         }
         test("getId() succeeds on invalidated session") {
             session.invalidate()

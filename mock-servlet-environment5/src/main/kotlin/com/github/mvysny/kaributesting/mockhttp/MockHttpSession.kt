@@ -58,7 +58,12 @@ public open class MockHttpSession(
     override fun getSessionContext(): HttpSessionContext? = null
 
     override fun getAttribute(name: String): Any? {
-        checkValid()
+        // according to the servlet spec we should throw an IllegalStateException if the session is invalidated.
+        // However, Spring's SecurityContextLogoutHandler calls getContext() on logout after invalidating the session,
+        // which goes to VaadinAwareSecurityContextHolderStrategy.getContext() which then calls getAttribute() on the session.
+
+        // Since it apparently works in other servlet containers, we'll disable the check.
+        //checkValid()
         return attributes[name]
     }
 
@@ -74,7 +79,12 @@ public open class MockHttpSession(
     override fun getValueNames(): Array<String> = attributeNames.toList().toTypedArray()
 
     override fun setAttribute(name: String, value: Any?) {
-        checkValid()
+        // according to the servlet spec we should throw an IllegalStateException if the session is invalidated.
+        // However, Spring's SecurityContextLogoutHandler invalidates the session then
+        // calls HttpSessionSecurityContextRepository.saveContextInHttpSession() which then calls setAttribute() on the session.
+
+        // Since it apparently works in other servlet containers, we'll disable the check.
+        //checkValid()
         attributes.putOrRemove(name, value)
     }
 

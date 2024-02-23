@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.sidenav.SideNav
 import com.vaadin.flow.component.sidenav.SideNavItem
+import com.vaadin.flow.data.provider.CallbackDataProvider
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
@@ -195,6 +196,11 @@ public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id
  * Pretty-prints a DataProvider.
  */
 public fun DataProvider<*, *>.toPrettyString(): String = when {
+    this is CallbackDataProvider ->
+        // in Vaadin 24.4.0.alpha5 CallbackDataProvider has toString() but it prints
+        // CallbackDataProvider(fetchCallback=com.github.mvysny.kaributesting.v10.Grid19TestKt$grid19Testbatch$3$2$2$grid$1$$Lambda/0x00007441dc57ec68@7be9582e, countCallback=com.vaadin.flow.data.provider.HasLazyDataView$$Lambda/0x00007441dc57d610@2297c8bf, idGetter=com.vaadin.flow.data.provider.CallbackDataProvider$$Lambda/0x00007441dc57d828@154fcedd)
+        // so it's almost useless. Fall back to just javaClass.simpleName
+        this.javaClass.simpleName
     javaClass.hasCustomToString() ->
         this.toString()
     this is ListDataProvider<*> ->

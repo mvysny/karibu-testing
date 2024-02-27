@@ -7,15 +7,15 @@ dependencies {
     api(libs.karibudsl) {
         exclude(module = "javax.el")
     }
-    implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
-    implementation("jakarta.el:jakarta.el-api:5.0.1")
+    implementation(libs.hibernate.validator)
+    implementation(libs.jakarta.el.api)
 
     api(libs.vaadin.v24.all)
 
-    api("org.springframework.boot:spring-boot-starter-test:3.0.4") {
+    api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")
     }
-    api("org.springframework.boot:spring-boot-starter-web:3.0.4") {
+    api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")
     }
     api(libs.vaadin.v24.spring)

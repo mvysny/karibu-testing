@@ -15,7 +15,7 @@ dependencies {
     api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")
     }
-    api(libs.spring.boot.starter.test) {
+    api(libs.spring.boot.starter.web) {
         exclude(group = "ch.qos.logback")
     }
     api(libs.vaadin.v24.spring)

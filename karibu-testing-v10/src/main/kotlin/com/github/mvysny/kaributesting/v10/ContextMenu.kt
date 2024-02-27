@@ -250,3 +250,11 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
         }
     }
 }
+
+private val __SubMenuBase_getMenuManager: Method by lazy {
+    val m = SubMenuBase::class.java.getDeclaredMethod("getMenuManager")
+    m.isAccessible = true
+    m
+}
+
+public val SubMenuBase<*, *, *>._menuManager: MenuManager<*, *, *> get() = __SubMenuBase_getMenuManager.invoke(this) as MenuManager<*, *, *>

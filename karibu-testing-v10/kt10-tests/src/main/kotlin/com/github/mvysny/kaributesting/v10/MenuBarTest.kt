@@ -55,10 +55,30 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
             }
             menuBar._expectOne<Span>()
         }
-        test("in submenu") {
+        test("Item in submenu") {
             val menuBar: MenuBar = UI.getCurrent().menuBar {
                 item("foo") {
                     item(Span("foo"))
+                }
+            }
+            menuBar._expectOne<Span>()
+        }
+        test("Component in submenu") {
+            // PopupButton in Karibu-DSL uses this trick
+            // test for https://github.com/mvysny/karibu-testing/issues/163
+            val menuBar: MenuBar = UI.getCurrent().menuBar {
+                item("foo") {
+                    subMenu.add(Span("foo"))
+                }
+            }
+            menuBar._expectOne<Span>()
+        }
+        test("Component in submenu") {
+            // PopupButton in Karibu-DSL uses this trick
+            // test for https://github.com/mvysny/karibu-testing/issues/163
+            val menuBar: MenuBar = UI.getCurrent().menuBar {
+                item("foo") {
+                    subMenu.add(Span("foo"))
                 }
             }
             menuBar._expectOne<Span>()

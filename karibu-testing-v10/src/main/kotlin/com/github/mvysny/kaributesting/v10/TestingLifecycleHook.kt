@@ -134,7 +134,10 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
         component is MenuItemBase<*, *, *> -> {
             val items: List<Component> = (component.subMenu as SubMenuBase<*, *, *>).items
             // also include component.children: https://github.com/mvysny/karibu-testing/issues/76
-            (component.children.toList() + items).distinct()
+            val children = component.children.toList()
+            // also include MenuManager's children: https://github.com/mvysny/karibu-testing/issues/163
+            val menuManagerChildren = component.subMenu._menuManager.children.toList()
+            (children + items + menuManagerChildren).distinct()
         }
         component is MenuBar -> {
             // don't include virtual children since that would make the MenuItems appear two times.

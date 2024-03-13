@@ -876,7 +876,12 @@ narrow down your search:
 
 ### Customizing dump for your components
 
-The `dump()` function uses the `toPrettyString()` function to print all basic information
+Call `System.out.println(PrettyPrintTreeKt.toPrettyTree(UI.getCurrent()))` to
+show a tree of all components attached to the current UI.
+Note that the tree may not be up-to-date for reasons, call `MockVaadin.clientRoundtrip();`
+to make it up-to-date; this is what all `_get()`/`_find()` functions do automatically.
+
+The `toPrettyTree()` function uses the `toPrettyString()` function to print all basic information
 about a Vaadin component: the visibility, read-only-ness, value, whether the component is enabled or not, etc.
 See the above dump for an example for a
 `TextField` and a `Button`.

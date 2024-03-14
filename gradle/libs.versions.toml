@@ -6,6 +6,8 @@ vaadin8 = "8.16.1"
 vaadin14 = "14.9.8"
 # Latest unstable Vaadin 14 version
 vaadin14_next = "14.10.4"
+vaadin23="23.2.17"
+vaadin23_next="23.3.19"
 # https://repo1.maven.org/maven2/org/slf4j/slf4j-api/
 slf4j = "2.0.12"
 # Stay on 1.0.8/1.1.3 because of Vaadin 8 compatibility
@@ -25,10 +27,13 @@ vaadin-v14 = { module = "com.vaadin:vaadin", version.ref = "vaadin14" }
 vaadin-v14next = { module = "com.vaadin:vaadin", version.ref = "vaadin14_next" }
 vaadin-v14core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14" }
 vaadin-v14nextcore = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14_next" }
+vaadin-v23-all = { module = "com.vaadin:vaadin", version.ref = "vaadin23" }
+vaadin-v23next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin23_next" }
 vaadin-spring = "com.vaadin:vaadin-spring:12.3.3"
 dynatest = "com.github.mvysny.dynatest:dynatest:0.24"
 karibu-dsl8 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v8", version.ref = "karibudsl10" }
 karibu-dsl = { module = "com.github.mvysny.karibudsl:karibu-dsl", version.ref = "karibudsl11" }
+karibu-dsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.ref = "karibudsl11" }
 fake-servlet = { module = "com.github.mvysny.fake-servlet:fake-servlet", version.ref = "fake-servlet" }
 fake-servlet5 = { module = "com.github.mvysny.fake-servlet:fake-servlet5", version.ref = "fake-servlet" }
 karibu-tools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref = "karibu_tools" }

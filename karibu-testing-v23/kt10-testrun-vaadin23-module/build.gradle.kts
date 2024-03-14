@@ -1,5 +1,5 @@
 dependencies {
-    testImplementation("com.vaadin:vaadin:${properties["vaadin23_version"]}")
+    testImplementation(libs.vaadin.v23.all)
     testImplementation(project(":karibu-testing-v23:kt23-tests")) {
         exclude(group = "com.github.appreciated")
     }

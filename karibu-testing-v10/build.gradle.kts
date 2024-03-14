@@ -7,7 +7,7 @@ dependencies {
     compileOnly(libs.vaadin.v24.all)
     testImplementation(libs.vaadin.v24.all)
 
-    api(project(":mock-servlet-environment5"))
+    api(libs.fake.servlet5)
     api(libs.kaributools)
 
     testImplementation(libs.dynatest)

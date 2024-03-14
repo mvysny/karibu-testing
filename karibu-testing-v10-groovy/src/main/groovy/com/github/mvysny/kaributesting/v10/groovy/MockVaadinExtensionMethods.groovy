@@ -1,8 +1,8 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
-import com.github.mvysny.kaributesting.mockhttp.MockHttpSession
-import com.github.mvysny.kaributesting.mockhttp.MockRequest
-import com.github.mvysny.kaributesting.mockhttp.MockResponse
+import com.github.mvysny.fakeservlet.FakeHttpSession
+import com.github.mvysny.fakeservlet.FakeRequest
+import com.github.mvysny.fakeservlet.FakeResponse
 import com.github.mvysny.kaributesting.v10.UtilsKt
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.VaadinResponse
@@ -19,7 +19,7 @@ class MockVaadinExtensionMethods {
      * </pre>
      */
     @NotNull
-    static MockRequest getMock(@NotNull VaadinRequest self) {
+    static FakeRequest getMock(@NotNull VaadinRequest self) {
         UtilsKt.getMock(self)
     }
 
@@ -30,7 +30,7 @@ class MockVaadinExtensionMethods {
      * </pre>
      */
     @NotNull
-    static MockResponse getMock(@NotNull VaadinResponse self) {
+    static FakeResponse getMock(@NotNull VaadinResponse self) {
         UtilsKt.getMock(self)
     }
 
@@ -41,7 +41,7 @@ class MockVaadinExtensionMethods {
      * </pre>
      */
     @NotNull
-    static MockHttpSession getMock(@NotNull VaadinSession self) {
+    static FakeHttpSession getMock(@NotNull VaadinSession self) {
         UtilsKt.getMock(self)
     }
 }

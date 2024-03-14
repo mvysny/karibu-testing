@@ -20,6 +20,19 @@ internal fun DynaNodeGroup.dialogTestbatch() {
     // for other Dialog-related tests see MockVaadinTest.kt
     group("dialogs") {
 
+        test("no dialog") {
+            _expectNone<Dialog>()
+        }
+
+        test("simple dialog") {
+            // tests for https://github.com/mvysny/karibu-testing/issues/166
+            val dlg = Dialog()
+            dlg.open()
+            _expectOne<Dialog>()
+            dlg.close()
+            _expectNone<Dialog>()
+        }
+
         // tests https://github.com/mvysny/karibu-testing/issues/102
         test("nested modal dialogs") {
             val dialog = Dialog()

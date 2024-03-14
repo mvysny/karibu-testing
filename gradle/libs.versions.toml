@@ -1,11 +1,15 @@
 [versions]
 # check the newest Vaadin Framework version at https://github.com/vaadin/framework/tags
 vaadin8 = "8.16.1"
+# Check the newest Vaadin version at https://github.com/vaadin/platform/tags
+# This is the latest stable Vaadin 14 version
+vaadin14 = "14.9.8"
 # https://repo1.maven.org/maven2/org/slf4j/slf4j-api/
 slf4j = "2.0.12"
 # Stay on 1.0.8/1.1.3 because of Vaadin 8 compatibility
 karibudsl10 = "1.0.8"
 fake-servlet = "1.0"
+karibu_tools = "0.14"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -13,7 +17,10 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 vaadin8-server = { module = "com.vaadin:vaadin-server", version.ref = "vaadin8" }
 vaadin8-client-compiled = { module = "com.vaadin:vaadin-client-compiled", version.ref = "vaadin8" }
+vaadin-v14 = { module = "com.vaadin:vaadin", version.ref = "vaadin14" }
 dynatest = "com.github.mvysny.dynatest:dynatest:0.24"
 karibu-dsl8 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v8", version.ref = "karibudsl10" }
 fake-servlet = { module = "com.github.mvysny.fake-servlet:fake-servlet", version.ref = "fake-servlet" }
 fake-servlet5 = { module = "com.github.mvysny.fake-servlet:fake-servlet5", version.ref = "fake-servlet" }
+karibu-tools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref = "karibu_tools" }
+classgraph = "io.github.classgraph:classgraph:4.8.149"

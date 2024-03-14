@@ -7,7 +7,7 @@ dependencies {
     compileOnly("com.vaadin:vaadin:${properties["vaadin14_version"]}")
     testImplementation("com.vaadin:vaadin:${properties["vaadin14_version"]}")
 
-    api(project(":mock-servlet-environment"))
+    api(libs.fake.servlet)
     api("com.github.mvysny.karibu-tools:karibu-tools:${properties["karibu_tools_version"]}")
 
     testImplementation("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")

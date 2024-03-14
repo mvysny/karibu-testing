@@ -1,6 +1,6 @@
 dependencies {
     api(libs.vaadin8.server)
-    api(project(":mock-servlet-environment"))
+    api(libs.fake.servlet)
     implementation(libs.slf4j.api)
 
     testImplementation(libs.dynatest)

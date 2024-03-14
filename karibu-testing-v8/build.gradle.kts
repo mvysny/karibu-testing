@@ -1,13 +1,13 @@
 dependencies {
-    api("com.vaadin:vaadin-server:${properties["vaadin8_version"]}")
+    api(libs.vaadin8.server)
     api(project(":mock-servlet-environment"))
-    implementation("org.slf4j:slf4j-api:${properties["slf4j_version"]}")
+    implementation(libs.slf4j.api)
 
-    testImplementation("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
+    testImplementation(libs.dynatest)
     api(kotlin("test"))
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
-    testImplementation("com.github.mvysny.karibudsl:karibu-dsl-v8:${properties["karibudsl10_version"]}")
-    testImplementation("com.vaadin:vaadin-client-compiled:${properties["vaadin8_version"]}")
+    testImplementation(libs.slf4j.simple)
+    testImplementation(libs.karibu.dsl8)
+    testImplementation(libs.vaadin8.client.compiled)
 }
 
 kotlin {

@@ -23,10 +23,10 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 vaadin8-server = { module = "com.vaadin:vaadin-server", version.ref = "vaadin8" }
 vaadin8-client-compiled = { module = "com.vaadin:vaadin-client-compiled", version.ref = "vaadin8" }
-vaadin-v14 = { module = "com.vaadin:vaadin", version.ref = "vaadin14" }
-vaadin-v14next = { module = "com.vaadin:vaadin", version.ref = "vaadin14_next" }
-vaadin-v14core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14" }
-vaadin-v14nextcore = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14_next" }
+vaadin-v14-all = { module = "com.vaadin:vaadin", version.ref = "vaadin14" }
+vaadin-v14next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin14_next" }
+vaadin-v14-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14" }
+vaadin-v14next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin14_next" }
 vaadin-v23-all = { module = "com.vaadin:vaadin", version.ref = "vaadin23" }
 vaadin-v23next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin23_next" }
 vaadin-spring = "com.vaadin:vaadin-spring:12.3.3"

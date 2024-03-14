@@ -11,8 +11,8 @@ dependencies {
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     // 2. Don't depend on Vaadin 23: it requires Java11+ and Groovy fails for some reason.
-    compileOnly(libs.vaadin.v14core)
-    testImplementation(libs.vaadin.v14core)
+    compileOnly(libs.vaadin.v14.core)
+    testImplementation(libs.vaadin.v14.core)
 
     api(project(":karibu-testing-v10"))
 

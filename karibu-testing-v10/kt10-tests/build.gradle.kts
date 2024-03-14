@@ -5,7 +5,7 @@ dependencies {
     api(libs.dynatest)
     api(libs.slf4j.simple)
     api(libs.karibu.dsl)
-    api(libs.vaadin.v14)
+    api(libs.vaadin.v14.all)
 
     api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")

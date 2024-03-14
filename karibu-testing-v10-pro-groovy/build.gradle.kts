@@ -10,8 +10,8 @@ dependencies {
     // npm mode and exclude all webjars.
     // depend on vaadin instead of vaadin-core, to bring in Confirm Dialog and Grid Pro.
     // 2. Don't depend on Vaadin 23: it requires Java11+ and Groovy fails for some reason.
-    compileOnly(libs.vaadin.v14)
-    testImplementation(libs.vaadin.v14)
+    compileOnly(libs.vaadin.v14.all)
+    testImplementation(libs.vaadin.v14.all)
 
     testImplementation(libs.junit.jupiter.runtime)
     testImplementation(libs.slf4j.simple)

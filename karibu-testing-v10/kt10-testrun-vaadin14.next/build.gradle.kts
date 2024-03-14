@@ -1,13 +1,13 @@
 dependencies {
-    testImplementation("com.vaadin:vaadin:${properties["vaadin14_next_version"]}")
+    testImplementation(libs.vaadin.v14next)
     testImplementation(project(":karibu-testing-v10:kt10-tests")) {
         exclude(group = "com.vaadin")
     }
 
     // for testing out the NPM template loading from META-INF/resources/frontend/
-    testImplementation("com.github.appreciated:app-layout-addon:4.0.0.beta5") {
+    testImplementation(libs.addon.applayout) {
         exclude(group = "com.vaadin")
     }
 
-    testImplementation("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
+    testImplementation(libs.vaadin.spring)
 }

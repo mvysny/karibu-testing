@@ -2,24 +2,24 @@ dependencies {
     api(project(":karibu-testing-v10"))
 
     // for testing purposes
-    api("com.github.mvysny.dynatest:dynatest:${properties["dynatest_version"]}")
-    api("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
-    api("com.github.mvysny.karibudsl:karibu-dsl:${properties["karibudsl11_version"]}")
-    api("com.vaadin:vaadin:${properties["vaadin14_version"]}")
+    api(libs.dynatest)
+    api(libs.slf4j.simple)
+    api(libs.karibu.dsl)
+    api(libs.vaadin.v14)
 
-    api("org.springframework.boot:spring-boot-starter-test:2.3.0.RELEASE") {
+    api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")
     }
-    api("org.springframework.boot:spring-boot-starter-web:2.3.0.RELEASE") {
+    api(libs.spring.boot.starter.web) {
         exclude(group = "ch.qos.logback")
     }
-    api("com.vaadin:vaadin-spring:${properties["vaadin_spring_version"]}")
+    api(libs.vaadin.spring)
     api(project(":karibu-testing-v10-spring"))
 
     // for testing out the NPM template loading from META-INF/resources/frontend/
-    api("com.github.appreciated:app-layout-addon:4.0.0.beta5")
+    api(libs.addon.applayout)
 
     // to test that EnhancedDialog's components are discovered properly
     // Issue: https://github.com/mvysny/karibu-testing/issues/85
-    implementation("com.vaadin.componentfactory:enhanced-dialog:1.0.4")
+    implementation(libs.addon.enhanceddialog)
 }

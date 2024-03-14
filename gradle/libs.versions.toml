@@ -37,7 +37,7 @@ karibu-dsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.
 fake-servlet = { module = "com.github.mvysny.fake-servlet:fake-servlet", version.ref = "fake-servlet" }
 fake-servlet5 = { module = "com.github.mvysny.fake-servlet:fake-servlet5", version.ref = "fake-servlet" }
 karibu-tools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref = "karibu_tools" }
-classgraph = "io.github.classgraph:classgraph:4.8.149"
+classgraph = "io.github.classgraph:classgraph:4.8.151"
 addon-applayout = "com.github.appreciated:app-layout-addon:4.0.0.beta5"
 addon-enhanceddialog = "com.vaadin.componentfactory:enhanced-dialog:1.0.4"
 spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:2.3.0.RELEASE"

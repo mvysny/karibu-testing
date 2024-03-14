@@ -3,23 +3,23 @@ plugins {
 }
 
 dependencies {
-    api("org.codehaus.groovy:groovy:3.0.17")
+    api(libs.groovy)
     // IDEA language injections
-    api("org.jetbrains:annotations:24.0.1")
+    api(libs.jetbrains.annotations)
 
     // 1. don't compile-depend on vaadin-core anymore: the app itself should manage Vaadin dependencies, for example
     // using the gradle-flow-plugin or direct dependency on vaadin-core. The reason is that the app may wish to use the
     // npm mode and exclude all webjars.
     // 2. Don't depend on Vaadin 23: it requires Java11+ and Groovy fails for some reason.
-    compileOnly("com.vaadin:vaadin-core:${properties["vaadin14_version"]}")
-    testImplementation("com.vaadin:vaadin-core:${properties["vaadin14_version"]}")
+    compileOnly(libs.vaadin.v14core)
+    testImplementation(libs.vaadin.v14core)
 
     api(project(":karibu-testing-v10"))
 
-    implementation("org.junit.jupiter:junit-jupiter-api:${properties["junit5_version"]}")
-    testImplementation("org.junit.jupiter:junit-jupiter:${properties["junit5_version"]}")
+    implementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.runtime)
     api(kotlin("test"))
-    testImplementation("org.slf4j:slf4j-simple:${properties["slf4j_version"]}")
+    testImplementation(libs.slf4j.simple)
 }
 
 @Suppress("UNCHECKED_CAST")

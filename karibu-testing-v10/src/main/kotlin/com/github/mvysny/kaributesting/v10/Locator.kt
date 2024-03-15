@@ -13,6 +13,7 @@ import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
+import java.io.PrintStream
 import java.util.*
 import java.util.function.Predicate
 
@@ -423,4 +424,17 @@ public fun _expectInternalServerError(expectedErrorMessage: String = "") {
     if (!error.errorMessage.contains(expectedErrorMessage)) {
         throw AssertionError("Expected InternalServerError with message '$expectedErrorMessage' but was '${error.errorMessage}'. Component tree:\n${currentUI.toPrettyTree()}")
     }
+}
+
+/**
+ * Pretty-prints the Vaadin component tree to [output], for example:
+ * ```
+ * └── MockedUI[]
+ *     └── Button[text='Hello!']
+ * ```
+ */
+@JvmOverloads
+public fun _dump(output: PrintStream = System.out) {
+    testingLifecycleHook.awaitBeforeLookup()
+    output.print(currentUI.toPrettyTree())
 }

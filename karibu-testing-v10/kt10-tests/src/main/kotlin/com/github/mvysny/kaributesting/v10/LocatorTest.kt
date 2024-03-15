@@ -70,6 +70,15 @@ internal fun DynaNodeGroup.locatorTest2() {
             }
         }
     }
+
+    test("_dump") {
+        currentUI.button("Hello!")
+        val ps = InMemoryPrintStream()
+        _dump(ps)
+        expect("""└── MockedUI[]
+    └── Button[text='Hello!']
+""") { ps.toString() }
+    }
 }
 
 @DynaTestDsl

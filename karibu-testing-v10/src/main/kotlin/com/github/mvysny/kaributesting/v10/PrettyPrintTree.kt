@@ -59,6 +59,13 @@ public class PrettyPrintTree(public val name: String, public val children: Mutab
     }
 }
 
+/**
+ * Pretty-prints the Vaadin component tree and returns it as a string, for example:
+ * ```
+ * └── MockedUI[]
+ *     └── Button[text='Hello!']
+ * ```
+ */
 public fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).print()
 
 /**

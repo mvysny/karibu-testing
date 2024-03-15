@@ -395,4 +395,15 @@ public class LocatorJ {
     public static void _assertNotReadOnly(@NotNull HasValue<?, ?> component) {
         BasicUtilsKt._expectNotReadOnly(component);
     }
+
+    /**
+     * Pretty-prints the Vaadin component tree to the stdout, for example:
+     * <pre><code>
+     * └── MockedUI[]
+     *     └── Button[text='Hello!']
+     * </code></pre>
+     */
+    public static void _dump() {
+        LocatorKt._dump();
+    }
 }

@@ -38,6 +38,10 @@ import com.vaadin.flow.component.sidenav.SideNavItem
  * See the Karibu-Testing documentation for more help.
  *
  * ### Delegating properly to the default impl
+ *
+ * It's **super-important** to delegate to the original hook, so that [MockVaadin.clientRoundtrip] is called. Otherwise, you'll\
+ * experience strange behavior like the Dialogs not being connected to the UI upon opening.
+ *
  * ```
  * class MyLifecycleHook(val delegate: TestingLifecycleHook) : TestingLifecycleHook by delegate {
  *   override fun awaitBeforeLookup() { delegate.awaitBeforeLookup() }
@@ -49,6 +53,9 @@ import com.vaadin.flow.component.sidenav.SideNavItem
 public interface TestingLifecycleHook {
     /**
      * Invoked before every component lookup. You can e.g. wait for any async operations to finish and for the server to settle down.
+     *
+     * It's **super-important** to delegate to the original hook, so that [MockVaadin.clientRoundtrip] is called. Otherwise, you'll\
+     * experience strange behavior like the Dialogs not being connected to the UI upon opening.
      *
      * See [TestingLifecycleHookVaadin14Default.awaitBeforeLookup] for the default implementation.
      */

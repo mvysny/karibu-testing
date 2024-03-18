@@ -6,8 +6,10 @@ import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.ListDataProvider
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import kotlin.test.expect
 
 @DynaTestDsl
@@ -126,6 +128,20 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                     cb.selectByLabel("aaa")
                 }
             }
+        }
+    }
+    group("_getRenderedComponentFor") {
+        test("ComboBox") {
+            val cb = ComboBox<String>().apply {
+                setRenderer(ComponentRenderer { it -> Span(it) })
+            }
+            expect("foo") { (cb._getRenderedComponentFor("foo") as Span).text }
+        }
+        test("Select") {
+            val cb = Select<String>().apply {
+                setRenderer(ComponentRenderer { it -> Span(it) })
+            }
+            expect("foo") { (cb._getRenderedComponentFor("foo") as Span).text }
         }
     }
 }

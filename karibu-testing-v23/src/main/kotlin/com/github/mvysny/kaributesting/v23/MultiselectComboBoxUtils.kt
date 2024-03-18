@@ -2,9 +2,11 @@ package com.github.mvysny.kaributesting.v23
 
 import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.data.provider.DataCommunicator
-import java.lang.reflect.Method
+import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.data.renderer.Renderer
 import kotlin.test.fail
 
 /**
@@ -19,7 +21,7 @@ import kotlin.test.fail
  */
 public fun <T> MultiSelectComboBox<T>.setUserInput(userInput: String?) {
     _expectEditableByUser()
-    getComboBoxBaseFilterSlot(this).accept(userInput)
+    KaribuInternalComboBoxSupport.get().setUserInput(this, userInput)
 }
 
 /**
@@ -66,21 +68,9 @@ public fun <T> MultiSelectComboBox<T>.selectByLabel(
     }
 }
 
-private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
-    m.isAccessible = true
-    m
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> getDataCommunicator(cb: MultiSelectComboBox<T>): DataCommunicator<T>? =
-    _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
-
 @Suppress("UNCHECKED_CAST")
 internal val <T> MultiSelectComboBox<T>._dataCommunicator: DataCommunicator<T>
-    get() = getDataCommunicator(this)
+    get() = KaribuInternalComboBoxSupport.get().getDataCommunicator(this) as DataCommunicator<T>?
         ?: fail("${toPrettyString()}: items/dataprovider has not been set")
 
 /**
@@ -97,4 +87,21 @@ public fun <T> MultiSelectComboBox<T>.getSuggestionItems(): List<T> =
 public fun <T> MultiSelectComboBox<T>.getSuggestions(): List<String> {
     val items: List<T> = getSuggestionItems()
     return items.map { itemLabelGenerator.apply(it) }
+}
+
+/**
+ * Returns the renderer set via [ComboBox.setRenderer].
+ */
+@Suppress("UNCHECKED_CAST")
+public val <T> MultiSelectComboBox<T>._renderer: Renderer<T> get() = KaribuInternalComboBoxSupport.get().getRenderer(this) as Renderer<T>
+
+/**
+ * Returns the component rendered in [ComboBox] dropdown overlay for given [item].
+ *
+ * Fails if the [ComboBox] renderer is something else than [ComponentRenderer].
+ */
+public fun <T> MultiSelectComboBox<T>._getRenderedComponentFor(item: T): Component {
+    val r = _renderer
+    val r2 = r as? ComponentRenderer<*, T> ?: fail("${toPrettyString()}: expected ComponentRenderer but got $r")
+    return r2.createComponent(item)
 }

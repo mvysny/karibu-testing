@@ -12,6 +12,8 @@ import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.DataCommunicator
 import com.vaadin.flow.data.provider.DataProvider
+import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.function.SerializableConsumer
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -29,47 +31,7 @@ import kotlin.test.fail
  */
 public fun <T> ComboBox<T>.setUserInput(userInput: String?) {
     _expectEditableByUser()
-    if (VaadinVersion.get.isAtLeast(23, 2)) {
-        getComboBoxBaseFilterSlot(this).accept(userInput)
-    } else {
-        val comboBoxFilterSlot: Field =
-            ComboBox::class.java.getDeclaredField("filterSlot")
-        comboBoxFilterSlot.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val filterSlot =
-            comboBoxFilterSlot.get(this) as SerializableConsumer<String?>
-        filterSlot.accept(userInput)
-    }
-}
-
-private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataController")
-    m.isAccessible = true
-    m
-}
-private val _ComboBoxDataController_filterSlot: Field by lazy(
-    LazyThreadSafetyMode.PUBLICATION
-) {
-    val comboBoxFilterSlot: Field =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController")
-            .getDeclaredField("filterSlot")
-    comboBoxFilterSlot.isAccessible = true
-    comboBoxFilterSlot
-}
-
-/**
- * INTERNAL, DON'T USE. Only for Vaadin 23.2+. Calls `(this as ComboBoxBase).getDataController().filterSlot`.
- */
-public fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.combobox.ComboBoxBase*/Any): SerializableConsumer<String?> {
-    require(VaadinVersion.get.isAtLeast(23, 2)) { "This only works for Vaadin 23.2 and higher but got ${VaadinVersion.get}" }
-    val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
-
-    @Suppress("UNCHECKED_CAST")
-    val filterSlot =
-        _ComboBoxDataController_filterSlot.get(dataController) as SerializableConsumer<String?>
-    return filterSlot
+    KaribuInternalComboBoxSupport.get().setUserInput(this, userInput)
 }
 
 /**
@@ -113,14 +75,6 @@ public fun <T> ComboBox<T>.selectByLabel(
     }
 }
 
-private val _ComboBoxBase: Class<*>? by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    try {
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    } catch (e: ClassNotFoundException) {
-        null
-    }
-}
-
 /**
  * Simulates the user creating a custom item. Only works if the field is editable by the user
  * and allows custom values ([ComboBox.isAllowCustomValue] is true).
@@ -128,43 +82,12 @@ private val _ComboBoxBase: Class<*>? by lazy(LazyThreadSafetyMode.PUBLICATION) {
 public fun <T> ComboBox<T>._fireCustomValueSet(userInput: String) {
     _expectEditableByUser()
     check(isAllowCustomValue) { "${toPrettyString()} doesn't allow custom values" }
-    if (_ComboBoxBase != null) {
-        val eventClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase${'$'}CustomValueSetEvent")
-        val event = eventClass.constructors[0].newInstance(this, true, userInput)
-        _fireEvent(event as ComponentEvent<*>)
-    } else {
-        // Older Vaadin API uses GeneratedVaadinComboBox
-        _fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(this, true, userInput))
-    }
+    KaribuInternalComboBoxSupport.get().fireCustomValueSet(this, userInput)
 }
-
-private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator")
-    field.isAccessible = true
-    field
-}
-
-private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    val comboBoxBaseClass =
-        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
-    val m = comboBoxBaseClass.getDeclaredMethod("getDataCommunicator")
-    m.isAccessible = true
-    m
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> getDataCommunicator(cb: ComboBox<T>): DataCommunicator<T>? =
-    when {
-        VaadinVersion.get.isAtLeast(23, 2) ->
-            _ComboBox_23_2_dataCommunicator.invoke(cb) as DataCommunicator<T>?
-
-        else ->
-            _ComboBox_dataCommunicator.get(cb) as DataCommunicator<T>?
-    }
 
 @Suppress("UNCHECKED_CAST")
 internal val <T> ComboBox<T>._dataCommunicator: DataCommunicator<T>
-    get() = getDataCommunicator(this)
+    get() = KaribuInternalComboBoxSupport.get().getDataCommunicator(this) as DataCommunicator<T>?
         ?: fail("${toPrettyString()}: items/dataprovider has not been set")
 
 /**
@@ -235,3 +158,157 @@ internal fun <T> HasValue<*, T>.selectByLabel(
         else -> _value = itemsWithLabel[0]
     }
 }
+
+/**
+ * Internal, don't use.
+ */
+public interface KaribuInternalComboBoxSupport {
+    /**
+     * @param comboBox [ComboBox] or `MultiSelectComboBox`.
+     */
+    public fun getRenderer(comboBox: Any): Renderer<*>
+    public fun getDataCommunicator(comboBox: Any): DataCommunicator<*>?
+    /**
+     * Simulates the user creating a custom item. Only works if the field is editable by the user
+     * and allows custom values ([ComboBox.isAllowCustomValue] is true).
+     */
+    public fun <T> fireCustomValueSet(comboBox: ComboBox<T>, userInput: String)
+
+    /**
+     * @param comboBox [ComboBox] or `MultiSelectComboBox`.
+     */
+    public fun setUserInput(comboBox: Any, userInput: String?)
+
+    public companion object {
+        public fun get(): KaribuInternalComboBoxSupport = when {
+            VaadinVersion.get.isAtLeast(23, 2) -> KaribuInternalComboBoxSupportVaadin23_2
+            else -> KaribuInternalComboBoxSupportVaadin14
+        }
+    }
+}
+
+private object KaribuInternalComboBoxSupportVaadin14 : KaribuInternalComboBoxSupport {
+    private val _ComboBox_dataCommunicator: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val field: Field = ComboBox::class.java.getDeclaredField("dataCommunicator")
+        field.isAccessible = true
+        field
+    }
+
+    private val _ComboBox_renderer: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val m = ComboBox::class.java.getDeclaredField("renderer")
+        m.isAccessible = true
+        m
+    }
+    override fun getRenderer(comboBox: Any): Renderer<*> = _ComboBox_renderer.get(comboBox) as Renderer<*>
+    override fun getDataCommunicator(comboBox: Any): DataCommunicator<*>? = _ComboBox_dataCommunicator.get(comboBox) as DataCommunicator<*>?
+    override fun <T> fireCustomValueSet(comboBox: ComboBox<T>, userInput: String) {
+        comboBox._fireEvent(GeneratedVaadinComboBox.CustomValueSetEvent<ComboBox<T>>(comboBox, true, userInput))
+    }
+
+    override fun setUserInput(comboBox: Any, userInput: String?) {
+        ComboBox::class.java.cast(comboBox)
+        val comboBoxFilterSlot: Field =
+            ComboBox::class.java.getDeclaredField("filterSlot")
+        comboBoxFilterSlot.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val filterSlot =
+            comboBoxFilterSlot.get(comboBox) as SerializableConsumer<String?>
+        filterSlot.accept(userInput)
+    }
+}
+
+private object KaribuInternalComboBoxSupportVaadin23_2 : KaribuInternalComboBoxSupport {
+    private val _ComboBoxBase: Class<*> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase")
+    }
+
+    private val _ComboBox_23_2_dataCommunicator: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val m = _ComboBoxBase.getDeclaredMethod("getDataCommunicator")
+        m.isAccessible = true
+        m
+    }
+
+    /**
+     * Vaadin 23+ uses RendererManager to store renderers.
+     */
+    private val _ComboBoxBase_renderManager: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val m = _ComboBoxBase.getDeclaredMethod("getRenderManager")
+        m.isAccessible = true
+        m
+    }
+
+    private val _ComboBoxRenderManager: Class<*> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        Class.forName("com.vaadin.flow.component.combobox.ComboBoxRenderManager")
+    }
+
+    private val _ComboBoxRenderManager_renderer: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val m = checkNotNull(_ComboBoxRenderManager).getDeclaredField("renderer")
+        m.isAccessible = true
+        m
+    }
+
+    override fun getRenderer(comboBox: Any): Renderer<*> {
+        val rendererManager = _ComboBoxBase_renderManager.invoke(comboBox)
+        val renderer: Renderer<*> = _ComboBoxRenderManager_renderer.get(rendererManager) as Renderer<*>
+        return renderer
+    }
+
+    override fun getDataCommunicator(comboBox: Any): DataCommunicator<*>? = _ComboBox_23_2_dataCommunicator.invoke(comboBox) as DataCommunicator<*>?
+    override fun <T> fireCustomValueSet(comboBox: ComboBox<T>, userInput: String) {
+        val eventClass = Class.forName("com.vaadin.flow.component.combobox.ComboBoxBase${'$'}CustomValueSetEvent")
+        val event = eventClass.constructors[0].newInstance(comboBox, true, userInput)
+        comboBox._fireEvent(event as ComponentEvent<*>)
+    }
+
+    private val _ComboBoxBase_getDataController: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val m = _ComboBoxBase.getDeclaredMethod("getDataController")
+        m.isAccessible = true
+        m
+    }
+    private val _ComboBoxDataController_filterSlot: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        val comboBoxFilterSlot: Field =
+            Class.forName("com.vaadin.flow.component.combobox.ComboBoxDataController")
+                .getDeclaredField("filterSlot")
+        comboBoxFilterSlot.isAccessible = true
+        comboBoxFilterSlot
+    }
+
+    /**
+     * Calls `(this as ComboBoxBase).getDataController().filterSlot`.
+     */
+    private fun getComboBoxBaseFilterSlot(comboBoxBase: /*com.vaadin.flow.component.combobox.ComboBoxBase*/Any): SerializableConsumer<String?> {
+        _ComboBoxBase.cast(comboBoxBase)
+        val dataController: /*ComboBoxDataController*/Any = _ComboBoxBase_getDataController.invoke(comboBoxBase)
+
+        @Suppress("UNCHECKED_CAST")
+        val filterSlot =
+            _ComboBoxDataController_filterSlot.get(dataController) as SerializableConsumer<String?>
+        return filterSlot
+    }
+
+    override fun setUserInput(comboBox: Any, userInput: String?) {
+        getComboBoxBaseFilterSlot(comboBox).accept(userInput)
+    }
+}
+
+/**
+ * Returns the renderer set via [ComboBox.setRenderer].
+ */
+@Suppress("UNCHECKED_CAST")
+public val <T> ComboBox<T>._renderer: Renderer<T> get() = KaribuInternalComboBoxSupport.get().getRenderer(this) as Renderer<T>
+
+/**
+ * Returns the component rendered in [ComboBox] dropdown overlay for given [item].
+ *
+ * Fails if the [ComboBox] renderer is something else than [ComponentRenderer].
+ */
+public fun <T> ComboBox<T>._getRenderedComponentFor(item: T): Component {
+    val r = _renderer
+    val r2 = r as? ComponentRenderer<*, T> ?: fail("${toPrettyString()}: expected ComponentRenderer but got $r")
+    return r2.createComponent(item)
+}
+
+/**
+ * Returns the component rendered in [Select] dropdown overlay for given [item].
+ */
+public fun <T> Select<T>._getRenderedComponentFor(item: T): Component = itemRenderer.createComponent(item)

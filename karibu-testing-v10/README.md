@@ -1243,6 +1243,10 @@ new item in the ComboBox.
 Finally, call `comboBox.selectByLabel()`/`select.selectByLabel()` to select an item by its label,
 changing the value of the combobox/select. (Since Karibu-Testing 1.3.15)
 
+When using `ComponentRenderer` to render items in the dropdown overlay, call
+`comboBox._getRenderedComponentFor()`/`ComboBoxKt._getRenderedComponentFor()` to call renderer
+to create the component for particular item. (Since Karibu-Testing 1.4.0/2.1.5).
+
 ### Support for ListBox/MultiSelectListBox
 
 (Since Karibu-Testing 1.3.9)
@@ -1264,6 +1268,10 @@ to retrieve filtered items, in order to verify that the filter on your data prov
 
 Finally, call `msComboBox.selectByLabel()` to select an item by its label,
 changing the value of the combobox.
+
+When using `ComponentRenderer` to render items in the dropdown overlay, call
+`msComboBox._getRenderedComponentFor()`/`MultiSelectComboBoxUtilsKt._getRenderedComponentFor()` to call renderer
+to create the component for particular item. (Since Karibu-Testing 1.4.0/2.1.5).
 
 Make sure to depend on `karibu-testing-v23` Maven dependency to gain access to these functions
 - see the top of this page for more information.

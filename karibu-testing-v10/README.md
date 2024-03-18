@@ -1292,7 +1292,7 @@ to create the component for particular item. (Since Karibu-Testing 1.4.0/2.1.5).
 
 (Since Karibu-Testing 1.3.9)
 
-Call `listBox.getRenderedItems()`/`MultiSelectComboBoxKt.getRenderedItems(listBox)` to retrieve
+Call `listBox.getRenderedItems()`/`ListBoxKt.getRenderedItems(listBox)` to retrieve
 the rendered items (items from the DataProvider passed through the item renderer).
 
 ### Support for MultiSelectComboBox

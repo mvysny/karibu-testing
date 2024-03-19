@@ -5,7 +5,7 @@ vaadin8 = "8.16.1"
 # This is the latest stable Vaadin 14 version
 vaadin14 = "14.10.12"
 # Latest unstable Vaadin 14 version
-vaadin14_next = "14.11.5"
+vaadin14_next = "14.11.7"
 vaadin23="23.2.17"
 vaadin23_next="23.3.33"
 # https://repo1.maven.org/maven2/org/slf4j/slf4j-api/

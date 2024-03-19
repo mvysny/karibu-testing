@@ -26,6 +26,7 @@ public open class MockVaadinServlet @JvmOverloads constructor(
         MockVaadinHelper.mockFlowBuildInfo(this)
         // workaround for https://github.com/vaadin/flow/issues/18682
         System.setProperty(Constants.VAADIN_PREFIX + FrontendUtils.PARAM_FRONTEND_DIR, File(FrontendUtils.DEFAULT_FRONTEND_DIR).absolutePath)
+        System.setProperty(Constants.VAADIN_PREFIX + FrontendUtils.PROJECT_BASEDIR, File(".").absolutePath)
         return super.createDeploymentConfiguration()
     }
 

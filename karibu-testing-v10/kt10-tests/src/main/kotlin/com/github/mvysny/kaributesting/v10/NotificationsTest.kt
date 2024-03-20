@@ -37,8 +37,29 @@ private fun DynaNodeGroup.notificationsTests() {
     }
 
     test("expectNotifications() fails if there are expected notifications but no actual notifications") {
-        expectThrows(AssertionError::class) {
+        expectThrows(AssertionError::class, "Notifications: Expected [Error, Warning, baz] but there are no notifications. Dump:") {
             expectNotifications("Error", "Warning", "baz")
+        }
+    }
+
+    test("expectNotifications() fails if no notifications are expected but there are some") {
+        Notification.show("Foo")
+        expectThrows(AssertionError::class, "Notifications: expected [] but got [Foo]. Dump:") {
+            expectNoNotifications()
+        }
+    }
+
+    test("expectNotifications() fails if notifications don't match expected value") {
+        Notification.show("Foo")
+        expectThrows(AssertionError::class, "Notifications: expected [Bar, Baz] but got [Foo]. Dump:") {
+            expectNotifications("Bar", "Baz")
+        }
+    }
+
+    test("expectNotifications() fails if notifications don't match expected value 2") {
+        Notification.show("Bar")
+        expectThrows(AssertionError::class, "Notifications: expected [Bar, Baz] but got [Bar]. Dump:") {
+            expectNotifications("Bar", "Baz")
         }
     }
 

@@ -4,7 +4,7 @@ import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
-import kotlin.streams.toList
+import kotlin.test.fail
 
 /**
  * Returns the list of currently displayed notifications.
@@ -32,9 +32,18 @@ public fun getNotifications(): List<Notification> {
 /**
  * Expects that given list of notifications is displayed. Also clears the notifications.
  */
-public fun expectNotifications(vararg texts: String) {
+public fun expectNotifications(vararg expected: String) {
     val notifications: List<Notification> = getNotifications()
-    expectList(*texts) { notifications.map { it.getText() } }
+    val actual = notifications.map { it.getText() }
+    if (actual.isEmpty()) {
+        if (expected.isNotEmpty()) {
+            fail("Notifications: Expected ${expected.toList()} but there are no notifications. Dump:\n${UI.getCurrent().toPrettyTree()}")
+        }
+    } else {
+        if (actual != expected.toList()) {
+            fail("Notifications: expected ${expected.toList()} but got $actual. Dump:\n${UI.getCurrent().toPrettyTree()}")
+        }
+    }
     clearNotifications()
 }
 

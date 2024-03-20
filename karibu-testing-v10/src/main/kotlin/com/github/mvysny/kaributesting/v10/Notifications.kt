@@ -4,6 +4,7 @@ import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
+import kotlin.streams.toList
 import kotlin.test.fail
 
 /**

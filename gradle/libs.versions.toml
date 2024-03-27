@@ -1,6 +1,6 @@
 [versions]
 slf4j = "2.0.12"
-kaributools = "0.19"
+kaributools = "0.20"
 karibudsl = "2.1.3"
 junit5 = "5.10.2"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags

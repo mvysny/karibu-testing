@@ -10,6 +10,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.sidenav.SideNav
 import com.vaadin.flow.component.sidenav.SideNavItem
+import com.vaadin.flow.router.NavigationTrigger
 import org.myapp.AdminView
 import org.myapp.LoginView
 import org.myapp.routes
@@ -48,8 +49,11 @@ fun DynaNodeGroup.sideNavTests() {
     }
 
     test("click()") {
+        lateinit var trigger: NavigationTrigger
+        UI.getCurrent().addBeforeEnterListener { e -> trigger = e.trigger }
         SideNavItem("foo", LoginView::class.java)._click()
         _expectOne<LoginView>()
+        expect(NavigationTrigger.CLIENT_SIDE) { trigger }
         SideNavItem("foo", "admin")._click()
         _expectOne<AdminView>()
     }

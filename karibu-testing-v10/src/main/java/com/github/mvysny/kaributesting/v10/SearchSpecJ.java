@@ -197,8 +197,8 @@ public class SearchSpecJ<T extends Component> {
 
     /**
      * Only matches component with given icon. Only works for Button and Icon.
-     * @param collection
-     * @param iconName
+     * @param collection the icon collection, e.g. "vaadin" for Vaadin-provided icons
+     * @param iconName the name of the individual icon.
      * @return this
      */
     @NotNull
@@ -215,6 +215,17 @@ public class SearchSpecJ<T extends Component> {
     @NotNull
     public SearchSpecJ<T> withIcon(@NotNull VaadinIcon vaadinIcon) {
         spec.iconIs(vaadinIcon);
+        return this;
+    }
+
+    /**
+     * Only matches component with given enabled state.
+     * @param enabled the enabled state to match
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withEnabled(boolean enabled) {
+        spec.setEnabled(enabled);
         return this;
     }
 }

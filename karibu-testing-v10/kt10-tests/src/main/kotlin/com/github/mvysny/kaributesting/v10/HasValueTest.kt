@@ -86,5 +86,29 @@ internal fun DynaNodeGroup.hasValueTestbatch() {
             tf._fireValueChange()
             expect(true) { called }
         }
+        group("from client") {
+            test("TextField") {
+                val tf = TextField()
+                var called = false
+                tf.addValueChangeListener {
+                    expect(false) { called }
+                    expect(true) { it.isFromClient }
+                    called = true
+                }
+                tf._setValue("foo")
+                expect(true) { called }
+            }
+            test("CheckBox") {
+                val tf = Checkbox()
+                var called = false
+                tf.addValueChangeListener {
+                    expect(false) { called }
+                    expect(true) { it.isFromClient }
+                    called = true
+                }
+                tf._setValue(true)
+                expect(true) { called }
+            }
+        }
     }
 }

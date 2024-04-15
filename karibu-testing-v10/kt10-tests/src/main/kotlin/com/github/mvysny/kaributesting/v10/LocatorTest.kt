@@ -245,6 +245,12 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(true) { Button().matches {}}
             expect(false) { Button().matches { predicates.add(Predicate { false }) }}
         }
+        test("enabled") {
+            expect(true) { Button().matches { enabled = true }}
+            expect(false) { Button().matches { enabled = false }}
+            expect(false) { Button().apply { isEnabled = false }.matches { enabled = true }}
+            expect(true) { Button().apply { isEnabled = false }.matches { enabled = false }}
+        }
         test("themes") {
             expect(true) { Button().apply { addThemeNames("custom-theme", "my-theme") }.matches {} }
             expect(true) {

@@ -36,7 +36,8 @@ import java.util.function.Predicate
  * @property themes if not null, the component must have all theme names defined. Space-separated
  * @property withoutThemes if not null, the component must NOT have any of the theme names defined. Space-separated
  * @property icon if not null, the component must have given [_iconName].
- * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default empty.
+ * @property enabled if not null, the component's [Component.isEnabled] must match this value.
+ * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default, empty.
  */
 public class SearchSpec<T : Component>(
         public val clazz: Class<T>,
@@ -53,6 +54,7 @@ public class SearchSpec<T : Component>(
         public var themes: String? = null,
         public var withoutThemes: String? = null,
         public var icon: IconName? = null,
+        public var enabled: Boolean? = null,
         public var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
@@ -73,6 +75,7 @@ public class SearchSpec<T : Component>(
         if (!withoutThemes.isNullOrBlank()) list.add("withoutThemes='$withoutThemes'")
         if (icon != null) list.add("icon='$icon'")
         if (value != null) list.add("value=$value")
+        if (enabled != null) list.add(if (enabled!!) "enabled" else "disabled")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
         list.addAll(predicates.map { it.toString() })
         return list.joinToString(" and ")
@@ -97,6 +100,7 @@ public class SearchSpec<T : Component>(
         if (text != null) p.add { component -> component._text == text }
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
         if (icon != null) p.add { component -> component._iconName == icon }
+        if (enabled != null) p.add { component -> component.isEnabled == enabled }
         @Suppress("UNCHECKED_CAST")
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()

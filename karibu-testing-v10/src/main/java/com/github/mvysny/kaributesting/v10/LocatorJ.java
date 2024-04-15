@@ -113,6 +113,18 @@ public class LocatorJ {
     }
 
     /**
+     * Sets the value of given component, but only if it is actually possible to do so by the user.
+     * If the component is read-only or disabled, an exception is thrown.
+     * <p></p>
+     * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
+     * mirror the <code>fromClient</code> parameter.
+     * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
+     */
+    static <V> void _setValue(@NotNull HasValue<?, V> self, @Nullable V value, boolean fromClient) {
+        HasValueUtilsKt._setValue(self, value, fromClient);
+    }
+
+    /**
      * Fires a value change event which "comes from the client".
      * <p></p>
      * The event is only fired if it is actually possible to do so by the user.

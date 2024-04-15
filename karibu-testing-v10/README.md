@@ -952,11 +952,13 @@ all the above items prior setting the new value:
 * Java: `LocatorJ._setValue(textField, "42");`
 
 Changing the value fires the ValueChangeEvent with `isFromClient` set to false.
-However, sometimes you need to fire a "client-side"/"isfromuser" value-change event,
+However, sometimes you need to fire a "client-side"/"isfromuser"/"userOriginated" value-change event,
 to test a code reacting to such events. In such case please use:
 
-* Kotlin, Groovy: `textField._fireValueChange()`
-* Java: `LocatorJ._fireValueChange(textField)`
+* Kotlin, Groovy: `textField._fireValueChange()` is able to fire value change event with `isFromClient` set to true.
+  * Java: `LocatorJ._fireValueChange(textField)`
+* Better: `textField._setValue("foo")` sets the value as if changed by the client.
+  * Java: `LocatorJ._setValue(textField, "foo", true);`
 
 ### Firing DOM Events
 

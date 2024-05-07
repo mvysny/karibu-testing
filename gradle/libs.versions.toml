@@ -4,7 +4,7 @@ kaributools = "0.20"
 karibudsl = "2.1.3"
 junit5 = "5.10.2"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "24.3.10"
+vaadin24 = "24.3.11"
 vaadin24_spring = "24.3.9"
 vaadin24next = "24.4.0.beta1"
 vaadin24next_spring = "24.4.0.beta1"

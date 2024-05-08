@@ -150,6 +150,28 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
+     * If not null, the component must match all of these themes. Space-separated.
+     * @param themes expected space-separated themes.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withThemes(@Nullable String themes) {
+        spec.setThemes(themes);
+        return this;
+    }
+
+    /**
+     * If not null, the component must NOT match any of these themes. Space-separated.
+     * @param themes space-separated themes, neither of which must be present on the component.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withoutThemes(@Nullable String themes) {
+        spec.setWithoutThemes(themes);
+        return this;
+    }
+
+    /**
      * Adds additional predicate which the component needs to match. Not null.
      * <p/>
      * Please remember to provide a proper {@link Object#toString()} for the predicate,

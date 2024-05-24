@@ -14,6 +14,8 @@ import com.github.mvysny.kaributesting.v10.mock.MockService
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinServlet
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinSession
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
+import com.github.mvysny.kaributools.SemanticVersion
+import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.navigateTo
 import com.github.mvysny.kaributools.removeFromParent
 import com.vaadin.flow.component.AttachEvent
@@ -38,6 +40,10 @@ import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
 import kotlin.test.expect
+
+fun SemanticVersion.isAtMost(major: Int): Boolean = this.major <= major
+@JvmOverloads
+fun SemanticVersion.isAtMost(major: Int, minor: Int, bugfix: Int = Int.MAX_VALUE): Boolean = this <= SemanticVersion(major, minor, bugfix)
 
 @DynaTestDsl
 internal fun DynaNodeGroup.mockVaadinTest() {
@@ -65,7 +71,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinSession.getCurrent().browser.locale != null }
             expect(false) { VaadinSession.getCurrent().browser.isIPhone }
             expect(true) { VaadinSession.getCurrent().browser.isFirefox }
-            expect(false) { VaadinSession.getCurrent().browser.isTooOldToFunctionProperly }
+            if (VaadinVersion.get.isAtMost(23, 3)) {
+                // Vaadin 23.4+ lacks Browser.isTooOldToFunctionProperly
+                expect(false) { VaadinSession.getCurrent().browser.isTooOldToFunctionProperly }
+            }
             expect(false) { VaadinSession.getCurrent().browser.isChrome }
             expect(false) { VaadinSession.getCurrent().browser.isChromeOS }
             expect(false) { VaadinSession.getCurrent().browser.isAndroid }

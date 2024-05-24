@@ -1,5 +1,5 @@
 [versions]
-slf4j = "2.0.12"
+slf4j = "2.0.13"
 kaributools = "0.21"
 karibudsl = "2.1.3"
 junit5 = "5.10.2"
@@ -32,4 +32,4 @@ hibernate-validator = "org.hibernate.validator:hibernate-validator:8.0.1.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:5.0.1"
 spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.0.4"
 spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:3.0.4"
-fake-servlet5 = "com.github.mvysny.fake-servlet:fake-servlet5:1.0"
+fake-servlet5 = "com.github.mvysny.fake-servlet:fake-servlet5:1.1"

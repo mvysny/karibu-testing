@@ -6,8 +6,8 @@ junit5 = "5.10.2"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 vaadin24 = "24.3.12"
 vaadin24_spring = "24.3.11"
-vaadin24next = "24.4.0.beta3"
-vaadin24next_spring = "24.4.0.beta3"
+vaadin24next = "24.4.0.beta4"
+vaadin24next_spring = "24.4.0.beta4"
 
 [libraries]
 dynatest = "com.github.mvysny.dynatest:dynatest:0.25"

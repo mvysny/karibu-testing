@@ -13,7 +13,7 @@ Compatibility chart:
 | 1.2.3+                 | no          | Java 1.8+                                                         | Vaadin 14.3 and higher in (p)npm mode; Vaadin 16-18  |
 | 1.2.11+                | no          | Java 1.8+                                                         | Vaadin 14 (only 14.3+) in (p)npm mode; Vaadin 18-19+ |
 | 1.3.x                  | no          | Java 1.8+                                                         | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 19-23  |
-| **1.4.x**              | yes         | Java 1.8+                                                         | Vaadin 14 (only 14.6+) in (p)npm mode; 23            |
+| **1.4.x**              | yes         | Java 1.8+                                                         | Vaadin 14 (only 14.6+) in (p)npm mode; Vaadin 23     |
 | 2.0.x                  | no          | Java 17+                                                          | Vaadin 24.0+                                         |
 | **2.1.x**              | yes         | Java 17+                                                          | Vaadin 24.1+                                         |
 

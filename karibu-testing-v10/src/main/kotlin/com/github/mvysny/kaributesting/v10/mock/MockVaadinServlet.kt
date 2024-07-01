@@ -18,7 +18,7 @@ import java.lang.reflect.Method
  */
 public open class MockVaadinServlet @JvmOverloads constructor(
         public val routes: Routes = Routes(),
-        public val uiFactory: () -> UI = { MockedUI() }
+        public val uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }
 ) : VaadinServlet() {
 
     @Throws(ServletException::class)

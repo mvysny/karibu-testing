@@ -63,9 +63,9 @@ public object MockVaadin {
     @JvmStatic
     @JvmOverloads
     public fun setup(routes: Routes = Routes(),
-              uiFactory: () -> UI = { MockedUI() }) {
+              uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }) {
         // init servlet
-        val servlet = MockVaadinServlet(routes)
+        val servlet = MockVaadinServlet(routes, uiFactory)
         setup(uiFactory, servlet)
     }
 
@@ -86,7 +86,7 @@ public object MockVaadin {
      * on what methods you must override in your custom service.
      */
     @JvmStatic
-    public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
+    public fun setup(uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }, servlet: VaadinServlet) {
         check(VaadinVersion.get.isAtLeast(24)) {
             "Karibu-Testing 2.x only works with Vaadin 24+ but you're using ${VaadinVersion.get}"
         }

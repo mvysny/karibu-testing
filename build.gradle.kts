@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.23" // can't v-bump until this is fixed: https://youtrack.jetbrains.com/issue/KT-68361/Function0-not-serializable
+    kotlin("jvm") version "2.0.0"
     `maven-publish`
     signing
 }

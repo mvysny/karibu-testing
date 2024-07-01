@@ -83,6 +83,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         test("serializable") {
+            System.setProperty("sun.io.serialization.extendedDebugInfo", "true") // https://mvysny.github.io/NotSerializableException/
             UI.getCurrent().cloneBySerialization()
             VaadinSession.getCurrent().cloneBySerialization()
             // even that it says it's Serializable it's really not.

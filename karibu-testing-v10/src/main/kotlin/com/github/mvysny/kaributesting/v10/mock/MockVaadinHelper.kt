@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.mockhttp.MockContext
+import com.github.mvysny.fakeservlet.FakeContext
 import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.server.DeploymentConfigurationFactory
@@ -33,7 +33,7 @@ public object MockVaadinHelper {
     }
 
     public fun createMockContext(): ServletContext {
-        val ctx = MockContext()
+        val ctx = FakeContext()
         MockVaadin19.init(ctx)
         return ctx
     }

@@ -1,8 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.kaributesting.mockhttp.MockHttpSession
-import com.github.mvysny.kaributesting.mockhttp.MockRequest
-import com.github.mvysny.kaributesting.mockhttp.MockResponse
+import com.github.mvysny.fakeservlet.FakeHttpSession
+import com.github.mvysny.fakeservlet.FakeRequest
+import com.github.mvysny.fakeservlet.FakeResponse
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.HasErrorParameter
@@ -134,7 +134,7 @@ public val currentUI: UI
  * currentRequest.mock.addCookie(Cookie("foo", "bar"))
  * ```
  */
-public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+public val VaadinRequest.mock: FakeRequest get() = (this as VaadinServletRequest).request as FakeRequest
 
 /**
  * Retrieves the mock request which backs up [VaadinResponse].
@@ -142,7 +142,7 @@ public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest
  * currentResponse.mock.getCookie("foo").value
  * ```
  */
-public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+public val VaadinResponse.mock: FakeResponse get() = (this as VaadinServletResponse).response as FakeResponse
 
 /**
  * Retrieves the mock session which backs up [VaadinSession].
@@ -150,7 +150,7 @@ public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletRespo
  * VaadinSession.getCurrent().mock
  * ```
  */
-public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
+public val VaadinSession.mock: FakeHttpSession get() = (session as WrappedHttpSession).httpSession as FakeHttpSession
 
 public val VaadinContext.context: ServletContext get() = (this as VaadinServletContext).context
 

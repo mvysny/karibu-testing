@@ -1,5 +1,9 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.fakeservlet.FakeHttpSession
+import com.github.mvysny.fakeservlet.FakeRequest
+import com.github.mvysny.fakeservlet.FakeResponse
+import com.github.mvysny.fakeservlet.FakeServletConfig
 import com.github.mvysny.kaributesting.mockhttp.*
 import com.github.mvysny.kaributesting.v10.mock.*
 import com.github.mvysny.kaributools.VaadinVersion
@@ -94,7 +98,7 @@ public object MockVaadin {
 
         if (!servlet.isInitialized) {
             val ctx: ServletContext = MockVaadinHelper.createMockContext()
-            servlet.init(MockServletConfig(ctx))
+            servlet.init(FakeServletConfig(ctx))
         }
         val service: VaadinServletService = checkNotNull(servlet.serviceSafe)
         check(service.router != null) { "$servlet failed to call VaadinServletService.init() in createServletService()" }
@@ -177,11 +181,11 @@ public object MockVaadin {
      * Creates [MockRequest]; override if you need to return a class that extends [MockRequest]
      * and modifies its behavior.
      */
-    public var mockRequestFactory: (MockHttpSession) -> MockRequest = { MockRequest(it) }
+    public var mockRequestFactory: (FakeHttpSession) -> FakeRequest = { FakeRequest(it) }
 
     private fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
-        val httpSession: MockHttpSession = MockHttpSession.create(ctx)
+        val httpSession: FakeHttpSession = FakeHttpSession.create(ctx)
 
         // init Vaadin Request
         val mockRequest = mockRequestFactory(httpSession)
@@ -210,7 +214,7 @@ public object MockVaadin {
         checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }
 
         // init Vaadin Response
-        val response = createVaadinServletResponse(MockResponse(), service)
+        val response = createVaadinServletResponse(FakeResponse(), service)
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 
@@ -368,7 +372,7 @@ public object MockVaadin {
         if (!currentlyClosingSession.get()) {
             // Vaadin 20.0.5+: closing session also clears the wrapped VaadinSession.getSession().
             // Acquire the wrapped session beforehand.
-            val mockSession: MockHttpSession = session.mock
+            val mockSession: FakeHttpSession = session.mock
             clearVaadinInstances(true)
             mockSession.destroy()
             createSession(mockSession.servletContext, uiFactory)

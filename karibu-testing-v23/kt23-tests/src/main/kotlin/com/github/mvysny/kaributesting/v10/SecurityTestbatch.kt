@@ -32,8 +32,8 @@ fun DynaNodeGroup.securityTests() {
     }
 
     test("user") {
-        currentRequest.mock.userPrincipalInt = MockPrincipal("user", listOf("user"))
-        currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        currentRequest.fake.userPrincipalInt = MockPrincipal("user", listOf("user"))
+        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
@@ -41,8 +41,8 @@ fun DynaNodeGroup.securityTests() {
     }
 
     test("admin") {
-        currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
-        currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
+        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
@@ -62,8 +62,8 @@ fun DynaNodeGroup.securityTests() {
         navigateTo<AdminView>()
         _expectOne<LoginView>()
 
-        currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
-        currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
+        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         navigateTo<AdminView>()
         _expectOne<AdminView>()
     }

@@ -134,7 +134,8 @@ public val currentUI: UI
  * currentRequest.mock.addCookie(Cookie("foo", "bar"))
  * ```
  */
-public val VaadinRequest.mock: FakeRequest get() = (this as VaadinServletRequest).request as FakeRequest
+@Deprecated("replaced by 'fake'", replaceWith = ReplaceWith("fake"))
+public val VaadinRequest.mock: FakeRequest get() = fake
 
 /**
  * Retrieves the mock request which backs up [VaadinResponse].
@@ -142,7 +143,8 @@ public val VaadinRequest.mock: FakeRequest get() = (this as VaadinServletRequest
  * currentResponse.mock.getCookie("foo").value
  * ```
  */
-public val VaadinResponse.mock: FakeResponse get() = (this as VaadinServletResponse).response as FakeResponse
+@Deprecated("replaced by 'fake'", replaceWith = ReplaceWith("fake"))
+public val VaadinResponse.mock: FakeResponse get() = fake
 
 /**
  * Retrieves the mock session which backs up [VaadinSession].
@@ -150,7 +152,32 @@ public val VaadinResponse.mock: FakeResponse get() = (this as VaadinServletRespo
  * VaadinSession.getCurrent().mock
  * ```
  */
-public val VaadinSession.mock: FakeHttpSession get() = (session as WrappedHttpSession).httpSession as FakeHttpSession
+@Deprecated("replaced by 'fake'", replaceWith = ReplaceWith("fake"))
+public val VaadinSession.mock: FakeHttpSession get() = fake
+
+/**
+ * Retrieves the mock request which backs up [VaadinRequest].
+ * ```
+ * currentRequest.fake.addCookie(Cookie("foo", "bar"))
+ * ```
+ */
+public val VaadinRequest.fake: FakeRequest get() = (this as VaadinServletRequest).request as FakeRequest
+
+/**
+ * Retrieves the mock request which backs up [VaadinResponse].
+ * ```
+ * currentResponse.fake.getCookie("foo").value
+ * ```
+ */
+public val VaadinResponse.fake: FakeResponse get() = (this as VaadinServletResponse).response as FakeResponse
+
+/**
+ * Retrieves the mock session which backs up [VaadinSession].
+ * ```
+ * VaadinSession.getCurrent().fake
+ * ```
+ */
+public val VaadinSession.fake: FakeHttpSession get() = (session as WrappedHttpSession).httpSession as FakeHttpSession
 
 public val VaadinContext.context: ServletContext get() = (this as VaadinServletContext).context
 

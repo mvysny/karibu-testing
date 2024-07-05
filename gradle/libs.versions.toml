@@ -5,7 +5,7 @@ vaadin8 = "8.16.1"
 # This is the latest stable Vaadin 14 version
 vaadin14 = "14.10.12"
 # Latest unstable Vaadin 14 version
-vaadin14_next = "14.11.10"
+vaadin14_next = "14.11.12"
 vaadin23="23.3.35"
 # Don't go 23.5+ - it requires license
 vaadin23_next="23.4.1"

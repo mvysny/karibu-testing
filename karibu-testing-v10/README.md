@@ -1962,7 +1962,16 @@ In Vaadin 24, RichTextEditor is a simple field with a HTML String value, so no s
 
 In Vaadin 23 however, RichTextEditor's value is in the Delta format; you need to bind `RichTextEditor.asHtml()` to
 obtain the value in HTML. Because of AsHtml depending on JavaScript code, setting its value doesn't fire any value change listeners.
-You need to use TODO Karibu function to emulate the proper setting of the HTML value:
+You need to use the following Karibu function to emulate the proper setting of the HTML value:
+
+kotlin:
+```kotlin
+rte._setHtmlValue("<b>hello</b>")
+```
+java:
+```
+RichTextEditorsKt._setHtmlValue(rte, "<b>hello</b>");
+```
 
 ## Security/Principal/isUserInRole
 

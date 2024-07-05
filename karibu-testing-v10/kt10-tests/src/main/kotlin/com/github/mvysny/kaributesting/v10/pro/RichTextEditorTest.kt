@@ -4,13 +4,12 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.MockVaadin
-import com.github.mvysny.kaributesting.v10._value
 import com.vaadin.flow.component.richtexteditor.RichTextEditor
 import kotlin.test.expect
 
 /**
- * In Vaadin 24, RichTextEditor is a simple field with a HTML String value, so no special support is necessary.
- * This test only makes sure this assumption holds.
+ * In Vaadin 23, RichTextEditor is a simple field with a Delta String value. When binding to HTML value, you need to use [RichTextEditor.asHtml].
+ * This test tests that everything works as expected.
  */
 @DynaTestDsl
 internal fun DynaNodeGroup.richTextEditorTests() {
@@ -18,28 +17,33 @@ internal fun DynaNodeGroup.richTextEditorTests() {
     beforeEach { MockVaadin.setup() }
     afterEach { MockVaadin.tearDown() }
 
+    test("smoke") {
+        val cb = RichTextEditor()
+        cb.asHtml().value = "foo"
+        expect("foo") { cb.asHtml().value }
+    }
+
     test("listeners fired") {
         val cb = RichTextEditor()
         var called = false
-        cb.addValueChangeListener {
+        cb.asHtml().addValueChangeListener {
             called = true
             expect("foo") { it.value }
         }
-        cb._value = "foo"
-        expect("foo") { cb._value }
+        cb._htmlValue = "foo"
+        expect("foo") { cb._htmlValue }
         expect(true) { called }
-        expect("foo") { cb.asHtml().value }
     }
 
     test("disabled") {
         // Vaadin ignores the enabled flag and updates the value happily.
-        expect("foo") { RichTextEditor().apply { isEnabled = false; value = "foo" } .asHtml().value }
+        expect("foo") { RichTextEditor().apply { isEnabled = false; asHtml().value = "foo" } .asHtml().value }
         // However, calling _value will fail
         val cb = RichTextEditor()
         cb.isEnabled = false
         expectThrows(IllegalStateException::class, "The RichTextEditor[DISABLED, value=''] is not enabled") {
-            cb._value = "foo"
+            cb._htmlValue = "foo"
         }
-        expect("") { cb._value }
+        expect("") { cb._htmlValue }
     }
 }

@@ -1,6 +1,6 @@
 package com.github.mvysny.kaributesting.v8
 
-import com.github.mvysny.kaributesting.mockhttp.*
+import com.github.mvysny.fakeservlet.*
 import com.vaadin.server.*
 import com.vaadin.shared.Version
 import com.vaadin.shared.ui.ui.PageClientRpc
@@ -8,7 +8,6 @@ import com.vaadin.ui.UI
 import com.vaadin.util.CurrentInstance
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
 import javax.servlet.ServletContext
@@ -28,7 +27,7 @@ private class MockVaadinServlet : VaadinServlet() {
             super.getService()
 }
 
-private class MockVaadinSession(val httpSession: MockHttpSession,
+private class MockVaadinSession(val httpSession: FakeHttpSession,
                                 service: VaadinService,
                                 private val uiFactory: () -> UI) : VaadinSession(service) {
     override fun close() {
@@ -80,9 +79,9 @@ public object MockVaadin {
      */
     @JvmStatic
     @JvmOverloads
-    public fun setup(uiFactory: () -> UI = { MockUI() },
-              httpSession: MockHttpSession? = null,
-              servletContext: ServletContext = MockContext()) {
+    public fun setup(uiFactory: () -> UI = @JvmSerializableLambda { MockUI() },
+              httpSession: FakeHttpSession? = null,
+              servletContext: ServletContext = FakeContext()) {
 
         val enableProductionModeTemporarily: Boolean = System.getProperty("vaadin.productionMode") == null
         if (enableProductionModeTemporarily) {
@@ -103,15 +102,15 @@ public object MockVaadin {
         // prepare mocking servlet environment
         val servlet = MockVaadinServlet()
         try {
-            servlet.init(MockServletConfig(servletContext))
+            servlet.init(FakeServletConfig(servletContext))
         } finally {
             if (enableProductionModeTemporarily) {
                 System.clearProperty("vaadin.productionMode")
             }
         }
 
-        val httpSess: MockHttpSession = httpSession
-                ?: MockHttpSession.create(servletContext)
+        val httpSess: FakeHttpSession = httpSession
+                ?: FakeHttpSession.create(servletContext)
 
         // mock Vaadin environment: Service
         VaadinService.setCurrent(servlet.service)
@@ -148,7 +147,7 @@ public object MockVaadin {
         strongRefSession = null
     }
 
-    internal fun createSession(httpSession: MockHttpSession, uiFactory: () -> UI) {
+    internal fun createSession(httpSession: FakeHttpSession, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
         val session = MockVaadinSession(httpSession, service, uiFactory)
 
@@ -159,13 +158,13 @@ public object MockVaadin {
         strongRefSession = session
 
         // request
-        val httpRequest = MockRequest(httpSession)
+        val httpRequest = FakeRequest(httpSession)
         httpRequest.setParameter("v-loc", "http://localhost:8080")
         strongRefRequest = VaadinServletRequest(httpRequest, service)
         CurrentInstance.set(VaadinRequest::class.java, strongRefRequest)
 
         // response
-        strongRefResponse = VaadinServletResponse(MockResponse(), service)
+        strongRefResponse = VaadinServletResponse(FakeResponse(), service)
         CurrentInstance.set(VaadinResponse::class.java, strongRefResponse)
 
         // UI
@@ -337,7 +336,7 @@ public val currentUI: UI
  * currentRequest.mock.addCookie(Cookie("foo", "bar"))
  * ```
  */
-public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest).request as MockRequest
+public val VaadinRequest.mock: FakeRequest get() = (this as VaadinServletRequest).request as FakeRequest
 
 /**
  * Retrieves the mock request which backs up [VaadinResponse].
@@ -345,7 +344,7 @@ public val VaadinRequest.mock: MockRequest get() = (this as VaadinServletRequest
  * currentResponse.mock.getCookie("foo").value
  * ```
  */
-public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletResponse).response as MockResponse
+public val VaadinResponse.mock: FakeResponse get() = (this as VaadinServletResponse).response as FakeResponse
 
 /**
  * Retrieves the mock session which backs up [VaadinSession].
@@ -353,4 +352,4 @@ public val VaadinResponse.mock: MockResponse get() = (this as VaadinServletRespo
  * VaadinSession.getCurrent().mock
  * ```
  */
-public val VaadinSession.mock: MockHttpSession get() = (session as WrappedHttpSession).httpSession as MockHttpSession
+public val VaadinSession.mock: FakeHttpSession get() = (session as WrappedHttpSession).httpSession as FakeHttpSession

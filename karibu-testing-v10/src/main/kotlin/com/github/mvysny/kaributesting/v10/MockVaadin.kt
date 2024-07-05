@@ -67,9 +67,9 @@ public object MockVaadin {
     @JvmStatic
     @JvmOverloads
     public fun setup(routes: Routes = Routes(),
-              uiFactory: () -> UI = { MockedUI() }) {
+              uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }) {
         // init servlet
-        val servlet = MockVaadinServlet(routes)
+        val servlet = MockVaadinServlet(routes, uiFactory)
         setup(uiFactory, servlet)
     }
 
@@ -90,7 +90,7 @@ public object MockVaadin {
      * on what methods you must override in your custom service.
      */
     @JvmStatic
-    public fun setup(uiFactory: () -> UI = { MockedUI() }, servlet: VaadinServlet) {
+    public fun setup(uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }, servlet: VaadinServlet) {
         check(VaadinVersion.get.isAtLeast(14, 3)) {
             "Karibu-Testing only works with Vaadin 14.3.0+ but you're using ${VaadinVersion.get}"
         }
@@ -372,7 +372,7 @@ public object MockVaadin {
         if (!currentlyClosingSession.get()) {
             // Vaadin 20.0.5+: closing session also clears the wrapped VaadinSession.getSession().
             // Acquire the wrapped session beforehand.
-            val mockSession: FakeHttpSession = session.mock
+            val mockSession: FakeHttpSession = session.fake
             clearVaadinInstances(true)
             mockSession.destroy()
             createSession(mockSession.servletContext, uiFactory)

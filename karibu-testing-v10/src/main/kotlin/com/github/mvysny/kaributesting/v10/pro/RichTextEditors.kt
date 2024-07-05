@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10.pro
 
 import com.github.mvysny.kaributesting.v10._expectEditableByUser
-import com.github.mvysny.kaributesting.v10._fireValueChange
 import com.vaadin.flow.component.richtexteditor.RichTextEditor
 
 /**
@@ -9,11 +8,9 @@ import com.vaadin.flow.component.richtexteditor.RichTextEditor
  * If the component is read-only or disabled, an exception is thrown.
  *
  * Also fires value change listeners.
- * @param fromClient defaults to true
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
-@JvmOverloads
-public fun RichTextEditor._setHtmlValue(value: String, fromClient: Boolean = true) {
+public fun RichTextEditor._setHtmlValue(value: String) {
     _expectEditableByUser()
 
     // The implementation doesn't fire value change event directly: it invokes a JavaScript function instead,
@@ -28,7 +25,7 @@ public fun RichTextEditor._setHtmlValue(value: String, fromClient: Boolean = tru
     // now we can fire the value change event manually. RichTextEditor.asHtml() captures value-change-event
     // fired on RichTextEditor, modifies it and fires its own event. All we therefore need to do
     // is to fire the value-change-event on the RichTextEditor itself.
-    _fireValueChange(fromClient)
+    this.value = value
 }
 
 public var RichTextEditor._htmlValue: String

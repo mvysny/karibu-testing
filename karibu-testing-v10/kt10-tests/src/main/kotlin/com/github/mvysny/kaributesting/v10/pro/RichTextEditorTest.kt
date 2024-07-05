@@ -27,6 +27,7 @@ internal fun DynaNodeGroup.richTextEditorTests() {
         val cb = RichTextEditor()
         var called = false
         cb.asHtml().addValueChangeListener {
+            expect(false) { called }
             called = true
             expect("foo") { it.value }
         }

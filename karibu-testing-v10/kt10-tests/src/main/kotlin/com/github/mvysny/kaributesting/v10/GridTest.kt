@@ -830,7 +830,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         test("smoke") {
             lateinit var column: Grid.Column<TestPerson>
             val grid = UI.getCurrent().grid<TestPerson> {
-                column = columnFor(TestPerson::name) {
+                column = addColumn { it.name } .apply {
                     isResizable = true
                 }
             }

@@ -13,7 +13,7 @@ vaadin23_next="23.4.1"
 slf4j = "2.0.13"
 karibudsl11 = "1.2.0" # Can't use Karibu-DSL 2.+ since it requires Java 17+
 fake-servlet = "1.1"
-karibu_tools = "0.14"
+karibu_tools = "0.21"
 junit = "5.10.2"
 
 [libraries]

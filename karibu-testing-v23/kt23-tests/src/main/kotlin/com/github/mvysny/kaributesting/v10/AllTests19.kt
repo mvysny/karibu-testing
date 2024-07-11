@@ -38,4 +38,8 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
             multiselectComboBoxTests()
         }
     }
+
+    group("Tabs+TabSheet") {
+        tabsTests()
+    }
 }

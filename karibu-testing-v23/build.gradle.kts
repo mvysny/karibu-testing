@@ -7,6 +7,7 @@ dependencies {
     compileOnly(libs.vaadin.v23.all)
     testImplementation(libs.vaadin.v23.all)
     api(project(":karibu-testing-v10"))
+    api(libs.karibu.tools23)
 
     testImplementation(libs.dynatest)
     testImplementation(libs.slf4j.simple)

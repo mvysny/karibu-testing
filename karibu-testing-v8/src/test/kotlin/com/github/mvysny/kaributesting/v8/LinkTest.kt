@@ -52,7 +52,7 @@ class LinkTest : DynaTest({
         }
         test("download connector") {
             val contents = FileResource(File("build.gradle.kts")).download().toString(Charsets.UTF_8)
-            expect(true, contents) { contents.contains("configureBintray") }
+            expect(true, contents) { contents.contains("configureMavenCentral") }
             expect("link!") { ClassResource(LinkTest::class.java, "link.txt").download().toString(Charsets.UTF_8) }
         }
         test("relative paths in theme resource") {

@@ -23,5 +23,5 @@ dependencies {
 }
 
 @Suppress("UNCHECKED_CAST")
-val configureBintray = ext["configureMavenCentral"] as (artifactId: String) -> Unit
-configureBintray("karibu-testing-v10-groovy")
+val configureMavenCentral = ext["configureMavenCentral"] as (artifactId: String) -> Unit
+configureMavenCentral("karibu-testing-v10-groovy")

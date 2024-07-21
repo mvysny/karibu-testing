@@ -12,5 +12,5 @@ kotlin {
 }
 
 @Suppress("UNCHECKED_CAST")
-val configureBintray = ext["configureBintray"] as (artifactId: String) -> Unit
+val configureBintray = ext["configureMavenCentral"] as (artifactId: String) -> Unit
 configureBintray("karibu-testing-v24")

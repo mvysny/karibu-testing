@@ -1285,7 +1285,7 @@ You can also use `comboBox._fireCustomValueSet()`/`ComboBoxKt._fireCustomValueSe
 new item in the ComboBox.
 
 Finally, call `comboBox.selectByLabel()`/`select.selectByLabel()` to select an item by its label,
-changing the value of the combobox/select. (Since Karibu-Testing 1.3.15)
+changing the value of the combobox/select. (Since Karibu-Testing 1.3.15; Java: `ComboBoxKt.selectByLabel()`)
 
 When using `ComponentRenderer` to render items in the dropdown overlay, call
 `comboBox._getRenderedComponentFor()`/`ComboBoxKt._getRenderedComponentFor()` to call renderer
@@ -1311,7 +1311,7 @@ filtering the suggestions.  You should use `getSuggestionItems()`
 to retrieve filtered items, in order to verify that the filter on your data provider works properly.
 
 Finally, call `msComboBox.selectByLabel()` to select an item by its label,
-changing the value of the combobox.
+changing the value of the combobox. Java: `MultiSelectComboBoxUtilsKt.selectByLabel()`
 
 When using `ComponentRenderer` to render items in the dropdown overlay, call
 `msComboBox._getRenderedComponentFor()`/`MultiSelectComboBoxUtilsKt._getRenderedComponentFor()` to call renderer

@@ -221,6 +221,10 @@ internal fun DynaNodeGroup.navigatorTest() {
 
     group("security") {
         group("no user logged in") {
+            test("both mock routes are present") {
+                expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteNotFoundError::class.java) }
+                expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteAccessDeniedError::class.java) }
+            }
             test("when access is rejected, redirect goes to WelcomeView") {
                 UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl().apply {
                     setLoginView(WelcomeView::class.java)
@@ -260,6 +264,10 @@ internal fun DynaNodeGroup.navigatorTest() {
         afterEach { MockVaadin.tearDown() }
 
         group("no user logged in") {
+            test("both mock routes are present") {
+                val routes = Routes().autoDiscoverViews()
+                expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteAccessDeniedError::class.java) }
+            }
             test("when access is rejected, redirect goes to WelcomeView") {
                 val routes = Routes().autoDiscoverViews()
                 routes.errorRoutes.remove(MyRouteNotFoundError::class.java)

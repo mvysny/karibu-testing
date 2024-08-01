@@ -21,6 +21,7 @@ import com.vaadin.flow.router.Route
 import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.auth.NavigationAccessControl
+import test.app.MyRouteNotFoundError
 import java.io.Serializable
 import java.security.Principal
 import java.util.function.Predicate
@@ -247,6 +248,61 @@ internal fun DynaNodeGroup.navigatorTest() {
                 }
             }
             test("when access is rejected, Karibu's MockRouteAccessDeniedError throws AccessDeniedException") {
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
+                expectThrows<AccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
+                    navigateTo<TestingView>()
+                }
+            }
+        }
+    }
+    group("security2 - with all routes") {
+        beforeEach { MockVaadin.tearDown() }
+        afterEach { MockVaadin.tearDown() }
+
+        group("no user logged in") {
+            test("when access is rejected, redirect goes to WelcomeView") {
+                val routes = Routes().autoDiscoverViews()
+                routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
+                routes.errorRoutes.add(MockRouteNotFoundError::class.java)
+                MockVaadin.setup(routes)
+
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl().apply {
+                    setLoginView(WelcomeView::class.java)
+                })
+                navigateTo<TestingView>()
+                expectView<WelcomeView>()
+            }
+            test("when access is rejected and no login view is set, redirects to MockRouteNotFoundError") {
+                val routes = Routes().autoDiscoverViews()
+                routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
+                routes.errorRoutes.add(MockRouteNotFoundError::class.java)
+                MockVaadin.setup(routes)
+
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl())
+                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+                    navigateTo<TestingView>()
+                }
+            }
+        }
+        group("user logged in") {
+            test("when access is rejected, default handler redirects to MockRouteNotFoundError") {
+                val routes = Routes().autoDiscoverViews()
+                routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
+                routes.errorRoutes.add(MockRouteNotFoundError::class.java)
+                routes.errorRoutes.remove(MockRouteAccessDeniedError::class.java)
+                MockVaadin.setup(routes)
+
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
+                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+                    navigateTo<TestingView>()
+                }
+            }
+            test("when access is rejected, Karibu's MockRouteAccessDeniedError throws AccessDeniedException") {
+                val routes = Routes().autoDiscoverViews()
+                routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
+                routes.errorRoutes.add(MockRouteNotFoundError::class.java)
+                MockVaadin.setup(routes)
+
                 UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
                 expectThrows<AccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
                     navigateTo<TestingView>()

@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.mock.MockVaadin19
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.router.*
@@ -81,6 +82,13 @@ public data class Routes(
             scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info: ClassInfo ->
                 Class.forName(info.name).asSubclass(HasErrorParameter::class.java)
             }
+        }
+
+        // remove @DefaultErrorHandler RouteAccessDeniedError and RouteNotFoundError so that they're replaced with Karibu's Mock counterparts
+        // which perform better logging
+        errorRoutes.remove(RouteNotFoundError::class.java)
+        if (VaadinVersion.get.isAtLeast(24, 3)) {
+            errorRoutes.remove(Class.forName("com.vaadin.flow.router.RouteAccessDeniedError"))
         }
 
         // https://github.com/mvysny/karibu-testing/issues/50

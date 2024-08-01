@@ -24,6 +24,7 @@ import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
+import com.vaadin.flow.server.auth.AnonymousAllowed
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -598,6 +599,7 @@ class HelloWorldView : VerticalLayout() {
 
 @Route("")
 @PWA(name = "My Foo PWA", shortName = "Foo PWA")
+@AnonymousAllowed
 class WelcomeView : VerticalLayout() {
     init {
         width = null

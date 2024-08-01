@@ -16,6 +16,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.VaadinRequest
+import com.vaadin.flow.server.auth.NavigationAccessControl
+import java.security.Principal
+import java.util.function.Predicate
 import kotlin.test.expect
 
 @DynaTestDsl
@@ -209,6 +213,14 @@ internal fun DynaNodeGroup.navigatorTest() {
             expect(TestingView::class.java) { currentView }
         }
     }
+
+    group("security") {
+        test("when access is rejected, redirect goes to WelcomeView") {
+            UI.getCurrent().addBeforeEnterListener(NoUserLoggedInNavigationAccessControl())
+            navigateTo<TestingView>()
+            expectView<WelcomeView>()
+        }
+    }
 }
 
 @Route("navigation-postpone")
@@ -225,4 +237,12 @@ class NavigationPostponeView : VerticalLayout(), BeforeLeaveObserver {
             }
         }.open()
     }
+}
+
+class NoUserLoggedInNavigationAccessControl : NavigationAccessControl() {
+    init {
+        loginView = WelcomeView::class.java
+    }
+    override fun getPrincipal(request: VaadinRequest?): Principal? = null
+    override fun getRolesChecker(request: VaadinRequest?): Predicate<String> = Predicate { false }
 }

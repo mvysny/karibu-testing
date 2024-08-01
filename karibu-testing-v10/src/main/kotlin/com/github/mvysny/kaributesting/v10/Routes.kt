@@ -30,7 +30,7 @@ import kotlin.test.expect
  */
 public data class Routes(
         val routes: MutableSet<Class<out Component>> = mutableSetOf(),
-        val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf(MockRouteNotFoundError::class.java),
+        val errorRoutes: MutableSet<Class<out HasErrorParameter<*>>> = mutableSetOf(MockRouteNotFoundError::class.java, MockRouteAccessDeniedError::class.java),
         var skipPwaInit: Boolean = true
 ) : Serializable {
 

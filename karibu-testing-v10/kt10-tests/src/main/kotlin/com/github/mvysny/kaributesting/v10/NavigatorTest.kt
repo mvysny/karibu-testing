@@ -4,6 +4,7 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.onClick
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.span
 import com.github.mvysny.kaributools.get
@@ -234,10 +235,10 @@ class NavigationPostponeView : VerticalLayout(), BeforeLeaveObserver {
         Dialog().apply {
             span("Are you sure you want to leave such a beautiful view?")
             button("Yes") {
-                onLeftClick { action.proceed(); close() }
+                onClick { action.proceed(); close() }
             }
             button("No") {
-                onLeftClick { close() }
+                onClick { close() }
             }
         }.open()
     }

@@ -15,9 +15,11 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
+import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.auth.NavigationAccessControl
+import java.io.Serializable
 import java.security.Principal
 import java.util.function.Predicate
 import kotlin.test.expect
@@ -215,10 +217,28 @@ internal fun DynaNodeGroup.navigatorTest() {
     }
 
     group("security") {
-        test("when access is rejected, redirect goes to WelcomeView") {
-            UI.getCurrent().addBeforeEnterListener(NoUserLoggedInNavigationAccessControl())
-            navigateTo<TestingView>()
-            expectView<WelcomeView>()
+        group("no user logged in") {
+            test("when access is rejected, redirect goes to WelcomeView") {
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl().apply {
+                    setLoginView(WelcomeView::class.java)
+                })
+                navigateTo<TestingView>()
+                expectView<WelcomeView>()
+            }
+            test("when access is rejected and no login view is set, redirects to MockRouteNotFoundError") {
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl())
+                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+                    navigateTo<TestingView>()
+                }
+            }
+        }
+        group("user logged in") {
+            test("when access is rejected, default handler redirects to MockRouteNotFoundError") {
+                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
+                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+                    navigateTo<TestingView>()
+                }
+            }
         }
     }
 }
@@ -239,10 +259,11 @@ class NavigationPostponeView : VerticalLayout(), BeforeLeaveObserver {
     }
 }
 
-class NoUserLoggedInNavigationAccessControl : NavigationAccessControl() {
-    init {
-        loginView = WelcomeView::class.java
-    }
-    override fun getPrincipal(request: VaadinRequest?): Principal? = null
+class SimpleNavigationAccessControl(val user: String? = null) : NavigationAccessControl() {
+    override fun getPrincipal(request: VaadinRequest?): Principal? = if (user == null) null else SimplePrincipal(user)
     override fun getRolesChecker(request: VaadinRequest?): Predicate<String> = Predicate { false }
+}
+
+data class SimplePrincipal(private val name: String): Principal, Serializable {
+    override fun getName(): String = name
 }

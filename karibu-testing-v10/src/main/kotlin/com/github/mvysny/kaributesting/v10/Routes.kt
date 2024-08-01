@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.VaadinContext
+import com.vaadin.flow.server.auth.AnonymousAllowed
 import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
@@ -110,6 +111,7 @@ public fun ApplicationRouteRegistry.clearPwaClass() {
  * any navigation to a missing route and can respond with an informative exception.
  */
 @Tag(Tag.DIV)
+@AnonymousAllowed
 public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoundException> {
     override fun setErrorParameter(event: BeforeEnterEvent, parameter: ErrorParameter<NotFoundException>): Int {
         val message: String = buildString {

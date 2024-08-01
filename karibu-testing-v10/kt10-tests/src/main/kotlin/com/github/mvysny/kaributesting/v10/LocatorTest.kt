@@ -47,7 +47,7 @@ internal fun DynaNodeGroup.locatorTest2() {
             // the _expect*() functions should detect this and fail fast.
             currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
             navigateTo("")
-            expectThrows<AssertionError>("An internal server error occurred; please check log for the actual stack-trace. Error text: There was an exception while trying to navigate to") {
+            expectThrows<AssertionError>("An internal server error occurred; please check log for the actual stack-trace. Error text: There was an exception while trying to navigate to '' with the exception message 'Simulated'") {
                 _expectOne<UI>()
             }
         }

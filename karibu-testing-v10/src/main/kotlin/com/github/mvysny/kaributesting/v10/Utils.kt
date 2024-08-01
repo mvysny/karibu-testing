@@ -5,6 +5,7 @@ import com.github.mvysny.fakeservlet.FakeRequest
 import com.github.mvysny.fakeservlet.FakeResponse
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.internal.ReflectTools
+import com.vaadin.flow.router.AccessDeniedException
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.server.*
@@ -113,6 +114,8 @@ internal fun Class<*>.getErrorParameterType(): Class<*>? =
 
 internal val Class<*>.isRouteNotFound: Boolean
     get() = getErrorParameterType() == NotFoundException::class.java
+internal val Class<*>.isAccessDenied: Boolean
+    get() = getErrorParameterType() == AccessDeniedException::class.java
 
 public val currentRequest: VaadinRequest
     get() = VaadinService.getCurrentRequest()

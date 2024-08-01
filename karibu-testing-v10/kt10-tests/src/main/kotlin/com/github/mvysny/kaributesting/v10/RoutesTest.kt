@@ -28,7 +28,7 @@ val allViews: Set<Class<out Component>> = setOf<Class<out Component>>(
     NavigationPostponeView::class.java,
     PreserveOnRefreshView::class.java
 )
-val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java)
+val allErrorRoutes: Set<Class<out HasErrorParameter<*>>> = setOf(ErrorView::class.java, MockRouteNotFoundError::class.java, MockRouteAccessDeniedError::class.java)
 
 @DynaTestDsl
 fun DynaNodeGroup.routesTestBatch() {

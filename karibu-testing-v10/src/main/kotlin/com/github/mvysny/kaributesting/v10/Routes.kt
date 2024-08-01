@@ -11,6 +11,7 @@ import com.vaadin.flow.server.startup.RouteRegistryInitializer
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ClassInfo
 import io.github.classgraph.ScanResult
+import org.slf4j.LoggerFactory
 import java.io.Serializable
 import java.lang.reflect.Field
 import java.util.concurrent.atomic.AtomicReference
@@ -87,6 +88,9 @@ public data class Routes(
         if (errorRoutes.any { it != MockRouteNotFoundError::class.java && it.isRouteNotFound }) {
             errorRoutes.remove(MockRouteNotFoundError::class.java)
         }
+        if (errorRoutes.any { it != MockRouteAccessDeniedError::class.java && it.isAccessDenied }) {
+            errorRoutes.remove(MockRouteAccessDeniedError::class.java)
+        }
 
         println("Auto-discovered views: $this")
     }
@@ -126,6 +130,36 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
             append("\nIf you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the ${MockRouteNotFoundError::class.java} from Routes.errorRoutes")
         }
         throw NotFoundException(message).apply { initCause(parameter.caughtException) }
+    }
+}
+
+/**
+ * This route gets registered by default in [Routes], so that Karibu-Testing can catch
+ * any [AccessDeniedException] and throw it immediately, instead of redirecting to [NotFoundException] as the original [RouteAccessDeniedError]
+ * handler does. Fixes [#161](https://github.com/mvysny/karibu-testing/issues/161).
+ */
+@Tag(Tag.DIV)
+@AnonymousAllowed
+public open class MockRouteAccessDeniedError: Component(), HasErrorParameter<AccessDeniedException> {
+    override fun setErrorParameter(event: BeforeEnterEvent, parameter: ErrorParameter<AccessDeniedException>): Int {
+        // don't re-throw caughtException - the stacktrace won't point here.
+        // try our best to preserve the stacktrace, but bail out for custom exceptions
+        if (parameter.exception.javaClass == AccessDeniedException::class.java || parameter.exception.javaClass == MockAccessDeniedException::class.java) {
+            throw MockAccessDeniedException(parameter)
+        }
+        log.error("!!!! Karibu-Testing: MockRouteAccessDeniedError caught an exception ${parameter.caughtException}: ${parameter.customMessage}")
+        throw parameter.caughtException!!
+    }
+    public companion object {
+        @JvmStatic
+        private val log = LoggerFactory.getLogger(MockRouteAccessDeniedError::class.java)
+    }
+}
+
+public class MockAccessDeniedException(override val message: String, cause: Throwable?) : AccessDeniedException() {
+    public constructor(param: ErrorParameter<AccessDeniedException>) : this(param.customMessage, param.caughtException)
+    init {
+        initCause(cause)
     }
 }
 

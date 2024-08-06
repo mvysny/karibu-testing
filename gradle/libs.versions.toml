@@ -3,9 +3,9 @@
 vaadin8 = "8.16.1"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 # This is the latest stable Vaadin 14 version
-vaadin14 = "14.11.13"
-# Latest unstable Vaadin 14 version
-vaadin14_next = "14.12.0.alpha1"
+vaadin14 = "14.10.12"
+# Latest unstable Vaadin 14 version. Don't go 14.12+ since that requires Pro license
+vaadin14_next = "14.11.13"
 vaadin23="23.3.35"
 # Don't go 23.5+ - it requires license
 vaadin23_next="23.4.1"

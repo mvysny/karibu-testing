@@ -250,3 +250,18 @@ private fun MenuItemBase<*, *, *>.checkMenuItemEnabled(originalItem: MenuItemBas
         }
     }
 }
+
+/**
+ * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
+ */
+public fun ContextMenu.setOpened(opened: Boolean) {
+    element.setProperty("opened", opened)
+}
+
+/**
+ * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
+ */
+public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?) {
+    _setContextMenuTargetItemKey(gridItem)
+    element.setProperty("opened", opened)
+}

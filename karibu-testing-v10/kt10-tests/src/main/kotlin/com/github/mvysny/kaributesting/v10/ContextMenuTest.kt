@@ -197,6 +197,41 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
+    test("setOpened(true) fires ContextMenuBase.OpenedChangeEvent") {
+        var called = false
+        lateinit var cm: ContextMenu
+        UI.getCurrent().div {
+            cm = contextMenu {
+                item("click me")
+            }
+        }
+        cm.addOpenedChangeListener { e ->
+            called = true
+            expect(true) { e.isOpened }
+            expect(false) { e.isFromClient }
+        }
+        cm.setOpened(true)
+        expect(true) { called }
+    }
+
+    test("setOpened(false) fires ContextMenuBase.OpenedChangeEvent") {
+        var called = false
+        lateinit var cm: ContextMenu
+        UI.getCurrent().div {
+            cm = contextMenu {
+                item("click me")
+            }
+        }
+        cm.setOpened(true)
+        cm.addOpenedChangeListener { e ->
+            called = true
+            expect(false) { e.isOpened }
+            expect(false) { e.isFromClient }
+        }
+        cm.setOpened(false)
+        expect(true) { called }
+    }
+
     group("grid context menu") {
         test("simple click") {
             lateinit var clicked: String
@@ -307,6 +342,43 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithCaption("click me", "foo")
             expect(true) { listenerCalled }
             expect("foo") { clicked }
+        }
+
+        test("setOpened(true) fires GridContextMenuOpenedEvent") {
+            var called = false
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me")
+                }
+            }
+            cm.addGridContextMenuOpenedListener() { e ->
+                called = true
+                expect(true) { e.isOpened }
+                expect(false) { e.isFromClient }
+                expect("foo") { e.item.orElse(null) }
+            }
+            cm.setOpened(true, "foo")
+            expect(true) { called }
+        }
+
+        test("setOpened(false) fires GridContextMenuOpenedEvent") {
+            var called = false
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me")
+                }
+            }
+            cm.setOpened(true, "foo")
+            cm.addGridContextMenuOpenedListener { e ->
+                called = true
+                expect(false) { e.isOpened }
+                expect(false) { e.isFromClient }
+                expect("foo") { e.item.orElse(null) }
+            }
+            cm.setOpened(false, "foo")
+            expect(true) { called }
         }
     }
 }

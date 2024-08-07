@@ -19,7 +19,7 @@ import kotlin.test.fail
  */
 public fun HasMenuItems._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>) {
     // fires ContextMenuOpenedListener to simulate menu opening
-    (this as Component).element.setProperty("opened", true)
+    (this as? ContextMenu)?.setOpened(true)
 
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     val predicate = searchSpec.toPredicate()
@@ -28,7 +28,7 @@ public fun HasMenuItems._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*
     (item as MenuItem)._click(parentMap)
 
     // fires ContextMenuOpenedListener to simulate menu closing
-    (this as Component).element.setProperty("opened", false)
+    (this as? ContextMenu)?.setOpened(false)
 }
 
 /**
@@ -106,14 +106,6 @@ public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridIte
 public fun <T> GridContextMenu<T>._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>, gridItem: T?) {
     // fires ContextMenuOpenedListener to simulate menu opening
     setOpened(true, gridItem)
-
-    // notify the context menu dynamic item generator
-    dynamicContentHandler?.also {
-        val openMenu: Boolean = it.test(gridItem)
-        if (!openMenu) {
-            fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
-        }
-    }
 
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = getParentMap()
     val predicate = searchSpec.toPredicate()
@@ -267,6 +259,15 @@ public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, colum
         val id = requireNotNull(column.id_) { "Column $column must have an ID assigned in order to be identifiable in the event object" }
         require(id.isNotBlank()) { "Column $column must have an ID assigned in order to be identifiable in the event object" }
         target.element.setProperty("_contextMenuTargetColumnId", id)
+    }
+    if (opened) {
+        // notify the context menu dynamic item generator
+        dynamicContentHandler?.also {
+            val openMenu: Boolean = it.test(gridItem)
+            if (!openMenu) {
+                fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
+            }
+        }
     }
     element.setProperty("opened", opened)
 }

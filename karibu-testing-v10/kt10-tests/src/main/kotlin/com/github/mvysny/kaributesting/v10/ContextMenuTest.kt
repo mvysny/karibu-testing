@@ -388,6 +388,28 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect(2) { called }
         }
 
+        test("setOpened(true) succeeds on null item") {
+            var called = 0
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me")
+                    setDynamicContentHandler { item ->
+                        expect(null) { item }
+                        expect(0) { called }
+                        called = 1
+                        true
+                    }
+                }
+            }
+            cm.addGridContextMenuOpenedListener { e ->
+                expect(1) { called }
+                called = 2
+            }
+            cm.setOpened(true, null)
+            expect(2) { called }
+        }
+
         test("setOpened(false) fires GridContextMenuOpenedEvent") {
             var called = false
             lateinit var cm: GridContextMenu<String>

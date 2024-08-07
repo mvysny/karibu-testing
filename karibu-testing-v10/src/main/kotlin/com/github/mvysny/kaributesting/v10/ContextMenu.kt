@@ -8,6 +8,9 @@ import com.vaadin.flow.component.contextmenu.*
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import elemental.json.Json
+import elemental.json.JsonObject
+import elemental.json.impl.JreJsonObject
 import java.lang.reflect.Method
 import kotlin.test.expect
 import kotlin.test.fail
@@ -257,6 +260,21 @@ public fun ContextMenu.setOpened(opened: Boolean) {
     element.setProperty("opened", opened)
 }
 
+private val __ContextMenuBase_onBeforeOpenMenu: Method by lazy {
+    val m = ContextMenuBase::class.java.getDeclaredMethod("onBeforeOpenMenu", JsonObject::class.java)
+    m.isAccessible = true
+    m
+}
+
+private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, columnId: String?): Boolean {
+    val json = Json.createObject().apply {
+        if (itemKey != null) put("key", itemKey)
+        if (columnId != null) put("columnId", columnId)
+    }
+    val obj = __ContextMenuBase_onBeforeOpenMenu.invoke(this, json) as Boolean
+    return obj
+}
+
 /**
  * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
  */
@@ -270,11 +288,11 @@ public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, colum
     }
     if (opened) {
         // notify the context menu dynamic item generator
-        dynamicContentHandler?.also {
-            val openMenu: Boolean = it.test(gridItem)
-            if (!openMenu) {
-                fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
-            }
+        val grid = target as Grid<T>
+        val itemKey = if (gridItem == null) null else grid.dataCommunicator.keyMapper.key(gridItem)
+        // call onBeforeOpenMenu() instead of calling dynamicContentGenerator, for better compatibility
+        if (!invokeOnBeforeOpenMenu(itemKey, column?.id_)) {
+            fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
         }
     }
     element.setProperty("opened", opened)

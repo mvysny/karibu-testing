@@ -105,8 +105,7 @@ public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridIte
  */
 public fun <T> GridContextMenu<T>._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>, gridItem: T?) {
     // fires ContextMenuOpenedListener to simulate menu opening
-    _setContextMenuTargetItemKey(gridItem)
-    element.setProperty("opened", true)
+    setOpened(true, gridItem)
 
     // notify the context menu dynamic item generator
     dynamicContentHandler?.also {
@@ -124,7 +123,7 @@ public fun <T> GridContextMenu<T>._clickItemMatching(searchSpec: SearchSpec<Menu
     (item as GridMenuItem<T>)._click(gridItem)
 
     // fires ContextMenuOpenedListener to simulate menu closing
-    element.setProperty("opened", false)
+    setOpened(false, gridItem)
 }
 
 private fun Component.getParentMap(): Map<MenuItemBase<*, *, *>, Component> {
@@ -206,7 +205,7 @@ private fun MenuItemBase<*, *, *>.checkMenuItemVisible(originalItem: MenuItemBas
         }
     }
     val parent: Component = parentMap[this]
-            ?: fail("${originalItem.toPrettyString()} is not part of\n${getContextMenu().toPrettyTree()}?!?")
+            ?: fail("${originalItem.toPrettyString()} is not part of\n${contextMenu.toPrettyTree()}?!?")
     when (parent) {
         is MenuItem -> parent.checkMenuItemVisible(originalItem, parentMap)
         is GridMenuItem<*> -> parent.checkMenuItemVisible(originalItem, parentMap)
@@ -261,7 +260,13 @@ public fun ContextMenu.setOpened(opened: Boolean) {
 /**
  * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
  */
-public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?) {
+@JvmOverloads
+public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, column: Grid.Column<T>? = null) {
     _setContextMenuTargetItemKey(gridItem)
+    if (column != null) {
+        val id = requireNotNull(column.id_) { "Column $column must have an ID assigned in order to be identifiable in the event object" }
+        require(id.isNotBlank()) { "Column $column must have an ID assigned in order to be identifiable in the event object" }
+        target.element.setProperty("_contextMenuTargetColumnId", id)
+    }
     element.setProperty("opened", opened)
 }

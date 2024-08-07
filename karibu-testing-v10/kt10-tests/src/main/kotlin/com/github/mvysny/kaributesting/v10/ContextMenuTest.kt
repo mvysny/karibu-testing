@@ -347,18 +347,22 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         test("setOpened(true) fires GridContextMenuOpenedEvent") {
             var called = false
             lateinit var cm: GridContextMenu<String>
-            UI.getCurrent().grid<String> {
+            val grid = UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
                     item("click me")
                 }
+                addColumn({ it }).apply {
+                    id_ = "foo!"
+                }
             }
-            cm.addGridContextMenuOpenedListener() { e ->
+            cm.addGridContextMenuOpenedListener { e ->
                 called = true
                 expect(true) { e.isOpened }
                 expect(false) { e.isFromClient }
                 expect("foo") { e.item.orElse(null) }
+                expect("foo!") { e.columnId.get() }
             }
-            cm.setOpened(true, "foo")
+            cm.setOpened(true, "foo", grid.columns[0])
             expect(true) { called }
         }
 
@@ -376,6 +380,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 expect(false) { e.isOpened }
                 expect(false) { e.isFromClient }
                 expect("foo") { e.item.orElse(null) }
+                expect(null) { e.columnId.orElse(null) }
             }
             cm.setOpened(false, "foo")
             expect(true) { called }

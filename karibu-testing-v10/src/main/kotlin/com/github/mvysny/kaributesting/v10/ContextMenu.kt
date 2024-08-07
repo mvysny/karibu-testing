@@ -260,8 +260,8 @@ private val __ContextMenuBase_onBeforeOpenMenu: Method by lazy {
 
 private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, columnId: String?): Boolean {
     val json = Json.createObject().apply {
-        if (itemKey != null) put("key", itemKey)
-        if (columnId != null) put("columnId", columnId)
+        put("key", itemKey ?: "")
+        put("columnId", columnId ?: "")
     }
     val obj = __ContextMenuBase_onBeforeOpenMenu.invoke(this, json) as Boolean
     return obj

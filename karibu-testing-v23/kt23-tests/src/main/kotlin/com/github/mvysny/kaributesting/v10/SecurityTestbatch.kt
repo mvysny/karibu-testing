@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "removal")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup

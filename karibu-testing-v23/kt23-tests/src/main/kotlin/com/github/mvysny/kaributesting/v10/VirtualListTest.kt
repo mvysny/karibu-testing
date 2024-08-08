@@ -10,7 +10,7 @@ import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
-import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.virtuallist.VirtualList
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -91,9 +91,8 @@ internal fun DynaNodeGroup.virtualListTests() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                    .withLocale(Locale("fi", "FI"))
+                    .withLocale(Locale.forLanguageTag("fi-FI"))
                 // use this constructor: the non-deprecated one isn't available in Vaadin 22
-                @Suppress("DEPRECATION")
                 setRenderer(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
             }
             vl.expectRow(0, "1.3.2019")
@@ -117,7 +116,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             var called = false
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
-                    onLeftClick {
+                    onClick {
                         called = true
                         expect("name 8") { person.name }
                     }
@@ -152,12 +151,12 @@ internal fun DynaNodeGroup.virtualListTests() {
             }
         }
         test("fails on unsupported component type") {
-            expect(false) { Label() is ClickNotifier<*> }
+            expect(false) { NativeLabel() is ClickNotifier<*> }
             val vl = VirtualList<TestPerson>().apply {
                 setItems((0..10).map { TestPerson("name $it", it) })
-                setRenderer(ComponentRenderer<Label, TestPerson> { _ -> Label() })
+                setRenderer(ComponentRenderer { _ -> NativeLabel() })
             }
-            expectThrows(AssertionError::class, "VirtualList[dataprovider='ListDataProvider<TestPerson>(11 items)']: ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
+            expectThrows(AssertionError::class, "VirtualList[dataprovider='ListDataProvider<TestPerson>(11 items)']: ComponentRenderer produced NativeLabel[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 vl._clickRenderer(8)
             }
         }
@@ -177,7 +176,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             var called = false
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
-                    onLeftClick {
+                    onClick {
                         called = true
                         expect("name 8") { person.name }
                     }

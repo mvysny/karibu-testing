@@ -3,7 +3,7 @@ package com.github.mvysny.kaributesting.v10;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,6 +17,7 @@ import static com.github.mvysny.kaributesting.v10.GridKt.*;
  * is hard to use from Java. This is an API test.
  * @author mavi
  */
+@SuppressWarnings("removal")
 public class LocatorJApiTest {
 
     public static class MainView extends VerticalLayout {}
@@ -28,32 +29,32 @@ public class LocatorJApiTest {
         final MainView main = (MainView) UI.getCurrent().getChildren().findFirst().get();
         main.getChildren().count();
 
-        _get(Label.class);
-        _get(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _get(H1.class);
+        _get(H1.class, spec -> spec.withLabel("Name:").withId("foo"));
         _get(new Button(), TextField.class);
-        _get(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
+        _get(new VerticalLayout(), TextField.class, spec -> spec.withText("Name:").withId("foo").withCount(0));
 
-        _find(Label.class);
-        _find(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _find(H1.class);
+        _find(H1.class, spec -> spec.withCaption("Name:").withId("foo"));
         _find(new Button(), TextField.class);
         _find(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo"));
 
-        _assertNone(Label.class);
-        _assertNone(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _assertNone(H1.class);
+        _assertNone(H1.class, spec -> spec.withCaption("Name:").withId("foo"));
         _assertNone(new Button(), TextField.class);
         _assertNone(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo"));
 
-        _assertOne(Label.class);
-        _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo"));
-        _assertOne(Label.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
+        _assertOne(H1.class);
+        _assertOne(H1.class, spec -> spec.withCaption("Name:").withId("foo"));
+        _assertOne(H1.class, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
         _assertOne(new Button(), TextField.class);
         _assertOne(new VerticalLayout(), TextField.class, spec -> spec.withCaption("Name:").withId("foo").withoutClasses("current"));
         _assertOne(new Icon(VaadinIcon.ABACUS), Icon.class, spec -> spec.withIcon(VaadinIcon.ABACUS));
         _assertOne(new Button(VaadinIcon.ABACUS.create()), Button.class, spec -> spec.withIcon(VaadinIcon.ABACUS));
 
-        _assert(Label.class, 2);
-        _assert(Label.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
-        _assert(Label.class, 4, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
+        _assert(H1.class, 2);
+        _assert(H1.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
+        _assert(H1.class, 4, spec -> spec.withCaption("Name:").withId("foo").withCount(0));
         _assert(new Button(), TextField.class, 6);
         _assert(new VerticalLayout(), TextField.class, 3, spec -> spec.withCaption("Name:").withId("foo"));
 

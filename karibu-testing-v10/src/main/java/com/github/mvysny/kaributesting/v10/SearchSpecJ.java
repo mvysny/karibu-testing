@@ -14,12 +14,17 @@ import kotlin.ranges.IntRange;
 
 /**
  * A criterion for matching components. The component must match all of non-null fields.
+ * @param <T> the class of the component we are searching for.
  * @author mavi
  */
 public class SearchSpecJ<T extends Component> {
     @NotNull
     private final SearchSpec<T> spec;
 
+    /**
+     * Creates the criterion. You're not supposed to create instances yourself - they will be created for you by helper methods of the {@link LocatorJ} class.
+     * @param spec configure this delegate
+     */
     public SearchSpecJ(@NotNull SearchSpec<T> spec) {
         this.spec = spec;
     }
@@ -36,10 +41,23 @@ public class SearchSpecJ<T extends Component> {
     }
 
     /**
-     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
-     * @param caption
+     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getLabel(Component)}; if {@code null}, no particular label is matched.
+     * @param label The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getLabel(Component)}; if {@code null}, no particular label is matched.
      * @return this
      */
+    @NotNull
+    public SearchSpecJ<T> withLabel(@Nullable String label) {
+        spec.setLabel(label);
+        return this;
+    }
+
+    /**
+     * The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
+     * @param caption The required {@link com.github.mvysny.kaributools.ComponentUtilsKt#getCaption(Component)}; if {@code null}, no particular caption is matched.
+     * @return this
+     */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated(forRemoval = true)
     @NotNull
     public SearchSpecJ<T> withCaption(@Nullable String caption) {
         spec.setCaption(caption);
@@ -160,7 +178,7 @@ public class SearchSpecJ<T extends Component> {
 
     /**
      * Adds additional predicate which the component needs to match. Not null.
-     * <p/>
+     * <br/>
      * Please remember to provide a proper {@link Object#toString()} for the predicate,
      * so that you'll get an informative error message on lookup failure.
      * @param predicate the matcher

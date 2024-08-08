@@ -14,7 +14,6 @@ import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate
 import com.vaadin.flow.router.InternalServerError
 import java.io.PrintStream
-import java.util.*
 import java.util.function.Predicate
 
 /**
@@ -23,6 +22,7 @@ import java.util.function.Predicate
  * You can add more properties, simply by creating a write-only property which will register a new [predicates] on write. See
  * [Adding support for custom search criteria](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#adding-support-for-custom-search-criteria)
  * for more details.
+ * @param T the class of the component we are searching for.
  * @property clazz the class of the component we are searching for.
  * @property id the required [Component.getId]; if null, no particular id is matched.
  * @property label the required [Component.label]; if null, no particular label is matched.

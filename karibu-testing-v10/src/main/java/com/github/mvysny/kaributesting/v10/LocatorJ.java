@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10;
 
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.button.Button;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +17,10 @@ import kotlin.Unit;
  */
 public class LocatorJ {
     /**
+     * Utility class with static functions only, not meant to be instantiated.
+     */
+    private LocatorJ() {}
+    /**
      * Finds a VISIBLE component of given type which matches given class. {@link UI#getCurrent()} all of its descendants are searched.
      *
      * @param clazz the component class
@@ -32,10 +35,12 @@ public class LocatorJ {
 
     /**
      * Finds a VISIBLE component in the current UI of given clazz which matches given spec. The {@link UI#getCurrent()} and all of its descendants are searched.
-     * <p>
+     * <br/>
      * Example:
-     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));</code>
-     * </p>
+     * <pre><code>
+     * import static com.github.karibu.testing.LocatorJ.*;
+     * _get(TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));
+     * </code></pre>
      *
      * @param clazz the component must be of this class.
      * @param spec  allows you to add search criterion.
@@ -67,9 +72,12 @@ public class LocatorJ {
 
     /**
      * Finds a VISIBLE component of given clazz which matches given spec. The receiver and all of its descendants are searched.
-     * <p></p>
+     * <br/>
      * Example:
-     * <code>import static com.github.karibu.testing.LocatorJ.*; _get(layout, TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));</code>
+     * <pre><code>
+     * import static com.github.karibu.testing.LocatorJ.*;
+     * _get(layout, TextField.class, spec -&gt; spec.withCaption("Name:").withId("name"));
+     * </code></pre>
      *
      * @param receiver the parent layout to search in, not null.
      * @param clazz    the component must be of this class.
@@ -88,17 +96,17 @@ public class LocatorJ {
 
     /**
      * Clicks the button, but only if it is actually possible to do so by the user. If the button is read-only or disabled, an exception is thrown.
-     *
+     * @param button button to click.
      * @throws IllegalStateException if the button was not visible or not enabled.
      */
-    public static void _click(@NotNull ClickNotifier<?> receiver) {
-        ButtonKt._click(receiver);
+    public static void _click(@NotNull ClickNotifier<?> button) {
+        ButtonKt._click(button);
     }
 
     /**
      * Sets the value of given component, but only if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
-     * <p></p>
+     * <br/>
      * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
      * return false indicating that the event came from the server. If this is not desired,
      * depending on your code, it may be
@@ -115,7 +123,7 @@ public class LocatorJ {
     /**
      * Sets the value of given component, but only if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
-     * <p></p>
+     * <br/>
      * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
      * mirror the <code>fromClient</code> parameter.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
@@ -126,7 +134,7 @@ public class LocatorJ {
 
     /**
      * Fires a value change event which "comes from the client".
-     * <p></p>
+     * <br/>
      * The event is only fired if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
      * @param receiver the component, must be
@@ -140,7 +148,7 @@ public class LocatorJ {
 
     /**
      * Fires a value change event which "comes from the client".
-     * <p></p>
+     * <br/>
      * The event is only fired if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
      * @param receiver the component, must be
@@ -165,6 +173,7 @@ public class LocatorJ {
     /**
      * Finds a list of VISIBLE components of given class. {@link UI#getCurrent()} and all of its descendants are searched.
      * @param clazz the requested type of returned components.
+     * @param spec configures the search criteria.
      * @param <T> the type of components being returned.
      * @return the list of matching components, may be empty.
      */
@@ -389,7 +398,7 @@ public class LocatorJ {
      * @throws IllegalStateException if any of the above doesn't hold.
      */
     public static void assertEditableByUser(@NotNull Component component) {
-        BasicUtilsKt.checkEditableByUser(component);
+        BasicUtilsKt._expectEditableByUser(component);
     }
 
     /**

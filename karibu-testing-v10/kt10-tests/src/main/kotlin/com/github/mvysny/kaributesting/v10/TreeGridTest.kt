@@ -60,14 +60,14 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             test("simple") {
                 expect(20) {
                     val g = TreeGrid<Int>()
-                    g.dataProvider = treedp((0 until 20).toList())
+                    g.setDataProvider(treedp((0 until 20).toList()))
                     g._size()
                 }
             }
             test("size calculates sizes of all nodes") {
                 expect(10) {
                     val g = TreeGrid<Int>()
-                    g.dataProvider = treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })
+                    g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
                     g._expandAll()
                     g._size()
                 }
@@ -75,7 +75,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             test("size ignores collapsed nodes") {
                 expect(1) {
                     val g = TreeGrid<Int>()
-                    g.dataProvider = treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })
+                    g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
                     // all nodes are by default collapsed
                     g._size()
                 }
@@ -87,7 +87,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 val grid = TreeGrid<TestPerson>().apply {
                     addHierarchyColumn { it -> it.name }
                     addColumnFor(TestPerson::age)
-                    dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                    setDataProvider(treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() }))
                     _expandAll()
                 }
                 grid.expectRow(0, "name 0", "0")
@@ -99,10 +99,10 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 val grid = TreeGrid<TestPerson>().apply {
                     addHierarchyColumn { it.name }
                     addColumnFor(TestPerson::age)
-                    dataProvider = treedp<TestPerson>(roots) {
+                    setDataProvider(treedp<TestPerson>(roots) {
                         if (it.age < 3) listOf(TestPerson("${it.name} 0", it.age + 1), TestPerson("${it.name} 1", it.age + 1))
                         else listOf<TestPerson>()
-                    }
+                    })
                     _expandAll()
                 }
                 // expected tree:
@@ -136,7 +136,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             val grid = TreeGrid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                setDataProvider(treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() }))
                 _prepare()
             }
             expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
@@ -165,10 +165,10 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             val grid = TreeGrid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
-                dataProvider = treedp<TestPerson>(roots) {
+                setDataProvider(treedp<TestPerson>(roots) {
                     if (it.age < 3) listOf(TestPerson("${it.name} 0", it.age + 1), TestPerson("${it.name} 1", it.age + 1))
                     else listOf<TestPerson>()
-                }
+                })
                 _prepare()
             }
             expect("""TreeGrid[dataprovider='TreeDataProvider<TestPerson>(? items)']
@@ -200,7 +200,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                     called = true
                     expect("name 8") { person.name }
                 }).key = "name"
-                dataProvider = treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() })
+                setDataProvider(treedp<TestPerson>(roots, { if (it.age < 9) listOf(TestPerson("name ${it.age + 1}", it.age + 1)) else listOf<TestPerson>() }))
             }
             grid._expandAll()
             grid._clickRenderer(8, "name")

@@ -6,7 +6,7 @@ import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.formItem
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.formlayout.FormLayout
-import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.TextField
 import kotlin.test.expect
 
@@ -41,7 +41,7 @@ internal fun DynaNodeGroup.formLayoutTest() {
             expect(tf) { f._get<FormLayout.FormItem> { label = "foo" } .field }
         }
         test("fails with no field") {
-            val f: FormLayout.FormItem = FormLayout().addFormItem(Label(), "foo")
+            val f: FormLayout.FormItem = FormLayout().addFormItem(Select<String>(), "foo")
             f.removeAll()
             expectThrows(IllegalStateException::class, "FormItem: Expected 1 field but got 0. Component tree:\n└── FormItem[]") {
                 f.field

@@ -3,8 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.button
-import com.github.mvysny.karibudsl.v10.onLeftClick
-import com.github.mvysny.kaributools.ModifierKey
+import com.github.mvysny.karibudsl.v10.onClick
 import com.github.mvysny.kaributools.ModifierKey.Alt
 import com.github.mvysny.kaributools.addClickShortcut
 import com.vaadin.flow.component.Key
@@ -26,7 +25,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
         test("simple") {
             var clicked = false
             currentUI.button {
-                onLeftClick { clicked = true }
+                onClick { clicked = true }
                 addClickShortcut(Key.ENTER)
             }
             fireShortcut(Key.ENTER)
@@ -36,7 +35,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
         test("button not triggered on different key press") {
             var clicked = false
             currentUI.button {
-                onLeftClick { clicked = true }
+                onClick { clicked = true }
                 addClickShortcut(Key.KEY_A)
             }
             fireShortcut(Key.ENTER)
@@ -48,7 +47,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
         test("button not triggered on different modifiers") {
             var clicked = false
             currentUI.button {
-                onLeftClick { clicked = true }
+                onClick { clicked = true }
                 addClickShortcut(Alt + Key.KEY_A)
             }
             fireShortcut(Key.KEY_A)
@@ -65,7 +64,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
             // Key.SPACE has multiple key bindings, test that out.
             var clicked = false
             currentUI.button {
-                onLeftClick { clicked = true }
+                onClick { clicked = true }
                 addClickShortcut(Key.SPACE)
             }
             fireShortcut(Key.SPACE)
@@ -75,7 +74,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
         test("space not triggered on different modifiers") {
             var clicked = false
             currentUI.button {
-                onLeftClick { clicked = true }
+                onClick { clicked = true }
                 addClickShortcut(Alt + Key.SPACE)
             }
             fireShortcut(Key.ENTER)
@@ -110,7 +109,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
 
         test("button not triggered on different modifiers") {
             var clicked = false
-            Shortcuts.addShortcutListener(currentUI, Command { clicked = true }, Key.KEY_A, KeyModifier.values()[2] /*ALT*/)
+            Shortcuts.addShortcutListener(currentUI, Command { clicked = true }, Key.KEY_A, KeyModifier.entries[2] /*ALT*/)
             fireShortcut(Key.KEY_A)
             expect(false) { clicked }
             fireShortcut(Key.KEY_A, Key.CONTROL)
@@ -131,7 +130,7 @@ internal fun DynaNodeGroup.shortcutsTestBatch() {
 
         test("space not triggered on different modifiers") {
             var clicked = false
-            Shortcuts.addShortcutListener(currentUI, Command { clicked = true }, Key.SPACE, KeyModifier.values()[2] /*ALT*/)
+            Shortcuts.addShortcutListener(currentUI, Command { clicked = true }, Key.SPACE, KeyModifier.entries[2] /*ALT*/)
             fireShortcut(Key.ENTER)
             expect(false) { clicked }
             fireShortcut(Key.SPACE)

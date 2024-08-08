@@ -13,7 +13,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.dialog.Dialog
-import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
@@ -305,7 +305,7 @@ internal fun DynaNodeGroup.locatorTest() {
 
         test("FailsOnNoComponents") {
             expectThrows(AssertionError::class) {
-                Button()._expectOne(Label::class.java)
+                Button()._expectOne(NativeLabel::class.java)
             }
             expectAfterLookupCalled()
         }
@@ -342,19 +342,19 @@ internal fun DynaNodeGroup.locatorTest() {
 
     group("_expect") {
         test("FailsOnNoComponents UI") {
-            expectThrows(AssertionError::class) { _expect<Label>() }
+            expectThrows(AssertionError::class) { _expect<NativeLabel>() }
             expectAfterLookupCalled()
         }
 
         test("FailsOnNoComponents") {
-            expectThrows(AssertionError::class) { Button()._expect<Label>() }
+            expectThrows(AssertionError::class) { Button()._expect<NativeLabel>() }
             expectAfterLookupCalled()
         }
 
         test("matching 0 components works") {
-            _expect<Label>(0)
+            _expect<NativeLabel>(0)
             expectAfterLookupCalled()
-            Button()._expect<Label>(0)
+            Button()._expect<NativeLabel>(0)
         }
 
         test("fails when the count is wrong") {

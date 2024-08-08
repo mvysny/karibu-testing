@@ -8,7 +8,6 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
-import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField

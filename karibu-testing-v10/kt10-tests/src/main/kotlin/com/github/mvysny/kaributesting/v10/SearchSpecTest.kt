@@ -12,7 +12,7 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.html.Input
-import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.listbox.ListBox
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.select.Select
@@ -30,7 +30,7 @@ internal fun DynaNodeGroup.searchSpecTest() {
     test("clazz") {
         val spec = SearchSpec(Button::class.java)
         expect(true) { spec.toPredicate()(Button())}
-        expect(false) { spec.toPredicate()(Label())}
+        expect(false) { spec.toPredicate()(NativeLabel())}
     }
 
     test("id") {
@@ -148,6 +148,6 @@ internal fun DynaNodeGroup.searchSpecTest() {
             predicates.add(Predicate { it is Button })
         }
         expect(true) { spec.toPredicate()(Button()) }
-        expect(false) { spec.toPredicate()(Label()) }
+        expect(false) { spec.toPredicate()(NativeLabel()) }
     }
 }

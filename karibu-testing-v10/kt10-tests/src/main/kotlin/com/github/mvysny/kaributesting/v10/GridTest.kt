@@ -9,16 +9,14 @@ import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
-import com.vaadin.flow.component.grid.ColumnReorderEvent
 import com.vaadin.flow.component.grid.ColumnResizeEvent
 import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
-import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.textfield.TextField
-import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
@@ -173,7 +171,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             addColumn(NativeButtonRenderer<TestPerson>("View", { }))
             addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                    .withLocale(Locale("fi", "FI"))
+                    .withLocale(Locale.forLanguageTag("fi-FI"))
             addColumn(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
         }
         grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
@@ -249,7 +247,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
-                    onLeftClick {
+                    onClick {
                         called = true
                         expect("name 8") { person.name }
                     }
@@ -285,13 +283,16 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
         test("fails on unsupported component type") {
-            expect(false) { Label() is ClickNotifier<*> }
+            expect(false) {
+                @Suppress("KotlinConstantConditions")
+                NativeLabel() is ClickNotifier<*>
+            }
             val grid = Grid<TestPerson>().apply {
                 setItems2((0..10).map { TestPerson("name $it", it) })
-                addColumn(ComponentRenderer<Label, TestPerson> { _ -> Label() }).key = "name"
+                addColumn(ComponentRenderer { _ -> NativeLabel() }).key = "name"
                 _prepare()
             }
-            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name': ComponentRenderer produced Label[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
+            expectThrows(AssertionError::class, "Grid[dataprovider='ListDataProvider<TestPerson>(11 items)'] column key='name': ComponentRenderer produced NativeLabel[] which is not a button nor a ClickNotifier - please use _getCellComponent() instead") {
                 grid._clickRenderer(8, "name")
             }
         }
@@ -312,7 +313,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
-                    onLeftClick {
+                    onClick {
                         called = true
                         expect("name 8") { person.name }
                     }
@@ -867,7 +868,7 @@ fun <T> Grid<T>.setItems2(items: Collection<T>) {
     dataProvider = ListDataProvider(items)
 }
 
-public fun Grid<*>._prepare() {
+fun Grid<*>._prepare() {
     // remove attribute added by Vaadin 23.2.0.beta1, so that the _dump() function produces
     // same results for all vaadin versions
     element.removeAttribute("multi-sort-priority")

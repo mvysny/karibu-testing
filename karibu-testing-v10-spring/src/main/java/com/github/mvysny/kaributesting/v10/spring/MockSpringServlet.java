@@ -22,13 +22,28 @@ import javax.servlet.ServletException;
  * @author mavi
  */
 public class MockSpringServlet extends SpringServlet {
+    /**
+     * The routes registered to the application.
+     */
     @NotNull
     public final Routes routes;
+    /**
+     * The application context.
+     */
     @NotNull
     public final ApplicationContext ctx;
+    /**
+     * Creates new UIs.
+     */
     @NotNull
     public final Function0<UI> uiFactory;
 
+    /**
+     * Creates new servlet.
+     * @param routes The routes registered to the application.
+     * @param ctx The application context.
+     * @param uiFactory Creates new UIs.
+     */
     public MockSpringServlet(@NotNull Routes routes, @NotNull ApplicationContext ctx, @NotNull Function0<UI> uiFactory) {
         super(ctx, false);
         this.ctx = ctx;

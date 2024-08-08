@@ -21,9 +21,19 @@ import java.util.concurrent.locks.ReentrantLock;
  *   </ul>
  */
 public class MockSpringVaadinSession extends SpringVaadinSession {
+    /**
+     * Creates new UIs.
+     */
     @NotNull
     private final Function0<UI> uiFactory;
 
+    /**
+     * Creates a new testing VaadinSession tied to a VaadinService.
+     *
+     * @param service
+     *            the Vaadin service for the new session
+     * @param uiFactory creates new UIs.
+     */
     public MockSpringVaadinSession(@NotNull VaadinService service, @NotNull Function0<UI> uiFactory) {
         super(service);
         this.uiFactory = uiFactory;

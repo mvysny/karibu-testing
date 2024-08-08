@@ -91,7 +91,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                    .withLocale(Locale("fi", "FI"))
+                    .withLocale(Locale.forLanguageTag("fi-FI"))
                 // use this constructor: the non-deprecated one isn't available in Vaadin 22
                 @Suppress("DEPRECATION")
                 setRenderer(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, formatter))

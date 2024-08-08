@@ -18,7 +18,7 @@ import java.util.function.Predicate
 /**
  * A criterion for matching components. The component must match all of non-null fields.
  *
- * You can add more properties, simply by creating a write-only property which will register a new [predicate] on write. See
+ * You can add more properties, simply by creating a write-only property which will register a new [predicates] on write. See
  * [Adding support for custom search criteria](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#adding-support-for-custom-search-criteria)
  * for more details.
  * @property clazz the class of the component we are searching for.
@@ -125,10 +125,12 @@ public class SearchSpec<T : Component>(
 public fun Iterable<String?>.filterNotBlank(): List<String> = filterNotNull().filter { it.isNotBlank() }
 
 private fun Component.hasAllClasses(classes: String): Boolean {
+    @Suppress("USELESS_IS_CHECK") // still needed for earlier Vaadin
     if (this !is HasStyle) return false
     return classes.split(' ').filterNotBlank().all { classNames.contains(it) }
 }
 private fun Component.doesntHaveAnyClasses(classes: String): Boolean {
+    @Suppress("USELESS_IS_CHECK") // still needed for earlier Vaadin
     if (this !is HasStyle) return true
     return classes.split(' ').filterNotBlank().all { !classNames.contains(it) }
 }

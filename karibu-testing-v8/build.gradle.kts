@@ -3,6 +3,12 @@ dependencies {
     api(libs.fake.servlet)
     implementation(libs.slf4j.api)
 
+    // these are needed to remove warnings during javadoc gradle task
+    compileOnly(libs.javax.portletapi)
+    compileOnly(libs.javax.validation)
+    compileOnly(libs.atmosphere)
+    compileOnly(libs.gwt.user)
+
     testImplementation(libs.dynatest)
     api(kotlin("test"))
     testImplementation(libs.slf4j.simple)

@@ -45,3 +45,7 @@ spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:2.3.
 groovy = "org.codehaus.groovy:groovy:3.0.17"
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-runtime = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+javax-portletapi = "javax.portlet:portlet-api:3.0.1"
+javax-validation = "javax.validation:validation-api:2.0.1.Final"
+atmosphere = "com.vaadin.external.atmosphere:atmosphere-runtime:2.4.30.vaadin4"
+gwt-user = "com.google.gwt:gwt-user:2.8.2"

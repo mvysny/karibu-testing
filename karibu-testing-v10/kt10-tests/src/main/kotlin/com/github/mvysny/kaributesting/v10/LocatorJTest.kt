@@ -47,7 +47,7 @@ internal fun DynaNodeGroup.locatorJTest() {
         test("selects self") {
             val button = Button("foo")
             expect(button) { LocatorJ._get(button, Button::class.java) }
-            expect(button) { LocatorJ._get(button, Button::class.java) { it.withCaption("foo") } }
+            expect(button) { LocatorJ._get(button, Button::class.java) { it.withText("foo") } }
         }
 
         test("ReturnsNested") {
@@ -149,10 +149,10 @@ internal fun DynaNodeGroup.locatorJTest() {
 
         test("spec") {
             expectThrows(AssertionError::class) {
-                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withText("bar") }
             }
             expectThrows(AssertionError::class) {
-                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withCaption("bar") }
+                LocatorJ._assert(Button("foo"), Button::class.java, 1) { it.withText("bar") }
             }
         }
     }
@@ -168,6 +168,7 @@ internal fun DynaNodeGroup.locatorJTest() {
             expect(false) { Button().apply { id_ = "a b" } .matches { withId("a") } }
             expect(false) { Button().apply { id_ = "a" } .matches { withId("a b") } }
         }
+        @Suppress("removal", "deprecation")
         test("caption") {
             expect(true) { Button("click me").matches { withCaption("click me") } }
             expect(true) { TextField("name:").matches { withCaption("name:") } }

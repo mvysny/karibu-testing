@@ -88,7 +88,7 @@ internal fun DynaNodeGroup.ironListTestbatch() {
             val il = IronList<TestPerson>()
             il.dataProvider = dp
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                    .withLocale(Locale("fi", "FI"))
+                    .withLocale(Locale.forLanguageTag("fi-FI"))
             il.setRenderer(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, formatter))
             il.expectRow(0, "1.3.2019")
         }

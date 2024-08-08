@@ -15,6 +15,8 @@ dependencies {
 
     testImplementation(libs.junit.jupiter.runtime)
     testImplementation(libs.slf4j.simple)
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 @Suppress("UNCHECKED_CAST")

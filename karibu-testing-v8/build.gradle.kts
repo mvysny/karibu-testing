@@ -14,6 +14,8 @@ dependencies {
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.karibu.dsl8)
     testImplementation(libs.vaadin8.client.compiled)
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {

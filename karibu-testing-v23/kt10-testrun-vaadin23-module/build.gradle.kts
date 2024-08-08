@@ -3,6 +3,8 @@ dependencies {
     testImplementation(project(":karibu-testing-v23:kt23-tests")) {
         exclude(group = "com.github.appreciated")
     }
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 // Vaadin 23 requires Java 11 or higher

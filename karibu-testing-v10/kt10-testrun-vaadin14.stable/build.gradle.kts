@@ -10,4 +10,6 @@ dependencies {
     }
 
     testImplementation(libs.vaadin.spring)
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

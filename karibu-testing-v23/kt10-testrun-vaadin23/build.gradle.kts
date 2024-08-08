@@ -4,6 +4,8 @@ dependencies {
 
     // for testing out the NPM template loading from META-INF/resources/frontend/
     testImplementation(libs.addon.applayout)
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 // Vaadin 23 requires Java 11 or higher

@@ -270,6 +270,7 @@ private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, co
 /**
  * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
  */
+@Suppress("UNCHECKED_CAST")
 @JvmOverloads
 public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, column: Grid.Column<T>? = null) {
     _setContextMenuTargetItemKey(gridItem)

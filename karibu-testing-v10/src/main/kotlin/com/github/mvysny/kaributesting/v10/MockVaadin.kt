@@ -96,6 +96,10 @@ public object MockVaadin {
         }
         check(!VaadinMeta.isCompatibilityMode)
 
+        // disable the Page.reload() detection if tearDown() was not called.
+       lastUILocation.remove()
+
+        // initialize servlet if necessary
         if (!servlet.isInitialized) {
             val ctx: ServletContext = MockVaadinHelper.createMockContext()
             servlet.init(FakeServletConfig(ctx))
@@ -131,44 +135,57 @@ public object MockVaadin {
      * should you forget to call [setup] properly.
      *
      * You don't have to call this function though; [setup] will overwrite any current UI/Session instances with a fresh ones.
+     *
+     * Any exceptions thrown by listeners such as UI detach listener, or session/service destroy listeners, or scheduled calls
+     * to [UI.access] will be propagated and thrown by this function.
      */
     @JvmStatic
     public fun tearDown() {
-        clearVaadinInstances(false)
+        try {
+            clearVaadinInstances(false)
+        } finally {
+            lastUILocation.remove()
+        }
         val service: VaadinService? = VaadinService.getCurrent()
         if (service != null) {
             service.fireServiceDestroyListeners(ServiceDestroyEvent(service))
             VaadinService.setCurrent(null)
         }
-        lastUILocation.remove()
     }
 
     private fun clearVaadinInstances(fireUIDetach: Boolean) {
-        closeCurrentUI(fireUIDetach)
-        closeCurrentSession()
-        CurrentInstance.set(VaadinRequest::class.java, null)
-        CurrentInstance.set(VaadinResponse::class.java, null)
-        strongRefReq.remove()
-        strongRefRes.remove()
+        try {
+            closeCurrentUI(fireUIDetach)
+            closeCurrentSession()
+        } finally {
+            CurrentInstance.set(VaadinRequest::class.java, null)
+            CurrentInstance.set(VaadinResponse::class.java, null)
+            strongRefReq.remove()
+            strongRefRes.remove()
+        }
     }
 
+    /**
+     * Closes current session if [VaadinSession.getCurrent] is not null.
+     */
     private fun closeCurrentSession() {
         val session: VaadinSession? = VaadinSession.getCurrent()
+        strongRefSession.remove()
         if (session != null) {
             val service: VaadinService = VaadinService.getCurrent()
             service.fireSessionDestroy(session)
             VaadinSession.setCurrent(null)
             // service destroys session via session.access(); we need to run that action now.
             currentlyClosingSession.set(true)
-            runUIQueue(session = session)
-            currentlyClosingSession.set(false)
+            try {
+                runUIQueue(session = session)
+            } finally {
+                currentlyClosingSession.set(false)
+            }
         }
-        strongRefSession.remove()
     }
 
-    private val currentlyClosingSession: ThreadLocal<Boolean> = object : ThreadLocal<Boolean>() {
-        override fun initialValue(): Boolean = false
-    }
+    private val currentlyClosingSession: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
 
     /**
      * Change & call [setup] to set a different browser.

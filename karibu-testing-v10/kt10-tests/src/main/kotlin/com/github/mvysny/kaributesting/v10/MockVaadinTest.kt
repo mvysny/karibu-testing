@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.http.Cookie
+import java.util.concurrent.ExecutionException
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
@@ -148,6 +149,22 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             MockVaadin.tearDown()
             expect(1, "detach should be called exactly once") { detachCalled }
             expect(1, "detach should be called exactly once") { vldetachCalled }
+        }
+
+        test("tearDown() runs UI.access{} blocks") {
+            var called = 0
+            UI.getCurrent().access { called++ }
+            expect(0) { called }
+            MockVaadin.tearDown()
+            expect(1) { called }
+        }
+
+        test("when UI.access{} throws, follow-up setup() shouldn't be affected") {
+            UI.getCurrent().access { throw RuntimeException("Simulated") }
+            expectThrows<ExecutionException>("Simulated") {
+                MockVaadin.tearDown()
+            }
+            MockVaadin.setup()
         }
     }
 

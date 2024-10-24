@@ -6,7 +6,7 @@ junit5 = "5.11.0"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 vaadin24 = "24.4.13"
 vaadin24_spring = "24.4.8"
-vaadin24next = "24.5.0"
+vaadin24next = "24.5.1"
 vaadin24next_spring = "24.5.0"
 
 [libraries]

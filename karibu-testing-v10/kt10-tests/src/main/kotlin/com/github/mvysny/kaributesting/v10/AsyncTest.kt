@@ -2,6 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.expectThrows
+import com.github.mvysny.kaributools.SemanticVersion
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.*
 import java.util.concurrent.ExecutionException
@@ -59,9 +61,15 @@ internal fun DynaNodeGroup.asyncTestbatch() {
             UI.getCurrent().access {
                 expect(true) { VaadinSession.getCurrent() != null }
                 expect(true) { VaadinService.getCurrent() != null }
-                expect(true) { VaadinRequest.getCurrent() != null }
                 expect(true) { UI.getCurrent() != null }
-                expect(true) { VaadinResponse.getCurrent() != null }
+                // technically.... these guys can be null since there's no request in bg thread...
+                if (VaadinVersion.get <= SemanticVersion(24, 5, 0)) {
+                    expect(true) { VaadinRequest.getCurrent() != null }
+                    expect(true) { VaadinResponse.getCurrent() != null }
+                } else {
+                    expect(null) { VaadinRequest.getCurrent() }
+                    expect(null) { VaadinResponse.getCurrent() }
+                }
             }
             MockVaadin.clientRoundtrip()
         }
@@ -120,9 +128,15 @@ internal fun DynaNodeGroup.asyncTestbatch() {
                 ui.access {
                     expect(true) { VaadinSession.getCurrent() != null }
                     expect(true) { VaadinService.getCurrent() != null }
-                    expect(true) { VaadinRequest.getCurrent() != null }
                     expect(true) { UI.getCurrent() != null }
-                    expect(true) { VaadinResponse.getCurrent() != null }
+                    // technically.... these guys can be null since there's no request in bg thread...
+                    if (VaadinVersion.get <= SemanticVersion(24, 5, 0)) {
+                        expect(true) { VaadinRequest.getCurrent() != null }
+                        expect(true) { VaadinResponse.getCurrent() != null }
+                    } else {
+                        expect(null) { VaadinRequest.getCurrent() }
+                        expect(null) { VaadinResponse.getCurrent() }
+                    }
                 }
             }
             MockVaadin.clientRoundtrip()

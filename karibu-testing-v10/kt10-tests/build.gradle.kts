@@ -3,6 +3,7 @@ dependencies {
 
     // for testing purposes
     api(libs.dynatest)
+    api(libs.junit.jupiterapi)
     api(libs.slf4j.simple)
     api(libs.karibudsl) {
         exclude(module = "javax.el")

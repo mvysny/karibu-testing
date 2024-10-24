@@ -6,7 +6,18 @@ import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
 import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 import com.github.mvysny.kaributesting.v10.pro.richTextEditorTests
 import npmPolymerTemplateTestBatch
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import java.util.*
+
+open class AbstractAllTests10(val isModuleTest: Boolean) {
+    @BeforeEach fun resetLocale() {
+        // make sure that Validator produces messages in English
+        Locale.setDefault(Locale.ENGLISH)
+    }
+
+    @Nested inner class RoutesTests : AbstractRoutesTests()
+}
 
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
@@ -18,9 +29,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("routes test") {
-        routesTestBatch()
-    }
     group("basic utils") {
         basicUtilsTestbatch()
     }

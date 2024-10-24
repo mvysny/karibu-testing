@@ -1,37 +1,38 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaTest
 import com.vaadin.flow.router.*
 import elemental.json.Json
+import org.junit.jupiter.api.Nested
 import java.io.Serializable
 import java.util.concurrent.Callable
+import kotlin.test.Test
 import kotlin.test.expect
 
 /**
  * Tests the `Utils.kt` set of utility functions.
  * @author mavi
  */
-class UtilsTest : DynaTest({
-    group("serializeDeserialize") {
-        test("primitives") {
+class UtilsTest {
+    @Nested inner class serializeDeserialize() {
+        @Test fun primitives() {
             expect("foo") { "foo".serializeDeserialize() }
             expect(false) { false.serializeDeserialize() }
         }
     }
 
-    group("Json") {
-        group("unwrap") {
-            test("primitives") {
+    @Nested inner class JsonTests() {
+        @Nested inner class unwrap() {
+            @Test fun primitives() {
                 expect(false) { Json.create(false).unwrap() }
                 expect("foo") { Json.create("foo").unwrap() }
                 expect(null) { Json.createNull().unwrap() }
                 expect(4.0) { Json.create(4.0).unwrap() }
             }
-            group("array") {
-                test("empty") {
+            @Nested inner class array() {
+                @Test fun empty() {
                     expectList() { Json.createArray().unwrap() as List<*> }
                 }
-                test("populated with primitives") {
+                @Test fun `populated with primitives`() {
                     val a = Json.createArray()
                     a.set(0, false)
                     a.set(1, 1.0)
@@ -41,11 +42,11 @@ class UtilsTest : DynaTest({
                 }
             }
         }
-        group("JsonArray.toList()") {
-            test("empty") {
+        @Nested inner class `JsonArray-toList` {
+            @Test fun empty() {
                 expectList() { Json.createArray().toList() }
             }
-            test("primitives") {
+            @Test fun primitives() {
                 val a = Json.createArray()
                 a.set(0, false)
                 a.set(1, 1.0)
@@ -54,7 +55,7 @@ class UtilsTest : DynaTest({
                 expectList(false, 1.0, "hello", null) { a.toList().unwrap() }
             }
         }
-        test("JsonArray.add()") {
+        @Test fun `JsonArray-add`() {
             val a = Json.createArray()
             a.add(true)
             a.add(2.0)
@@ -64,11 +65,11 @@ class UtilsTest : DynaTest({
         }
     }
 
-    group("jvm version") {
-        test("smoke") {
+    @Nested inner class `jvm version` {
+        @Test fun smoke() {
             println("JVM Version: $jvmVersion")
         }
-        test("parse") {
+        @Test fun parse() {
             expect(6) { "1.6.0_23".parseJvmVersion() }
             expect(7) { "1.7.0".parseJvmVersion() }
             expect(7) { "1.7.0_80".parseJvmVersion() }
@@ -80,7 +81,7 @@ class UtilsTest : DynaTest({
         }
     }
 
-    test("isRouteNotFound") {
+    @Test fun isRouteNotFound() {
         expect(false) { Any().javaClass.isRouteNotFound }
         expect(false) { InternalServerError::class.java.isRouteNotFound }
         expect(true) { RouteNotFoundError::class.java.isRouteNotFound }
@@ -95,7 +96,7 @@ class UtilsTest : DynaTest({
         expect(true) { Foo::class.java.isRouteNotFound }
     }
 
-    test("ellipsize") {
+    @Test fun ellipsize() {
         expect("a") { "a".ellipsize(3) }
         expect("a") { "a".ellipsize(4) }
         expect("a") { "a".ellipsize(100) }
@@ -107,7 +108,7 @@ class UtilsTest : DynaTest({
         expect("aaaaaa") { "aaaaaa".ellipsize(100) }
     }
 
-    test("hasCustomToString") {
+    @Test fun hasCustomToString() {
         expect(true) { String::class.java.hasCustomToString() }
         expect(false) { Object::class.java.hasCustomToString() }
         class Hello()
@@ -117,4 +118,4 @@ class UtilsTest : DynaTest({
         }
         expect(true) { Hello2::class.java.hasCustomToString() }
     }
-})
+}

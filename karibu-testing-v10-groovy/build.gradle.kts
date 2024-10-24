@@ -17,6 +17,7 @@ dependencies {
 
     implementation(libs.junit.jupiterapi)
     testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     api(kotlin("test"))
     testImplementation(libs.slf4j.simple)
 }

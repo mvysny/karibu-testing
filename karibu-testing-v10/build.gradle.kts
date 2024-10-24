@@ -10,7 +10,7 @@ dependencies {
     api(libs.fake.servlet5)
     api(libs.kaributools)
 
-    testImplementation(libs.dynatest)
+    testImplementation(libs.junit.jupiter)
     api(kotlin("test"))
     testImplementation(libs.slf4j.simple)
 

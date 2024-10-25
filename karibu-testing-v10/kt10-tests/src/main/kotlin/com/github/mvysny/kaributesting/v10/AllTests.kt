@@ -17,6 +17,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     }
 
     @Nested inner class RoutesTests : AbstractRoutesTests()
+    @Nested inner class BasicUtilsTests : AbstractBasicUtilsTests()
 }
 
 /**
@@ -29,9 +30,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("basic utils") {
-        basicUtilsTestbatch()
-    }
     group("element utils") {
         elementUtilsTestbatch()
     }

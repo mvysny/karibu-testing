@@ -11,27 +11,29 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.TextField
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
 @Suppress("DEPRECATION")
-@DynaTestDsl
-internal fun DynaNodeGroup.locatorAddonsTests() {
+abstract class AbstractLocatorAddonsTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    group("captionContains") {
-        test("fails when caption doesn't match") {
+    @Nested inner class captionContains {
+        @Test fun `fails when caption doesn't match`() {
             UI.getCurrent().button("bar")
             expectThrows<AssertionError>("and captionContains('foo')") {
                 _get<Button> { captionContains("foo") }
             }
         }
-        test("succeeds when caption matches") {
+        @Test fun `succeeds when caption matches`() {
             UI.getCurrent().add(Button("foo bar"))
             _get<Button> { captionContains("foo") }
         }
-        test("picks proper button when caption matches") {
+        @Test fun `picks proper button when caption matches`() {
             UI.getCurrent().apply {
                 verticalLayout {
                     button("foo bar")
@@ -42,18 +44,18 @@ internal fun DynaNodeGroup.locatorAddonsTests() {
         }
     }
 
-    group("labelContains") {
-        test("fails when caption doesn't match") {
+    @Nested inner class labelContains() {
+        @Test fun `fails when caption doesn't match`() {
             UI.getCurrent().button("foo")
             expectThrows<AssertionError>("and labelContains('foo')") {
                 _get<Button> { labelContains("foo") }
             }
         }
-        test("succeeds when caption matches") {
+        @Test fun `succeeds when caption matches`() {
             UI.getCurrent().add(TextField("foo bar"))
             _get<TextField> { labelContains("foo") }
         }
-        test("picks proper component when caption matches") {
+        @Test fun `picks proper component when caption matches`() {
             UI.getCurrent().apply {
                 verticalLayout {
                     textField("foo bar")
@@ -64,18 +66,18 @@ internal fun DynaNodeGroup.locatorAddonsTests() {
         }
     }
 
-    group("textContains") {
-        test("fails when text doesn't match") {
+    @Nested inner class textContains {
+        @Test fun `fails when text doesn't match`() {
             UI.getCurrent().span("bar")
             expectThrows<AssertionError>("and textContains('foo')") {
                 _get<Span> { textContains("foo") }
             }
         }
-        test("succeeds when text matches") {
+        @Test fun `succeeds when text matches`() {
             UI.getCurrent().span("foo bar")
             _get<Span> { textContains("foo") }
         }
-        test("picks proper span when text matches") {
+        @Test fun `picks proper span when text matches`() {
             UI.getCurrent().apply {
                 verticalLayout {
                     span("foo bar")
@@ -85,8 +87,8 @@ internal fun DynaNodeGroup.locatorAddonsTests() {
             expect("foo bar") { _get<Span> { textContains("foo") }.text }
         }
     }
-    group("iconIs") {
-        test("smoke") {
+    @Nested inner class iconIs {
+        @Test fun smoke() {
             UI.getCurrent().button("iconless")
             val btn: Button = UI.getCurrent().iconButton(VaadinIcon.VAADIN_H.create())
             UI.getCurrent().iconButton(VaadinIcon.HOURGLASS.create())

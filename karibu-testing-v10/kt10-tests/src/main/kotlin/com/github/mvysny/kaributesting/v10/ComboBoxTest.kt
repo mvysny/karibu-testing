@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectList
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.ItemLabelGenerator
@@ -10,23 +8,26 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.comboBoxTestbatch() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractComboBoxTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("ComboBox") {
-        group("getSuggestionItems()") {
-            test("by default shows all items") {
+    @Nested inner class ComboBoxTests {
+        @Nested inner class getSuggestionItems {
+            @Test fun `by default shows all items`() {
                 val cb = ComboBox<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
                 expectList("aaa", "bbb", "ccc") { cb.getSuggestionItems() }
             }
 
-            test("setting user input filters out stuff") {
+            @Test fun `setting user input filters out stuff`() {
                 val cb = ComboBox<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
@@ -34,7 +35,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 expectList("aaa") { cb.getSuggestionItems() }
             }
 
-            test("full-blown example") {
+            @Test fun `full-blown example`() {
                 val cb = ComboBox<TestPerson>().apply {
                     setItems2((0..10).map { TestPerson("foo $it", it) })
                     setItemLabelGenerator { it.name }
@@ -43,40 +44,38 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 expectList("foo 1", "foo 10") { cb.getSuggestions() }
             }
         }
-        group("selectByLabel") {
-            fun withBypassSetUserInput(bypassSetUserInput: Boolean) {
-                group("bypassSetUserInput=$bypassSetUserInput") {
-                    test("simple") {
-                        val cb = ComboBox<String>().apply {
-                            setItems2(listOf("aaa", "bbb", "ccc"))
-                        }
+        @Nested inner class selectByLabel {
+            abstract inner class withBypassSetUserInput(val bypassSetUserInput: Boolean) {
+                @Test fun simple() {
+                    val cb = ComboBox<String>().apply {
+                        setItems2(listOf("aaa", "bbb", "ccc"))
+                    }
+                    cb.selectByLabel("aaa")
+                    expect("aaa") { cb._value }
+                }
+                @Test fun `fails on no match`() {
+                    val cb = ComboBox<String>().apply {
+                        setItems2(listOf("aaa", "bbb", "ccc"))
+                    }
+                    expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: ['aaa'=>aaa, 'bbb'=>bbb, 'ccc'=>ccc]") {
+                        cb.selectByLabel("d")
+                    }
+                }
+                @Test fun `fails on multiple match`() {
+                    val cb = ComboBox<String>().apply {
+                        setItems2(listOf("aaa", "aaa", "ccc"))
+                    }
+                    expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
                         cb.selectByLabel("aaa")
-                        expect("aaa") { cb._value }
-                    }
-                    test("fails on no match") {
-                        val cb = ComboBox<String>().apply {
-                            setItems2(listOf("aaa", "bbb", "ccc"))
-                        }
-                        expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: No item found with label 'd'. Available items: ['aaa'=>aaa, 'bbb'=>bbb, 'ccc'=>ccc]") {
-                            cb.selectByLabel("d")
-                        }
-                    }
-                    test("fails on multiple match") {
-                        val cb = ComboBox<String>().apply {
-                            setItems2(listOf("aaa", "aaa", "ccc"))
-                        }
-                        expectThrows<AssertionError>("ComboBox[value='null', dataprovider='ListDataProvider<String>(3 items)']: Multiple items found with label 'aaa': [aaa, aaa]") {
-                            cb.selectByLabel("aaa")
-                        }
                     }
                 }
             }
 
-            withBypassSetUserInput(false)
-            withBypassSetUserInput(true)
+            @Nested inner class WithoutBypassSetUserInput : withBypassSetUserInput(false)
+            @Nested inner class WithBypassSetUserInput : withBypassSetUserInput(true)
         }
-        group("_fireCustomValueSet") {
-            test("smoke") {
+        @Nested inner class _fireCustomValueSet {
+            @Test fun smoke() {
                 val cb = ComboBox<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                     isAllowCustomValue = true
@@ -86,9 +85,9 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
         }
     }
 
-    group("Select") {
-        group("getSuggestionItems()") {
-            test("simple strings") {
+    @Nested inner class SelectTests {
+        @Nested inner class getSuggestionItems {
+            @Test fun `simple strings`() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
@@ -96,7 +95,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 expectList("aaa", "bbb", "ccc") { cb.getSuggestions() }
             }
 
-            test("full-blown example") {
+            @Test fun `full-blown example`() {
                 val cb = Select<TestPerson>().apply {
                     setItems2((0..5).map { TestPerson("foo $it", it) })
                     setItemLabelGenerator { it.name }
@@ -104,15 +103,15 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                 expectList("foo 0", "foo 1", "foo 2", "foo 3", "foo 4", "foo 5") { cb.getSuggestions() }
             }
         }
-        group("selectByLabel") {
-            test("simple") {
+        @Nested inner class selectByLabel {
+            @Test fun simple() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
                 cb.selectByLabel("aaa")
                 expect("aaa") { cb._value }
             }
-            test("fails on no match") {
+            @Test fun `fails on no match`() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "bbb", "ccc"))
                 }
@@ -120,7 +119,7 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
                     cb.selectByLabel("d")
                 }
             }
-            test("fails on multiple match") {
+            @Test fun `fails on multiple match`() {
                 val cb = Select<String>().apply {
                     setItems2(listOf("aaa", "aaa", "ccc"))
                 }
@@ -130,14 +129,14 @@ internal fun DynaNodeGroup.comboBoxTestbatch() {
             }
         }
     }
-    group("_getRenderedComponentFor") {
-        test("ComboBox") {
+    @Nested inner class _getRenderedComponentFor {
+        @Test fun ComboBoxTests() {
             val cb = ComboBox<String>().apply {
                 setRenderer(ComponentRenderer { it -> Span(it) })
             }
             expect("foo") { (cb._getRenderedComponentFor("foo") as Span).text }
         }
-        test("Select") {
+        @Test fun SelectTests() {
             val cb = Select<String>().apply {
                 setRenderer(ComponentRenderer { it -> Span(it) })
             }

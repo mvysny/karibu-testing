@@ -1,17 +1,17 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.dom.DomEvent
 import elemental.json.Json
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-@DynaTestDsl
-internal fun DynaNodeGroup.elementUtilsTestbatch() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractElementUtilsTests {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("fireDomEvent() smoke") {
+    @Test fun `fireDomEvent() smoke`() {
         val element = Div().element
         element._fireDomEvent(DomEvent(element, "click", Json.createObject()))
     }

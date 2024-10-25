@@ -26,6 +26,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class GridTests : AbstractGridTests()
     @Nested inner class TreeGridTests : AbstractTreeGridTests()
     @Nested inner class LocatorAddonsTests : AbstractLocatorAddonsTests()
+    @Nested inner class LocatorJTests : AbstractLocatorJTests()
 }
 
 /**
@@ -38,9 +39,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("locatorj") {
-        locatorJTest()
-    }
     group("locator") {
         group("with lifecycle hook testing") {
             locatorTest()

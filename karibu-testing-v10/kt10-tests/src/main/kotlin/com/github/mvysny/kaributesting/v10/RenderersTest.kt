@@ -1,16 +1,14 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.function.SerializableFunction
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.renderersTests() {
-    test("_getPresentationValue()") {
+abstract class AbstractRenderersTests {
+    @Test fun _getPresentationValue() {
         expect("Item #25") {
             val r =
                 TextRenderer<Int> { "Item #$it" }._getPresentationValue(25)

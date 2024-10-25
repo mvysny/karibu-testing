@@ -23,6 +23,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class ButtonTests : AbstractButtonTests()
     @Nested inner class HasValueTests : AbstractHasValueTests()
     @Nested inner class ComboBoxTests : AbstractComboBoxTests()
+    @Nested inner class GridTests : AbstractGridTests()
 }
 
 /**
@@ -35,9 +36,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("grid") {
-        gridTestbatch()
-    }
     group("tree grid") {
         treeGridTestbatch()
     }

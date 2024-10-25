@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.*
@@ -23,6 +21,10 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.selection.SelectionEvent
 import com.vaadin.flow.function.ValueProvider
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -31,20 +33,18 @@ import java.util.stream.Stream
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaTestDsl
-internal fun DynaNodeGroup.gridTestbatch() {
+abstract class AbstractGridTests {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    group("DataProvider") {
-        test("_size") {
+    @Nested inner class DataProviderTests {
+        @Test fun _size() {
             expect(20) {
                 ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._size()
             }
         }
 
-        test("_get") {
+        @Test fun _get() {
             expect("name 5") {
                 ListDataProvider<TestPerson>((0 until 20).map { TestPerson("name $it", it) })._get(5).name
             }
@@ -53,13 +53,13 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
 
-        test("_findAll") {
+        @Test fun _findAll() {
             val list = (0 until 20).map { TestPerson("name $it", it) }
             expect(list) { ListDataProvider<TestPerson>(list)._findAll() }
         }
     }
 
-    test("_dump") {
+    @Test fun _dump() {
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         val grid = UI.getCurrent().grid<TestPerson>(dp) {
             addColumnFor(TestPerson::name)
@@ -75,7 +75,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("_dump shows sorting indicator") {
+    @Test fun `_dump shows sorting indicator`() {
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         val grid = UI.getCurrent().grid<TestPerson>(dp) {
             addColumnFor(TestPerson::name)
@@ -87,7 +87,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Grid[<TestPerson>, dataprovider='ListDataProvider<TestPerson>(7 items)']\n--[Name]v-[Age]^--\n--and 7 more\n") { grid._dump(0 until 0) }
     }
 
-    test("_sort fails with an informative error message on missing column") {
+    @Test fun `_sort fails with an informative error message on missing column`() {
         // https://github.com/mvysny/karibu-testing/issues/97
         expectThrows(AssertionError::class, "No such column with key 'Last Name'; available columns: [name, age]") {
             UI.getCurrent().grid<TestPerson>() {
@@ -98,8 +98,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("expectRow()") {
-        test("simple") {
+    @Nested inner class expectRow {
+        @Test fun simple() {
             val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
             val grid = UI.getCurrent().grid<TestPerson>(dp) {
                 addColumnFor(TestPerson::name)
@@ -109,7 +109,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid.expectRow(0, "name 0", "0")
         }
 
-        test("failed expectRow contains table dump") {
+        @Test fun `failed expectRow contains table dump`() {
             val dp = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })
             val grid = UI.getCurrent().grid<TestPerson>(dp) {
                 addColumnFor(TestPerson::name)
@@ -120,7 +120,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
 
-        test("row out-of-bounds contains table dump") {
+        @Test fun `row out-of-bounds contains table dump`() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
             val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
                 addColumnFor(TestPerson::name)
@@ -132,8 +132,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("expectRowRegex()") {
-        test("simple") {
+    @Nested inner class expectRowRegex {
+        @Test fun simple() {
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -142,7 +142,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid.expectRowRegex(0, "name.*", "0")
         }
 
-        test("failed expectRow message contains table dump") {
+        @Test fun `failed expectRow message contains table dump`() {
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider(1)) {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -153,7 +153,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
 
-        test("row out-of-bounds contains table dump") {
+        @Test fun `row out-of-bounds contains table dump`() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
             val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
                 addColumnFor(TestPerson::name)
@@ -165,7 +165,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("renderers") {
+    @Test fun renderers() {
         val grid = UI.getCurrent().grid<TestPerson> {
             addColumnFor(TestPerson::name)
             addColumn(NativeButtonRenderer<TestPerson>("View", { }))
@@ -178,7 +178,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         grid.expectRow(0, "name 0", "View", "Button[text='name 0']", "1.3.2019")
     }
 
-    test("column with ValueProvider") {
+    @Test fun `column with ValueProvider`() {
         val grid = UI.getCurrent().grid<TestPerson> {
             addColumn(ValueProvider<TestPerson, String> { it.name })
         }
@@ -186,14 +186,14 @@ internal fun DynaNodeGroup.gridTestbatch() {
         grid.expectRow(0, "name 0")
     }
 
-    test("lookup finds components in header") {
+    @Test fun `lookup finds components in header`() {
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
         expect("Foo!") { grid._get<TextField>().label }
     }
 
     // tests https://github.com/mvysny/karibu-testing/issues/52
-    test("lookup finds components in merged header cells") {
+    @Test fun `lookup finds components in merged header cells`() {
         UI.getCurrent().grid<String> {
             val c1: Grid.Column<String> = addColumn { it }
             val c2: Grid.Column<String> = addColumn { it }
@@ -205,7 +205,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     // tests https://github.com/mvysny/karibu-testing/issues/52
-    test("lookup finds components in merged footer cells") {
+    @Test fun `lookup finds components in merged footer cells`() {
         UI.getCurrent().grid<String> {
             val c1: Grid.Column<String> = addColumn { it }
             val c2: Grid.Column<String> = addColumn { it }
@@ -216,13 +216,13 @@ internal fun DynaNodeGroup.gridTestbatch() {
         _expectOne<TextField> { label = "Bar" }
     }
 
-    test("lookup finds components in footer") {
+    @Test fun `lookup finds components in footer`() {
         val grid = Grid(TestPerson::class.java)
         grid.appendFooterRow().cells[0].setComponent(TextField("Foo!"))
         expect("Foo!") { grid._get<TextField>().label }
     }
 
-    test("lookup skips empty slots in header") {
+    @Test fun `lookup skips empty slots in header`() {
         val grid = Grid<TestPerson>(TestPerson::class.java)
         grid.headerRows[0].cells[0].setComponent(TextField("Foo!"))
         grid.appendHeaderRow().cells[0].component = null
@@ -230,8 +230,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         expect("Foo!") { grid._get<TextField>().label }
     }
 
-    group("click renderer") {
-        test("ClickableRenderer") {
+    @Nested inner class `click renderer` {
+        @Test fun ClickableRenderer() {
             var called = false
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") { person ->
@@ -243,7 +243,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
-        test("ComponentRenderer with Button") {
+        @Test fun `ComponentRenderer with Button`() {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
@@ -257,7 +257,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
-        test("ComponentRenderer with ClickNotifier") {
+        @Test fun `ComponentRenderer with ClickNotifier`() {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Checkbox, TestPerson> { person -> Checkbox("View").apply {
@@ -271,7 +271,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickRenderer(8, "name")
             expect(true) { called }
         }
-        test("fails on disabled grid") {
+        @Test fun `fails on disabled grid`() {
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") { fail("Shouldn't be called") }).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
@@ -282,7 +282,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid._clickRenderer(2, "name")
             }
         }
-        test("fails on unsupported component type") {
+        @Test fun `fails on unsupported component type`() {
             expect(false) {
                 @Suppress("KotlinConstantConditions")
                 NativeLabel() is ClickNotifier<*>
@@ -298,8 +298,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("_getCellComponent") {
-        test("fails with ClickableRenderer") {
+    @Nested inner class _getCellComponent {
+        @Test fun `fails with ClickableRenderer`() {
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(NativeButtonRenderer<TestPerson>("View") {}).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
@@ -309,7 +309,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid._getCellComponent(8, "name")
             }
         }
-        test("ComponentRenderer with Button") {
+        @Test fun `ComponentRenderer with Button`() {
             var called = false
             val grid = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
@@ -323,7 +323,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             (grid._getCellComponent(8, "name") as Button)._click()
             expect(true) { called }
         }
-        test("doesn't fail on disabled grid") {
+        @Test fun `doesn't fail on disabled grid`() {
             val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
                 addColumn(ComponentRenderer<Button, TestPerson> { _ -> Button("View") }).key = "name"
                 setItems2((0..10).map { TestPerson("name $it", it) })
@@ -333,8 +333,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("sorting") {
-        test("_sort") {
+    @Nested inner class sorting {
+        @Test fun _sort() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -346,7 +346,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(10) { grid._get(0).age }
             expect(0) { grid._get(10).age }
         }
-        test("_sortByKey") {
+        @Test fun _sortByKey() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -358,7 +358,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(10) { grid._get(0).age }
             expect(0) { grid._get(10).age }
         }
-        test("_sortByHeader") {
+        @Test fun _sortByHeader() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -372,7 +372,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("_getColumnByKey()") {
+    @Test fun _getColumnByKey() {
         val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
@@ -385,7 +385,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    test("_getColumnByHeader()") {
+    @Test fun _getColumnByHeader() {
         val grid: Grid<TestPerson> = Grid<TestPerson>().apply {
             addColumnFor(TestPerson::name)
             addColumnFor(TestPerson::age)
@@ -398,9 +398,9 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("_getFormatted()") {
+    @Nested inner class _getFormatted() {
         // tests https://github.com/mvysny/karibu-testing/issues/18
-        test("non-existing column key") {
+        @Test fun `non-existing column key`() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -411,7 +411,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
 
-        test("non-existing row") {
+        @Test fun `non-existing row`() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -421,7 +421,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             }
         }
 
-        test("basic") {
+        @Test fun basic() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -431,8 +431,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("_clickItem") {
-        test("fails on disabled grid") {
+    @Nested inner class _clickItem {
+        @Test fun `fails on disabled grid`() {
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -445,7 +445,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid._clickItem(2)
             }
         }
-        test("simple") {
+        @Test fun simple() {
             lateinit var event: ItemClickEvent<TestPerson>
             val grid = Grid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
@@ -462,7 +462,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(false) { event.isMetaKey }
             expect(false) { event.isShiftKey }
         }
-        test("get clicked column") {
+        @Test fun `get clicked column`() {
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var nameColumn: Grid.Column<*>
 
@@ -476,7 +476,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickItem(2, nameColumn)
             expect(nameColumn) { event.column }
         }
-        test("get clicked column by columnKey") {
+        @Test fun `get clicked column by columnKey`() {
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var nameColumn: Grid.Column<*>
 
@@ -490,7 +490,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickItem(2, nameColumn.key)
             expect(nameColumn) { event.column }
         }
-        test("SingleSelect: SelectionEvent fired as well") {
+        @Test fun `SingleSelect - SelectionEvent fired as well`() {
             // see https://github.com/mvysny/karibu-testing/issues/96
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var selectionEvent: SelectionEvent<*, *>
@@ -508,7 +508,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(nameColumn) { event.column }
             expect(TestPerson("name 2", 2)) { selectionEvent.firstSelectedItem.get() }
         }
-        test("SingleSelect: Selection cleared when clicking an item two times") {
+        @Test fun `SingleSelect - Selection cleared when clicking an item two times`() {
             // see https://github.com/mvysny/karibu-testing/issues/96
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var selectionEvent: SelectionEvent<*, *>
@@ -527,7 +527,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(nameColumn) { event.column }
             expect(null) { selectionEvent.firstSelectedItem.orElse(null) }
         }
-        test("SingleSelect: Selection properly updated when clicking another item") {
+        @Test fun `SingleSelect - Selection properly updated when clicking another item`() {
             // see https://github.com/mvysny/karibu-testing/issues/96
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var selectionEvent: SelectionEvent<*, *>
@@ -546,7 +546,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(nameColumn) { event.column }
             expect(TestPerson("name 1", 1)) { selectionEvent.firstSelectedItem.get() }
         }
-        test("MultiSelect: no SelectionEvent fired") {
+        @Test fun `MultiSelect - no SelectionEvent fired`() {
             // see https://github.com/mvysny/karibu-testing/issues/96
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var nameColumn: Grid.Column<*>
@@ -562,7 +562,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             grid._clickItem(2, nameColumn.key)
             expect(nameColumn) { event.column }
         }
-        test("no selection: no SelectionEvent fired") {
+        @Test fun `no selection - no SelectionEvent fired`() {
             // see https://github.com/mvysny/karibu-testing/issues/96
             lateinit var event: ItemClickEvent<TestPerson>
             lateinit var nameColumn: Grid.Column<*>
@@ -579,8 +579,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("_doubleClickItem") {
-        test("fails on disabled grid") {
+    @Nested inner class _doubleClickItem {
+        @Test fun `fails on disabled grid`() {
             val grid = UI.getCurrent().grid<TestPerson> {
                 addColumnFor(TestPerson::name)
                 addColumnFor(TestPerson::age)
@@ -593,7 +593,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid._doubleClickItem(2)
             }
         }
-        test("simple") {
+        @Test fun simple() {
             lateinit var event: ItemClickEvent<TestPerson>
             val grid = UI.getCurrent().grid<TestPerson> {
                 addColumnFor(TestPerson::name)
@@ -612,8 +612,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("drag n drop") {
-        test("smoke") {
+    @Nested inner class `drag n drop`() {
+        @Test fun smoke() {
             UI.getCurrent().grid<String> {
                 dropMode = GridDropMode.ON_TOP
                 isRowsDraggable = true
@@ -624,14 +624,14 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     // https://github.com/mvysny/karibu-testing/issues/75
-    group("editor") {
-        test("smoke") {
+    @Nested inner class editor {
+        @Test fun smoke() {
             UI.getCurrent().grid<String> {
                 setItems2(listOf("foo"))
                 editor._editItem("foo")
             }
         }
-        test("opening editor populates editor fields and runs openlisteners") {
+        @Test fun `opening editor populates editor fields and runs openlisteners`() {
             val editorField = TextField()
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2((0..10).map { TestPerson("name $it", it) })
@@ -652,7 +652,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(true) { ran }
             expect("name 0") { editorField.value }
         }
-        test("opening editor then get field to set value") {
+        @Test fun `opening editor then get field to set value`() {
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 val binder = beanValidationBinder<TestPerson>()
@@ -671,7 +671,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             val editorField = grid._get<TextField>()
             expect("name 0") { editorField.value }
         }
-        test("opening editor fails on incorrect binding") {
+        @Test fun `opening editor fails on incorrect binding`() {
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2((0..10).map { TestPerson("name $it", it) })
                 val binder = beanValidationBinder<TestPerson>()
@@ -688,7 +688,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
                 grid.editor._editItem(TestPerson("name 0", 0))
             }
         }
-        test("closing editor fires the event") {
+        @Test fun `closing editor fires the event`() {
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2((0..10).map { TestPerson("name $it", it) })
             }
@@ -700,8 +700,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("selection") {
-        test("_select") {
+    @Nested inner class selection {
+        @Test fun _select() {
             val items = (0..10).map { TestPerson("name $it", it) }
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2(items)
@@ -720,7 +720,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(setOf()) { grid.selectedItems }
         }
 
-        test("_selectRow") {
+        @Test fun _selectRow() {
             val items = (0..10).map { TestPerson("name $it", it) }
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2(items)
@@ -739,7 +739,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(setOf()) { grid.selectedItems }
         }
 
-        test("_selectAll()") {
+        @Test fun _selectAll() {
             val items = (0..10).map { TestPerson("name $it", it) }
             val grid = UI.getCurrent().grid<TestPerson> {
                 setItems2(items)
@@ -763,8 +763,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
     }
 
     // https://github.com/mvysny/karibu-testing/issues/124
-    group("non-pure column value providers") {
-        test("_get() caches values") {
+    @Nested inner class `non-pure column value providers`() {
+        @Test fun `_get() caches values`() {
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider())
             val person = grid._get(2)
             expect("name 2") { person.name } // sanity check
@@ -774,7 +774,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(true) { person === person2 }
         }
 
-        test("_get() calls column valueproviders") {
+        @Test fun `_get() calls column valueproviders`() {
             // test the "lazy populator" use-case where column ValueProviders act like lazy bean populators.
             // Weird, but allowed by Vaadin.
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
@@ -784,7 +784,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(-3, "person: $person") { person.age }
         }
 
-        test("_get() calls column valueproviders at most once") {
+        @Test fun `_get() calls column valueproviders at most once`() {
             // test the "lazy populator" use-case where column ValueProviders act like lazy bean populators.
             // Weird, but allowed by Vaadin.
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
@@ -796,7 +796,7 @@ internal fun DynaNodeGroup.gridTestbatch() {
             expect(1, "person: $person") { person.age }
         }
 
-        test("_selectRow() test") {
+        @Test fun `_selectRow() test`() {
             // test the use-case documented in https://github.com/mvysny/karibu-testing/issues/124
             val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider()) {
                 // a column ValueProvider with a side-effect (non-pure function)
@@ -819,8 +819,8 @@ internal fun DynaNodeGroup.gridTestbatch() {
         }
     }
 
-    group("_fireColumnResizedEvent") {
-        test("smoke") {
+    @Nested inner class _fireColumnResizedEvent {
+        @Test fun smoke() {
             lateinit var column: Grid.Column<TestPerson>
             val grid = UI.getCurrent().grid<TestPerson> {
                 column = columnFor(TestPerson::name) {

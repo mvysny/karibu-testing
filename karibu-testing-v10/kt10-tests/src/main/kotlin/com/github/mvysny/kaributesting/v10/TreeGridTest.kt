@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributools.addColumnFor
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider
@@ -9,28 +7,30 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.util.stream.Stream
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.treeGridTestbatch() {
+abstract class AbstractTreeGridTests {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    group("HierarchicalDataProvider") {
-        group("_size") {
-            test("simple") {
+    @Nested inner class HierarchicalDataProviderTests {
+        @Nested inner class _size {
+            @Test fun simple() {
                 expect(20) { treedp((0 until 20).toList())._size() }
             }
-            test("size calculates sizes of all nodes") {
+            @Test fun `size calculates sizes of all nodes`() {
                 expect(10) { treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() })._size() }
             }
         }
     }
 
-    group("lying HierarchicalDataProvider") {
-        test("hasChildren=false but returns children") {
+    @Nested inner class `lying HierarchicalDataProvider` {
+        @Test fun `hasChildren=false but returns children`() {
             val lyingHDP = object : AbstractBackEndHierarchicalDataProvider<Int, Nothing?>() {
                 override fun hasChildren(item: Int): Boolean = false
                 override fun fetchChildrenFromBackEnd(query: HierarchicalQuery<Int, Nothing?>): Stream<Int> {
@@ -41,7 +41,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
             }
             expect(1) { lyingHDP._size() }
         }
-        test("size=0 but returns root items") {
+        @Test fun `size=0 but returns root items`() {
             val lyingHDP = object : AbstractBackEndHierarchicalDataProvider<Int, Nothing?>() {
                 override fun hasChildren(item: Int): Boolean = true
                 override fun fetchChildrenFromBackEnd(query: HierarchicalQuery<Int, Nothing?>): Stream<Int> =
@@ -52,19 +52,19 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
         }
     }
 
-    group("TreeGrid") {
-        group("_size") {
-            test("0 on empty grid") {
+    @Nested inner class TreeGridTests {
+        @Nested inner class _size {
+            @Test fun `0 on empty grid`() {
                 expect(0) { TreeGrid<String>()._size() }
             }
-            test("simple") {
+            @Test fun simple() {
                 expect(20) {
                     val g = TreeGrid<Int>()
                     g.setDataProvider(treedp((0 until 20).toList()))
                     g._size()
                 }
             }
-            test("size calculates sizes of all nodes") {
+            @Test fun `size calculates sizes of all nodes`() {
                 expect(10) {
                     val g = TreeGrid<Int>()
                     g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
@@ -72,7 +72,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                     g._size()
                 }
             }
-            test("size ignores collapsed nodes") {
+            @Test fun `size ignores collapsed nodes`() {
                 expect(1) {
                     val g = TreeGrid<Int>()
                     g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
@@ -81,8 +81,8 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 }
             }
         }
-        group("_get") {
-            test("degenerate tree") {
+        @Nested inner class _get {
+            @Test fun `degenerate tree`() {
                 val roots = listOf(TestPerson("name 0", 0))
                 val grid = TreeGrid<TestPerson>().apply {
                     addHierarchyColumn { it -> it.name }
@@ -94,7 +94,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 grid.expectRow(1, "name 1", "1")
                 grid.expectRow(9, "name 9", "9")
             }
-            test("balanced tree") {
+            @Test fun `balanced tree`() {
                 val roots = listOf(TestPerson("name 0", 0))
                 val grid = TreeGrid<TestPerson>().apply {
                     addHierarchyColumn { it.name }
@@ -131,7 +131,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 grid.expectRow(14, "name 0 1 1 1", "3")
             }
         }
-        test("_dump") {
+        @Test fun _dump() {
             val roots = listOf(TestPerson("name 0", 0))
             val grid = TreeGrid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
@@ -160,7 +160,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 grid._dump(0..6)
             }
         }
-        test("_dump balanced tree") {
+        @Test fun `_dump balanced tree`() {
             val roots = listOf(TestPerson("name 0", 0))
             val grid = TreeGrid<TestPerson>().apply {
                 addColumnFor(TestPerson::name)
@@ -192,7 +192,7 @@ internal fun DynaNodeGroup.treeGridTestbatch() {
                 grid._dump(0..6)
             }
         }
-        test("clickable renderer") {
+        @Test fun `clickable renderer`() {
             val roots = listOf(TestPerson("name 0", 0))
             var called = false
             val grid = TreeGrid<TestPerson>().apply {

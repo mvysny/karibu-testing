@@ -20,7 +20,6 @@ import kotlin.test.expect
 import kotlin.test.fail
 
 abstract class AbstractBasicUtilsTests {
-
     @Nested inner class _expectEditableByUser {
         @Test fun `disabled textfield fails`() {
             expectThrows(java.lang.IllegalStateException::class, "The TextField[DISABLED, value=''] is not enabled") {

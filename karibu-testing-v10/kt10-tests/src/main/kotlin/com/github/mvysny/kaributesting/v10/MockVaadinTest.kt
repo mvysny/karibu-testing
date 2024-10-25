@@ -31,17 +31,23 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import jakarta.servlet.http.Cookie
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.mockVaadinTest() {
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
-    beforeEach {
+abstract class AbstractMockVaadinTests() {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun discoverRoutes() { routes = Routes().autoDiscoverViews("com.github") }
+    }
+    @BeforeEach fun fakeVaadin() {
         MockVaadin.setup(routes)
         expect("""
 └── MockedUI[]
@@ -49,10 +55,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         └── Text[text='Welcome!']
 """.trim()) { UI.getCurrent().toPrettyTree().trim() }
     }
-    afterEach { MockVaadin.tearDown() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("setup/teardown tests") {
-        test("smoke test that everything is mocked") {
+    @Nested inner class `setup-teardown tests` {
+        @Test fun `smoke test that everything is mocked`() {
             expect(true) { UI.getCurrent() != null }
             expect(true) { VaadinSession.getCurrent() != null }
             expect(true) { VaadinService.getCurrent() != null }
@@ -70,7 +76,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { VaadinResponse.getCurrent() != null }
         }
 
-        test("current UI contains sane values") {
+        @Test fun `current UI contains sane values`() {
             expect(true) { UI.getCurrent().locale != null }
             expect(true) { UI.getCurrent().element != null }
             expect(true) { UI.getCurrent().session != null }
@@ -84,7 +90,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { UI.getCurrent().router != null }
         }
 
-        test("serializable") {
+        @Test fun serializable() {
             System.setProperty("sun.io.serialization.extendedDebugInfo", "true") // https://mvysny.github.io/NotSerializableException/
             UI.getCurrent().cloneBySerialization()
             VaadinSession.getCurrent().cloneBySerialization()
@@ -94,19 +100,19 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             // VaadinResponse.getCurrent().cloneBySerialization()
         }
 
-        test("setup() can be called multiple times in a row") {
+        @Test fun `setup() can be called multiple times in a row`() {
             MockVaadin.setup()
             MockVaadin.setup()
         }
 
-        test("setup() always provides new instances") {
+        @Test fun `setup() always provides new instances`() {
             MockVaadin.setup()
             val ui = UI.getCurrent()!!
             MockVaadin.setup()
             expect(true) { UI.getCurrent()!! !== ui }
         }
 
-        test("Vaadin.getCurrent() returns null after tearDown()") {
+        @Test fun `Vaadin-getCurrent() returns null after tearDown()`() {
             MockVaadin.tearDown()
             expect(null) { VaadinSession.getCurrent() }
             expect(null) { VaadinService.getCurrent() }
@@ -115,13 +121,13 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(null) { VaadinResponse.getCurrent() }
         }
 
-        test("tearDown() can be called multiple times") {
+        @Test fun `tearDown() can be called multiple times`() {
             MockVaadin.tearDown()
             MockVaadin.tearDown()
             MockVaadin.tearDown()
         }
 
-        test("tearDown() calls UI detach listeners") {
+        @Test fun `tearDown() calls UI detach listeners`() {
             val vl = UI.getCurrent().verticalLayout()
             var vldetachCalled = 0
             vl.addDetachListener {
@@ -138,7 +144,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(1, "detach should be called exactly once") { vldetachCalled }
         }
 
-        test("tearDown() runs UI.access{} blocks") {
+        @Test fun `tearDown() runs UI-access{} blocks`() {
             var called = 0
             UI.getCurrent().access { called++ }
             expect(0) { called }
@@ -146,7 +152,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(1) { called }
         }
 
-        test("when UI.access{} throws, follow-up setup() shouldn't be affected") {
+        @Test fun `when UI-access{} throws, follow-up setup() shouldn't be affected`() {
             UI.getCurrent().access { throw RuntimeException("Simulated") }
             expectThrows<ExecutionException>("Simulated") {
                 MockVaadin.tearDown()
@@ -155,12 +161,12 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("proper mocking") {
-        test("configuration mocked as well") {
+    @Nested inner class `proper mocking` {
+        @Test fun `configuration mocked as well`() {
             expect(false) { VaadinSession.getCurrent().configuration.isProductionMode }
         }
 
-        test("verifyAttachCalled") {
+        @Test fun verifyAttachCalled() {
             var attachCallCount = 0
             var detachCallCount = 0
             val vl = object : VerticalLayout() {
@@ -204,7 +210,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(2) { detachCallCount }
         }
 
-        test("detach on forceful UI close") {
+        @Test fun `detach on forceful UI close`() {
             val vl = UI.getCurrent().verticalLayout()
             var detachCalled = 0
             vl.addDetachListener { detachCalled++ }
@@ -223,7 +229,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(false) { UI.getCurrent().isAttached() }
         }
 
-        test("navigation works in mocked env") {
+        @Test fun `navigation works in mocked env`() {
             // no need: when UI is initialized in MockVaadin.setup(), automatic navigation to "" is performed.
 //        UI.getCurrent().navigate("")
             _get<Text> { text = "Welcome!" }
@@ -231,17 +237,17 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             _get<Button> { caption = "Hello, World!" }
         }
 
-        test("navigation to parametrized view works in mocked env") {
+        @Test fun `navigation to parametrized view works in mocked env`() {
             UI.getCurrent().navigate("params/1")
             _get<ParametrizedView>()
         }
 
-        test("navigation to view with parent route works in mocked env") {
+        @Test fun `navigation to view with parent route works in mocked env`() {
             UI.getCurrent().navigate("parent/child")
             _get<ChildView>()
         }
 
-        test("UI.getUrl() to view works in mocked env") {
+        @Test fun `UI-getUrl() to view works in mocked env`() {
             val routeConfig = RouteConfiguration.forRegistry(UI.getCurrent().router.registry)
             expect("helloworld") { routeConfig.getUrl(HelloWorldView::class.java) }
             expect("params/1") { routeConfig.getUrl(ParametrizedView::class.java, 1) }
@@ -252,8 +258,8 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/11
-        group("beforeClientResponse invoked") {
-            test("on an UI") {
+        @Nested inner class `beforeClientResponse invoked` {
+            @Test fun `on an UI`() {
                 var ran = false
                 UI.getCurrent().beforeClientResponse(UI.getCurrent()) {
                     expect(false, "the block was supposed to be run only once") { ran }
@@ -262,7 +268,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
                 _get<UI> {} // do the lookup which should trigger the beforeClientResponse run
                 expect(true) { ran }
             }
-            test("on a button nested within the UI") {
+            @Test fun `on a button nested within the UI`() {
                 var ran = false
                 val button = UI.getCurrent().button()
                 UI.getCurrent().beforeClientResponse(button) {
@@ -275,9 +281,9 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("dialogs") {
+    @Nested inner class dialogs {
 
-        test("open dialog") {
+        @Test fun `open dialog`() {
             // there should be no dialogs in the UI
             _expectNone<Dialog>()
             _expectNone<Div> { text = "Dialog Text" }
@@ -291,7 +297,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             _expectNone<Dialog>()
         }
 
-        test("the dialogs must be cleared up from the component tree on close") {
+        @Test fun `the dialogs must be cleared up from the component tree on close`() {
             val dialog = Dialog(Div().apply { text("Dialog Text") })
             dialog.open()
             dialog.close()
@@ -306,8 +312,8 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("page reloading") {
-        test("Page reload should re-create the UI") {
+    @Nested inner class `page reloading` {
+        @Test fun `Page reload should re-create the UI`() {
             val ui = UI.getCurrent()
             var detachCalled = false
             ui.addDetachListener {
@@ -322,7 +328,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(true) { detachCalled }
         }
 
-        test("Page reload should preserve session") {
+        @Test fun `Page reload should preserve session`() {
             val session = VaadinSession.getCurrent()
             session.setAttribute("foo", "bar")
             UI.getCurrent().page.reload()
@@ -330,7 +336,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect("bar") { VaadinSession.getCurrent().getAttribute("foo") }
         }
 
-        test("Page reload should automatically navigate to the current URL") {
+        @Test fun `Page reload should automatically navigate to the current URL`() {
             _get<WelcomeView>()
             UI.getCurrent().page.reload()
             _get<WelcomeView>()
@@ -342,7 +348,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             _get<HelloWorldView>()
         }
 
-        test("page reload should create new view instance") {
+        @Test fun `page reload should create new view instance`() {
             navigateTo<HelloWorldView>()
             val viewInstance = _get<HelloWorldView>()
             UI.getCurrent().page.reload()
@@ -350,7 +356,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
 
         // https://github.com/mvysny/karibu-testing/issues/118
-        test("page reload should preserve the view instance on @PreserveOnRefresh") {
+        @Test fun `page reload should preserve the view instance on @PreserveOnRefresh`() {
             navigateTo<PreserveOnRefreshView>()
             val viewInstance = _get<PreserveOnRefreshView>()
             UI.getCurrent().page.reload()
@@ -358,11 +364,10 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("ExtendedClientDetails") {
-        beforeEach { fakeExtendedClientDetails = true }
-        afterEach { fakeExtendedClientDetails = true }
+    @Nested inner class ExtendedClientDetailsTests {
+        @BeforeEach @AfterEach fun resetFakeExtendedClientDetails() { fakeExtendedClientDetails = true }
 
-        test("proper retrieval") {
+        @Test fun `proper retrieval`() {
             // by default they're null but a mock one can be retrieved.
             expect(null) { UI.getCurrent().internals.extendedClientDetails }
             lateinit var ecd: ExtendedClientDetails
@@ -371,7 +376,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
         }
 
-        test("nothing is fetched when fakeExtendedClientDetails=false") {
+        @Test fun `nothing is fetched when fakeExtendedClientDetails=false`() {
             fakeExtendedClientDetails = false
             expect(null) { UI.getCurrent().internals.extendedClientDetails }
             var ecd: ExtendedClientDetails? = null
@@ -381,7 +386,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    test("VaadinSession.close() must re-create the entire session and the UI") {
+    @Test fun `VaadinSession-close() must re-create the entire session and the UI`() {
         val ui = UI.getCurrent()
         var detachCalled = false
         ui.addDetachListener { detachCalled = true }
@@ -401,7 +406,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
     }
 
 
-    test("Reusing UI fails with helpful message") {
+    @Test fun `Reusing UI fails with helpful message`() {
         val ui = MockedUI()
         MockVaadin.setup(uiFactory = { ui })
         expectThrows(IllegalArgumentException::class, "which is already attached to a Session") {
@@ -409,37 +414,35 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("async") {
-        asyncTestbatch()
-    }
+    @Nested inner class async : AbstractAsyncTests()
 
-    group("init listener") {
-        beforeEach {
+    @Nested inner class `init listener` {
+        @BeforeEach fun setupWithInitListener() {
             MockVaadin.tearDown()
             TestInitListener.clearInitFlags()
             MockVaadin.setup(routes)
         }
-        test("init listeners called") {
+        @Test fun `init listeners called`() {
             expect(true) { TestInitListener.serviceInitCalled }
             expect(true) { TestInitListener.uiInitCalled }
             expect(true) { TestInitListener.uiBeforeEnterCalled }
         }
     }
 
-    group("request") {
-        test("cookies") {
+    @Nested inner class request {
+        @Test fun cookies() {
             currentRequest.mock.addCookie(Cookie("foo", "bar"))
             expectList("bar") { currentRequest.cookies!!.map { it.value } }
         }
     }
 
-    group("response") {
-        test("cookies") {
+    @Nested inner class response {
+        @Test fun cookies() {
             currentResponse.addCookie(Cookie("foo", "bar"))
             expect("bar") { currentResponse.mock.getCookie("foo").value }
         }
 
-        test("cookies in UI.init()") {
+        @Test fun `cookies in UI-init()`() {
             MockVaadin.tearDown()
             var initCalled = false
             MockVaadin.setup(uiFactory = {
@@ -455,12 +458,12 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("session") {
-        test("attributes") {
+    @Nested inner class session {
+        @Test fun attributes() {
             VaadinSession.getCurrent().session.setAttribute("foo", "bar")
             expect("bar") { VaadinSession.getCurrent().mock.getAttribute("foo") }
         }
-        test("reinitializeSession()") {
+        @Test fun reinitializeSession() {
             var id = VaadinSession.getCurrent().session.id
             VaadinSession.getCurrent().session.setAttribute("foo", "bar")
             expect(true) { VaadinSession.getCurrent().hasLock() }
@@ -481,9 +484,9 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("multiple threads") {
+    @Nested inner class `multiple threads` {
         // don't extract this into a testBatch method - references 'lateinit routes'
-        test("UIs/Sessions not reused between threads") {
+        @Test fun `UIs-Sessions not reused between threads`() {
             fun newVaadinThread(): Pair<UI, VaadinSession> {
                 val uiref = AtomicReference<UI>()
                 val sessionref = AtomicReference<VaadinSession>()
@@ -500,7 +503,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             expect(false) { pair1.first == pair2.first }
             expect(false) { pair1.second == pair2.second }
         }
-        test("executor example") {
+        @Test fun `executor example`() {
             // a simple service which only counts the number of calls
             class MyService {
                 private var count = 0
@@ -549,8 +552,8 @@ internal fun DynaNodeGroup.mockVaadinTest() {
         }
     }
 
-    group("VaadinService") {
-        test("Registering custom VaadinService is possible") {
+    @Nested inner class VaadinServiceTests {
+        @Test fun `Registering custom VaadinService is possible`() {
             open class MyMockService(servlet: VaadinServlet, deploymentConfiguration: DeploymentConfiguration) : VaadinServletService(servlet, deploymentConfiguration) {
                 override fun isAtmosphereAvailable(): Boolean = false
                 override fun getMainDivId(session: VaadinSession, request: VaadinRequest): String = "ROOT-1"
@@ -567,7 +570,7 @@ internal fun DynaNodeGroup.mockVaadinTest() {
             })
             expect<Class<*>>(MyMockService::class.java) { VaadinService.getCurrent().javaClass }
         }
-        test("VaadinService listeners should be invoked") {
+        @Test fun `VaadinService listeners should be invoked`() {
             MockVaadin.tearDown()
             var sessionInitListenerInvocationCount = 0
             var uiInitListenerInvocationCount = 0

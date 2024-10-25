@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.text
@@ -17,16 +15,19 @@ import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextField
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.util.function.Predicate
 import kotlin.streams.asSequence
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.locatorTest2() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractLocatorTest2 {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("_expectNoDialogs()") {
+    @Test fun _expectNoDialogsTest() {
         _expectNoDialogs() // should succeed on no dialogs
         val dlg = Dialog()
         dlg.open()
@@ -41,8 +42,8 @@ internal fun DynaNodeGroup.locatorTest2() {
         _expectNoDialogs()
     }
 
-    group("InternalServerError handling") {
-        test("component lookup fails on navigation error") {
+    @Nested inner class `InternalServerError handling` {
+        @Test fun `component lookup fails on navigation error`() {
             // Vaadin shows InternalServerError when an exception occurs during the navigation phase.
             // the _expect*() functions should detect this and fail fast.
             currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
@@ -51,19 +52,19 @@ internal fun DynaNodeGroup.locatorTest2() {
                 _expectOne<UI>()
             }
         }
-        group("_expectInternalServerError") {
-            test("fails on no error") {
+        @Nested inner class _expectInternalServerErrorTests {
+            @Test fun `fails on no error`() {
                 expectThrows<java.lang.AssertionError>(
                     """Expected an internal server error but none happened. Component tree:
 └── MockedUI[]"""
                 ) { _expectInternalServerError() }
             }
-            test("succeeds on error") {
+            @Test fun `succeeds on error`() {
                 currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
                 navigateTo("")
                 _expectInternalServerError()
             }
-            test("matches error message correctly") {
+            @Test fun `matches error message correctly`() {
                 currentUI.addBeforeEnterListener { event -> event.rerouteToError(RuntimeException("Simulated"), "Simulated") }
                 navigateTo("")
                 _expectInternalServerError("Simulated")
@@ -71,7 +72,7 @@ internal fun DynaNodeGroup.locatorTest2() {
         }
     }
 
-    test("_dump") {
+    @Test fun _dump() {
         currentUI.button("Hello!")
         val ps = InMemoryPrintStream()
         _dump(ps)
@@ -81,23 +82,25 @@ internal fun DynaNodeGroup.locatorTest2() {
     }
 }
 
-@DynaTestDsl
-internal fun DynaNodeGroup.locatorTest() {
+abstract class AbstractLocatorTest {
+    @BeforeEach fun fakeVaadin() {
+        MockVaadin.setup()
+        testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
+    }
+    @AfterEach fun tearDownVaadin() {
+        testingLifecycleHook = TestingLifecycleHook.default
+        MockVaadin.tearDown()
+    }
 
-    beforeEach { MockVaadin.setup() }
-    beforeEach { testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default) }
-    afterEach { testingLifecycleHook = TestingLifecycleHook.default }
-    afterEach { MockVaadin.tearDown() }
-
-    group("_get") {
-        test("fails when no component match") {
+    @Nested inner class _get {
+        @Test fun `fails when no component match`() {
             expectThrows(AssertionError::class) {
                 Button()._get(TextField::class.java)
             }
             expectAfterLookupCalled()
         }
 
-        test("fail when multiple component match") {
+        @Test fun `fail when multiple component match`() {
             expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
@@ -106,52 +109,52 @@ internal fun DynaNodeGroup.locatorTest() {
             expectAfterLookupCalled()
         }
 
-        test("ReturnsSelf") {
+        @Test fun ReturnsSelf() {
             val button = Button()
             expect(button) { button._get(Button::class.java) }
             expectAfterLookupCalled()
         }
 
-        test("ReturnsNested") {
+        @Test fun ReturnsNested() {
             val button = Button()
             expect(button) { VerticalLayout(button)._get(Button::class.java) }
             expectAfterLookupCalled()
         }
 
-        test("fails on invisible") {
+        @Test fun `fails on invisible`() {
             val button = Button().apply { isVisible = false }
             expectThrows(java.lang.AssertionError::class) { button._get(Button::class.java) }
             expectAfterLookupCalled()
         }
     }
 
-    group("_find") {
-        test("findMatchingId") {
+    @Nested inner class _find {
+        @Test fun findMatchingId() {
             val button = Button().apply { id_ = "foo" }
             expectList(button) { VerticalLayout(button, Button())._find<Button> { id = "foo" } }
             expectAfterLookupCalled()
         }
 
-        test("doesn't return invisible") {
+        @Test fun `doesn't return invisible`() {
             val button = Button().apply { isVisible = false }
             expectList() { button._find(Button::class.java) }
             expectAfterLookupCalled()
         }
 
-        test("returns nested") {
+        @Test fun `returns nested`() {
             val vl = VerticalLayout().apply { verticalLayout {} }
             expect(2) { vl._find(VerticalLayout::class.java).size }
             expectAfterLookupCalled()
         }
     }
 
-    group("_expectNone") {
-        test("succeeds when no component match") {
+    @Nested inner class _expectNone {
+        @Test fun `succeeds when no component match`() {
             Button()._expectNone<TextField>()
             expectAfterLookupCalled()
         }
 
-        test("fail when multiple component match") {
+        @Test fun `fail when multiple component match`() {
             expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
@@ -160,20 +163,20 @@ internal fun DynaNodeGroup.locatorTest() {
             }
         }
 
-        test("fails if self matches") {
+        @Test fun `fails if self matches`() {
             val button = Button()
             expectThrows(AssertionError::class) { button._expectNone<Button>() }
             expectAfterLookupCalled()
         }
 
-        test("fails if nested matches") {
+        @Test fun `fails if nested matches`() {
             val button = Button()
             expectThrows(AssertionError::class) { VerticalLayout(button)._expectNone<Button>() }
             expectAfterLookupCalled()
         }
     }
 
-    test("simpleUITest") {
+    @Test fun simpleUITest() {
         lateinit var layout: VerticalLayout
         layout = UI.getCurrent().verticalLayout {
             val name = textField("Type your name here:")
@@ -197,8 +200,8 @@ internal fun DynaNodeGroup.locatorTest() {
         expect(3) { layout.componentCount }
     }
 
-    group("matcher") {
-        test("id") {
+    @Nested inner class matcher {
+        @Test fun id() {
             expect(true) { Button().matches { } }
             expect(false) { Button().matches { id = "a" } }
             expect(true) { Button().apply { id_ = "a" } .matches { } }
@@ -206,7 +209,7 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(false) { Button().apply { id_ = "a b" } .matches { id = "a" } }
             expect(false) { Button().apply { id_ = "a" } .matches { id = "a b" } }
         }
-        test("caption") {
+        @Test fun caption() {
             expect(true) { Button("click me").matches { text = "click me" } }
             expect(true) { TextField("name:").matches { label = "name:" } }
             expect(true) { Button("click me").matches { } }
@@ -214,18 +217,18 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(false) { Button("click me").matches { text = "Click Me" } }
             expect(false) { TextField("name:").matches { label = "Name"} }
         }
-        test("placeholder") {
+        @Test fun placeholder() {
             expect(true) { TextField("name", "the name").matches { placeholder = "the name" } }
             expect(true) { PasswordField("password", "at least 6 characters").matches { placeholder = "at least 6 characters" } }
             expect(true) { ComboBox<String>().apply { placeholder = "foo" }.matches { placeholder = "foo" } }
             expect(false) { TextField("name", "the name").matches { placeholder = "name" } }
             expect(false) { PasswordField("password", "at least 6 characters").matches { placeholder = "password" } }
         }
-        test("value") {
+        @Test fun value() {
             expect(true) { TextField(null, "Mannerheim", "placeholder").matches { value = "Mannerheim" } }
             expect(false) { TextField("Mannerheim").matches { value = "Mannerheim" } }
         }
-        test("styles") {
+        @Test fun styles() {
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { classes = "a" } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { classes = "b" } }
@@ -233,7 +236,7 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { classes = "a c" } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { classes = "c" } }
         }
-        test("withoutStyles") {
+        @Test fun withoutStyles() {
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "a" } }
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "b" } }
@@ -241,17 +244,17 @@ internal fun DynaNodeGroup.locatorTest() {
             expect(false) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "a c" } }
             expect(true) { Button().apply { addClassNames("a", "b") } .matches { withoutClasses = "c" } }
         }
-        test("predicates") {
+        @Test fun predicates() {
             expect(true) { Button().matches {}}
             expect(false) { Button().matches { predicates.add(Predicate { false }) }}
         }
-        test("enabled") {
+        @Test fun enabled() {
             expect(true) { Button().matches { enabled = true }}
             expect(false) { Button().matches { enabled = false }}
             expect(false) { Button().apply { isEnabled = false }.matches { enabled = true }}
             expect(true) { Button().apply { isEnabled = false }.matches { enabled = false }}
         }
-        test("themes") {
+        @Test fun themes() {
             expect(true) { Button().apply { addThemeNames("custom-theme", "my-theme") }.matches {} }
             expect(true) {
                 Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { themes = "custom-theme" }
@@ -267,7 +270,7 @@ internal fun DynaNodeGroup.locatorTest() {
                 Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { themes = "no-theme" }
             }
         }
-        test("withoutThemes") {
+        @Test fun withoutThemes() {
             expect(true) { Button().apply { addThemeNames("custom-theme", "my-theme") }.matches {} }
             expect(false) {
                 Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { withoutThemes = "custom-theme" }
@@ -285,9 +288,9 @@ internal fun DynaNodeGroup.locatorTest() {
         }
     }
 
-    group("unmocked env") {
-        beforeEach { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.default }
-        test("lookup functions should work in unmocked environment") {
+    @Nested inner class `unmocked env`() {
+        @BeforeEach fun unfakeEnv() { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.default }
+        @Test fun `lookup functions should work in unmocked environment`() {
             Button()._get(Button::class.java)
             expectThrows(AssertionError::class) {
                 Button()._get(TextField::class.java)
@@ -295,22 +298,22 @@ internal fun DynaNodeGroup.locatorTest() {
         }
     }
 
-    group("_expectOne") {
-        test("FailsOnNoComponents UI") {
+    @Nested inner class _expectOne {
+        @Test fun `FailsOnNoComponents UI`() {
             expectThrows(AssertionError::class) {
                 _expectOne(Button::class.java)
             }
             expectAfterLookupCalled()
         }
 
-        test("FailsOnNoComponents") {
+        @Test fun FailsOnNoComponents() {
             expectThrows(AssertionError::class) {
                 Button()._expectOne(NativeLabel::class.java)
             }
             expectAfterLookupCalled()
         }
 
-        test("fails when multiple components match") {
+        @Test fun `fails when multiple components match`() {
             expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
@@ -319,17 +322,17 @@ internal fun DynaNodeGroup.locatorTest() {
             expectAfterLookupCalled()
         }
 
-        test("selects self") {
+        @Test fun `selects self`() {
             Button()._expectOne(Button::class.java)
             expectAfterLookupCalled()
         }
 
-        test("returns nested") {
+        @Test fun `returns nested`() {
             VerticalLayout(Button())._expectOne(Button::class.java)
             expectAfterLookupCalled()
         }
 
-        test("spec") {
+        @Test fun spec() {
             expectThrows(AssertionError::class) {
                 Button("foo")._expectOne<Button> { text = "bar" }
             }
@@ -340,24 +343,24 @@ internal fun DynaNodeGroup.locatorTest() {
         }
     }
 
-    group("_expect") {
-        test("FailsOnNoComponents UI") {
+    @Nested inner class _expect {
+        @Test fun `FailsOnNoComponents UI`() {
             expectThrows(AssertionError::class) { _expect<NativeLabel>() }
             expectAfterLookupCalled()
         }
 
-        test("FailsOnNoComponents") {
+        @Test fun `FailsOnNoComponents`() {
             expectThrows(AssertionError::class) { Button()._expect<NativeLabel>() }
             expectAfterLookupCalled()
         }
 
-        test("matching 0 components works") {
+        @Test fun `matching 0 components works`() {
             _expect<NativeLabel>(0)
             expectAfterLookupCalled()
             Button()._expect<NativeLabel>(0)
         }
 
-        test("fails when the count is wrong") {
+        @Test fun `fails when the count is wrong`() {
             expectThrows(AssertionError::class) {
                 UI.getCurrent().verticalLayout {
                     verticalLayout { }
@@ -366,24 +369,24 @@ internal fun DynaNodeGroup.locatorTest() {
             expectAfterLookupCalled()
         }
 
-        test("succeeds when the count is right") {
+        @Test fun `succeeds when the count is right`() {
             UI.getCurrent().verticalLayout {
                 verticalLayout { }
             }._expect<VerticalLayout>(2)
             expectAfterLookupCalled()
         }
 
-        test("selects self") {
+        @Test fun `selects self`() {
             Button()._expect<Button>(1)
             expectAfterLookupCalled()
         }
 
-        test("returns nested") {
+        @Test fun `returns nested`() {
             VerticalLayout(Button())._expect<Button>(1)
             expectAfterLookupCalled()
         }
 
-        test("spec") {
+        @Test fun spec() {
             expectThrows(AssertionError::class) {
                 Button("foo")._expect<Button> { text = "bar" }
             }

@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.HtmlSpan
 import com.github.mvysny.kaributools.header2
@@ -23,18 +21,24 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaTestDsl
-internal fun DynaNodeGroup.prettyPrintTreeTest() {
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractPrettyPrintTreeTests {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun discoverRoutes() { routes = Routes().autoDiscoverViews("com.github") }
+    }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("toPrettyTree()") {
-        test("Simple dump") {
+    @Nested inner class toPrettyTree {
+        @Test fun `Simple dump`() {
             val div = Div().apply {
                 text("Foo")
             }
@@ -43,7 +47,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                     └── Text[text='Foo']
                 """.trimIndent()) { div.toPrettyTree().trim() }
         }
-        test("UI+Notification") {
+        @Test fun `UI+Notification`() {
             Notification.show("foo")
             expect("""
                 └── MockedUI[]
@@ -52,8 +56,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
     }
 
-    group("toPrettyString()") {
-        test("basics") {
+    @Nested inner class toPrettyString {
+        @Test fun basics() {
             expect("Text[text='foo']") { Text("foo").toPrettyString() }
             expect("Div[INVIS]") {
                 Div().apply { isVisible = false }.toPrettyString()
@@ -147,13 +151,13 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
                 Tab("foo").toPrettyString()
             }
         }
-        group("notifications") {
-            test("basic") {
+        @Nested inner class notifications {
+            @Test fun basic() {
                 expect("Notification['foobar']") {
                     Notification("foobar").apply { open() }.toPrettyString()
                 }
             }
-            test("closed") {
+            @Test fun closed() {
                 expect("Notification['foobar', CLOSED]") {
                     Notification("foobar").apply { close() }.toPrettyString()
                 }
@@ -161,7 +165,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
     }
 
-    test("styles not duplicated") {
+    @Test fun `styles not duplicated`() {
         val div = Div()
         expect("Div[]") { div.toPrettyString() }
         div.setWidthFull()
@@ -170,7 +174,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         expect("Div[@style='width:100%;flex-shrink:1']") { div.toPrettyString() }
     }
 
-    test("menu dump") {
+    @Test fun `menu dump`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -189,8 +193,8 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
 
     }
 
-    group("grid") {
-        test("column headers") {
+    @Nested inner class grid {
+        @Test fun `column headers`() {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 addColumn(karibuDslI18n).setHeader("Hello!")
                 setItems2(listOf())
@@ -202,7 +206,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
 """.trim()) { grid.toPrettyTree().trim() }
         }
 
-        test("grid menu dump") {
+        @Test fun `grid menu dump`() {
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
@@ -221,7 +225,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/37
-        test("grid filters dump") {
+        @Test fun `grid filters dump`() {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 val col: Grid.Column<String> = addColumn(karibuDslI18n)
                 appendHeaderRow().getCell(col).setComponent(TextField("Filter:"))
@@ -235,7 +239,7 @@ internal fun DynaNodeGroup.prettyPrintTreeTest() {
         }
 
         // tests https://github.com/mvysny/karibu-testing/issues/37
-        test("grid filters dump for joined column") {
+        @Test fun `grid filters dump for joined column`() {
             val grid: Grid<String> = UI.getCurrent().grid<String> {
                 val col1: Grid.Column<String> = addColumn(karibuDslI18n).setHeader("foo")
                 val col2: Grid.Column<String> = addColumn(karibuDslI18n).setHeader("bar")

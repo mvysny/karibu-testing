@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.beanValidationBinder
 import com.github.mvysny.karibudsl.v10.bind
@@ -9,25 +7,26 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.data.binder.ValidationException
 import jakarta.validation.constraints.NotNull
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.expect
 
 class Person(
         @field:NotNull var name: String? = null
 )
 
-@DynaTestDsl
-internal fun DynaNodeGroup.binderTestbatch() {
-    test("ValidationException.verboseMessage") {
+abstract class AbstractBinderTests {
+    @Test fun `ValidationException-verboseMessage`() {
         val binder: Binder<Person> = beanValidationBinder<Person>()
         TextField("Name:").apply {
             bind(binder).bind(Person::name)
         }
-        val e = expectThrows<ValidationException> { binder.writeBean(Person()) }
+        val e = assertThrows<ValidationException> { binder.writeBean(Person()) }
         expect("Validation has failed for some fields: field validation errors: [Name:: ERROR must not be null, value=''], bean validation errors: []") {
             e.verboseMessage
         }
     }
-    test("BinderValidationStatus.verboseMessage") {
+    @Test fun `BinderValidationStatus-verboseMessage`() {
         val binder: Binder<Person> = beanValidationBinder<Person>()
         TextField("Name").apply {
             bind(binder).bind(Person::name)
@@ -36,7 +35,7 @@ internal fun DynaNodeGroup.binderTestbatch() {
             binder.validate().verboseMessage
         }
     }
-    test("BinderValidationStatus.expectValid()") {
+    @Test fun `BinderValidationStatus-expectValid`() {
         val binder: Binder<Person> = beanValidationBinder<Person>()
         TextField("Name").apply {
             bind(binder).bind(Person::name)
@@ -45,7 +44,7 @@ internal fun DynaNodeGroup.binderTestbatch() {
             binder.validate()._expectValid()
         }
     }
-    test("Binder.expectValid()") {
+    @Test fun `Binder-expectValid`() {
         val binder: Binder<Person> = beanValidationBinder<Person>()
         TextField("Name").apply {
             bind(binder).bind(Person::name)
@@ -54,7 +53,7 @@ internal fun DynaNodeGroup.binderTestbatch() {
             binder._expectValid()
         }
     }
-    test("Binder._expectInvalid()") {
+    @Test fun `Binder-_expectInvalid()`() {
         val binder: Binder<Person> = beanValidationBinder<Person>()
         val tf = TextField("Name").apply {
             bind(binder).bind(Person::name)

@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributools.SemanticVersion
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.UI
@@ -10,6 +8,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -56,9 +55,10 @@ abstract class AbstractAsyncTests() {
 
         @Test fun `clientRoundtrip() propagates failures`() {
             UI.getCurrent().access { throw RuntimeException("simulated") }
-            expectThrows(ExecutionException::class, "simulated") {
+            val ex = assertThrows<ExecutionException> {
                 MockVaadin.clientRoundtrip()
             }
+            expect("java.lang.RuntimeException: simulated") { ex.message }
         }
 
         @Test fun `access() has properly mocked instances`() {

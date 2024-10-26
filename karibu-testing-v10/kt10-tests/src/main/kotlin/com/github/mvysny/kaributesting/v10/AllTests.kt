@@ -30,6 +30,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class LocatorTest : AbstractLocatorTest()
     @Nested inner class LocatorTest2 : AbstractLocatorTest2()
     @Nested inner class MockVaadinTests : AbstractMockVaadinTests()
+    @Nested inner class BinderTests : AbstractBinderTests()
 }
 
 /**
@@ -74,9 +75,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
     }
     group("login form test") {
         loginFormTestbatch()
-    }
-    group("binder test") {
-        binderTestbatch()
     }
     group("form layout test") {
         formLayoutTest()

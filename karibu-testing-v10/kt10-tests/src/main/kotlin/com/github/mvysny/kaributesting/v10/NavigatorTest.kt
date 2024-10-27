@@ -1,11 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onClick
-import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.span
 import com.github.mvysny.kaributools.get
 import com.github.mvysny.kaributools.navigateTo
@@ -19,44 +16,49 @@ import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
 import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.Route
-import com.vaadin.flow.router.RouteNotFoundError
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.auth.NavigationAccessControl
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import test.app.MyRouteNotFoundError
 import java.io.Serializable
 import java.security.Principal
 import java.util.function.Predicate
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.navigatorTest() {
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.github") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractNavigatorTests {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun scanForRoutes() { routes = Routes().autoDiscoverViews("com.github") }
+    }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("currentView") {
-        test("simple view") {
+    @Nested inner class currentView {
+        @Test fun `simple view`() {
             navigateTo<TestingView>()
             expect(TestingView::class.java) { currentView }
         }
 
-        test("navigation to parametrized test") {
+        @Test fun `navigation to parametrized test`() {
             navigateTo(ParametrizedView::class, 5)
             expect(ParametrizedView::class.java) { currentView }
         }
 
-        test("navigation to view nested in a router layout") {
+        @Test fun `navigation to view nested in a router layout`() {
             navigateTo<ChildView>()
             expect(ChildView::class.java) { currentView }
         }
-        test("query parameters using navigateTo()") {
+        @Test fun `query parameters using navigateTo()`() {
             navigateTo("params/5?foo=bar")
             expect(ParametrizedView::class.java) { currentView }
         }
     }
-    group("expectView") {
-        test("simple view") {
+    @Nested inner class expectView {
+        @Test fun `simple view`() {
             navigateTo<TestingView>()
             expectView<TestingView>()
             expectThrows(AssertionError::class) {
@@ -64,43 +66,43 @@ internal fun DynaNodeGroup.navigatorTest() {
             }
         }
 
-        test("navigation to parametrized test") {
+        @Test fun `navigation to parametrized test`() {
             navigateTo(ParametrizedView::class, 5)
             expectThrows(AssertionError::class) {
                 expectView<TestingView>()
             }
         }
 
-        test("navigation to view nested in a router layout") {
+        @Test fun `navigation to view nested in a router layout`() {
             navigateTo<ChildView>()
             expectView<ChildView>()
         }
 
-        test("query parameters using navigateTo()") {
+        @Test fun `query parameters using navigateTo()`() {
             navigateTo("params/5?foo=bar")
             expectView<ParametrizedView>()
         }
     }
 
-    group("navigation") {
-        test("navigation") {
+    @Nested inner class navigation {
+        @Test fun `simple navigation`() {
             navigateTo<TestingView>()
             expect("testing") { currentPath }
             expectView<TestingView>()
         }
 
-        test("navigation using navigateTo()") {
+        @Test fun `navigation using navigateTo()`() {
             navigateTo("testing")
             expect("testing") { currentPath }
             expectView<TestingView>()
         }
 
-        test("navigation to parametrized test") {
+        @Test fun `navigation to parametrized test`() {
             navigateTo(ParametrizedView::class, 5)
             expect(5) { _get<ParametrizedView>().parameter }
         }
 
-        test("navigation to parametrized test using navigateTo()") {
+        @Test fun `navigation to parametrized test using navigateTo()`() {
             navigateTo("params/5")
             expect("params/5") { currentPath }
             expect(ParametrizedView::class.java) { currentView }
@@ -108,38 +110,38 @@ internal fun DynaNodeGroup.navigatorTest() {
             expect(5) { _get<ParametrizedView>().parameter }
         }
 
-        test("query parameters using navigateTo()") {
+        @Test fun `query parameters using navigateTo()`() {
             navigateTo("params/5?foo=bar")
             expect(5) { _get<ParametrizedView>().parameter }
             expect("bar") { _get<ParametrizedView>().qp["foo"] }
         }
     }
 
-    group("currentPath") {
-        test("simple view") {
+    @Nested inner class currentPath {
+        @Test fun `simple view`() {
             navigateTo<TestingView>()
             expect("testing") { currentPath }
         }
 
-        test("navigation to parametrized test") {
+        @Test fun `navigation to parametrized test`() {
             navigateTo(ParametrizedView::class, 5)
             expect("params/5") { currentPath }
         }
 
-        test("navigation to view nested in a router layout") {
+        @Test fun `navigation to view nested in a router layout`() {
             navigateTo<ChildView>()
             expect("parent/child") { currentPath }
         }
 
-        test("query parameters using navigateTo()") {
+        @Test fun `query parameters using navigateTo()`() {
             navigateTo("params/5?foo=bar")
             expect("params/5?foo=bar") { currentPath }
         }
     }
 
     // tests for https://github.com/mvysny/karibu-testing/issues/34
-    group("delayed navigation") {
-        test("view") {
+    @Nested inner class `delayed navigation` {
+        @Test fun view() {
             var a: BeforeLeaveEvent.ContinueNavigationAction? = null
             UI.getCurrent().addBeforeLeaveListener { e ->
                 expect(null) { a }
@@ -151,7 +153,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             _expectOne<TestingView>()
         }
 
-        test("notification") {
+        @Test fun notification() {
             var a: BeforeLeaveEvent.ContinueNavigationAction? = null
             UI.getCurrent().addBeforeLeaveListener { e ->
                 expect(null) { a }
@@ -164,7 +166,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             expectNoNotifications()
         }
 
-        test("dialog - stay on page") {
+        @Test fun `dialog - stay on page`() {
             navigateTo<NavigationPostponeView>()
             _expectNone<Dialog>()
 
@@ -182,7 +184,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             _expectNone<TestingView>()
         }
 
-        test("dialog - leave") {
+        @Test fun `dialog - leave`() {
             navigateTo<NavigationPostponeView>()
             _expectNone<Dialog>()
 
@@ -201,8 +203,8 @@ internal fun DynaNodeGroup.navigatorTest() {
         }
     }
 
-    group("History") {
-        test("replaceState() doesn't affect currentPath") {
+    @Nested inner class History {
+        @Test fun `replaceState() doesn't affect currentPath`() {
             // also see https://github.com/mvysny/karibu-testing/issues/138
             navigateTo<TestingView>()
             expect("testing") { currentPath }
@@ -210,7 +212,7 @@ internal fun DynaNodeGroup.navigatorTest() {
             expect("testing") { currentPath }
             expect(TestingView::class.java) { currentView }
         }
-        test("pushState() doesn't affect currentPath") {
+        @Test fun `pushState() doesn't affect currentPath`() {
             // also see https://github.com/mvysny/karibu-testing/issues/138
             navigateTo<TestingView>()
             expect("testing") { currentPath }
@@ -220,11 +222,15 @@ internal fun DynaNodeGroup.navigatorTest() {
         }
     }
 
-    group("security") {
-        navigatorSecurityTests("com.github") // includes also Karibu-Testing MockRouteNotFoundError and MockRouteAccessDeniedError on classpath
-        navigatorSecurityTests(null) // includes everything on classpath, including Flow's default RouteNotFoundError and RouteAccessDeniedError and also MyRouteNotFoundError
-        navigatorSecurityTests("test.app") // includes only MyRouteNotFoundError, but not Mock*Errors nor Flow default routes.
-        navigatorSecurityTests("nonexisting.pkg") // includes nothing.
+    @Nested inner class security {
+        // includes also Karibu-Testing MockRouteNotFoundError and MockRouteAccessDeniedError on classpath
+        @Nested inner class ComGithub : AbstractNavigatorSecurityTests("com.github")
+        // includes everything on classpath, including Flow's default RouteNotFoundError and RouteAccessDeniedError and also MyRouteNotFoundError
+        @Nested inner class All : AbstractNavigatorSecurityTests(null)
+        // includes only MyRouteNotFoundError, but not Mock*Errors nor Flow default routes.
+        @Nested inner class TestApp : AbstractNavigatorSecurityTests("test.app")
+        // includes nothing.
+        @Nested inner class NonexistingPkg : AbstractNavigatorSecurityTests("nonexisting.pkg")
     }
 }
 
@@ -253,57 +259,54 @@ data class SimplePrincipal(private val name: String): Principal, Serializable {
     override fun getName(): String = name
 }
 
-@DynaTestDsl
-internal fun DynaNodeGroup.navigatorSecurityTests(classpathScanPackage: String?) {
-    group("classpath scan of $classpathScanPackage") {
-        lateinit var routes: Routes
-        beforeEach {
-            MockVaadin.tearDown()
-            routes = Routes().autoDiscoverViews(classpathScanPackage)
-            if (routes.errorRoutes.contains(MyRouteNotFoundError::class.java)) {
-                routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
-                routes.errorRoutes.add(MockRouteNotFoundError::class.java)
-            }
-            routes.routes.addAll(setOf(TestingView::class.java, WelcomeView::class.java))
-            MockVaadin.setup(routes)
+abstract class AbstractNavigatorSecurityTests(val classpathScanPackage: String?) {
+    lateinit var routes: Routes
+    @BeforeEach fun fakeVaadin() {
+        MockVaadin.tearDown()
+        routes = Routes().autoDiscoverViews(classpathScanPackage)
+        if (routes.errorRoutes.contains(MyRouteNotFoundError::class.java)) {
+            routes.errorRoutes.remove(MyRouteNotFoundError::class.java)
+            routes.errorRoutes.add(MockRouteNotFoundError::class.java)
         }
-        afterEach { MockVaadin.tearDown() }
+        routes.routes.addAll(setOf(TestingView::class.java, WelcomeView::class.java))
+        MockVaadin.setup(routes)
+    }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-        group("no user logged in") {
-            test("both mock routes are present") {
-                expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteNotFoundError::class.java) }
-                expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteAccessDeniedError::class.java) }
-            }
-            test("when access is rejected, redirect goes to WelcomeView") {
-                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl().apply {
-                    setLoginView(WelcomeView::class.java)
-                })
+    @Nested inner class `no user logged in`() {
+        @Test fun `both mock routes are present`() {
+            expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteNotFoundError::class.java) }
+            expect(true, routes.toString()) { routes.errorRoutes.contains(MockRouteAccessDeniedError::class.java) }
+        }
+        @Test fun `when access is rejected, redirect goes to WelcomeView`() {
+            UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl().apply {
+                setLoginView(WelcomeView::class.java)
+            })
+            navigateTo<TestingView>()
+            expectView<WelcomeView>()
+        }
+        @Test fun `when access is rejected and no login view is set, redirects to MockRouteNotFoundError`() {
+            UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl())
+            expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
                 navigateTo<TestingView>()
-                expectView<WelcomeView>()
-            }
-            test("when access is rejected and no login view is set, redirects to MockRouteNotFoundError") {
-                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl())
-                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
-                    navigateTo<TestingView>()
-                }
             }
         }
-        group("user logged in") {
-            test("when access is rejected, default handler redirects to MockRouteNotFoundError") {
-                MockVaadin.tearDown()
-                routes.errorRoutes.remove(MockRouteAccessDeniedError::class.java)
-                MockVaadin.setup(routes)
+    }
+    @Nested inner class `user logged in` {
+        @Test fun `when access is rejected, default handler redirects to MockRouteNotFoundError`() {
+            MockVaadin.tearDown()
+            routes.errorRoutes.remove(MockRouteAccessDeniedError::class.java)
+            MockVaadin.setup(routes)
 
-                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
-                expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
-                    navigateTo<TestingView>()
-                }
+            UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
+            expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+                navigateTo<TestingView>()
             }
-            test("when access is rejected, Karibu's MockRouteAccessDeniedError throws AccessDeniedException") {
-                UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
-                expectThrows<AccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
-                    navigateTo<TestingView>()
-                }
+        }
+        @Test fun `when access is rejected, Karibu's MockRouteAccessDeniedError throws AccessDeniedException`() {
+            UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
+            expectThrows<AccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
+                navigateTo<TestingView>()
             }
         }
     }

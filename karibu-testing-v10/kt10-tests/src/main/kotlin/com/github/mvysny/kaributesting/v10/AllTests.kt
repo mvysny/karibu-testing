@@ -33,6 +33,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class BinderTests : AbstractBinderTests()
     @Nested inner class PrettyPrintTests : AbstractPrettyPrintTreeTests()
     @Nested inner class SearchSpecTests : AbstractSearchSpecTests()
+    @Nested inner class NotificationTests : AbstractNotificationsTests()
 }
 
 /**
@@ -45,9 +46,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("notifications") {
-        notificationsTestBattery()
-    }
     group("context menu") {
         contextMenuTestbatch()
     }

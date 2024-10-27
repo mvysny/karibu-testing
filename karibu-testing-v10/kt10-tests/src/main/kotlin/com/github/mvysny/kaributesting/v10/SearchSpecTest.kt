@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributools.LabelWrapper
 import com.github.mvysny.kaributools.label
 import com.vaadin.flow.component.Component
@@ -19,28 +17,30 @@ import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.component.timepicker.TimePicker
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.function.Predicate
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.searchSpecTest() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractSearchSpecTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("clazz") {
+    @Test fun clazz() {
         val spec = SearchSpec(Button::class.java)
         expect(true) { spec.toPredicate()(Button())}
         expect(false) { spec.toPredicate()(NativeLabel())}
     }
 
-    test("id") {
+    @Test fun id() {
         val spec = SearchSpec(Component::class.java, id = "25")
         expect(true) { spec.toPredicate()(Button().apply { setId("25") }) }
         expect(false) { spec.toPredicate()(Button().apply { setId("42") }) }
         expect(false) { spec.toPredicate()(Button()) }
     }
 
-    test("caption") {
+    @Test fun caption() {
         val spec = SearchSpec(Component::class.java, caption = "foo")
         expect(true) { spec.toPredicate()(Button("foo")) }
         expect(false) { spec.toPredicate()(Button("bar")) }
@@ -85,7 +85,7 @@ internal fun DynaNodeGroup.searchSpecTest() {
         expect(false) { spec.toPredicate()(ComboBox<Int>()) }
     }
 
-    test("label") {
+    @Test fun label() {
         val spec = SearchSpec(Component::class.java, label = "foo")
         expect(false) { spec.toPredicate()(Button("foo")) }
         expect(false) { spec.toPredicate()(Button("bar")) }
@@ -130,7 +130,7 @@ internal fun DynaNodeGroup.searchSpecTest() {
         expect(false) { spec.toPredicate()(ComboBox<Int>()) }
     }
 
-    test("text") {
+    @Test fun text() {
         val spec = SearchSpec(Component::class.java, text = "foo")
         expect(true) { spec.toPredicate()(Button("foo")) }
         expect(false) { spec.toPredicate()(Button("bar")) }
@@ -143,7 +143,7 @@ internal fun DynaNodeGroup.searchSpecTest() {
         expect(false) { spec.toPredicate()(TextField("")) }
     }
 
-    test("predicates") {
+    @Test fun predicates() {
         var spec = SearchSpec(Component::class.java).apply {
             predicates.add(Predicate { it is Button })
         }

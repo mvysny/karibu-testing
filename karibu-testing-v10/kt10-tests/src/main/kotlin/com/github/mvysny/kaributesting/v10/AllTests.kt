@@ -32,6 +32,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class MockVaadinTests : AbstractMockVaadinTests()
     @Nested inner class BinderTests : AbstractBinderTests()
     @Nested inner class PrettyPrintTests : AbstractPrettyPrintTreeTests()
+    @Nested inner class SearchSpecTests : AbstractSearchSpecTests()
 }
 
 /**
@@ -44,9 +45,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("search spec") {
-        searchSpecTest()
-    }
     group("notifications") {
         notificationsTestBattery()
     }

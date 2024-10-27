@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.vaadin.flow.component.UI
@@ -9,15 +7,18 @@ import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaTestDsl
-internal fun DynaNodeGroup.contextMenuTestbatch() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractContextMenuTests {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("simple click") {
+    @Test fun `simple click`() {
         var clicked = 0
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -29,7 +30,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
-    test("simple click by ID") {
+    @Test fun `simple click by ID`() {
         var clicked = 0
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -41,7 +42,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
-    test("click checks isChecked") {
+    @Test fun `click checks isChecked`() {
         var clicked = 0
         var checkedOnClick = false
         lateinit var cm: ContextMenu
@@ -58,7 +59,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
     }
 
     // https://github.com/mvysny/karibu-testing/issues/126
-    test("click unchecks isChecked") {
+    @Test fun `click unchecks isChecked`() {
         var clicked = 0
         var checkedOnClick = true
         lateinit var cm: ContextMenu
@@ -74,7 +75,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(false) { checkedOnClick }
     }
 
-    test("clicking menu item calls the 'menu open' listeners") {
+    @Test fun `clicking menu item calls the 'menu open' listeners`() {
         var called = false
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -87,7 +88,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(true) { called }
     }
 
-    test("clicking non-existent menu fails") {
+    @Test fun `clicking non-existent menu fails`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -100,7 +101,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking non-existent menu by ID fails") {
+    @Test fun `clicking non-existent menu by ID fails`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -113,7 +114,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking disabled menu throws exception") {
+    @Test fun `clicking disabled menu throws exception`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -127,7 +128,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking invisible menu throws exception") {
+    @Test fun `clicking invisible menu throws exception`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -141,7 +142,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking menu with disabled parent throws exception") {
+    @Test fun `clicking menu with disabled parent throws exception`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -156,7 +157,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking menu with invisible parent throws exception") {
+    @Test fun `clicking menu with invisible parent throws exception`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             cm = contextMenu {
@@ -171,7 +172,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking menu on invisible component throws exception") {
+    @Test fun `clicking menu on invisible component throws exception`() {
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
             isVisible = false
@@ -184,7 +185,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
     }
 
-    test("clicking menu on disabled component succeeds") {
+    @Test fun `clicking menu on disabled component succeeds`() {
         var clicked = 0
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -197,7 +198,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(1) { clicked }
     }
 
-    test("setOpened(true) fires ContextMenuBase.OpenedChangeEvent") {
+    @Test fun `setOpened(true) fires ContextMenuBase-OpenedChangeEvent`() {
         var called = false
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -214,7 +215,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(true) { called }
     }
 
-    test("setOpened(false) fires ContextMenuBase.OpenedChangeEvent") {
+    @Test fun `setOpened(false) fires ContextMenuBase-OpenedChangeEvent`() {
         var called = false
         lateinit var cm: ContextMenu
         UI.getCurrent().div {
@@ -232,8 +233,8 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         expect(true) { called }
     }
 
-    group("grid context menu") {
-        test("simple click") {
+    @Nested inner class `grid context menu` {
+        @Test fun `simple click`() {
             lateinit var clicked: String
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -244,7 +245,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithCaption("click me", "foo")
             expect("foo") { clicked }
         }
-        test("click by non-existing caption fails") {
+        @Test fun `click by non-existing caption fails`() {
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
@@ -257,7 +258,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 cm._clickItemWithCaption("non-existing", "foo")
             }
         }
-        test("simple click by ID") {
+        @Test fun `simple click by ID`() {
             lateinit var clicked: String
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -268,7 +269,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithID("bar", "foo")
             expect("foo") { clicked }
         }
-        test("click by non-existing ID fails") {
+        @Test fun `click by non-existing ID fails`() {
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
                 cm = gridContextMenu {
@@ -281,7 +282,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
                 cm._clickItemWithID("non-existing", "foo")
             }
         }
-        test("click toggles isChecked") {
+        @Test fun `click toggles isChecked`() {
             lateinit var i: GridMenuItem<String>
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -292,7 +293,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             cm._clickItemWithCaption("click me", "foo")
             expect(true) { i.isChecked }
         }
-        test("submenu click") {
+        @Test fun `submenu click`() {
             var clicked: String? = null
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -306,7 +307,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect("foo") { clicked }
         }
 
-        test("context menu opened listener fired") {
+        @Test fun `context menu opened listener fired`() {
             var listenerCalled = false
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -323,7 +324,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
         }
 
         // test for https://github.com/mvysny/karibu-testing/issues/40
-        test("dynamic menu content populated correctly") {
+        @Test fun `dynamic menu content populated correctly`() {
             var clicked: String? = null
             var listenerCalled = false
             lateinit var cm: GridContextMenu<String>
@@ -344,7 +345,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect("foo") { clicked }
         }
 
-        test("setOpened(true) fires GridContextMenuOpenedEvent") {
+        @Test fun `setOpened(true) fires GridContextMenuOpenedEvent`() {
             var called = false
             lateinit var cm: GridContextMenu<String>
             val grid = UI.getCurrent().grid<String> {
@@ -366,7 +367,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect(true) { called }
         }
 
-        test("setOpened(true) calls dynamic handler") {
+        @Test fun `setOpened(true) calls dynamic handler`() {
             var called = 0
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -388,7 +389,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect(2) { called }
         }
 
-        test("setOpened(true) succeeds on null item") {
+        @Test fun `setOpened(true) succeeds on null item`() {
             var called = 0
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {
@@ -410,7 +411,7 @@ internal fun DynaNodeGroup.contextMenuTestbatch() {
             expect(2) { called }
         }
 
-        test("setOpened(false) fires GridContextMenuOpenedEvent") {
+        @Test fun `setOpened(false) fires GridContextMenuOpenedEvent`() {
             var called = false
             lateinit var cm: GridContextMenu<String>
             UI.getCurrent().grid<String> {

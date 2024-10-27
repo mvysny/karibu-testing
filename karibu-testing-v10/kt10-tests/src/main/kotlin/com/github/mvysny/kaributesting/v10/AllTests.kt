@@ -36,6 +36,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class NotificationTests : AbstractNotificationsTests()
     @Nested inner class ContextMenuTests : AbstractContextMenuTests()
     @Nested inner class NavigatorTests : AbstractNavigatorTests()
+    @Nested inner class RouterLinkTests : AbstractRouterLinkTests()
 }
 
 /**
@@ -48,9 +49,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("router link tests") {
-        routerLinkBatch()
-    }
     group("download test battery") {
         downloadTestBattery()
     }

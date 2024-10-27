@@ -1,25 +1,24 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.anchor
 import com.github.mvysny.karibudsl.v10.routerLink
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.NotFoundException
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.routerLinkBatch() {
-    beforeEach {
+abstract class  AbstractRouterLinkTests() {
+    @BeforeEach fun fakeVaadin() {
         MockVaadin.setup(Routes().apply { routes.add(TestingView::class.java) })
     }
-    afterEach {
-        MockVaadin.tearDown()
-    }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("routerLink") {
-        test("simple") {
+    @Nested inner class routerLink {
+        @Test fun simple() {
             UI.getCurrent().apply {
                 routerLink(null, "testing", TestingView::class) {
                     _click()
@@ -28,7 +27,7 @@ internal fun DynaNodeGroup.routerLinkBatch() {
             // make sure that the navigation has been performed and there is the TestingView in the current UI
             _get<TestingView>()
         }
-        test("disabled link cannot be clicked") {
+        @Test fun `disabled link cannot be clicked`() {
             expectThrows(IllegalStateException::class, "The RouterLink[DISABLED, text='testing'] is not enabled") {
                 UI.getCurrent().apply {
                     routerLink(null, "testing", TestingView::class) {
@@ -38,7 +37,7 @@ internal fun DynaNodeGroup.routerLinkBatch() {
                 }
             }
         }
-        test("navigation to non-existing route blows immediately") {
+        @Test fun `navigation to non-existing route blows immediately`() {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {
@@ -52,15 +51,15 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
         }
     }
 
-    group("anchor") {
-        test("simple") {
+    @Nested inner class anchor {
+        @Test fun simple() {
             UI.getCurrent().anchor("testing") {
                 _click()
             }
             // make sure that the navigation has been performed and there is the TestingView in the current UI
             _get<TestingView>()
         }
-        test("toPrettyString") {
+        @Test fun toPrettyString() {
             expect("Anchor[text='testing', href='testing']") {
                 UI.getCurrent().anchor("testing").toPrettyString()
             }
@@ -68,7 +67,7 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
                 UI.getCurrent().anchor("testing") { isEnabled = false }.toPrettyString()
             }
         }
-        test("disabled link cannot be clicked") {
+        @Test fun `disabled link cannot be clicked`() {
             expectThrows(IllegalStateException::class, "The Anchor[DISABLED, text='testing', href='testing'] is not enabled") {
                 UI.getCurrent().anchor("testing") {
                     isEnabled = false
@@ -76,7 +75,7 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
                 }
             }
         }
-        test("navigation to non-existing route blows immediately") {
+        @Test fun `navigation to non-existing route blows immediately`() {
             expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {

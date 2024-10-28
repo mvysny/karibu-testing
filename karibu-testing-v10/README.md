@@ -213,17 +213,19 @@ simple testing app uses `MainView` as the root route):
 
 Kotlin:
 ```kotlin
-class MyUITest : DynaTest({
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+class MyUITest {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun scanForRoutes() { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("simple UI test") {
+    @Test fun `simple UI test`() {
         val main = UI.getCurrent().children.findFirst().get() as MainView
         expect(2) { main.children.count() }
     }
-})
+}
 ``` 
 
 Java:

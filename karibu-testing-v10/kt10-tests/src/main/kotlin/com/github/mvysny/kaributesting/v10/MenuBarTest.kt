@@ -1,22 +1,22 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v10.item
 import com.github.mvysny.karibudsl.v10.menuBar
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.menubar.MenuBar
-import kotlin.streams.toList
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.menuBarTestbatch() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractMenuBarTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("_clickItemWithCaption fires click listener") {
+    @Test fun `_clickItemWithCaption fires click listener`() {
         var clicked = 0
         val menuBar: MenuBar = UI.getCurrent().menuBar {
             item("foo", { clicked++ })
@@ -25,7 +25,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
         expect(1) { clicked }
     }
 
-    test("_clickItemWithCaption toggles isChecked") {
+    @Test fun `_clickItemWithCaption toggles isChecked`() {
         lateinit var i: MenuItem
         val menuBar: MenuBar = UI.getCurrent().menuBar {
             item("bar") {
@@ -36,7 +36,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
         expect(true) { i.isChecked }
     }
 
-    test("_click") {
+    @Test fun _click() {
         var clicked = 0
         lateinit var mi: MenuItem
         val menuBar: MenuBar = UI.getCurrent().menuBar {
@@ -47,15 +47,15 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
     }
 
     // test for https://github.com/mvysny/karibu-testing/issues/76
-    group("locate components") {
-        test("in MenuBar") {
+    @Nested inner class `locate components` {
+        @Test fun `in MenuBar`() {
             val menuBar: MenuBar = UI.getCurrent().menuBar {
                 val mi = item(Span("foo"))
                 println("$mi ${mi.children.toList()}")
             }
             menuBar._expectOne<Span>()
         }
-        test("Item in submenu") {
+        @Test fun `Item in submenu`() {
             val menuBar: MenuBar = UI.getCurrent().menuBar {
                 item("foo") {
                     item(Span("foo"))
@@ -63,7 +63,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
             }
             menuBar._expectOne<Span>()
         }
-        test("Component in submenu") {
+        @Test fun `Component in submenu`() {
             // PopupButton in Karibu-DSL uses this trick
             // test for https://github.com/mvysny/karibu-testing/issues/163
             val menuBar: MenuBar = UI.getCurrent().menuBar {
@@ -73,7 +73,7 @@ internal fun DynaNodeGroup.menuBarTestbatch() {
             }
             menuBar._expectOne<Span>()
         }
-        test("Component in sub-submenu") {
+        @Test fun `Component in sub-submenu`() {
             // PopupButton in Karibu-DSL uses this trick
             // test for https://github.com/mvysny/karibu-testing/issues/163
             val menuBar: MenuBar = UI.getCurrent().menuBar {

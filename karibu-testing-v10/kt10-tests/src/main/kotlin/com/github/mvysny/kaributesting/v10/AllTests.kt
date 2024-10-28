@@ -4,7 +4,6 @@ import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.pro.AbstractGridProTests
 import com.github.mvysny.kaributesting.v10.pro.richTextEditorTests
-import npmPolymerTemplateTestBatch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import java.util.*
@@ -45,6 +44,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class MenuBarTests : AbstractMenuBarTests()
     @Nested inner class ShortcutsTests : AbstractShortcutsTests()
     @Nested inner class LitTemplateTests : AbstractLitTemplateTests(isModuleTest)
+    @Nested inner class NpmTemplateTests : AbstractNpmPolymerTemplateTests(isModuleTest)
 }
 
 /**
@@ -57,9 +57,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("npm PolymerTemplates") {
-        npmPolymerTemplateTestBatch(isModuleTest)
-    }
     group("dialog") {
         dialogTests()
     }

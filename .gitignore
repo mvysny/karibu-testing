@@ -8,3 +8,4 @@ styles.css.gz
 *.iml
 out
 .attach_pid*
+.kotlin

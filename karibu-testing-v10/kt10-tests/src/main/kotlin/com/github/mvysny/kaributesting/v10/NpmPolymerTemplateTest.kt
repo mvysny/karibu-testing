@@ -1,21 +1,21 @@
 @file:Suppress("DEPRECATION")
+package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Tag
 import com.vaadin.flow.component.dependency.JsModule
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
-@DynaTestDsl
-fun DynaNodeGroup.npmPolymerTemplateTestBatch(isModuleTest: Boolean) {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractNpmPolymerTemplateTests(val isModuleTest: Boolean) {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("UnloadableComponent works without any mocking") {
+    @Test fun smoke() {
         UnloadableComponent()
     }
 }

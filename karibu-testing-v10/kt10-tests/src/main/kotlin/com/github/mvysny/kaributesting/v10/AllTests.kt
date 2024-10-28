@@ -2,8 +2,8 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.dynatest.DynaNodeGroup
 import com.github.mvysny.dynatest.DynaTestDsl
+import com.github.mvysny.kaributesting.v10.pro.AbstractGridProTests
 import com.github.mvysny.kaributesting.v10.pro.confirmDialogTestbatch
-import com.github.mvysny.kaributesting.v10.pro.gridProTestbatch
 import com.github.mvysny.kaributesting.v10.pro.richTextEditorTests
 import npmPolymerTemplateTestBatch
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +38,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class NavigatorTests : AbstractNavigatorTests()
     @Nested inner class RouterLinkTests : AbstractRouterLinkTests()
     @Nested inner class DownloadTests : AbstractDownloadTests()
+    @Nested inner class GridProTests : AbstractGridProTests()
 }
 
 /**
@@ -50,9 +51,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("grid pro") {
-        gridProTestbatch()
-    }
     group("ConfirmDialog") {
         confirmDialogTestbatch()
     }

@@ -1,21 +1,21 @@
 package com.github.mvysny.kaributesting.v10.pro
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.TestPerson
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.textfield.NumberField
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.gridProTestbatch() {
+abstract class AbstractGridProTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    test("CellEditStartedEvent") {
+    @Test fun CellEditStartedEvent() {
         val grid = GridPro<TestPerson>(TestPerson::class.java)
         grid.removeAllColumns()
         val col = grid.addEditColumn("age")
@@ -29,8 +29,8 @@ internal fun DynaNodeGroup.gridProTestbatch() {
         expect(true) { listenerCalled }
     }
 
-    group("item updater") {
-        test("string + textfield") {
+    @Nested inner class `item updater` {
+        @Test fun `string + textfield`() {
             val grid = GridPro<TestPerson>(TestPerson::class.java)
             grid.removeAllColumns()
             val col = grid.addEditColumn("age")
@@ -39,7 +39,7 @@ internal fun DynaNodeGroup.gridProTestbatch() {
             grid._proedit(p) { col._text("Bar") }
             expect("Bar") { p.name }
         }
-        test("int + custom field") {
+        @Test fun `int + custom field`() {
             val grid = GridPro<TestPerson>(TestPerson::class.java)
             grid.removeAllColumns()
             val numberField = NumberField()
@@ -50,7 +50,7 @@ internal fun DynaNodeGroup.gridProTestbatch() {
             grid._proedit(p) { col._customFlush() }
             expect(3) { p.age }
         }
-        test("boolean + checkbox") {
+        @Test fun `boolean + checkbox`() {
             val grid = GridPro<TestProPerson>(TestProPerson::class.java)
             grid.removeAllColumns()
             val col = grid.addEditColumn("alive")
@@ -59,7 +59,7 @@ internal fun DynaNodeGroup.gridProTestbatch() {
             grid._proedit(p) { col._checkbox(false) }
             expect(false) { p.alive }
         }
-        test("select + enum") {
+        @Test fun `select + enum`() {
             val grid = GridPro<TestProPerson>(TestProPerson::class.java)
             grid.removeAllColumns()
             val col = grid.addEditColumn("status")

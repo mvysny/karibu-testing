@@ -1,17 +1,17 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.details.Details
 import com.vaadin.flow.component.html.Span
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-@DynaTestDsl
-internal fun DynaNodeGroup.detailsTests() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractDetailsTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
     // for other Dialog-related tests see MockVaadinTest.kt
-    test("smoke") {
+    @Test fun smoke() {
         val d = Details(Span("Contact"), Span("Foo"))
         d._expectOne<Span> { text = "Contact" }
         d._expectOne<Span> { text = "Foo" }

@@ -49,6 +49,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class CompositeTests : AbstractCompositeTests()
     @Nested inner class RadioButtonTests : AbstractRadioButtonTests()
     @Nested inner class ListBoxTests : AbstractListBoxTests()
+    @Nested inner class CheckboxGroupTests : AbstractCheckboxGroupTests()
 }
 
 /**
@@ -61,9 +62,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("CheckboxGroup") {
-        checkboxGroupTests()
-    }
     group("Details") {
         detailsTests()
     }

@@ -1,23 +1,21 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.checkbox.CheckboxGroup
-import com.vaadin.flow.data.provider.ListDataProvider
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.checkboxGroupTests() {
+abstract class AbstractCheckboxGroupTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    group("getItemLabels()") {
-        test("empty") {
+    @Nested inner class getItemLabels {
+        @Test fun empty() {
             expectList() { CheckboxGroup<String>().getItemLabels() }
         }
-        test("with itemLabelGenerator") {
+        @Test fun `with itemLabelGenerator`() {
             val cg = CheckboxGroup<String>()
             cg.setItems2("1", "2", "3")
             cg.setItemLabelGenerator { "item $it" }
@@ -26,20 +24,20 @@ internal fun DynaNodeGroup.checkboxGroupTests() {
             }
         }
     }
-    group("selectByLabel()") {
-        test("empty") {
+    @Nested inner class selectByLabel {
+        @Test fun empty() {
             expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<?>(0 items)']: No item found with label(s) '[foo]'. Available items: []") {
                 CheckboxGroup<String>().selectByLabel("foo")
             }
         }
-        test("fails on no match") {
+        @Test fun `fails on no match`() {
             val c = CheckboxGroup<String>()
             c.setItems2("1", "2", "3")
             expectThrows<AssertionError>("CheckboxGroup[value='[]', dataprovider='ListDataProvider<String>(3 items)']: No item found with label(s) '[foo]'. Available items: [1, 2, 3]") {
                 c.selectByLabel("foo")
             }
         }
-        test("simple with itemLabelGenerator") {
+        @Test fun `simple with itemLabelGenerator`() {
             val cg = CheckboxGroup<String>()
             cg.setItems2("1", "2", "3")
             cg.setItemLabelGenerator { "item $it" }

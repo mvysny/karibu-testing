@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v23._select
 import com.vaadin.flow.component.Component
@@ -9,34 +7,31 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.component.tabs.Tabs
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-
-@DynaTestDsl
-internal fun DynaNodeGroup.tabsTests() {
-    group("_select()") {
-        group("Tabs") {
-            selectTests(
-                { Tabs() },
-                { tabs, tab -> tabs.add(tab) },
-                { it.selectedTab })
-        }
-        group("TabSheet") {
-            selectTests(
-                { TabSheet() },
-                { tabs, tab -> tabs.add(tab, Span("contents of $tab")) },
-                { it.selectedTab })
-        }
+abstract class AbstractTabsTests() {
+    @Nested inner class SelectTests {
+        @Nested inner class TabsTests : AbstractTabsSelectTests<Tabs>(
+            { Tabs() },
+            { tabs, tab -> tabs.add(tab) },
+            { it.selectedTab }
+        )
+        @Nested inner class TabSheetTests : AbstractTabsSelectTests<TabSheet>(
+            { TabSheet() },
+            { tabs, tab -> tabs.add(tab, Span("contents of $tab")) },
+            { it.selectedTab }
+        )
     }
 }
 
-@DynaTestDsl
-private fun <T : Component> DynaNodeGroup.selectTests(
-    create: () -> T,
-    add: (T, Tab) -> Unit,
-    selected: (T) -> Tab
+abstract class AbstractTabsSelectTests<T : Component>(
+    val create: () -> T,
+    val add: (T, Tab) -> Unit,
+    val selected: (T) -> Tab
 ) {
-    test("select already selected tab succeeds") {
+    @Test fun `select already selected tab succeeds`() {
         val t = create()
         val tab = Tab("Foo")
         add(t, tab)
@@ -46,7 +41,7 @@ private fun <T : Component> DynaNodeGroup.selectTests(
         expect(tab) { selected(t) }
     }
 
-    test("select enabled+visible tab succeeds") {
+    @Test fun `select enabled+visible tab succeeds`() {
         val t = create()
         val tab = Tab("Foo")
         add(t, tab)
@@ -58,7 +53,7 @@ private fun <T : Component> DynaNodeGroup.selectTests(
         expect(tab2) { selected(t) }
     }
 
-    test("select disabled tab fails") {
+    @Test fun `select disabled tab fails`() {
         val t = create()
         val tab = Tab("Foo")
         add(t, tab)
@@ -73,7 +68,7 @@ private fun <T : Component> DynaNodeGroup.selectTests(
         expect(tab) { selected(t) }
     }
 
-    test("select invisible tab fails") {
+    @Test fun `select invisible tab fails`() {
         val t = create()
         val tab = Tab("Foo")
         add(t, tab)

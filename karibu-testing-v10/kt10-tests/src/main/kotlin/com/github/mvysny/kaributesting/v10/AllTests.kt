@@ -47,6 +47,8 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class NpmTemplateTests : AbstractNpmPolymerTemplateTests(isModuleTest)
     @Nested inner class DialogTests : AbstractDialogTests()
     @Nested inner class CompositeTests : AbstractCompositeTests()
+    @Nested inner class RadioButtonTests : AbstractRadioButtonTests()
+    @Nested inner class ListBoxTests : AbstractListBoxTests()
 }
 
 /**
@@ -59,12 +61,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("radio button") {
-        radioButtonTests()
-    }
-    group("ListBox") {
-        listBoxTestbatch()
-    }
     group("CheckboxGroup") {
         checkboxGroupTests()
     }

@@ -1,16 +1,18 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.data.renderer.LitRenderer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.renderers22Tests() {
-    beforeEach { MockVaadin.setup() }
+abstract class AbstractRenderers22Tests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    group("LitRenderer") {
-        test("_getPresentationValue()") {
+    @Nested inner class LitRendererTests {
+        @Test fun _getPresentationValue() {
             expect("Item #25") {
                 val r = LitRenderer.of<Int>("<div>\${item.foo}</div>")
                     .withProperty("foo") { "Item #$it" }
@@ -19,4 +21,3 @@ internal fun DynaNodeGroup.renderers22Tests() {
         }
     }
 }
-

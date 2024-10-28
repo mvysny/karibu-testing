@@ -9,7 +9,6 @@ dependencies {
     api(project(":karibu-testing-v10"))
     api(libs.kaributools23)
 
-    testImplementation(libs.dynatest)
     testImplementation(libs.slf4j.simple)
 }
 

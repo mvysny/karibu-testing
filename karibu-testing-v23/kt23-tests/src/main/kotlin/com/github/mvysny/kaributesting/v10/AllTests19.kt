@@ -9,10 +9,6 @@ import org.junit.jupiter.api.Nested
  */
 @DynaTestDsl
 fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
-    group("Grid Vaadin 19+") {
-        grid19Testbatch()
-    }
-
     group("security") {
         securityTests()
     }
@@ -44,4 +40,5 @@ fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
 
 abstract class AbstractAllTests19(val isModuleTest: Boolean) {
     @Nested inner class AllTests10 : AbstractAllTests10(isModuleTest)
+    @Nested inner class GridVaadin19Tests : AbstractGrid19Tests()
 }

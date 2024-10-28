@@ -1,21 +1,21 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.formItem
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.TextField
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-internal fun DynaNodeGroup.formLayoutTest() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractFormLayoutTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("basic FormItem lookup") {
+    @Test fun `basic FormItem lookup`() {
         val f: FormLayout = FormLayout().apply {
             formItem("foo") {
                 textField()
@@ -24,7 +24,7 @@ internal fun DynaNodeGroup.formLayoutTest() {
         f._expectOne<FormLayout.FormItem> { label = "foo" }
     }
 
-    test("API test: field retrieval from FormItem") {
+    @Test fun `API test - field retrieval from FormItem`() {
         lateinit var tf: TextField
         val f: FormLayout = FormLayout().apply {
             formItem("foo") {
@@ -34,13 +34,13 @@ internal fun DynaNodeGroup.formLayoutTest() {
         expect(tf) { f._get<FormLayout.FormItem> { label = "foo" } .field }
     }
 
-    group("FormItem.field") {
-        test("succeeds with one field and no label") {
+    @Nested inner class `FormItem-field` {
+        @Test fun `succeeds with one field and no label`() {
             val tf = TextField()
             val f: FormLayout.FormItem = FormLayout().addFormItem(tf, "foo")
             expect(tf) { f._get<FormLayout.FormItem> { label = "foo" } .field }
         }
-        test("fails with no field") {
+        @Test fun `fails with no field`() {
             val f: FormLayout.FormItem = FormLayout().addFormItem(Select<String>(), "foo")
             f.removeAll()
             expectThrows(IllegalStateException::class, "FormItem: Expected 1 field but got 0. Component tree:\n└── FormItem[]") {

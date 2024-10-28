@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI

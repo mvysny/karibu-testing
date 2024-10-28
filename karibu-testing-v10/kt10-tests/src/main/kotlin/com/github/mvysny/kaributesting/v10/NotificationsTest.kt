@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
 import org.junit.jupiter.api.AfterEach

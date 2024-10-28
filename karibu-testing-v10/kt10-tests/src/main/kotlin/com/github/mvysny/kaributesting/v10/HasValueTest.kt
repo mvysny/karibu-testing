@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.checkBox
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.orderedlayout.VerticalLayout

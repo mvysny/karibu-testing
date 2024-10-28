@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.beanValidationBinder
 import com.github.mvysny.karibudsl.v10.bind
 import com.vaadin.flow.component.textfield.TextField

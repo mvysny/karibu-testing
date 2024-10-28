@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload

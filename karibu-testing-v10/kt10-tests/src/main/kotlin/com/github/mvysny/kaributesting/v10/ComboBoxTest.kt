@@ -1,12 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectList
-import com.github.mvysny.dynatest.expectThrows
-import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.select.Select
-import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

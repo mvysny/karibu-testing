@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.button
 import com.vaadin.flow.component.ClickNotifier
 import com.vaadin.flow.component.Component

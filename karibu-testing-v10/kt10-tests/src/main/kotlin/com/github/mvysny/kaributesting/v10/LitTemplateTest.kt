@@ -1,8 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.Tag
@@ -15,35 +12,38 @@ import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.data.binder.Binder
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assumptions.assumeFalse
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
 /**
  * @param isModuleTest if true then this test run simulates a jar reusable component.
  */
-@DynaTestDsl
-fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    if (!isModuleTest) {
-        test("test loading of stuff from node_modules") {
-            val f = LitColorPickerField()
-            expect(true) { f.foo._isVisible }
-            UI.getCurrent().add(f)
-        }
+    @Test fun `test loading of stuff from node_modules`() {
+        assumeFalse(isModuleTest)
+        val f = LitColorPickerField()
+        expect(true) { f.foo._isVisible }
+        UI.getCurrent().add(f)
     }
 
-    test("loading from frontend/") {
+    @Test fun `loading from frontend`() {
         UI.getCurrent().add(MyTest())
     }
 
-    test("proper error message on unloadable component") {
+    @Test fun `proper error message on unloadable component`() {
         // this actually works?!? okay...
         LitUnloadableComponent()
         LitUnloadableComponent2()
     }
 
-    test("proper error message on unloadable template") {
+    @Test fun `proper error message on unloadable template`() {
         expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
             // mockGetSourcesFromTemplate() should fail with an informative error message; stacktrace:
 //            at com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser$Companion.mockGetSourcesFromTemplate(MockNpmTemplateParser.kt:78)
@@ -57,32 +57,32 @@ fun DynaNodeGroup.litTemplateTestBatch(isModuleTest: Boolean) {
         }
     }
 
-    test("form") {
+    @Test fun form() {
         UI.getCurrent().add(MyForm())
     }
 
-    group("includeVirtualChildrenInTemplates") {
-        afterEach { includeVirtualChildrenInTemplates = false }
-        test("false") {
+    @Nested inner class includeVirtualChildrenInTemplates() {
+        @AfterEach fun resetConfig() { includeVirtualChildrenInTemplates = false }
+        @Test fun `false`() {
             val form = MyForm()
             expect(setOf(form)) { form._find<Component>().toSet() }
             form._expectNone<EmailField>()
         }
-        test("true") {
+        @Test fun `true`() {
             includeVirtualChildrenInTemplates = true
             val form = MyForm()
             expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._find<Component>().toSet() }
             expect(form.emailField) { form._get<EmailField>() }
         }
 
-        group("Composite") {
-            class CompositeForm : Composite<MyForm>()
-            test("false") {
+        @Nested inner class CompositeTests {
+            inner class CompositeForm : Composite<MyForm>()
+            @Test fun `false`() {
                 val form = CompositeForm()
                 expect(setOf(form, form.content)) { form._find<Component>().toSet() }
                 form._expectNone<EmailField>()
             }
-            test("true") {
+            @Test fun `true`() {
                 includeVirtualChildrenInTemplates = true
                 val form = CompositeForm()
                 expect(setOf(form, form.content, form.content.emailField, form.content.firstNameField, form.content.lastNameField)) { form._find<Component>().toSet() }

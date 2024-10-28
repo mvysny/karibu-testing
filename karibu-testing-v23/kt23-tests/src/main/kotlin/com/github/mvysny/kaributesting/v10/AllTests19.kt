@@ -9,14 +9,6 @@ import org.junit.jupiter.api.Nested
  */
 @DynaTestDsl
 fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
-    group("Dialogs 23.1+ tests") {
-        dialog23_1tests()
-    }
-
-    group("VirtualList") {
-        virtualListTests()
-    }
-
     group("MultiselectComboBox") {
         multiselectComboBoxTests()
     }
@@ -35,4 +27,6 @@ abstract class AbstractAllTests19(val isModuleTest: Boolean) {
     @Nested inner class GridVaadin19Tests : AbstractGrid19Tests()
     @Nested inner class SecurityTests : AbstractSecurityTests()
     @Nested inner class RenderersVaadin22Tests : AbstractRenderers22Tests()
+    @Nested inner class Dialog23_1Tests : AbstractDialog23_1tests()
+    @Nested inner class VirtualListTests : AbstractVirtualListTests()
 }

@@ -1,8 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.karibudsl.v23.virtualList
 import com.github.mvysny.kaributesting.v23.*
@@ -16,6 +13,10 @@ import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -23,13 +24,11 @@ import java.util.*
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaTestDsl
-internal fun DynaNodeGroup.virtualListTests() {
+abstract class AbstractVirtualListTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    test("_dump") {
+    @Test fun _dump() {
         val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
         val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
             setRenderer { "${it.name}, ${it.age}" }
@@ -41,8 +40,8 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("expectRow()") {
-        test("simple") {
+    @Nested inner class expectRow {
+        @Test fun simple() {
             val dp = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer { "${it.name}, ${it.age}" }
@@ -51,7 +50,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             vl.expectRow(0, "name 0, 0")
         }
 
-        test("failed expectRow contains table dump") {
+        @Test fun `failed expectRow contains table dump`() {
             val dp = ListDataProvider<TestPerson>((0 until 1).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer({ "${it.name}, ${it.age}" })
@@ -61,7 +60,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             }
         }
 
-        test("row out-of-bounds contains table dump") {
+        @Test fun `row out-of-bounds contains table dump`() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer { "${it.name}, ${it.age}" }
@@ -72,22 +71,22 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("renderers") {
-        test("NativeButtonRenderer") {
+    @Nested inner class renderers {
+        @Test fun NativeButtonRenderer() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer(NativeButtonRenderer<TestPerson>("View", { }))
             }
             vl.expectRow(0, "View")
         }
-        test("ComponentRenderer") {
+        @Test fun ComponentRenderer() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 setRenderer(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
             }
             vl.expectRow(0, "Button[text='name 0']")
         }
-        test("LocalDateRenderer") {
+        @Test fun LocalDateRenderer() {
             val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 7).map { TestPerson("name $it", it) })
             val vl = UI.getCurrent().virtualList<TestPerson>(dp) {
                 val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
@@ -99,8 +98,8 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("click renderer") {
-        test("ClickableRenderer") {
+    @Nested inner class `click renderer` {
+        @Test fun ClickableRenderer() {
             var called = false
             val vl: VirtualList<TestPerson> = VirtualList<TestPerson>().apply {
                 setRenderer(NativeButtonRenderer<TestPerson>("View") { person ->
@@ -112,7 +111,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             vl._clickRenderer(8)
             expect(true) { called }
         }
-        test("ComponentRenderer with Button") {
+        @Test fun `ComponentRenderer with Button`() {
             var called = false
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
@@ -126,7 +125,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             vl._clickRenderer(8)
             expect(true) { called }
         }
-        test("ComponentRenderer with ClickNotifier") {
+        @Test fun `ComponentRenderer with ClickNotifier`() {
             var called = false
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Checkbox, TestPerson> { person -> Checkbox("View").apply {
@@ -140,7 +139,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             vl._clickRenderer(8)
             expect(true) { called }
         }
-        test("fails on disabled VirtualList") {
+        @Test fun `fails on disabled VirtualList`() {
             val vl: VirtualList<TestPerson> = VirtualList<TestPerson>().apply {
                 setRenderer(NativeButtonRenderer<TestPerson>("View") { fail("Shouldn't be called") })
                 setItems((0..10).map { TestPerson("name $it", it) })
@@ -150,7 +149,7 @@ internal fun DynaNodeGroup.virtualListTests() {
                 vl._clickRenderer(2)
             }
         }
-        test("fails on unsupported component type") {
+        @Test fun `fails on unsupported component type`() {
             expect(false) { NativeLabel() is ClickNotifier<*> }
             val vl = VirtualList<TestPerson>().apply {
                 setItems((0..10).map { TestPerson("name $it", it) })
@@ -162,8 +161,8 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("_getRowComponent") {
-        test("fails with ClickableRenderer") {
+    @Nested inner class _getRowComponent {
+        @Test fun `fails with ClickableRenderer`() {
             val vl: VirtualList<TestPerson> = VirtualList<TestPerson>().apply {
                 setRenderer(NativeButtonRenderer<TestPerson>("View") {})
                 setItems((0..10).map { TestPerson("name $it", it) })
@@ -172,7 +171,7 @@ internal fun DynaNodeGroup.virtualListTests() {
                 vl._getRowComponent(8)
             }
         }
-        test("ComponentRenderer with Button") {
+        @Test fun `ComponentRenderer with Button`() {
             var called = false
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Button, TestPerson> { person -> Button("View").apply {
@@ -186,7 +185,7 @@ internal fun DynaNodeGroup.virtualListTests() {
             (vl._getRowComponent(8) as Button)._click()
             expect(true) { called }
         }
-        test("doesn't fail on disabled VirtualList") {
+        @Test fun `doesn't fail on disabled VirtualList`() {
             val vl: VirtualList<TestPerson> = VirtualList<TestPerson>().apply {
                 setRenderer(ComponentRenderer<Button, TestPerson> { _ -> Button("View") })
                 setItems((0..10).map { TestPerson("name $it", it) })
@@ -196,15 +195,15 @@ internal fun DynaNodeGroup.virtualListTests() {
         }
     }
 
-    group("_getFormatted()") {
-        test("non-existing row") {
+    @Nested inner class _getFormatted {
+        @Test fun `non-existing row`() {
             val vl = VirtualList<TestPerson>()
             expectThrows(AssertionError::class, "Requested to get row 0 but the data provider only has 0 rows") {
                 vl._getFormatted(0)
             }
         }
 
-        test("basic") {
+        @Test fun basic() {
             val vl = VirtualList<TestPerson>().apply {
                 setRenderer { "${it.name} ${it.age}" }
                 setItems((0..10).map { TestPerson("name $it", it) })

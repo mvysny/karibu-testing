@@ -1,23 +1,23 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-@DynaTestDsl
-internal fun DynaNodeGroup.dialogTests() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractDialogTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
     // for other Dialog-related tests see MockVaadinTest.kt
 
-    test("no dialog") {
+    @Test fun `no dialog`() {
         _expectNone<Dialog>()
     }
 
-    test("simple dialog") {
+    @Test fun `simple dialog`() {
         // tests for https://github.com/mvysny/karibu-testing/issues/166
         val dlg = Dialog()
         dlg.open()
@@ -27,7 +27,7 @@ internal fun DynaNodeGroup.dialogTests() {
     }
 
     // tests https://github.com/mvysny/karibu-testing/issues/102
-    test("nested modal dialogs") {
+    @Test fun `nested modal dialogs`() {
         val dialog = Dialog()
         dialog.isModal = true
         dialog.open()
@@ -46,7 +46,7 @@ internal fun DynaNodeGroup.dialogTests() {
     }
 
     // for other Composite-related tests see CompositeTest.kt
-    test("Composite<Dialog> causes footer components to appear two times in Karibu tree dump") {
+    @Test fun `CompositeDialog causes footer components to appear two times in Karibu tree dump`() {
         class MyDialog : Composite<Dialog>() {
             init {
                 content.footer.add(Button("Hi!"))

@@ -45,6 +45,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class ShortcutsTests : AbstractShortcutsTests()
     @Nested inner class LitTemplateTests : AbstractLitTemplateTests(isModuleTest)
     @Nested inner class NpmTemplateTests : AbstractNpmPolymerTemplateTests(isModuleTest)
+    @Nested inner class DialogTests : AbstractDialogTests()
 }
 
 /**
@@ -57,9 +58,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("dialog") {
-        dialogTests()
-    }
     group("Composite") {
         compositeTests()
     }

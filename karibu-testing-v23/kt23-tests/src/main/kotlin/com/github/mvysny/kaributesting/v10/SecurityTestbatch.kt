@@ -2,8 +2,6 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.auth.AccessAnnotationChecker
@@ -15,25 +13,27 @@ import java.security.Principal
 import jakarta.annotation.security.DenyAll
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
 /**
  * Tests that we can mock `HttpServletRequest.isUserInRole()` and `HttpServletRequest.getUserPrincipal()`
  * in order for [AccessAnnotationChecker] to work properly.
  */
-@DynaTestDsl
-fun DynaNodeGroup.securityTests() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractSecurityTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("smoke") {
+    @Test fun smoke() {
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestAdminOnly::class.java) }
     }
 
-    test("user") {
+    @Test fun user() {
         currentRequest.fake.userPrincipalInt = MockPrincipal("user", listOf("user"))
         currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
@@ -42,7 +42,7 @@ fun DynaNodeGroup.securityTests() {
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestAdminOnly::class.java) }
     }
 
-    test("admin") {
+    @Test fun admin() {
         currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
         currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
@@ -51,7 +51,7 @@ fun DynaNodeGroup.securityTests() {
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAdminOnly::class.java) }
     }
 
-    test("navigation honors ViewAccessChecker") {
+    @Test fun `navigation honors ViewAccessChecker`() {
         MockVaadin.tearDown()
         MockVaadin.setup(Routes().apply {
             routes.add(LoginView::class.java)

@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.kaributesting.v10.pro.AbstractGridProTests
 import com.github.mvysny.kaributesting.v10.pro.AbstractRichTextEditorTests
 import org.junit.jupiter.api.BeforeEach
@@ -55,15 +53,4 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class HasValidationTests : AbstractHasValidationTests()
     @Nested inner class TabsTests : AbstractTabsTests()
     @Nested inner class RichTextEditorTests : AbstractRichTextEditorTests()
-}
-
-/**
- * @param isModuleTest if true then this test run simulates a jar reusable component.
- */
-@DynaTestDsl
-fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
-    beforeEach {
-        // make sure that Validator produces messages in English
-        Locale.setDefault(Locale.ENGLISH)
-    }
 }

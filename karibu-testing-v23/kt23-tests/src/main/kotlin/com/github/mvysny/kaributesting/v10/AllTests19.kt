@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Nested
  */
 @DynaTestDsl
 fun DynaNodeGroup.allTests19(isModuleTest: Boolean) {
-    allTests(isModuleTest)
-
     group("Grid Vaadin 19+") {
         grid19Testbatch()
     }

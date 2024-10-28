@@ -419,11 +419,13 @@ to call this function before all tests:
 
 Kotlin:
 ```kotlin
-class MyUITest : DynaTest({
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+class MyUITest {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun scanForRoutes() { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
   
     test("simple test") {
         // navigate to the "Categories" list route.
@@ -434,7 +436,7 @@ class MyUITest : DynaTest({
         grid.expectRows(1)
         // etc etc
     }
-})
+}
 ```
 
 Java:

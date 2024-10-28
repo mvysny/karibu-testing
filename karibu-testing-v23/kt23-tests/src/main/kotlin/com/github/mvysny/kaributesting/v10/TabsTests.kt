@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.expectThrows
 import com.github.mvysny.kaributesting.v23._select
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.html.Span

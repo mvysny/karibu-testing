@@ -1,21 +1,21 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.Tabs
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
-@DynaTestDsl
-internal fun DynaNodeGroup.tabsTestbatch() {
+abstract class AbstractTabsTests {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    group("Children") {
-        test("None by default") {
+    @Nested inner class Children {
+        @Test fun `None by default`() {
             Tabs()._expectNone<Tab>()
         }
-        test("Expect tabs to be found") {
+        @Test fun `Expect tabs to be found`() {
             val tabs = Tabs()
             val tab1 = Tab("Tab1")
             val tab2 = Tab("Tab2")
@@ -24,8 +24,8 @@ internal fun DynaNodeGroup.tabsTestbatch() {
         }
     }
 
-    group("lookup") {
-        test("lookup by label") {
+    @Nested inner class lookup {
+        @Test fun `lookup by label`() {
             val tabs = Tabs()
             tabs.add(Tab("foobar"))
             tabs._expect<Tab> { label = "foobar" }

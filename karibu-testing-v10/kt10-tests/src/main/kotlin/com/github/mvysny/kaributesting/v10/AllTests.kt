@@ -52,6 +52,8 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class CheckboxGroupTests : AbstractCheckboxGroupTests()
     @Nested inner class DetailsTests : AbstractDetailsTests()
     @Nested inner class MessageTests : AbstractMessageTests()
+    @Nested inner class HasValidationTests : AbstractHasValidationTests()
+    @Nested inner class TabsTests : AbstractTabsTests()
 }
 
 /**
@@ -64,12 +66,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("HasValidation") {
-        hasValidationTests()
-    }
-    group("Tabs") {
-        tabsTestbatch()
-    }
     group("RichTextEditor") {
         richTextEditorTests()
     }

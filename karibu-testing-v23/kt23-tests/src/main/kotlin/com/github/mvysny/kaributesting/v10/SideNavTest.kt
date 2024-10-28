@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.karibudsl.v23.item
 import com.github.mvysny.karibudsl.v23.route
 import com.github.mvysny.karibudsl.v23.sideNav
@@ -11,17 +9,19 @@ import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.sidenav.SideNav
 import com.vaadin.flow.component.sidenav.SideNavItem
 import com.vaadin.flow.router.NavigationTrigger
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.myapp.AdminView
 import org.myapp.LoginView
 import org.myapp.routes
 import kotlin.test.expect
 
-@DynaTestDsl
-fun DynaNodeGroup.sideNavTests() {
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractSideNavTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("lookup") {
+    @Test fun lookup() {
         UI.getCurrent().sideNav {
             route(LoginView::class, VaadinIcon.QUESTION) {
                 item("Hello!")
@@ -42,13 +42,13 @@ fun DynaNodeGroup.sideNavTests() {
         _expectOne<SideNavItem> { label = "AdminView" }
     }
 
-    test("lookup2") {
+    @Test fun lookup2() {
         UI.getCurrent().sideNav("label23")
         _expectOne<SideNav> { label = "label23" }
         _expectNone<SideNav> { label = "label22" }
     }
 
-    test("click()") {
+    @Test fun click() {
         lateinit var trigger: NavigationTrigger
         UI.getCurrent().addBeforeEnterListener { e -> trigger = e.trigger }
         SideNavItem("foo", LoginView::class.java)._click()
@@ -58,7 +58,7 @@ fun DynaNodeGroup.sideNavTests() {
         _expectOne<AdminView>()
     }
 
-    test("toPrettyString()") {
+    @Test fun toPrettyString() {
         expect("SideNav[label='label']") { SideNav("label").toPrettyString() }
         expect("SideNavItem[label='foo', @path='login']") { SideNavItem("foo", LoginView::class.java).toPrettyString() }
         expect("SideNavItem[label='bar', @path='admin']") { SideNavItem("bar", "admin").toPrettyString() }

@@ -25,7 +25,6 @@ class InMemoryPrintStream(private val bout: ByteArrayOutputStream = ByteArrayOut
  * @return the exception thrown, so that you can assert on it.
  */
 fun <T: Throwable> expectThrows(clazz: KClass<out T>, expectMessage: String = "", block: ()->Unit): T {
-    // tests for this function are present in the dynatest-engine project
     val ex = assertFailsWith(clazz, block)
     if (!(ex.message ?: "").contains(expectMessage)) {
         throw AssertionError("${clazz.javaObjectType.name} message: Expected '$expectMessage' but was '${ex.message}'", ex)

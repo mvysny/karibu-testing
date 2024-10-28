@@ -204,10 +204,6 @@ public class MyUITest {
 }
 ```
 
-> **Tip for Kotlin users:** We're using the [DynaTest](https://github.com/mvysny/dynatest)
-> testing framework which runs on top of JUnit5. You can of course use whichever
-> testing library you prefer.
-
 We can verify that everything is prepared correctly, simply by obtaining the current UI contents and asserting that it is a `MainView` (since our
 simple testing app uses `MainView` as the root route):
 
@@ -299,11 +295,13 @@ With this arsenal at hand, we can rewrite the test:
 
 Kotlin:
 ```kotlin
-class MainViewTest: DynaTest({
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
+class MainViewTest {
+    companion object {
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic fun scanForRoutes { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
     test("test greeting") {
         // simulate a button click as if clicked by the user
@@ -312,7 +310,7 @@ class MainViewTest: DynaTest({
         // look up the Example Template and assert on its value
         expect("Clicked!") { _get<ExampleTemplate>().value }
     }
-})
+}
 ``` 
 
 Java:

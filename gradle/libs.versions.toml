@@ -10,7 +10,6 @@ vaadin24next = "24.5.2"
 vaadin24next_spring = "24.5.0"
 
 [libraries]
-dynatest = "com.github.mvysny.dynatest:dynatest:0.25"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 kaributools = { module = "com.github.mvysny.karibu-tools:karibu-tools", version.ref = "kaributools" }

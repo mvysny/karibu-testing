@@ -1,16 +1,16 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.vaadin.flow.component.login.LoginOverlay
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.expect
 
-@DynaTestDsl
-fun DynaNodeGroup.loginFormTestbatch() {
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
+abstract class AbstractLoginFormTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    test("login event") {
+    @Test fun `login event`() {
         var loginCalled = false
         LoginOverlay().apply {
             addLoginListener {
@@ -24,7 +24,7 @@ fun DynaNodeGroup.loginFormTestbatch() {
         expect(true) { loginCalled }
     }
 
-    test("forgot password event") {
+    @Test fun `forgot password event`() {
         var forgotPasswordCalled = false
         LoginOverlay().apply {
             addForgotPasswordListener {

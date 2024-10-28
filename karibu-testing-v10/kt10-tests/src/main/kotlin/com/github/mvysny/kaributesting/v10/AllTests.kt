@@ -40,6 +40,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class GridProTests : AbstractGridProTests()
     @Nested inner class ConfirmDialogTests : AbstractConfirmDialogTests()
     @Nested inner class UploadTests : AbstractUploadTests()
+    @Nested inner class LoginFormTests : AbstractLoginFormTests()
 }
 
 /**
@@ -52,9 +53,6 @@ fun DynaNodeGroup.allTests(isModuleTest: Boolean) {
         Locale.setDefault(Locale.ENGLISH)
     }
 
-    group("login form test") {
-        loginFormTestbatch()
-    }
     group("form layout test") {
         formLayoutTest()
     }

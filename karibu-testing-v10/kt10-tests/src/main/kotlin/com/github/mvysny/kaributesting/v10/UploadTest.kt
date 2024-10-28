@@ -1,29 +1,28 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.dynatest.DynaNodeGroup
-import com.github.mvysny.dynatest.DynaTestDsl
 import com.github.mvysny.dynatest.expectThrows
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import kotlin.test.expect
 import kotlin.test.fail
 
-@DynaTestDsl
-internal fun DynaNodeGroup.uploadTestbatch() {
+abstract class AbstractUploadTests() {
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
-    beforeEach { MockVaadin.setup() }
-    afterEach { MockVaadin.tearDown() }
-
-    test("smoke") {
+    @Test fun smoke() {
         UI.getCurrent().add(Upload())
         _expectOne<Upload>()
     }
 
-    test("successful upload") {
+    @Test fun `successful upload`() {
         val upload = Upload()
         val memoryBuffer = MemoryBuffer()
         upload.receiver = memoryBuffer
@@ -58,7 +57,7 @@ internal fun DynaNodeGroup.uploadTestbatch() {
         expect("text/plain") { memoryBuffer.fileData.mimeType }
     }
 
-    test("unsuccessful upload") {
+    @Test fun `unsuccessful upload`() {
         val upload = Upload()
         upload.receiver = Receiver { fileName, mimeType ->
             expect("hello.txt") { fileName }
@@ -95,7 +94,7 @@ internal fun DynaNodeGroup.uploadTestbatch() {
         expect(true) { finishedCalled }
     }
 
-    test("failed upload") {
+    @Test fun `failed upload`() {
         val upload = Upload()
         upload.receiver = Receiver { fileName, mimeType ->
             expect("hello.txt") { fileName }

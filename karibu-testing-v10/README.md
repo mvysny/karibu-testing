@@ -73,13 +73,13 @@ We want to test the component so that a call to the `greet("world")` function wi
 
 Kotlin:
 ```kotlin
-class MyUITest : DynaTest({
-    test("proper greeting") {
+class MyUITest {
+    @Test fun `proper greeting`() {
         val label = GreetingLabel()
         label.greet("world")
         expect("Hello, world") { label.text }
     }
-})
+}
 ```
 
 Java:
@@ -171,13 +171,15 @@ to provide the auto-detected set of `@Route`s to the function:
 
 Kotlin:
 ```kotlin
-class MyUITest : DynaTest({
-    // initialize routes only once, to avoid view auto-detection before every test and to speed up the tests
-    lateinit var routes: Routes
-    beforeGroup { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
-    beforeEach { MockVaadin.setup(routes) }
-    afterEach { MockVaadin.tearDown() }
-})
+class MyUITest {
+    companion object {
+        // initialize routes only once, to avoid view auto-detection before every test and to speed up the tests
+        lateinit var routes: Routes
+        @BeforeAll @JvmStatic scanForRoutes() { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+    }
+    @BeforeEach fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach tearDownVaadin() { MockVaadin.tearDown() }
+}
 ```
 Java, Groovy:
 ```java

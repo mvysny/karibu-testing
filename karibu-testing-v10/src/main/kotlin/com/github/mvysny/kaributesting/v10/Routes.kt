@@ -24,6 +24,7 @@ import kotlin.test.expect
  * To speed up the tests, you can create one instance of this class only, then reuse that instance in every
  * call to [MockVaadin.setup].
  * @property routes a list of all route views in your application. Vaadin will ignore any routes not present here.
+ * Also includes all automatic [Layout]s (since V24.5).
  * @property errorRoutes a list of all route views in your application. Vaadin will ignore any routes not present here.
  * @property skipPwaInit if true, the PWA initialization code is skipped in Vaadin, which dramatically speeds up
  * the [MockVaadin.setup] from 2 seconds to 50ms. Since that's usually what you want to do, this defaults to true.
@@ -77,6 +78,9 @@ public data class Routes(
                 .acceptPackages(*(if (packageName == null) arrayOf() else arrayOf(packageName)))
         classGraph.scan().use { scanResult: ScanResult ->
             scanResult.getClassesWithAnnotation(Route::class.java.name).mapTo(routes) { info: ClassInfo ->
+                Class.forName(info.name).asSubclass(Component::class.java)
+            }
+            scanResult.getClassesWithAnnotation(Layout::class.java.name).mapTo(routes) { info: ClassInfo ->
                 Class.forName(info.name).asSubclass(Component::class.java)
             }
             scanResult.getClassesImplementing(HasErrorParameter::class.java.name).mapTo(errorRoutes) { info: ClassInfo ->

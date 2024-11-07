@@ -167,7 +167,7 @@ abstract class AbstractBasicUtilsTests {
     }
 }
 
-@Route("testing")
+@Route("testing", autoLayout = false)
 class TestingView : VerticalLayout()
 
 class ErrorView : VerticalLayout(), HasErrorParameter<Exception> {

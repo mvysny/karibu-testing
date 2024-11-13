@@ -25,7 +25,6 @@ class FormLayoutUtilsTest {
     void apiTest() {
         def tf = new TextField()
         FormLayout.FormItem item = new FormLayout().addFormItem(tf, "foo")
-        assertEquals("foo", item.caption)
         assertEquals(tf, item.field)
     }
 }

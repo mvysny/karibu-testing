@@ -56,34 +56,6 @@ class BasicUtils {
     }
 
     /**
-     * Determines the component's `label` (usually it's the HTML element's `label` property,
-     * but it's {@link com.vaadin.flow.component.checkbox.Checkbox#getLabel()} for checkbox).
-     * Intended to be used for fields such as a TextField.
-     */
-    @NotNull
-    static String getLabel(@NotNull Component self) {
-        return ComponentUtilsKt.getLabel(self)
-    }
-    static void setLabel(@NotNull Component self, @NotNull String label) {
-        ComponentUtilsKt.setLabel(self, label)
-    }
-
-    /**
-     * The Component's caption: {@link com.vaadin.flow.component.button.Button#getText()} for a Button,
-     * {@link #getLabel(com.vaadin.flow.component.Component)} for fields such as a TextField.
-     * <p></p>
-     * For FormItem: Concatenates texts from all elements placed in the `label` slot. This effectively
-     * returns whatever was provided in the String label via [FormLayout.addFormItem].
-     */
-    @NotNull
-    static String getCaption(@NotNull Component self) {
-        return ComponentUtilsKt.getCaption(self)
-    }
-    static void setCaption(@NotNull Component self, @NotNull String caption) {
-        ComponentUtilsKt.setCaption(self, caption)
-    }
-
-    /**
      * The same as {@link Component#getId()} but without Optional.
      * <p></p>
      * Workaround for https://github.com/vaadin/flow/issues/664
@@ -91,15 +63,6 @@ class BasicUtils {
     @Nullable
     static String getId_(@NotNull Component self) {
         return BasicUtilsKt.getId_(self)
-    }
-
-    /**
-     * Checks whether the component is attached to the UI.
-     * <p></p>
-     * Returns true for attached components even if the UI itself is closed.
-     */
-    static boolean isAttached(@NotNull Component self) {
-        return ComponentUtilsKt.isAttached(self)
     }
 
     /**
@@ -175,9 +138,11 @@ class BasicUtils {
 
     // modify when this is fixed: https://github.com/vaadin/flow/issues/4068
     @Nullable
+    @CompileDynamic // workaround for NPE bug in Groovy compiler
     static String getPlaceholder(@NotNull Component self) {
         return ComponentUtilsKt.getPlaceholder(self)
     }
+    @CompileDynamic // workaround for NPE bug in Groovy compiler
     static void setPlaceholder(@NotNull Component self, @Nullable String placeholder) {
         ComponentUtilsKt.setPlaceholder(self, placeholder)
     }
@@ -185,6 +150,7 @@ class BasicUtils {
     /**
      * Removes the component from its parent. Does nothing if the component does not have a parent.
      */
+    @CompileDynamic // workaround for NPE bug in Groovy compiler
     static void removeFromParent(@NotNull Component self) {
         ComponentUtilsKt.removeFromParent(self)
     }

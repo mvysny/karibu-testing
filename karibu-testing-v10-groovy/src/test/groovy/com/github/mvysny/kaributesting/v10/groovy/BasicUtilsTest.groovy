@@ -36,8 +36,6 @@ class BasicUtilsTest {
         new Button()._fireDomEvent("foo")
         new Checkbox().getLabel()
         new Checkbox().setLabel("foo")
-        new Checkbox().getCaption()
-        new Checkbox().setCaption("foo")
         new TextField().id_
         UI.current.isAttached()
         UI.current._isVisible

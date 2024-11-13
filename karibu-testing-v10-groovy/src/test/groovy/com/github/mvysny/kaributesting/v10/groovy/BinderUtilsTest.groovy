@@ -29,7 +29,7 @@ class BinderUtilsTest {
 
         def tf = new TextField()
         tf.assertValid()
-        tf.invalid = true
+        tf.setInvalid(true)
         tf.assertInvalid()
         UI.getCurrent().assertAllFieldsValid()
     }

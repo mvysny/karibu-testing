@@ -1673,6 +1673,33 @@ Therefore, `MockVaadin.clientRoundtrip()` is called from `TestingLifecycleHook.a
 
 You can change this behavior by providing your own `TestingLifecycleHook` implementation as described above.
 
+## JavaScript
+
+Whenever a JavaScript execution is scheduled (e.g. via `Element.executeJs()`), it's possible to
+capture such call and return a meaningful value. The easiest way is to add a handler
+to `pendingJavascriptInvocationHandlers` (`TestingLifecycleHookKt.getPendingJavascriptInvocationHandlers()`):
+
+```kotlin
+// register a handler; don't forget to unregister at the end of the test so that
+// old handlers won't interfere with new ones. Alternatively, populate once before any of your tests are run.
+pendingJavascriptInvocationHandlers.add { it ->
+    if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
+        it.complete(Json.create("something"))
+    }
+}
+lateinit var result: JsonValue
+val btn = UI.getCurrent().button {
+    onClick {
+        element.executeJs("return this.getBoundingClientRect();")
+            .then { result = it }
+    }
+}
+btn._click()
+MockVaadin.clientRoundtrip() // necessary, to run the handlers
+```
+
+Since Karibu-Testing 2.2.1.
+
 # Advanced Topics
 
 ## Testing Asynchronous Application

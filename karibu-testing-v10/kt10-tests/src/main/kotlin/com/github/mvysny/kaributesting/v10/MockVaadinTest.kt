@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.onClick
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.github.mvysny.karibudsl.v10.text
 import com.github.mvysny.karibudsl.v10.verticalLayout
@@ -17,10 +18,14 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.page.ExtendedClientDetails
+import com.vaadin.flow.component.page.PendingJavaScriptResult
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.auth.AnonymousAllowed
+import elemental.json.Json
+import elemental.json.JsonObject
+import elemental.json.JsonValue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -545,6 +550,44 @@ abstract class AbstractMockVaadinTests() {
 
             // make sure that every thread called the service
             expect(4) { service.getCount() }
+        }
+
+        @Nested inner class javascript {
+            @AfterEach fun cleanup() {
+                pendingJavascriptInvocationHandlers.clear()
+            }
+
+            @Test fun javascriptCallsGoThroughHandlers() {
+                pendingJavascriptInvocationHandlers.add { it ->
+                    if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
+                        it.complete(Json.create("Success!"))
+                    }
+                }
+                lateinit var result: JsonValue
+                UI.getCurrent().button {
+                    element.executeJs("return this.getBoundingClientRect();").then { result = it }
+                }
+                MockVaadin.clientRoundtrip()
+                expect("\"Success!\"") { result.toJson() }
+            }
+
+            @Test fun javascriptHandlersCalledAutomatically() {
+                pendingJavascriptInvocationHandlers.add { it ->
+                    if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
+                        it.complete(Json.create("Success!"))
+                    }
+                }
+                lateinit var result: JsonValue
+                val btn = UI.getCurrent().button {
+                    onClick {
+                        element.executeJs("return this.getBoundingClientRect();")
+                            .then { result = it }
+                    }
+                }
+                btn._click()
+                MockVaadin.clientRoundtrip() // still necessary
+                expect("\"Success!\"") { result.toJson() }
+            }
         }
     }
 

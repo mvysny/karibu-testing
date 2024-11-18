@@ -10,6 +10,7 @@ import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.contextmenu.SubMenuBase
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.internal.PendingJavaScriptInvocation
 import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.sidenav.SideNav
@@ -87,6 +88,17 @@ public interface TestingLifecycleHook {
      * The default implementation only covers the Vaadin built-in components.
      */
     public fun getLabel(component: Component): String?
+
+    /**
+     * Invoked by [MockVaadin.clientRoundtrip] to handle any pending javascript invocations.
+     *
+     * The default implementation calls all [pendingJavascriptInvocationHandlers].
+     */
+    public fun handlePendingJavascriptInvocations(invocations: List<PendingJavaScriptInvocation>) {
+        invocations.forEach { invocation ->
+            pendingJavascriptInvocationHandlers.forEach { it.invoke(invocation) }
+        }
+    }
 
     public companion object {
         /**
@@ -217,6 +229,16 @@ public var fakeExtendedClientDetails: Boolean = true
  * where exactly you can hook into. The best way is to delegate to the [TestingLifecycleHook.default] implementation.
  */
 public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.default
+
+/**
+ * Called by default from [TestingLifecycleHook.handlePendingJavascriptInvocations].
+ * You can register your custom handlers here; they can decide to
+ * * ignore the call and do nothing;
+ * * Call [PendingJavaScriptInvocation.complete] to complete the invocation successfully
+ * * Call [PendingJavaScriptInvocation.completeExceptionally] to complete the invocation with an error.
+ * An empty list by default.
+ */
+public var pendingJavascriptInvocationHandlers: MutableList<(PendingJavaScriptInvocation) -> Unit> = mutableListOf()
 
 /**
  * Checks whether given [component] is a dialog and needs to be removed from the UI.

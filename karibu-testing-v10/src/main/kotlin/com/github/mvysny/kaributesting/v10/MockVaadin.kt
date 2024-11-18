@@ -304,6 +304,7 @@ public object MockVaadin {
         runUIQueue()
         UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
         cleanupDialogs()
+        testingLifecycleHook.handlePendingJavascriptInvocations(UI.getCurrent().internals.dumpPendingJavaScriptInvocations())
     }
 
     /**

@@ -1695,7 +1695,8 @@ val btn = UI.getCurrent().button {
     }
 }
 btn._click()
-MockVaadin.clientRoundtrip() // necessary, to run the handlers
+MockVaadin.clientRoundtrip() // necessary, to run the handlers. However, this is called automatically
+// if your looks up a component as a next action.
 ```
 
 Since Karibu-Testing 2.2.1.

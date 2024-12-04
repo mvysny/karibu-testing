@@ -84,7 +84,15 @@ Karibu-Testing is compatible with any Vaadin 14+ version (14, 15, 16, 17, 18, 19
 
 ### Vaadin 8
 
-**>>>See [The main Karibu-Testing documentation for Vaadin 8](../../tree/1.3.x/karibu-testing-v8) <<<**. Karibu-Testing is compatible with any Vaadin 8.x version.
+**>>>See [The main Karibu-Testing documentation for Vaadin 8](../../tree/1.4.x/karibu-testing-v8) <<<**.
+Karibu-Testing is compatible with any Vaadin 8.x version.
+
+**Important:** Vaadin 8 has [reached an end-of-life at Feb 2022](https://vaadin.com/vaadin-8)
+and is no longer maintained by Vaadin for free. You can get new releases of Vaadin 8 but only
+as a commercial offering from Vaadin. There are even Vaadin 8 builds which use the `jakarta` APIs
+instead of `javax`, but [Karibu-Testing doesn't support jakarta Vaadin 8 at the moment](https://github.com/mvysny/karibu-testing/issues/178).
+Karibu-Testing support for Vaadin 8 javax is currently in hibernation: no maintenance
+is done at this moment.
 
 ## Why Unit-testing?
 

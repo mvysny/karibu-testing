@@ -1,6 +1,20 @@
 [![GitHub tag](https://img.shields.io/github/tag/mvysny/karibu-testing.svg)](https://github.com/mvysny/karibu-testing/tags)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing-v8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mvysny.kaributesting/karibu-testing-v8)
 
+**Important:** Vaadin 8 has [reached an end-of-life at Feb 2022](https://vaadin.com/vaadin-8)
+and is no longer maintained by Vaadin for free. You can get new releases of Vaadin 8 but only
+as a commercial offering from Vaadin. There are even Vaadin 8 builds which use the `jakarta` APIs
+instead of `javax`, but [Karibu-Testing doesn't support jakarta Vaadin 8 at the moment](https://github.com/mvysny/karibu-testing/issues/178).
+Karibu-Testing support for Vaadin 8 javax is currently in hibernation: no maintenance
+is done at this moment.
+
+Compatibility matrix:
+
+| Vaadin 8  | Supported | Maintained | Supported JVM | Karibu-Testing version |
+|-----------|-----------|------------|---------------|------------------------|
+| `javax`   | yes       | maybe      | 1.8+          | 1.4.x                  |
+| `jakarta` | no        | no         | 1.8+          | -                      |
+
 # Getting started: Vaadin 8
 
 To start, just add the following lines into your Gradle `build.gradle` file:

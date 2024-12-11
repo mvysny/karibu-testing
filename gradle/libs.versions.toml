@@ -1,13 +1,13 @@
 [versions]
 slf4j = "2.0.13"
-kaributools = "0.22"
-karibudsl = "2.1.3"
+kaributools = "0.23"
+karibudsl = "2.2.0"
 junit5 = "5.11.0"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "24.5.7"
+vaadin24 = "24.5.8"
 vaadin24_spring = "24.5.0"
-vaadin24next = "24.6.0.beta3"
-vaadin24next_spring = "24.6.0.beta3"
+vaadin24next = "24.6.0.beta4"
+vaadin24next_spring = "24.6.0.beta4"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }

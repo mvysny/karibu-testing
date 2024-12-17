@@ -7,9 +7,6 @@ import com.vaadin.flow.spring.SpringVaadinSession;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * A Vaadin Session with one important difference:
  *

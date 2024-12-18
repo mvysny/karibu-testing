@@ -1989,7 +1989,8 @@ RichTextEditorsKt._setHtmlValue(rte, "<b>hello</b>");
 It's possible to override `HttpRequest.getUserPrincipal()` and `isUserInRole()`; see the
 `MockRequest` class for more details. It's even
 possible to provide a custom implementation of `MockRequest` by modifying the
-`MockVaadin.mockRequestFactory` closure accordingly.
+`MockVaadin.mockRequestFactory` closure accordingly; see [issue #180](https://github.com/mvysny/karibu-testing/issues/180)
+for more details.
 
 An example which will fool
 Vaadin's `AccessAnnotationChecker` and `ViewAccessChecker`:
@@ -1998,6 +1999,22 @@ Vaadin's `AccessAnnotationChecker` and `ViewAccessChecker`:
 currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
 currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
 ```
+
+### `AccessDeniedException`
+
+In Unit Testing, the fail-eagerly principle is preferred: if an exception is thrown during testing, the test wants to learn and throw the original exception,
+so that the test failure can be analyzed and the cause can be understood quickly. In this case, if an `AccessDeniedException` is thrown by the app,
+I'd want the test to fail quickly with the `AccessDeniedException` as well.
+
+This is implemented by Karibu-Testing auto-registering the `MockRouteAccessDeniedError` page to Vaadin,
+which simply rethrows the `AccessDeniedException`. This is the default behavior of Karibu-Testing.
+
+However, you may want to emulate the default Vaadin behavior: redirecting to `NotFoundException` in production mode when access is denied.
+This can be achieved easily, by removing the `MockRouteAccessDeniedError` from Karibu-Testing `Routes`:
+```kotlin
+routes.errorRoutes.remove(MockRouteAccessDeniedError::class.java)
+```
+See [issue #179](https://github.com/mvysny/karibu-testing/issues/179) for more information.
 
 # MPR (Multi-Platform Runtime)
 

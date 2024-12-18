@@ -4,6 +4,9 @@ simple example projects that might help you get started.
 Please see [t-shirt shop example](https://github.com/mvysny/t-shirt-shop-example) on
 an example on how to use Karibu-Testing with a Spring app.
 
+Please see [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
+on an example for Spring+Karibu-Testing example project.
+
 ## Adding to your project
 
 Add the following dependencies to your project's `pom.xml`:

@@ -1402,8 +1402,7 @@ LoginFormKt._forgotPassword(_get(LoginOverlay.class));
 Note on Spring Security: Usually `LoginOverlay.setAction("login");` is used, to push the
 username+password through the Spring Security Filter. However, with Karibu-Testing
 there's no Servlet container, hence no Spring Security Filter is triggered by the POST action.
-Workaround is to perform the login programmatically. See [Issue #47](https://github.com/mvysny/karibu-testing/issues/47)
-and [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
+Workaround is to perform the login programmatically. See [Karibu-Testing-Spring](../karibu-testing-v10-spring/)
 for more details.
 
 ### Support for fields nested in FormLayout.FormItem

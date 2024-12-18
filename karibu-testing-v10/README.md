@@ -22,10 +22,11 @@ To start, just add the following lines into your Gradle `build.gradle` file:
 
 ```groovy
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 dependencies {
-    testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10:x.y.z")
+  testImplementation("com.github.mvysny.kaributesting:karibu-testing-v10:x.y.z")
+  testImplementation("com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z") // to bring in Vaadin 23+ specific bits
 }
 ```
 
@@ -43,18 +44,25 @@ to your `pom.xml`:
 
 ```xml
 <project>
-	<dependencies>
-		<dependency>
-			<groupId>com.github.mvysny.kaributesting</groupId>
-			<artifactId>karibu-testing-v10</artifactId>
-			<version>x.y.z</version>
-			<scope>test</scope>
-		</dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.mvysny.kaributesting</groupId>
+      <artifactId>karibu-testing-v10</artifactId>
+      <version>x.y.z</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- to bring in Vaadin 23+ specific bits -->
+    <dependency>
+      <groupId>com.github.mvysny.kaributesting</groupId>
+      <artifactId>karibu-testing-v23</artifactId>
+      <version>x.y.z</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
 ```
 
-For additional support for **Vaadin 23** (e.g. support for testing Vaadin 23 components such as `VirtualList`
+For additional support for **Vaadin 23+** (e.g. support for testing Vaadin 23 components such as `VirtualList`
 and `MultiselectComboBox`), use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
 
 You will also need to add the Kotlin language support into your project, to at least compile the testing classes: [Setup Kotlin Using Gradle](https://kotlinlang.org/docs/reference/using-gradle.html).
@@ -176,10 +184,10 @@ class MyUITest {
     companion object {
         // initialize routes only once, to avoid view auto-detection before every test and to speed up the tests
         lateinit var routes: Routes
-        @BeforeAll @JvmStatic scanForRoutes() { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
+        @BeforeAll @JvmStatic fun scanForRoutes() { routes = Routes().autoDiscoverViews("com.vaadin.flow.demo") }
     }
-    @BeforeEach fakeVaadin() { MockVaadin.setup(routes) }
-    @AfterEach tearDownVaadin() { MockVaadin.tearDown() }
+    @BeforeEach fun fakeVaadin() { MockVaadin.setup(routes) }
+    @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 }
 ```
 Java, Groovy:

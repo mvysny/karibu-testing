@@ -16,13 +16,13 @@ Add the following dependencies to your project's `pom.xml`:
     <dependency>
         <groupId>com.github.mvysny.kaributesting</groupId>
         <artifactId>karibu-testing-v10-spring</artifactId>
-        <version>1.3.23</version>
+        <version>x.y.z</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.github.mvysny.kaributesting</groupId>
         <artifactId>karibu-testing-v23</artifactId>
-        <version>1.3.23</version>
+        <version>x.y.z</version>
         <scope>test</scope>
     </dependency>
 </dependencies>

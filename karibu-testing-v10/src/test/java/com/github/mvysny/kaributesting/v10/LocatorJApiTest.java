@@ -61,6 +61,8 @@ public class LocatorJApiTest {
         _click(new Button());
         _click(new Icon());
         _setValue(new TextField(), "John");
+        _setValue(new TextField(), "John", true);
+        _setValue(new TextField(), "John", false);
         _fireValueChange(new TextField());
 
         @SuppressWarnings("unchecked")

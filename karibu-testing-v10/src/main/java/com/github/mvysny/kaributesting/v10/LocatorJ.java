@@ -128,7 +128,7 @@ public class LocatorJ {
      * mirror the <code>fromClient</code> parameter.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
-    static <V> void _setValue(@NotNull HasValue<?, V> self, @Nullable V value, boolean fromClient) {
+    public static <V> void _setValue(@NotNull HasValue<?, V> self, @Nullable V value, boolean fromClient) {
         HasValueUtilsKt._setValue(self, value, fromClient);
     }
 

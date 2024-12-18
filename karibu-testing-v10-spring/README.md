@@ -1,7 +1,6 @@
-Karibu-Testing doesn't officially support Spring. However, there are couple of very
-simple example projects that might help you get started.
+# Karibu-Testing Spring Integration
 
-Please see [t-shirt shop example](https://github.com/mvysny/t-shirt-shop-example) on
+Karibu-Testing offers basic support for Spring. Please see [t-shirt shop example](https://github.com/mvysny/t-shirt-shop-example) for
 an example on how to use Karibu-Testing with a Spring app.
 
 Please see [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
@@ -38,7 +37,8 @@ and `MultiselectComboBox`.
 Spring Security is not supported out-of-the-box: Spring Security usually uses Servlet Filter
 which requires Servlet Container to be up and running, yet Karibu-Testing doesn't
 start any Servlet Container. See [Issue #47](https://github.com/mvysny/karibu-testing/issues/47)
-for more details.
+for more details. One of the workarounds is to [Manually Authenticate User with Spring Security](https://www.baeldung.com/manually-set-user-authentication-spring-security),
+before navigating to a view.
 
 There are ways to enable Spring Security in Karibu's faked environment though, please
 take a look at [issue #94](https://github.com/mvysny/karibu-testing/issues/94) and

@@ -198,6 +198,7 @@ public object MockVaadin {
      * Creates [MockRequest]; override if you need to return a class that extends [MockRequest]
      * and modifies its behavior.
      */
+    @JvmStatic
     public var mockRequestFactory: (FakeHttpSession) -> FakeRequest = { FakeRequest(it) }
 
     private fun createSession(ctx: ServletContext, uiFactory: () -> UI) {

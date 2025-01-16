@@ -29,7 +29,7 @@ public class MockVaadinJApiTest {
         MockVaadin.INSTANCE.setMockRequestFactory(session -> new FakeRequest(session) {
             @Override
             public @Nullable Principal getUserPrincipal() {
-                return null; // SecurityContextHolder.getContext().getAuthentication()
+                return null; // SecurityContextHolder.getContext().getAuthentication();
             }
         });
     }

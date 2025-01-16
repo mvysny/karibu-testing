@@ -56,7 +56,7 @@ Java:
 MockVaadin.INSTANCE.setMockRequestFactory(session -> new FakeRequest(session) {
     @Override
     public @Nullable Principal getUserPrincipal() {
-        return null; // SecurityContextHolder.getContext().getAuthentication()
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 });
 ```

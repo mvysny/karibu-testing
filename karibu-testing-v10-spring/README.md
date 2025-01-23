@@ -60,3 +60,10 @@ MockVaadin.INSTANCE.setMockRequestFactory(session -> new FakeRequest(session) {
     }
 });
 ```
+
+There are other ways too; please take a look at:
+
+* The [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
+  example app which demoes the Spring Security as well
+* [Browserless Testing of Vaadin Apps With Karibu Testing](https://martinelli.ch/browserless-testing-of-vaadin-applications-with-karibu-testing/)
+  by Simon Martinelli.

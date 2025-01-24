@@ -61,7 +61,12 @@ MockVaadin.INSTANCE.setMockRequestFactory(session -> new FakeRequest(session) {
 });
 ```
 
-There are other ways too; please take a look at:
+Note that this will only carry the currently logged-in user (Principal) from Spring Security
+over to the faked Vaadin environment - a job that's usually done by Spring servlet filter.
+In this faked environment the filter is not triggered, and therefore this manual step is necessary.
+Note that the code above **doesn't** log in the user: you'll need to
+log in user in Spring Security beforehand, either via annotations or manually.
+See below for an example on how to do that.
 
 * The [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
   example app which demoes the Spring Security as well

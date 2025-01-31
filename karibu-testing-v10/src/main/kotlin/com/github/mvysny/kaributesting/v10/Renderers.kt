@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.template
 import com.github.mvysny.kaributools.textRecursively
 import com.github.mvysny.kaributools.valueProvider
 import com.vaadin.flow.component.Component
@@ -32,11 +33,7 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
         component.toPrettyString()
     }
     this is LitRenderer -> {
-        // LitRenderer re-declares private members
-        val templateProperty = this::class.java.getDeclaredField("templateExpression")
-        templateProperty.isAccessible = true
-        val templateExpression = templateProperty.get(this) as String
-        val renderedLitTemplateHtml: String = renderLitTemplate(templateExpression, valueProviders, rowObject)
+        val renderedLitTemplateHtml: String = renderLitTemplate(template, valueProviders, rowObject)
         Jsoup.parse(renderedLitTemplateHtml).textRecursively
     }
     else -> null

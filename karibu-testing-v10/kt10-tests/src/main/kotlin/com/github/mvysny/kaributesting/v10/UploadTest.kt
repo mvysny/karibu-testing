@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
@@ -19,6 +20,13 @@ abstract class AbstractUploadTests() {
     @Test fun smoke() {
         UI.getCurrent().add(Upload())
         _expectOne<Upload>()
+    }
+
+    @Test fun uploadButtonDiscoverable() {
+        val upload = Upload()
+        upload.uploadButton = Span("Hello!")
+        UI.getCurrent().add(upload)
+        _expectOne<Span> { text = "Hello!" }
     }
 
     @Test fun `successful upload`() {

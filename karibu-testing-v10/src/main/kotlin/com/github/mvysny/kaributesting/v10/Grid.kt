@@ -367,6 +367,7 @@ public fun <T : Any> Grid<T>._getCellComponent(
  * and converts the result to string (even if the result is a [Component]).
  * @param rowIndex the row index, 0 or higher.
  * @param columnKey the column ID.
+ * @return null if the ComponentRenderer produced null Component.
  */
 @Suppress("UNCHECKED_CAST")
 public fun <T : Any> Grid<T>._getFormatted(
@@ -382,6 +383,7 @@ public fun <T : Any> Grid<T>._getFormatted(
  * Returns the formatted value as a String. Uses [getPresentationValue]
  * and converts the result to string (even if the result is a [Component]).
  * @param rowObject the bean
+ * @return an empty string if the ComponentRenderer produced null Component.
  */
 @Suppress("UNCHECKED_CAST")
 public fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
@@ -391,6 +393,8 @@ public fun <T : Any> Grid.Column<T>._getFormatted(rowObject: T): String =
  * Returns the formatted row as a list of Strings, one for every visible column.
  * Uses [_getFormatted].
  * @param rowObject the bean
+ * @return a list of strings, one for every visible column. May contain empty strings
+ * if the ComponentRenderer for a particular column produced null Component.
  */
 public fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
     columns.filter { it.isVisible }.map { it._getFormatted(rowObject) }
@@ -399,6 +403,8 @@ public fun <T : Any> Grid<T>._getFormattedRow(rowObject: T): List<String> =
  * Returns the formatted row as a list of Strings, one for every visible column.
  * Uses [_getFormatted]. Fails if the [rowIndex] is not within the limits.
  * @param rowIndex the index of the row, 0..size-1.
+ * @return a list of strings, one for every visible column. May contain empty strings
+ * if the ComponentRenderer for a particular column produced null Component.
  */
 public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
     val rowObject: T = _get(rowIndex)
@@ -409,6 +415,8 @@ public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
  * Returns the formatted row as a list of Strings, one for every visible column.
  * Uses [_getFormatted]. Returns null if the [rowIndex] is not within the limits.
  * @param rowIndex the index of the row, 0-based.
+ * @return a list of strings, one for every visible column. May contain empty strings
+ * if the ComponentRenderer for a particular column produced null Component.
  */
 public fun <T : Any> Grid<T>._getFormattedRowOrNull(rowIndex: Int): List<String>? {
     val rowObject: T = _getOrNull(rowIndex) ?: return null

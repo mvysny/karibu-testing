@@ -29,8 +29,8 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
         renderText(rowObject)
     }
     this is ComponentRenderer<*, T> -> {
-        val component: Component = createComponent(rowObject)
-        component.toPrettyString()
+        val component: Component? = createComponent(rowObject)
+        component?.toPrettyString() ?: ""
     }
     this is LitRenderer -> {
         val renderedLitTemplateHtml: String = renderLitTemplate(template, valueProviders, rowObject)

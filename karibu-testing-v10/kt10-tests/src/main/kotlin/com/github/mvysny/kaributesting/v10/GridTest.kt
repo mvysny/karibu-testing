@@ -13,6 +13,7 @@ import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.NativeLabel
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -164,17 +165,36 @@ abstract class AbstractGridTests {
         }
     }
 
-    @Test fun renderers() {
-        val grid = UI.getCurrent().grid<TestPerson> {
-            addColumnFor(TestPerson::name)
-            addColumn(NativeButtonRenderer<TestPerson>("View", { }))
-            addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
-            val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                    .withLocale(Locale.forLanguageTag("fi-FI"))
-            addColumn(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
+    @Nested inner class renderers {
+        @Test fun smoke() {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumnFor(TestPerson::name)
+                addColumn(NativeButtonRenderer<TestPerson>("View", { }))
+                addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
+                val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+                        .withLocale(Locale.forLanguageTag("fi-FI"))
+                addColumn(LocalDateRenderer<TestPerson>({ LocalDate.of(2019, 3, 1) }, { formatter }))
+            }
+            grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+            grid.expectRow(0, "name 0", "View", "Button[text='name 0']", "1.3.2019")
         }
-        grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
-        grid.expectRow(0, "name 0", "View", "Button[text='name 0']", "1.3.2019")
+        @Test fun componentRenderer() {
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumn(ComponentRenderer<Button, TestPerson> { it -> Button(it.name) })
+                addComponentColumn({ it -> Span(it.name) })
+            }
+            grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+            grid.expectRow(0, "Button[text='name 0']", "Span[text='name 0']")
+        }
+        @Test fun renderersProducingNulls() {  // yup, this is allowed in Grid, the cell is then simply empty.
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumn(ComponentRenderer<Button, TestPerson> { it -> null })
+                addComponentColumn({ it -> null })
+                addColumn(ValueProvider<TestPerson, String?> { it -> null })
+            }
+            grid.dataProvider = ListDataProvider<TestPerson>((0 until 7).map { TestPerson("name $it", it) })
+            grid.expectRow(0, "", "", "")
+        }
     }
 
     @Test fun `column with ValueProvider`() {

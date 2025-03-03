@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10.spring;
 import com.github.mvysny.kaributesting.v10.MockVaadin;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.SpringVaadinSession;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
  *   In order to do that, simply override {@link #close()}, call `super.close()` then call
  *   {@link MockVaadin#afterSessionClose}.</li>
  *   </ul>
+ * @deprecated use {@link com.github.mvysny.kaributesting.v10.mock.MockVaadinSession}.
  */
-public class MockSpringVaadinSession extends SpringVaadinSession {
+@Deprecated
+public class MockSpringVaadinSession extends VaadinSession {
     /**
      * Creates new UIs.
      */

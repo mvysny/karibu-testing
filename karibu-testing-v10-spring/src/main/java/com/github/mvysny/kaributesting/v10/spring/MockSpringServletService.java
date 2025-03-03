@@ -56,6 +56,8 @@ public class MockSpringServletService extends SpringVaadinServletService {
 
     @Override
     protected VaadinSession createVaadinSession(VaadinRequest request) {
+        // return MockVaadinSession when MockSpringVaadinSession is removed
+        //noinspection deprecation
         return new MockSpringVaadinSession(this, uiFactory);
     }
 

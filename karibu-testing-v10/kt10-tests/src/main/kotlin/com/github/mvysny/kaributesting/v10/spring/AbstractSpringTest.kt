@@ -8,7 +8,6 @@ import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinSession
 import com.vaadin.flow.spring.SpringServlet
 import com.vaadin.flow.spring.SpringVaadinServletService
-import com.vaadin.flow.spring.SpringVaadinSession
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,7 +43,6 @@ abstract class AbstractSpringTest {
     @Test
     fun testBasicEnv() {
         // check correct vaadin instances
-        VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService
 
         // check that the context is set: https://github.com/mvysny/karibu-testing/issues/128
@@ -57,12 +55,11 @@ abstract class AbstractSpringTest {
     @Test
     fun testDestroyListenersCalled() {
         // check correct vaadin instances
-        VaadinSession.getCurrent() as SpringVaadinSession
         VaadinService.getCurrent() as SpringVaadinServletService
 
         // verify that the "destroy listeners" are called
         var called = 0
-        (VaadinSession.getCurrent() as SpringVaadinSession).addDestroyListener { called++ }
+        VaadinSession.getCurrent().addSessionDestroyListener { called++ }
         MockVaadin.tearDown()
         expect(1) { called }
     }

@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.util.concurrent.ExecutionException
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
@@ -371,10 +372,32 @@ abstract class AbstractMockVaadinTests() {
         @Test fun `proper retrieval`() {
             // by default they're null but a mock one can be retrieved.
             expect(null) { UI.getCurrent().internals.extendedClientDetails }
-            lateinit var ecd: ExtendedClientDetails
+            var ecd: ExtendedClientDetails? = null
             UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
-            expect(false) { ecd.isTouchDevice }
+
+            // the ECD is not retrieved yet: we need to do this asynchronously
+            // See https://github.com/mvysny/karibu-testing/issues/184#issuecomment-2639789774
+            expect(null) { ecd }
+            MockVaadin.clientRoundtrip()
+            // now "ecd" is populated.
+            expect(false) { ecd!!.isTouchDevice }
             expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
+        }
+
+        @Test fun `double retrieval doesn't create new ECD instances`() {
+            // by default ECD is null but a mock one can be retrieved.
+            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            var ecd: ExtendedClientDetails? = null
+            UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
+            MockVaadin.clientRoundtrip()
+            checkNotNull(ecd)
+
+            // now try the second time. The retriever must not be called since the ECD
+            // is already retrieved.
+            var ecd2: ExtendedClientDetails? = null
+            UI.getCurrent().page.retrieveExtendedClientDetails { ecd2 = it }
+            // the closure must be run right away, and ecd2 must be populated.
+            expect(true) { ecd2 === ecd }
         }
 
         @Test fun `nothing is fetched when fakeExtendedClientDetails=false`() {

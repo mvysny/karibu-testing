@@ -437,8 +437,24 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
         MockVaadin.createUI(uiFactory, session)
     }
 
+    /**
+     * Karibu-Testing-faked retrieval of [ExtendedClientDetails].
+     *
+     * Note that the
+     * retrieval is emulated in a way as if it executed "asynchronously" - the
+     * [receiver] closure isn't run immediately (unless the ECD was already fetched).
+     * To run the [receiver], call [MockVaadin.clientRoundtrip].
+     *
+     * Also see [fakeExtendedClientDetails] for more details.
+     */
     override fun retrieveExtendedClientDetails(receiver: ExtendedClientDetailsReceiver) {
         if (!fakeExtendedClientDetails) {
+            super.retrieveExtendedClientDetails(receiver)
+            return
+        }
+
+        if (ui.internals.extendedClientDetails != null) {
+            // already retrieved. just call super - it will call receiver right away.
             super.retrieveExtendedClientDetails(receiver)
             return
         }
@@ -452,7 +468,10 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
             "10800000", "7200000", "3600000", "true", "Europe/Helsinki",
             null, "false", "1.0", "ROOT-2521314-0.2626611481", "Linux x86_64"
         ) as ExtendedClientDetails
-        ui.internals.extendedClientDetails = ecd
-        super.retrieveExtendedClientDetails(receiver)
+        // need to call this lazily: https://github.com/mvysny/karibu-testing/issues/184#issuecomment-2639789774
+        ui.access {
+            ui.internals.extendedClientDetails = ecd
+            super.retrieveExtendedClientDetails(receiver)
+        }
     }
 }

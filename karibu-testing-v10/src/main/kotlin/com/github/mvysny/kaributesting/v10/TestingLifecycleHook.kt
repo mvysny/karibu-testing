@@ -214,12 +214,12 @@ internal val Component.isTemplate: Boolean get() = this is LitTemplate
 public var includeVirtualChildrenInTemplates: Boolean = false
 
 /**
- * By default, Karibu fakes [MockPage.retrieveExtendedClientDetails]. However, it seems
- * to interfere with Spring in some way, see [Issue #129](https://github.com/mvysny/karibu-testing/issues/129)
- * for more details. To work around that ticket, set this to false.
+ * By default, Karibu fakes [MockPage.retrieveExtendedClientDetails].
  *
  * Turning this off will cause `@PreserveOnRefresh` not to work anymore, see [Issue #118](https://github.com/mvysny/karibu-testing/issues/118)
  * for more details.
+ *
+ * Expert setting: you most probably don't need to touch this!
  */
 public var fakeExtendedClientDetails: Boolean = true
 

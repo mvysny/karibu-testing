@@ -4,6 +4,7 @@ import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
 import com.github.mvysny.kaributesting.v10.TestingView
+import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinSession
@@ -70,6 +71,9 @@ abstract class AbstractSpringTest {
      */
     @Test
     fun testRouteScopedComponent() {
+        navigateTo<TestingView>() // to setup the route scope
+        // if we don't navigate to TestingView, the scope isn't established and there's
+        // no instance of RouteScopedComponent, and the bean retrieval would fail.
         val c = ctx.getBean(RouteScopedComponent::class.java)
         expect(true) { c != null }
     }

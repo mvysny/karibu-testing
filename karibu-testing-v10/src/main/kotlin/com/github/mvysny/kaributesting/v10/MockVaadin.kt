@@ -459,17 +459,16 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
             return
         }
 
-        // construct mock ExtendedClientDetails then set it to ui.internals, which will cause
-        // super to call receiver straight away.
-        val constructor: Constructor<*> = ExtendedClientDetails::class.java.declaredConstructors[0]
-        constructor.isAccessible = true
-        val ecd: ExtendedClientDetails = constructor.newInstance(
-            "1920", "1080", "1846", "939", "1846", "939",
-            "10800000", "7200000", "3600000", "true", "Europe/Helsinki",
-            null, "false", "1.0", "ROOT-2521314-0.2626611481", "Linux x86_64"
-        ) as ExtendedClientDetails
         // need to call this lazily: https://github.com/mvysny/karibu-testing/issues/184#issuecomment-2639789774
         ui.access {
+            // construct mock ExtendedClientDetails then set it to ui.internals
+            val constructor: Constructor<*> = ExtendedClientDetails::class.java.declaredConstructors[0]
+            constructor.isAccessible = true
+            val ecd: ExtendedClientDetails = constructor.newInstance(
+                "1920", "1080", "1846", "939", "1846", "939",
+                "10800000", "7200000", "3600000", "true", "Europe/Helsinki",
+                null, "false", "1.0", "ROOT-2521314-0.2626611481", "Linux x86_64"
+            ) as ExtendedClientDetails
             ui.internals.extendedClientDetails = ecd
             super.retrieveExtendedClientDetails(receiver)
         }

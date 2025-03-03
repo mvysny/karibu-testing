@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationContext;
  * <ul>
  *     <li>Overrides {@link #isAtmosphereAvailable} to tell Vaadin that we don't have Atmosphere (otherwise Vaadin will crash)</li>
  *     <li>Provides some dummy value as a root ID via {@link #getMainDivId} (otherwise the mocked servlet env will crash).</li>
- *     <li>Provides a {@link MockSpringVaadinSession} instead of {@link com.vaadin.flow.spring.SpringVaadinSession}.</li>
  * </ul>
  * The class is intentionally opened, to be extensible in user's library.
  */

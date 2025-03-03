@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10.spring
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.github.mvysny.kaributesting.v10.mock.MockedUI
 import com.github.mvysny.kaributesting.v10.Routes
+import com.github.mvysny.kaributesting.v10.TestingView
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinSession
@@ -27,7 +28,7 @@ import kotlin.test.expect
 @DirtiesContext
 abstract class AbstractSpringTest {
 
-    private val routes: Routes = Routes()
+    private val routes: Routes = Routes(mutableSetOf(TestingView::class.java))
 
     @Autowired
     private lateinit var ctx: ApplicationContext
@@ -62,6 +63,15 @@ abstract class AbstractSpringTest {
         VaadinSession.getCurrent().addSessionDestroyListener { called++ }
         MockVaadin.tearDown()
         expect(1) { called }
+    }
+
+    /**
+     * Tests https://github.com/mvysny/karibu-testing/issues/184
+     */
+    @Test
+    fun testRouteScopedComponent() {
+        val c = ctx.getBean(RouteScopedComponent::class.java)
+        expect(true) { c != null }
     }
 
     @AfterEach

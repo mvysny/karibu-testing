@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Span
 import org.junit.jupiter.api.AfterEach
@@ -18,5 +19,16 @@ abstract class AbstractDialog23_1tests() {
         dialog.open()
         _expectOne<Span> { text = "Foo" }
         _expectOne<Button> { text = "Bar" }
+    }
+
+    @Test fun `lookup in ConfirmDialog`() {
+        val dlg = ConfirmDialog()
+        dlg.setCancelButton(Button("Cancel"))
+        dlg.setConfirmButton(Button("Confirm"))
+        dlg.setRejectButton(Button("Reject"))
+        dlg.open()
+        _expectOne<Button> { text = "Cancel" }
+        _expectOne<Button> { text = "Confirm" }
+        _expectOne<Button> { text = "Reject" }
     }
 }

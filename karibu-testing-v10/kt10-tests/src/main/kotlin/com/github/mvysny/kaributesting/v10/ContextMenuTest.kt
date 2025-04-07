@@ -6,6 +6,7 @@ import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.contextmenu.MenuItem
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import com.vaadin.flow.component.icon.VaadinIcon
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -279,6 +280,33 @@ abstract class AbstractContextMenuTests {
                     "└── GridContextMenu[]\n" +
                     "    └── GridMenuItem[text='click me']") {
                 cm._clickItemWithID("non-existing", "foo")
+            }
+        }
+        @Test fun `simple click by Icon`() {
+            lateinit var clicked: String
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item(VaadinIcon.MENU.create(), { e -> clicked = e!! })
+                }
+            }
+            cm._clickItemWithIcon(VaadinIcon.MENU.create(), "foo")
+            expect("foo") { clicked }
+        }
+        @Test fun `click by non-existing Icon fails`() {
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item(VaadinIcon.MENU.create(), { fail("should not be called") })
+                }
+            }
+            expectThrows<AssertionError>(
+                "No menu item with icon='vaadin:check' in GridContextMenu:\n" +
+                    "└── GridContextMenu[]\n" +
+                    "    └── GridMenuItem[icon='vaadin:menu']\n" +
+                    "        └── Icon[icon='vaadin:menu']"
+            ) {
+                cm._clickItemWithIcon(VaadinIcon.CHECK.create(), "foo")
             }
         }
         @Test fun `click toggles isChecked`() {

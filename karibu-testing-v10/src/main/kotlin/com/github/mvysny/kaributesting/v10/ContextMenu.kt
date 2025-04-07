@@ -2,15 +2,16 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.iconName
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.contextmenu.*
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import com.vaadin.flow.component.icon.Icon
 import elemental.json.Json
 import elemental.json.JsonObject
-import elemental.json.impl.JreJsonObject
 import java.lang.reflect.Method
 import kotlin.test.expect
 import kotlin.test.fail
@@ -50,6 +51,15 @@ public fun HasMenuItems._clickItemWithCaption(caption: String) {
  */
 public fun HasMenuItems._clickItemWithID(id: String) {
     _clickItemMatching(SearchSpec(MenuItemBase::class.java, id = id))
+}
+
+/**
+ * Tries to find a menu item with given [icon] and click it.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun HasMenuItems._clickItemWithIcon(icon: Icon) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon.iconName))
 }
 
 /**
@@ -99,6 +109,15 @@ public fun <T> GridContextMenu<T>._clickItemWithID(id: String, gridItem: T?) {
  */
 public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridItem: T?) {
     _clickItemMatching(SearchSpec(MenuItemBase::class.java, text = caption), gridItem)
+}
+
+/**
+ * Tries to find a menu item with given [icon] and click it, passing in given [gridItem].
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
+ * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
+ */
+public fun <T> GridContextMenu<T>._clickItemWithIcon(icon: Icon, gridItem: T?) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon.iconName), gridItem)
 }
 
 /**

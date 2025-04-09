@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.IconName
 import com.github.mvysny.kaributools.iconName
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
@@ -58,8 +59,8 @@ public fun HasMenuItems._clickItemWithID(id: String) {
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-public fun HasMenuItems._clickItemWithIcon(icon: Icon) {
-    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon.iconName))
+public fun HasMenuItems._clickItemWithIcon(icon: IconName) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon))
 }
 
 /**
@@ -116,8 +117,8 @@ public fun <T> GridContextMenu<T>._clickItemWithCaption(caption: String, gridIte
  * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible, or it's nested in
  * a menu item which is invisible or disabled, or it's attached to a component that's invisible.
  */
-public fun <T> GridContextMenu<T>._clickItemWithIcon(icon: Icon, gridItem: T?) {
-    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon.iconName), gridItem)
+public fun <T> GridContextMenu<T>._clickItemWithIcon(icon: IconName, gridItem: T?) {
+    _clickItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon), gridItem)
 }
 
 /**

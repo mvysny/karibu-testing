@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.karibudsl.v10.*
+import com.github.mvysny.kaributools.IconName
+import com.github.mvysny.kaributools.iconName
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.contextmenu.ContextMenu
 import com.vaadin.flow.component.contextmenu.MenuItem
@@ -290,7 +292,8 @@ abstract class AbstractContextMenuTests {
                     item(VaadinIcon.MENU.create(), { e -> clicked = e!! })
                 }
             }
-            cm._clickItemWithIcon(VaadinIcon.MENU.create(), "foo")
+            // TODO replace with VaadinIcon.MENU.iconName after karibu-tools release, including val VaadinIcon.iconName
+            cm._clickItemWithIcon(IconName.of(VaadinIcon.MENU), "foo")
             expect("foo") { clicked }
         }
         @Test fun `click by non-existing Icon fails`() {
@@ -306,7 +309,8 @@ abstract class AbstractContextMenuTests {
                     "    └── GridMenuItem[icon='vaadin:menu']\n" +
                     "        └── Icon[icon='vaadin:menu']"
             ) {
-                cm._clickItemWithIcon(VaadinIcon.CHECK.create(), "foo")
+                // TODO replace with VaadinIcon.CHECK.iconName after karibu-tools release, including val VaadinIcon.iconName
+                cm._clickItemWithIcon(IconName.of(VaadinIcon.CHECK), "foo")
             }
         }
         @Test fun `click toggles isChecked`() {

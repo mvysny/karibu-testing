@@ -15,7 +15,7 @@ import java.io.PrintStream
 import java.util.function.Predicate
 
 /**
- * A criterion for matching components. The component must match all of non-null fields.
+ * A criterion for matching components. The component must match all of the conditions below.
  *
  * You can add more properties, simply by creating a write-only property which will register a new [predicates] on write. See
  * [Adding support for custom search criteria](https://github.com/mvysny/karibu-testing/tree/master/karibu-testing-v10#adding-support-for-custom-search-criteria)
@@ -35,6 +35,7 @@ import java.util.function.Predicate
  * @property withoutThemes if not null, the component must NOT have any of the theme names defined. Space-separated
  * @property icon if not null, the component must have given [_iconName].
  * @property enabled if not null, the component's [Component.isEnabled] must match this value.
+ * @property attributes maps attribute name to the desired attribute value, retrieved via [com.vaadin.flow.dom.Element.getAttribute]. The attribute values must match exactly, case-sensitive.
  * @property predicates the predicates the component needs to match, not null. May be empty - in such case it is ignored. By default, empty.
  */
 public class SearchSpec<T : Component>(
@@ -53,6 +54,7 @@ public class SearchSpec<T : Component>(
         public var withoutThemes: String? = null,
         public var icon: IconName? = null,
         public var enabled: Boolean? = null,
+        public var attributes: MutableMap<String, String> = mutableMapOf(),
         public var predicates: MutableList<Predicate<T>> = mutableListOf()
 ) {
 
@@ -75,6 +77,7 @@ public class SearchSpec<T : Component>(
         if (value != null) list.add("value=$value")
         if (enabled != null) list.add(if (enabled!!) "enabled" else "disabled")
         if (count != (0..Int.MAX_VALUE) && count != 1..1) list.add("count=$count")
+        attributes.forEach { list.add("[${it.key}]='${it.value}'") }
         list.addAll(predicates.map { it.toString() })
         return list.joinToString(" and ")
     }
@@ -99,6 +102,7 @@ public class SearchSpec<T : Component>(
         if (value != null) p.add { component -> (component as? HasValue<*, *>)?.value == value }
         if (icon != null) p.add { component -> component._iconName == icon }
         if (enabled != null) p.add { component -> component.isEnabled == enabled }
+        attributes.forEach { (attrName, attrValue) -> p.add { component -> component.element.getAttribute(attrName) == attrValue }}
         @Suppress("UNCHECKED_CAST")
         p.addAll(predicates.map { predicate -> { component: Component -> clazz.isInstance(component) && predicate.test(component as T) } })
         return p.and()

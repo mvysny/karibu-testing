@@ -285,6 +285,12 @@ abstract class AbstractLocatorTest {
                 Button().apply { addThemeNames("custom-theme", "my-theme") }.matches { withoutThemes = "no-theme" }
             }
         }
+        @Test fun attributes() {
+            expect(true) { Button().apply { element.setAttribute("foo", "bar") }.matches { attributes["foo"] = "bar" } }
+            expect(false) { Button().matches { attributes["foo"] = "bar" } }
+            expect(false) { Button().apply { element.setAttribute("foo", "bar") }.matches { attributes["foo"] = "BAR" } }
+            expect(false) { Button().apply { element.setAttribute("foo", "bar") }.matches { attributes["foo"] = "a" } }
+        }
     }
 
     @Nested inner class `unmocked env`() {

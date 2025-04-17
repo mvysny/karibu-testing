@@ -33,6 +33,7 @@ public class LocatorJApiTest {
         _get(H1.class, spec -> spec.withLabel("Name:").withId("foo"));
         _get(new Button(), TextField.class);
         _get(new VerticalLayout(), TextField.class, spec -> spec.withText("Name:").withId("foo").withCount(0));
+        _get(TextField.class, spec -> spec.withAttribute("data-testid", "25"));
 
         _find(H1.class);
         _find(H1.class, spec -> spec.withCaption("Name:").withId("foo"));

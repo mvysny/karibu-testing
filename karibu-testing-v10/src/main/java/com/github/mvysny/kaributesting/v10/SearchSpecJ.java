@@ -256,4 +256,16 @@ public class SearchSpecJ<T extends Component> {
         spec.setEnabled(enabled);
         return this;
     }
+
+    /**
+     * Only matches component with given attribute.
+     * @param name the attribute name
+     * @param value the desired value; matched against the entire attribute value (no substring matching), case-sensitive.
+     * @return this
+     */
+    @NotNull
+    public SearchSpecJ<T> withAttribute(@NotNull String name, @NotNull String value) {
+        spec.getAttributes().put(name, value);
+        return this;
+    }
 }

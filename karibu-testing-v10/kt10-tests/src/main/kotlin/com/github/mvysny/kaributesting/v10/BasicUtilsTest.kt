@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -11,8 +12,16 @@ import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.router.ErrorParameter
 import com.vaadin.flow.router.HasErrorParameter
+import com.vaadin.flow.router.InternalServerError
+import com.vaadin.flow.router.Location
+import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.router.Router
+import com.vaadin.flow.server.RouteRegistry
+import com.vaadin.flow.server.startup.ApplicationRouteRegistry
 import elemental.json.Json
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.test.expect
@@ -165,6 +174,35 @@ abstract class AbstractBasicUtilsTests {
             TextField()._expectReadOnly()
         }
     }
+
+    @Nested inner class InternalServerErrorTests {
+        @BeforeEach fun fakeVaadin() {
+            MockVaadin.setup()
+        }
+        @AfterEach fun tearDownVaadin() {
+            MockVaadin.tearDown()
+        }
+        @Test
+        fun uninitialized() {
+            val e = InternalServerError()
+            expect("") { e._errorMessage }
+        }
+        @Test
+        fun simpleException() {
+            val e = InternalServerError()
+            e.setErrorParameter(fakeBeforeEnterEvent(), ErrorParameter(
+                Exception::class.java, RuntimeException("Simulated")))
+            expect(true, e._errorMessage) { e._errorMessage.startsWith("There was an exception while trying to navigate to ''\njava.lang.RuntimeException: Simulated") }
+        }
+        @Test
+        fun exceptionWithCause() {
+            val e = InternalServerError()
+            e.setErrorParameter(fakeBeforeEnterEvent(), ErrorParameter(
+                Exception::class.java, RuntimeException("Simulated", RuntimeException("Cause"))))
+            expect(true, e._errorMessage) { e._errorMessage.startsWith("There was an exception while trying to navigate to '' with the root cause 'java.lang.RuntimeException: Cause'\njava.lang.RuntimeException: Simulated") }
+            expect(true, e._errorMessage) { e._errorMessage.contains("RuntimeException: Cause") }
+        }
+    }
 }
 
 @Route("testing", autoLayout = false)
@@ -173,4 +211,12 @@ class TestingView : VerticalLayout()
 class ErrorView : VerticalLayout(), HasErrorParameter<Exception> {
     override fun setErrorParameter(event: BeforeEnterEvent, parameter: ErrorParameter<Exception>): Int =
             throw RuntimeException(parameter.caughtException)
+}
+
+fun fakeBeforeEnterEvent(): BeforeEnterEvent {
+    val router = currentUI.internals.router
+    return BeforeEnterEvent(
+        router,
+        NavigationTrigger.PROGRAMMATIC, Location(""), TestingView::class.java,
+        currentUI, listOf())
 }

@@ -247,7 +247,7 @@ private fun Component.find(predicate: (Component)->Boolean): List<Component> {
     testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) {
-        throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error.errorMessage}\n${currentUI.toPrettyTree()}")
+        throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error._errorMessage}\n${currentUI.toPrettyTree()}")
     }
     return descendants.filter { it.isEffectivelyVisible() && predicate(it) }
 }
@@ -429,8 +429,8 @@ public fun _expectInternalServerError(expectedErrorMessage: String = "") {
     if (error == null) {
         throw AssertionError("Expected an internal server error but none happened. Component tree:\n${currentUI.toPrettyTree()}")
     }
-    if (!error.errorMessage.contains(expectedErrorMessage)) {
-        throw AssertionError("Expected InternalServerError with message '$expectedErrorMessage' but was '${error.errorMessage}'. Component tree:\n${currentUI.toPrettyTree()}")
+    if (!error._errorMessage.contains(expectedErrorMessage)) {
+        throw AssertionError("Expected InternalServerError with message '$expectedErrorMessage' but was '${error._errorMessage}'. Component tree:\n${currentUI.toPrettyTree()}")
     }
 }
 

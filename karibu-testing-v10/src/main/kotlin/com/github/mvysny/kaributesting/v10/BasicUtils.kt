@@ -210,7 +210,18 @@ public fun UI._close() {
 public fun Component._getVirtualChildren(): List<Component> =
     element.getVirtualChildren().map { it._findComponents() }.flatten()
 
-internal val InternalServerError.errorMessage: String get() = element.text
+/**
+ * Retrieves the error message from [InternalServerError].
+ */
+public val InternalServerError._errorMessage: String get() = buildString {
+    if (element.childCount == 0) {
+        appendLine(element.text)
+    } else {
+        element.children.forEach {
+            appendLine(it.text)
+        }
+    }
+} .trim()
 
 /**
  * Fails if this component is not [com.vaadin.flow.component.HasEnabled.isEnabled].

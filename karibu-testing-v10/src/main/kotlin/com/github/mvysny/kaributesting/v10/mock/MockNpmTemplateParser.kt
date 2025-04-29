@@ -34,14 +34,16 @@ public class MockNpmTemplateParser {
             }
 
             if (url.startsWith("./")) {
-                // relative URLs, located in `frontend/` folder or `META-INF/resources/frontend/` resource
+                // relative URLs, located in `frontend/`/`src/main/frontend/` folder or `META-INF/resources/frontend/` resource
                 val relativeUrl: String = url.substring(2)
 
                 // try loading from the local fs
-                val frontend: File = File("frontend").absoluteFile
-                val templateFile = File(frontend, relativeUrl)
-                if (templateFile.exists()) {
-                    return templateFile.readText()
+                listOf("frontend", "src/main/frontend").forEach { frontendDirName ->
+                    val frontend: File = File(frontendDirName).absoluteFile
+                    val templateFile = File(frontend, relativeUrl)
+                    if (templateFile.exists()) {
+                        return templateFile.readText()
+                    }
                 }
 
                 // try loading from classpath

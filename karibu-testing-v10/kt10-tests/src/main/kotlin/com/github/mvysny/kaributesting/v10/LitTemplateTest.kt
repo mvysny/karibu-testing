@@ -35,6 +35,7 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
 
     @Test fun `loading from frontend`() {
         UI.getCurrent().add(MyTest())
+        UI.getCurrent().add(MyTest2())
     }
 
     @Test fun `proper error message on unloadable component`() {
@@ -59,6 +60,7 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
 
     @Test fun form() {
         UI.getCurrent().add(MyForm())
+        UI.getCurrent().add(MyForm3())
     }
 
     @Nested inner class includeVirtualChildrenInTemplates() {
@@ -141,6 +143,34 @@ class MyForm : LitTemplate() {
 @Tag("my-test-element")
 @JsModule("./src/my-test-element.js")
 class MyTest(prop1: String = "") : Component() {
+    init {
+        element.setProperty("prop1", prop1)
+    }
+}
+
+@Tag("my-form2")
+@JsModule("./src/my-form2.ts")
+class MyForm3 : LitTemplate() {
+    @Id
+    lateinit var firstNameField: TextField
+
+    @Id
+    lateinit var lastNameField: TextField
+
+    @Id
+    lateinit var emailField: EmailField
+    val binder: Binder<Employee> = BeanValidationBinder(Employee::class.java)
+
+    init {
+        binder.forField(firstNameField).bind("firstName")
+        binder.forField(lastNameField).bind("lastName")
+        binder.forField(emailField).bind("email")
+    }
+}
+
+@Tag("my-test-element2")
+@JsModule("./src/my-test-element2.js")
+class MyTest2(prop1: String = "") : Component() {
     init {
         element.setProperty("prop1", prop1)
     }

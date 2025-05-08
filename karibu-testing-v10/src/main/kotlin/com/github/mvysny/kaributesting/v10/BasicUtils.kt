@@ -5,6 +5,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.kaributools.getVirtualChildren
 import com.github.mvysny.kaributools.textRecursively2
 import com.vaadin.flow.component.*
+import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.server.VaadinSession
@@ -75,11 +76,34 @@ public var Component.id_: String?
 /**
  * Checks whether the component is visible (usually [Component.isVisible] but for [Text]
  * the text must be non-empty).
+ *
+ * Special workarounds:
+ * * [TabSheet]: only show the content of the currently selected tab as visible.
  */
 public val Component._isVisible: Boolean
-    get() = when (this) {
-        is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
-        else -> isVisible
+    get() {
+        val p = parent.orElse(null)
+        if (p is TabSheet) {
+            // https://github.com/mvysny/karibu-testing/issues/192
+            // TabSheet doesn't hide contents of the unselected tabs: it only marks them
+            // disabled on server-side (and hides them on the client-side, but we can't see that).
+            // We have to have a special workaround for TabSheet
+            if (this == p._tabs) {
+                return isVisible
+            }
+            val tab = p.selectedTab
+            if (tab != null) {
+                val contents = p.getComponent(tab)
+                if (contents == this) {
+                    return isVisible
+                }
+                return false
+            }
+        }
+        return when (this) {
+            is Text -> !text.isNullOrBlank()   // workaround for https://github.com/vaadin/flow/issues/3201
+            else -> isVisible
+        }
     }
 
 /**

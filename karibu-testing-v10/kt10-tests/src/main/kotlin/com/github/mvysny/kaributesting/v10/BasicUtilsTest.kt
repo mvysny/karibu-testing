@@ -3,10 +3,12 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
+import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.router.BeforeEnterEvent
@@ -201,6 +203,33 @@ abstract class AbstractBasicUtilsTests {
                 Exception::class.java, RuntimeException("Simulated", RuntimeException("Cause"))))
             expect(true, e._errorMessage) { e._errorMessage.startsWith("There was an exception while trying to navigate to '' with the root cause 'java.lang.RuntimeException: Cause'\njava.lang.RuntimeException: Simulated") }
             expect(true, e._errorMessage) { e._errorMessage.contains("RuntimeException: Cause") }
+        }
+    }
+
+    @Nested inner class visibilityTests {
+        @Test fun unattachedComponentVisible() {
+            expect(true) { Button("foo")._isVisible }
+            expect(true) { Text("foo")._isVisible }
+        }
+        @Test fun textVisibility() {
+            expect(true) { Text("foo")._isVisible }
+            // workaround for https://github.com/vaadin/flow/issues/3201
+            expect(false) { Text("")._isVisible }
+        }
+        @Test fun tabSheetContentsVisibility() {
+            val ts = TabSheet()
+            val c1 = Button("Tab1")
+            val c2 = Button("Tab2")
+            ts.add("tab1", c1)
+            ts.add("tab2", c2)
+            expect(true) { c1._isVisible }
+            expect(null) { c2.parent.orElse(null) } // c2 not yet attached to TabSheet - lazy initialization
+            expect(true) { c2._isVisible } // c2 not yet attached to TabSheet - lazy initialization
+            expect(true) { ts._tabs._isVisible }
+            ts.selectedIndex = 1
+            expect(false) { c1._isVisible }
+            expect(true) { c2._isVisible }
+            expect(true) { ts._tabs._isVisible }
         }
     }
 }

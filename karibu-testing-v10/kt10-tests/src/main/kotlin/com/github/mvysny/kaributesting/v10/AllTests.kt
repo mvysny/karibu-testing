@@ -53,4 +53,5 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class HasValidationTests : AbstractHasValidationTests()
     @Nested inner class TabsTests : AbstractTabsTests()
     @Nested inner class RichTextEditorTests : AbstractRichTextEditorTests()
+    @Nested inner class TabSheetTests : AbstractTabSheetTests()
 }

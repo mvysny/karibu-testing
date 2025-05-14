@@ -4,6 +4,7 @@ import com.github.mvysny.fakeservlet.FakeHttpSession
 import com.github.mvysny.fakeservlet.FakeRequest
 import com.github.mvysny.fakeservlet.FakeResponse
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.internal.ReflectTools
 import com.vaadin.flow.router.AccessDeniedException
 import com.vaadin.flow.router.HasErrorParameter
@@ -17,6 +18,8 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import jakarta.servlet.Servlet
 import jakarta.servlet.ServletContext
+import java.lang.reflect.Constructor
+import kotlin.random.Random
 import kotlin.test.expect
 
 public fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { ObjectOutputStream(it).writeObject(this); it }.toByteArray()
@@ -191,4 +194,71 @@ public val Servlet.isInitialized: Boolean get() = servletConfig != null
  * the overriden version provides an informative insight into the object state.
  */
 internal fun Class<*>.hasCustomToString(): Boolean =
-    getMethod("toString").declaringClass != java.lang.Object::class.java
+    getMethod("toString").declaringClass != Object::class.java
+
+/**
+ * Creates new [ExtendedClientDetails].
+ *
+ * @param screenWidth
+ *            Screen width
+ * @param screenHeight
+ *            Screen height
+ * @param windowInnerWidth
+ *            Window width
+ * @param windowInnerHeight
+ *            Window height
+ * @param bodyClientWidth
+ *            Body element width
+ * @param bodyClientHeight
+ *            Body element height
+ * @param tzOffset
+ *            TimeZone offset in minutes from GMT
+ * @param rawTzOffset
+ *            raw TimeZone offset in minutes from GMT (w/o DST adjustment)
+ * @param dstShift
+ *            the difference between the raw TimeZone and DST in minutes
+ * @param dstInEffect
+ *            is DST currently active in the region or not?
+ * @param tzId
+ *            time zone id
+ * @param curDate
+ *            the current date in milliseconds since the epoch
+ * @param touchDevice
+ *            whether browser responds to touch events
+ * @param devicePixelRatio
+ *            the ratio of the display's resolution in physical pixels to
+ *            the resolution in CSS pixels
+ * @param windowName
+ *            a unique browser window name which persists on reload
+ * @param navigatorPlatform
+ *            navigation platform received from the browser
+ */
+public fun createExtendedClientDetails(
+    screenWidth: String = "1920",
+    screenHeight: String = "1080",
+    windowInnerWidth: String = "1846",
+    windowInnerHeight: String = "939",
+    bodyClientWidth: String = "1846",
+    bodyClientHeight: String = "939",
+    tzOffset: String = "10800000",
+    rawTzOffset: String = "7200000",
+    dstShift: String = "3600000",
+    dstInEffect: String = "true",
+    tzId: String = "Europe/Helsinki",
+    curDate: String? = null,
+    touchDevice: String = "false",
+    devicePixelRatio: String = "1.0",
+    windowName: String = "ROOT-2521314-0.2626611481",
+    navigatorPlatform: String = "Linux x86_64"
+): ExtendedClientDetails {
+    val constructor: Constructor<*> =
+        ExtendedClientDetails::class.java.declaredConstructors[0]
+    constructor.isAccessible = true
+    val ecd: ExtendedClientDetails = constructor.newInstance(
+        screenWidth, screenHeight, windowInnerWidth, windowInnerHeight,
+        bodyClientWidth, bodyClientHeight,
+        tzOffset, rawTzOffset, dstShift, dstInEffect, tzId,
+        curDate, touchDevice, devicePixelRatio, windowName, navigatorPlatform
+    ) as ExtendedClientDetails
+    return ecd
+}

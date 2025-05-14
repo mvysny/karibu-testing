@@ -215,6 +215,10 @@ public var includeVirtualChildrenInTemplates: Boolean = false
 
 /**
  * By default, Karibu fakes [MockPage.retrieveExtendedClientDetails].
+ * The [createExtendedClientDetails] function is used to construct fake ECD (ExtendedClientDetails).
+ *
+ * To set custom ECD, provide a custom UI factory in [MockVaadin.setup] which
+ * creates a UI and populates it with ECD.
  *
  * Turning this off will cause `@PreserveOnRefresh` not to work anymore, see [Issue #118](https://github.com/mvysny/karibu-testing/issues/118)
  * for more details.

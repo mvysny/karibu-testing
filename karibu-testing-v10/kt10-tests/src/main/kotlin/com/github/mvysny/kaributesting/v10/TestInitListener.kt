@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.server.ServiceInitEvent
 import com.vaadin.flow.server.VaadinServiceInitListener
+import kotlin.test.expect
 
 /**
  * This class is picked up automatically by Vaadin (since it's registered via META-INF/services). We then test elsewhere
@@ -12,6 +13,8 @@ class TestInitListener : VaadinServiceInitListener {
         serviceInitCalled = true
         event.source.addUIInitListener { e ->
             uiInitCalled = true
+            // assert that the ECD is not yet populated.
+            expect(null) { e.ui.internals.extendedClientDetails }
             e.ui.addBeforeEnterListener { uiBeforeEnterCalled = true }
         }
     }

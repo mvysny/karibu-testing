@@ -161,6 +161,27 @@ abstract class AbstractMockVaadinTests() {
             }
             MockVaadin.setup()
         }
+
+        @Test fun `check listeners called`() {
+            var initCalled = false
+            var beforeEnterListenerCalled = false
+            var afterNavigationListenerCalled = false
+            MockVaadin.tearDown()
+            MockVaadin.setup(routes, uiFactory = {
+                object : MockedUI() {
+                    override fun init(request: VaadinRequest) {
+                        initCalled = true
+                        addBeforeEnterListener { beforeEnterListenerCalled = true }
+                        addAfterNavigationListener { afterNavigationListenerCalled = true }
+                    }
+                }
+            })
+            expect(true) { initCalled }
+            // setup navigates to "" by default, which is WelcomeView. It must therefore have been instantiated and attaahed to the UI
+            _expectOne<WelcomeView>()
+            expect(true) { beforeEnterListenerCalled }
+            expect(true) { afterNavigationListenerCalled }
+        }
     }
 
     @Nested inner class `proper mocking` {
@@ -380,6 +401,7 @@ abstract class AbstractMockVaadinTests() {
             expect(null) { ecd }
             MockVaadin.clientRoundtrip()
             // now "ecd" is populated.
+            expect(true) { ecd != null }
             expect(false) { ecd!!.isTouchDevice }
             expect(ecd) { UI.getCurrent().internals.extendedClientDetails }
         }
@@ -403,10 +425,29 @@ abstract class AbstractMockVaadinTests() {
         @Test fun `nothing is fetched when fakeExtendedClientDetails=false`() {
             fakeExtendedClientDetails = false
             expect(null) { UI.getCurrent().internals.extendedClientDetails }
-            var ecd: ExtendedClientDetails? = null
-            UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it } // does nothing
-            expect(null) { ecd }
+            UI.getCurrent().page.retrieveExtendedClientDetails {
+                fail("shouldn't be called")
+            }
+            MockVaadin.clientRoundtrip()
             expect(null) { UI.getCurrent().internals.extendedClientDetails }
+        }
+
+        @Test fun `view is created with ECD already populated`() {
+            MockVaadin.tearDown()
+            var routeCreated = false
+            MockVaadin.setup(routes, uiFactory = {
+                object : MockedUI() {
+                    override fun init(request: VaadinRequest) {
+                        page.retrieveExtendedClientDetails {}
+                        addBeforeEnterListener {
+                            routeCreated = true
+                            val ecd = currentUI.internals.extendedClientDetails
+                            checkNotNull(ecd)
+                        }
+                    }
+                }
+            })
+            expect(true) { routeCreated }
         }
     }
 

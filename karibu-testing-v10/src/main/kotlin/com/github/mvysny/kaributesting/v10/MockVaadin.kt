@@ -17,7 +17,6 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.server.*
 import com.vaadin.flow.shared.communication.PushMode
-import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.locks.ReentrantLock
@@ -265,6 +264,12 @@ public object MockVaadin {
 
         session.addUI(ui)
         session.service.fireUIInitListeners(ui)
+
+        // Real Vaadin performs a client-side roundtrip before navigating to the main route.
+        // This has the following effect: if UIInitListener fetches ExtendedClientDetails, this
+        // is fetched before the main route is navigated to => ECD is available in main route's constructor.
+        // Emulate this.
+        clientRoundtrip()
 
         // navigate to the initial page
         if (lastUILocation.get() != null) {

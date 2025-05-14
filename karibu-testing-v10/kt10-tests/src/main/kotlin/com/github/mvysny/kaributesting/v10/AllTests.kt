@@ -4,7 +4,9 @@ import com.github.mvysny.kaributesting.v10.pro.AbstractGridProTests
 import com.github.mvysny.kaributesting.v10.pro.AbstractRichTextEditorTests
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.expect
 
 open class AbstractAllTests10(val isModuleTest: Boolean) {
     @BeforeEach fun resetLocale() {
@@ -54,4 +56,12 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class TabsTests : AbstractTabsTests()
     @Nested inner class RichTextEditorTests : AbstractRichTextEditorTests()
     @Nested inner class TabSheetTests : AbstractTabSheetTests()
+
+    @Nested inner class UtilsTests {
+        // test that the function succeeds on every Vaadin version
+        @Test fun createECD() {
+            val ecd = createExtendedClientDetails()
+            expect(false) { ecd.isTouchDevice }
+        }
+    }
 }

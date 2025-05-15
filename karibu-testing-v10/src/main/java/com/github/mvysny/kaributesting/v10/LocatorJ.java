@@ -126,6 +126,10 @@ public class LocatorJ {
      * <br/>
      * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
      * mirror the <code>fromClient</code> parameter.
+     * @param self the field to set the value to
+     * @param value the new value to set
+     * @param fromClient `true` if the new value originates from the client; otherwise `false`. This will be set to {@link ComponentEvent#isFromClient()}.
+     * @param <V> the type of the value we're setting to the field.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     public static <V> void _setValue(@NotNull HasValue<?, V> self, @Nullable V value, boolean fromClient) {

@@ -35,6 +35,8 @@ public val <T> AbstractField<*, T>._fieldSupport: AbstractFieldSupport<*, T> get
  *
  * Modification of this property fires the value change event; the [HasValue.ValueChangeEvent.isFromClient] will
  * mirror the [fromClient] parameter which defaults to `true` indicating that the event came from the client.
+ * @param V the type of the value we're setting to the receiver field.
+ * @param fromClient `true` if the new value originates from the client; otherwise `false`. This will be set to [com.vaadin.flow.component.ComponentEvent.fromClient].
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 @JvmOverloads

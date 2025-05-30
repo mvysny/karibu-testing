@@ -416,4 +416,27 @@ class GridExtensionMethods {
     static <T> void _fireColumnResizedEvent(@NotNull Grid<T> self, @NotNull Grid.Column<T> column, int newWidth) {
         GridKt._fireColumnResizedEvent(self, column, newWidth)
     }
+
+    /**
+     * Creates the Item Details Component for <code>item</code> as rendered by the renderer set via
+     * {@link Grid#setItemDetailsRenderer(com.vaadin.flow.data.renderer.Renderer)}.
+     * Expects the renderer to be a <code>ComponentRenderer</code>.
+     * @return the Component created by the Item Details Renderer.
+     */
+    @NotNull
+    static <T> Component _getItemDetailsComponent(@NotNull Grid<T> self, T item) {
+        GridKt._getItemDetailsComponent(self, item)
+    }
+
+    /**
+     * Creates the Item Details Component for given <code>rowIndex</code> as rendered by the renderer set via
+     * {@link Grid#setItemDetailsRenderer(com.vaadin.flow.data.renderer.Renderer)}.
+     * Expects the renderer to be a <code>ComponentRenderer</code>.
+     * @param rowIndex the index of the row in the grid, 0-based.
+     * @return the Component created by the Item Details Renderer.
+     */
+    @NotNull
+    static <T> Component _getItemDetailsComponent(@NotNull Grid<T> self, int rowIndex) {
+        GridKt._getItemDetailsComponent(self, rowIndex)
+    }
 }

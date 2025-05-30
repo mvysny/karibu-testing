@@ -1171,6 +1171,12 @@ Call `grid._fireColumnResizedEvent(column, 150)` (Java: `GridKt._fireColumnResiz
 to simulate user resizing a column in the grid. The `isFromClient` will be `true`
 and the new width will be stored in the `column` as `150px`.
 
+#### Grid Item Details Renderer
+
+(Since Karibu-Testing 2.3.1): when an item details is set via `grid.setItemDetailsRenderer()`, you can
+call `grid._getItemDetailsComponent(2)` to obtain the `Component` rendered by the Item Details Renderer
+for the row number two (Java: `GridKt._getItemDetailsComponent(grid, 2)`).
+
 #### TreeGrid
 
 All of the functions mentioned above also work on a TreeGrid. The index of a row is essentially

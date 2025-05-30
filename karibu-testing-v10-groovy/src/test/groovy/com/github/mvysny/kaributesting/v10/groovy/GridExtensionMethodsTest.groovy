@@ -2,10 +2,12 @@ package com.github.mvysny.kaributesting.v10.groovy
 
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.renderer.NumberRenderer
 import com.vaadin.flow.function.ValueProvider
@@ -81,5 +83,9 @@ class GridExtensionMethodsTest {
 
         grid.getColumnByKey("foo").setResizable(true)
         grid._fireColumnResizedEvent(grid.getColumnByKey("foo"), 125)
+
+        grid.setItemDetailsRenderer(new ComponentRenderer({ item -> new Span("Item: " + item )}))
+        grid._getItemDetailsComponent("foo")
+        grid._getItemDetailsComponent(1)
     }
 }

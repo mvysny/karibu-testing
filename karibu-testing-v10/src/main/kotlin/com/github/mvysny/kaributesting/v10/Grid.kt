@@ -414,7 +414,7 @@ public fun <T : Any> Grid<T>._getFormattedRow(rowIndex: Int): List<String> {
 /**
  * Returns the formatted row as a list of Strings, one for every visible column.
  * Uses [_getFormatted]. Returns null if the [rowIndex] is not within the limits.
- * @param rowIndex the index of the row, 0-based.
+ * @param rowIndex the index of the row in the grid, 0-based.
  * @return a list of strings, one for every visible column. May contain empty strings
  * if the ComponentRenderer for a particular column produced null Component.
  */
@@ -1063,8 +1063,9 @@ internal fun <T> DataGenerator<T>._findComponentDataGenerator(): AbstractCompone
 }
 
 /**
- * Creates the Item Details Component as rendered by the renderer set via [Grid.setItemDetailsRenderer].
+ * Creates the Item Details Component for [item] as rendered by the renderer set via [Grid.setItemDetailsRenderer].
  * Expects the renderer to be a [ComponentRenderer].
+ * @return the Component created by the Item Details Renderer.
  */
 public fun <T> Grid<T>._getItemDetailsComponent(item: T): Component {
     @Suppress("UNCHECKED_CAST")
@@ -1081,8 +1082,10 @@ public fun <T> Grid<T>._getItemDetailsComponent(item: T): Component {
 }
 
 /**
- * Creates the Item Details Component as rendered by the renderer set via [Grid.setItemDetailsRenderer].
+ * Creates the Item Details Component for given [rowIndex] as rendered by the renderer set via [Grid.setItemDetailsRenderer].
  * Expects the renderer to be a [ComponentRenderer].
+ * @param rowIndex the index of the row in the grid, 0-based.
+ * @return the Component created by the Item Details Renderer.
  */
 public fun <T: Any> Grid<T>._getItemDetailsComponent(rowIndex: Int): Component =
     _getItemDetailsComponent(_get(rowIndex))

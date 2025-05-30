@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.karibudsl.v10.*
 import com.github.mvysny.kaributools.*
 import com.vaadin.flow.component.ClickNotifier
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
@@ -852,6 +853,22 @@ abstract class AbstractGridTests {
             expect(true) { event.isFromClient }
             expect(column) { event.resizedColumn }
             expect("250px") { column.width }
+        }
+    }
+
+    @Nested inner class _getItemDetailsComponent {
+        @Test fun noItemDetailRendererSet() {
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider())
+            expectThrows<IllegalStateException> {
+                grid._getItemDetailsComponent(2)
+            }
+        }
+
+        @Test fun simple() {
+            val grid = UI.getCurrent().grid<TestPerson>(PersonBackendDataProvider())
+            grid.setItemDetailsRenderer(ComponentRenderer { p -> Span("Person: $p") })
+            val c: Span = grid._getItemDetailsComponent(2) as Span
+            expect("Person: TestPerson(name=name 2, age=2)") { c.text }
         }
     }
 }

@@ -1027,3 +1027,62 @@ public fun <T> Grid<T>._fireColumnResizedEvent(column: Grid.Column<T>, newWidth:
     column.setWidth("${newWidth}px")
     _fireEvent(ColumnResizeEvent(this, true, id))
 }
+
+private val __Grid_itemDetailsDataGenerator: Field by lazy {
+    val f = Grid::class.java.getDeclaredField("itemDetailsDataGenerator")
+    f.isAccessible = true
+    f
+}
+private val __CompositeDataGenerator_dataGenerators: Field by lazy {
+    val f = CompositeDataGenerator::class.java.getDeclaredField("dataGenerators")
+    f.isAccessible = true
+    f
+}
+private val __AbstractComponentDataGenerator_createComponent: Method by lazy {
+    val m = AbstractComponentDataGenerator::class.java.getDeclaredMethod("createComponent", Object::class.java)
+    m.isAccessible = true
+    m
+}
+
+internal fun <T> DataGenerator<T>._findComponentDataGenerator(): AbstractComponentDataGenerator<T>? {
+    when (this) {
+        is AbstractComponentDataGenerator -> {
+            return this
+        }
+
+        is CompositeDataGenerator -> {
+            @Suppress("UNCHECKED_CAST")
+            val dataGenerators: Set<DataGenerator<T>> = __CompositeDataGenerator_dataGenerators.get(this) as Set<DataGenerator<T>>
+            return dataGenerators.firstNotNullOfOrNull { it._findComponentDataGenerator() }
+        }
+
+        else -> {
+            return null
+        }
+    }
+}
+
+/**
+ * Creates the Item Details Component as rendered by the renderer set via [Grid.setItemDetailsRenderer].
+ * Expects the renderer to be a [ComponentRenderer].
+ */
+public fun <T> Grid<T>._getItemDetailsComponent(item: T): Component {
+    @Suppress("UNCHECKED_CAST")
+    val dataGenerator: DataGenerator<T>? = __Grid_itemDetailsDataGenerator.get(this) as DataGenerator<T>?
+    check(dataGenerator != null) {
+        "${this.toPrettyString()}: the Item Details Renderer was not set"
+    }
+    val componentDataGenerator = dataGenerator._findComponentDataGenerator()
+    checkNotNull(componentDataGenerator) {
+        "${this.toPrettyString()}: no AbstractComponentDataGenerator found in the Item Details DataGenerator $dataGenerator"
+    }
+    val component: Component = __AbstractComponentDataGenerator_createComponent.invoke(componentDataGenerator, item) as Component
+    return component
+}
+
+/**
+ * Creates the Item Details Component as rendered by the renderer set via [Grid.setItemDetailsRenderer].
+ * Expects the renderer to be a [ComponentRenderer].
+ */
+public fun <T: Any> Grid<T>._getItemDetailsComponent(rowIndex: Int): Component =
+    _getItemDetailsComponent(_get(rowIndex))

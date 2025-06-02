@@ -1,11 +1,19 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.karibudsl.v10.checkBox
+import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.datetimepicker.DateTimePicker
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.textfield.PasswordField
+import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.expect
 
 abstract class AbstractHasValueTests {
@@ -85,27 +93,37 @@ abstract class AbstractHasValueTests {
             expect(true) { called }
         }
         @Nested inner class `from client`() {
-            @Test fun testTextField() {
-                val tf = TextField()
+            private fun <V> testField(field: HasValue<*, V>, testValue: V) {
+                expect(false) { field.value == testValue }
                 var called = false
-                tf.addValueChangeListener {
+                field.addValueChangeListener {
                     expect(false) { called }
                     expect(true) { it.isFromClient }
                     called = true
                 }
-                tf._setValue("foo")
+                field._setValue(testValue)
                 expect(true) { called }
             }
+            @Test fun testTextField() {
+                testField(TextField(), "foo")
+            }
+            @Test fun testTextArea() {
+                testField(TextArea(), "foo")
+            }
+            @Test fun testPasswordField() {
+                testField(PasswordField(), "foo")
+            }
             @Test fun testCheckBox() {
-                val tf = Checkbox()
-                var called = false
-                tf.addValueChangeListener {
-                    expect(false) { called }
-                    expect(true) { it.isFromClient }
-                    called = true
-                }
-                tf._setValue(true)
-                expect(true) { called }
+                testField(Checkbox(), true)
+            }
+            @Test fun testDatePicker() {
+                testField(DatePicker(), LocalDate.now().plusDays(10))
+            }
+            @Test fun testDateTimePicker() {
+                testField(DateTimePicker(), LocalDateTime.now().plusDays(10))
+            }
+            @Test fun testComboBiox() {
+                testField(ComboBox<String>(), "foo")
             }
         }
     }

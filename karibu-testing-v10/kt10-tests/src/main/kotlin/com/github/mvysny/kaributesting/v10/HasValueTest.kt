@@ -4,6 +4,7 @@ import com.github.mvysny.karibudsl.v10.checkBox
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.datetimepicker.DateTimePicker
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -79,9 +80,24 @@ abstract class AbstractHasValueTests {
             }
         }
     }
+    @Nested inner class MultiSelectComboBoxTests : TestImpl<Set<String>>({ MultiSelectComboBox("label", "foo", "bar") }, setOf("foo")) {
+        @Test fun `_setValue should fail if ComboBox has no items`() {
+            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
+            expectThrows<IllegalStateException> {
+                MultiSelectComboBox<String>()._setValue(setOf("foo"))
+            }
+        }
+        @Test fun `setting _value should fail if ComboBox has no items`() {
+            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
+            expectThrows<IllegalStateException> {
+                MultiSelectComboBox<String>()._value = setOf("foo")
+            }
+        }
+    }
     @Nested inner class SelectTests : TestImpl<String>({ Select() }, "foo")
     @Nested inner class TimePickerTests : TestImpl<LocalTime>({ TimePicker() }, LocalTime.NOON)
     // @todo mavi CustomField, AbstractField, all vaadin-core HasValues
+    // @todo mavi emulate maybe how client-side sets value, by calling AbstractField.setModelValue()
 
     @Nested inner class `HasValue-setValue()` {
         @Test fun `disabled check box`() {

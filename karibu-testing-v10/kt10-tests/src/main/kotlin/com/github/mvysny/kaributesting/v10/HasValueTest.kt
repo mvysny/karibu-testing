@@ -3,11 +3,14 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.karibudsl.v10.checkBox
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.MultiSelectComboBox
+import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.datetimepicker.DateTimePicker
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.BigDecimalField
 import com.vaadin.flow.component.textfield.EmailField
@@ -66,36 +69,13 @@ abstract class AbstractHasValueTests {
     @Nested inner class BigDecimalFieldTests : TestImpl<BigDecimal>({ BigDecimalField() }, BigDecimal.valueOf(2))
     @Nested inner class DatePickerTests : TestImpl<LocalDate>({ DatePicker() }, LocalDate.now().plusDays(10))
     @Nested inner class DateTimePickerTests : TestImpl<LocalDateTime>({ DateTimePicker() }, LocalDateTime.of(LocalDate.now(), LocalTime.NOON))
-    @Nested inner class ComboBoxTests : TestImpl<String>({ ComboBox("label", "foo", "bar") }, "foo") {
-        @Test fun `_setValue should fail if ComboBox has no items`() {
-            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
-            expectThrows<IllegalStateException> {
-                ComboBox<String>()._setValue("foo")
-            }
-        }
-        @Test fun `setting _value should fail if ComboBox has no items`() {
-            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
-            expectThrows<IllegalStateException> {
-                ComboBox<String>()._value = "foo"
-            }
-        }
-    }
-    @Nested inner class MultiSelectComboBoxTests : TestImpl<Set<String>>({ MultiSelectComboBox("label", "foo", "bar") }, setOf("foo")) {
-        @Test fun `_setValue should fail if ComboBox has no items`() {
-            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
-            expectThrows<IllegalStateException> {
-                MultiSelectComboBox<String>()._setValue(setOf("foo"))
-            }
-        }
-        @Test fun `setting _value should fail if ComboBox has no items`() {
-            // ComboBox.setValue() fails if ComboBox has no items. _setValue() must emulate that.
-            expectThrows<IllegalStateException> {
-                MultiSelectComboBox<String>()._value = setOf("foo")
-            }
-        }
-    }
+    @Nested inner class ComboBoxTests : TestImpl<String>({ ComboBox("label", "foo", "bar") }, "foo")
+    @Nested inner class MultiSelectComboBoxTests : TestImpl<Set<String>>({ MultiSelectComboBox("label", "foo", "bar") }, setOf("foo"))
+    @Nested inner class CheckboxGroupTests : TestImpl<Set<String>>({ CheckboxGroup("label", "foo", "bar") }, setOf("foo"))
+    @Nested inner class RadioButtonGroupTests : TestImpl<String>({ RadioButtonGroup("label", "foo", "bar") }, "foo")
     @Nested inner class SelectTests : TestImpl<String>({ Select() }, "foo")
     @Nested inner class TimePickerTests : TestImpl<LocalTime>({ TimePicker() }, LocalTime.NOON)
+    @Nested inner class MyCustomFieldTests : TestImpl<String>({ MyCustomField() }, "foo")
     // @todo mavi CustomField, AbstractField, all vaadin-core HasValues
     // @todo mavi emulate maybe how client-side sets value, by calling AbstractField.setModelValue()
 
@@ -145,5 +125,13 @@ abstract class AbstractHasValueTests {
             }
             expect(false) { cb.value }
         }
+    }
+}
+
+class MyCustomField : CustomField<String>() {
+    private val tf = TextField()
+    override fun generateModelValue(): String? = tf.value
+    override fun setPresentationValue(newPresentationValue: String?) {
+        tf.value = newPresentationValue
     }
 }

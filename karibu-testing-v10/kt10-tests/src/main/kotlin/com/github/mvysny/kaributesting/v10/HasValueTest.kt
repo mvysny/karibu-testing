@@ -100,6 +100,30 @@ abstract class AbstractHasValueTests {
             expect(true) { called }
         }
 
+        @Test fun valueChangeListener_setValue_fromClient_false() {
+            expect(false) { field.value == testValue }
+            var called = false
+            field.addValueChangeListener {
+                expect(false) { called }
+                expect(false) { it.isFromClient }
+                called = true
+            }
+            field._setValue(testValue, fromClient = false)
+            expect(true) { called }
+        }
+
+        @Test fun valueChangeListener_value_fromClient_true() {
+            expect(false) { field.value == testValue }
+            var called = false
+            field.addValueChangeListener {
+                expect(false) { called }
+                expect(false) { it.isFromClient }
+                called = true
+            }
+            field._value = testValue
+            expect(true) { called }
+        }
+
         @Test fun valueChangeListener_fireValueChange_fromClient_true() {
             var called = false
             field.addValueChangeListener {

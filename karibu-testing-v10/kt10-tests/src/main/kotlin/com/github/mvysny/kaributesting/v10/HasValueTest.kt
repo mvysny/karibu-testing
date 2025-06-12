@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.karibudsl.v10.checkBox
+import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.HasEnabled
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.checkbox.CheckboxGroup
@@ -19,6 +21,7 @@ import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.component.timepicker.TimePicker
+import net.bytebuddy.asm.Advice
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -34,6 +37,57 @@ abstract class AbstractHasValueTests {
         @Test fun `enabled component`() {
             expect(testValue) { fieldSupplier().apply { value = testValue } .value }
             expect(testValue) { fieldSupplier().apply { _value = testValue } .value }
+        }
+
+        @Test fun `disabled component`() {
+            // Vaadin ignores the enabled flag and updates the value happily.
+            expect(testValue) { fieldSupplier().apply { (this as HasEnabled).isEnabled = false; value = testValue } .value }
+
+            // However, calling _value will fail
+            val cb = fieldSupplier().apply { (this as HasEnabled).isEnabled = false }
+            expectThrows(IllegalStateException::class, " is not enabled") {
+                cb._value = testValue
+            }
+            expect(cb.emptyValue) { cb.value }
+        }
+
+        @Test fun `invisible component`() {
+            expect(testValue) { fieldSupplier().apply { (this as Component).isVisible = false; value = testValue } .value }
+            // However, calling _value will fail
+            val cb = fieldSupplier().apply { (this as Component).isVisible = false }
+            expectThrows(IllegalStateException::class, " is not effectively visible") {
+                cb._value = testValue
+            }
+            expect(cb.emptyValue) { cb.value }
+        }
+
+        @Test fun `check box with parent disabled`() {
+            val layout = VerticalLayout().apply { isEnabled = false }
+            // Vaadin ignores the enabled flag and updates the value happily.
+            var cb = fieldSupplier()
+            layout.add(cb as Component)
+            cb.value = testValue
+            expect(testValue) { cb.value }
+            // However, calling _value will fail
+            cb = fieldSupplier()
+            layout.add(cb as Component)
+            expectThrows(IllegalStateException::class, " is nested in a disabled component") {
+                cb._value = testValue
+            }
+            expect(cb.emptyValue) { cb.value }
+        }
+
+        @Test fun `read-only check box`() {
+            var cb = fieldSupplier().apply { isReadOnly = true }
+            // surprisingly this works too
+            cb.value = testValue
+            expect(testValue) { cb.value }
+
+            cb = fieldSupplier().apply { isReadOnly = true }
+            expectThrows(IllegalStateException::class, " is read-only") {
+                cb._value = testValue
+            }
+            expect(cb.emptyValue) { cb.value }
         }
 
         @Test fun valueChangeListener_setValue_fromClient_true() {
@@ -78,54 +132,6 @@ abstract class AbstractHasValueTests {
     @Nested inner class MyCustomFieldTests : TestImpl<String>({ MyCustomField() }, "foo")
     // @todo mavi CustomField, AbstractField, all vaadin-core HasValues
     // @todo mavi emulate maybe how client-side sets value, by calling AbstractField.setModelValue()
-
-    @Nested inner class `HasValue-setValue()` {
-        @Test fun `disabled check box`() {
-            // Vaadin ignores the enabled flag and updates the value happily.
-            expect(true) { Checkbox().apply { isEnabled = false; value = true } .value }
-            // However, calling _value will fail
-            val cb = Checkbox().apply { isEnabled = false }
-            expectThrows(IllegalStateException::class, "The Checkbox[DISABLED, value='false'] is not enabled") {
-                cb._value = true
-            }
-            expect(false) { cb.value }
-        }
-
-        @Test fun `invisible check box`() {
-            expect(true) { Checkbox().apply { isVisible = false; value = true } .value }
-            // However, calling _value will fail
-            val cb = Checkbox().apply { isVisible = false }
-            expectThrows(IllegalStateException::class, "The Checkbox[INVIS, value='false'] is not effectively visible") {
-                cb._value = true
-            }
-            expect(false) { cb.value }
-        }
-
-        @Test fun `check box with parent disabled`() {
-            val layout = VerticalLayout().apply { isEnabled = false }
-            // Vaadin ignores the enabled flag and updates the value happily.
-            expect(true) { layout.checkBox { value = true } .value }
-            // However, calling _value will fail
-            val cb = layout.checkBox()
-            expectThrows(IllegalStateException::class, "The Checkbox[DISABLED, value='false'] is nested in a disabled component") {
-                cb._value = true
-            }
-            expect(false) { cb.value }
-        }
-
-        @Test fun `read-only check box`() {
-            var cb = Checkbox().apply { isReadOnly = true }
-            // surprisingly this works too
-            cb.value = true
-            expect(true) { cb.value }
-
-            cb = Checkbox().apply { isReadOnly = true }
-            expectThrows(IllegalStateException::class, "The Checkbox[RO, value='false'] is read-only") {
-                cb._value = true
-            }
-            expect(false) { cb.value }
-        }
-    }
 }
 
 class MyCustomField : CustomField<String>() {

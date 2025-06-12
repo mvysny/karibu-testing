@@ -4,6 +4,7 @@ import com.vaadin.flow.component.AbstractField
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
 import com.vaadin.flow.component.internal.AbstractFieldSupport
+import java.lang.reflect.Method
 
 /**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
@@ -22,11 +23,10 @@ public var <V> HasValue<*, V>._value: V?
         value = v
     }
 
-public val <T> AbstractField<*, T>._fieldSupport: AbstractFieldSupport<*, T> get() {
-    val f = AbstractField::class.java.getDeclaredField("fieldSupport")
-    f.isAccessible = true
-    @Suppress("UNCHECKED_CAST")
-    return f.get(this) as AbstractFieldSupport<*, T>
+private val __AbstractField_setModelValue: Method by lazy {
+    val m = AbstractField::class.java.getDeclaredMethod("setModelValue", Object::class.java, Boolean::class.java)
+    m.isAccessible = true
+    m
 }
 
 /**
@@ -42,10 +42,7 @@ public val <T> AbstractField<*, T>._fieldSupport: AbstractFieldSupport<*, T> get
 @JvmOverloads
 public fun <V> HasValue<*, V>._setValue(value: V?, fromClient: Boolean = true) {
     (this as Component)._expectEditableByUser()
-    val fs = (this as AbstractField<*, V>)._fieldSupport
-    val m = AbstractFieldSupport::class.java.getDeclaredMethod("setValue", Any::class.java, Boolean::class.java, Boolean::class.java)
-    m.isAccessible = true
-    m.invoke(fs, value, false, fromClient)
+    __AbstractField_setModelValue.invoke(this, value, fromClient)
 }
 
 /**

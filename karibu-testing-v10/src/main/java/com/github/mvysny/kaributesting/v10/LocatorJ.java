@@ -107,10 +107,7 @@ public class LocatorJ {
      * Sets the value of given component, but only if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
      * <br/>
-     * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
-     * return false indicating that the event came from the server. If this is not desired,
-     * depending on your code, it may be
-     * possible to call {@link #_fireValueChange(AbstractField, boolean)} with <code>fromClient=true</code> instead.
+     * The function calls {@link #_setValue(HasValue, Object, boolean)} with the <code>isFromClient</code> set to true.
      * @param receiver the component
      * @param value the new value
      * @param <V> the value type

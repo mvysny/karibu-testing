@@ -117,7 +117,7 @@ abstract class AbstractHasValueTests {
             var called = false
             field.addValueChangeListener {
                 expect(false) { called }
-                expect(false) { it.isFromClient }
+                expect(true) { it.isFromClient }
                 called = true
             }
             field._value = testValue

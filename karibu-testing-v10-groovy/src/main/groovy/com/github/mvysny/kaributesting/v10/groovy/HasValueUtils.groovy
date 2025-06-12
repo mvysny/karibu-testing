@@ -25,10 +25,7 @@ class HasValueUtils {
      * Sets the value of given component, but only if it is actually possible to do so by the user.
      * If the component is read-only or disabled, an exception is thrown.
      * <p></p>
-     * The function fires the value change event; the {@link HasValue.ValueChangeEvent#isFromClient()} will
-     * return false indicating that the event came from the server. If this is not desired,
-     * depending on your code, it may be
-     * possible to call {@link #_fireValueChange(AbstractField, boolean)} with <code>fromClient=true</code> instead.
+     * The function calls {@link #_setValue} with <code>fromClient</code> equal to true.
      * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
      */
     static <V> void set_value(@NotNull HasValue<?, V> self, @Nullable V value) {

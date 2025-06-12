@@ -3,24 +3,20 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.AbstractField
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
-import com.vaadin.flow.component.internal.AbstractFieldSupport
 import java.lang.reflect.Method
 
 /**
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
  *
- * Modification of this property fires the value change event; the [HasValue.ValueChangeEvent.isFromClient] will
- * return `false` indicating that the event came from the server. If this is not desired, use [_setValue];
- * alternatively it may be
- * possible to call [_fireValueChange] with `fromClient=true` instead.
+ * Modification of this property calls [_setValue] with `isFromClient` set to true.
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 public var <V> HasValue<*, V>._value: V?
     get() = value
     set(v) {
         (this as Component)._expectEditableByUser()
-        value = v
+        _setValue(v)
     }
 
 private val __AbstractField_setModelValue: Method by lazy {

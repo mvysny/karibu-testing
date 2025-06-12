@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.github.mvysny.karibudsl.v10.checkBox
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasEnabled
 import com.vaadin.flow.component.HasValue
@@ -21,7 +20,6 @@ import com.vaadin.flow.component.textfield.PasswordField
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.component.timepicker.TimePicker
-import net.bytebuddy.asm.Advice
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal

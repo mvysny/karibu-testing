@@ -217,4 +217,15 @@ abstract class AbstractLocatorJTests() {
     @Test fun `_assertNoDialogs() smoke`() {
         LocatorJ._assertNoDialogs()
     }
+
+    @Test fun `_setValue() isFromClient true`() {
+        val tf = TextField()
+        var called = false
+        tf.addValueChangeListener {
+            called = true
+            expect(true) { it.isFromClient }
+        }
+        LocatorJ._setValue(tf, "foo")
+        expect(true) { called }
+    }
 }

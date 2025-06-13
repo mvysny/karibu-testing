@@ -965,7 +965,7 @@ all the above items prior setting the new value:
 * Kotlin, Groovy: `textField._value = "42"`
 * Java: `LocatorJ._setValue(textField, "42");`
 
-Changing the value fires the ValueChangeEvent with `isFromClient` set to `true`.
+Changing the value fires the ValueChangeEvent with `isFromClient` set to `true` (since Karibu-Testing 2.4.0).
 Also:
 
 * Kotlin, Groovy: `textField._fireValueChange()` is able to fire value change event with `isFromClient` set to true.

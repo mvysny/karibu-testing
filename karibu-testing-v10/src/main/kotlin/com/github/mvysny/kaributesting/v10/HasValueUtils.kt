@@ -9,14 +9,16 @@ import java.lang.reflect.Method
  * Sets the value of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
  *
- * Modification of this property calls [_setValue] with `isFromClient` set to true.
+ * Modification of this property calls [_setValue] with `isFromClient` set to true (since Karibu-Testing
+ * 2.4.0). To emulate older Karibu-Testing, set [defaultIsFromClient] to `false`.
+ *
  * @throws IllegalStateException if the field was not visible, not enabled or was read-only.
  */
 public var <V> HasValue<*, V>._value: V?
     get() = value
     set(v) {
         (this as Component)._expectEditableByUser()
-        _setValue(v)
+        _setValue(v, defaultIsFromClient)
     }
 
 private val __AbstractField_setModelValue: Method by lazy {

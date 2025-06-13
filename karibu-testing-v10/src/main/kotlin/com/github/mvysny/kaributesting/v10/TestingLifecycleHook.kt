@@ -245,6 +245,12 @@ public var testingLifecycleHook: TestingLifecycleHook = TestingLifecycleHook.def
 public var pendingJavascriptInvocationHandlers: MutableList<(PendingJavaScriptInvocation) -> Unit> = mutableListOf()
 
 /**
+ * Controls the behavior of [_value]. Since Karibu-Testing 2.4.0, this is set to `true`;
+ * to configure Karibu-Testing to emulate previous versions set this to `false`.
+ */
+public var defaultIsFromClient: Boolean = true
+
+/**
  * Checks whether given [component] is a dialog and needs to be removed from the UI.
  * See [cleanupDialogs] for more info.
  */

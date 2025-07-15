@@ -56,6 +56,8 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class TabsTests : AbstractTabsTests()
     @Nested inner class RichTextEditorTests : AbstractRichTextEditorTests()
     @Nested inner class TabSheetTests : AbstractTabSheetTests()
+    @Nested inner class MasterDetailLayoutTests : AbstractMasterDetailLayoutTests()
+    @Nested inner class MarkdownTests : AbstractMarkdownTests()
 
     @Nested inner class UtilsTests {
         // test that the function succeeds on every Vaadin version

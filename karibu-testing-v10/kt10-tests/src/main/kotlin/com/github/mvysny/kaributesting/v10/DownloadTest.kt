@@ -12,6 +12,7 @@ import com.vaadin.flow.server.streams.InputStreamDownloadCallback
 import com.vaadin.flow.server.streams.InputStreamDownloadHandler
 import com.vaadin.flow.server.streams.TransferContext
 import com.vaadin.flow.server.streams.TransferProgressListener
+import org.apache.commons.io.input.BrokenInputStream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -114,7 +115,6 @@ abstract class AbstractDownloadTests() {
             }
         }
 
-        // @todo mavi also test transfer progress and that handler listener methods have been called (e.g. error)
         @Test fun `progress-notifications`() {
             val link = UI.getCurrent().anchor("")
             val progress = TestTransferProgressListener()
@@ -135,8 +135,34 @@ abstract class AbstractDownloadTests() {
             expect(6L) { progress.completedBytes }
         }
     }
+
+    @Test fun `progress-notifications-error`() {
+        val link = UI.getCurrent().anchor("")
+        val progress = TestTransferProgressListener()
+        val h = failingDownloadHandler("greeting.txt", progressListener = progress)
+        link.setHref(h, AttachmentType.DOWNLOAD)
+        expect(false) { progress.started }
+        expect(false) { progress.progressReported }
+        expect(null) { progress.error }
+        expect(null) { progress.completedBytes }
+
+        // exceptions are rethrown
+        expectThrows<IOException> { link.download().toString(Charsets.UTF_8) }
+        // notifications happen asynchronously
+        MockVaadin.clientRoundtrip()
+
+        expect(true) { progress.started }
+        expect(false) { progress.progressReported }
+        expect(IOException::class.java) { progress.error!!.javaClass }
+        expect(null) { progress.completedBytes }
+    }
 }
 
+/**
+ * Tracks the status of the download and provides insight via [started],
+ * [progressReported], [error] etc.
+ * @property error not-null if an exception was thrown while reading from an input stream.
+ */
 class TestTransferProgressListener : TransferProgressListener {
     var started = false
     var progressReported = false
@@ -175,8 +201,7 @@ class TestTransferProgressListener : TransferProgressListener {
 fun DownloadHandler(
     bytes: ByteArray,
     fileName: String,
-    contentType: String = currentService.getMimeType(fileName)
-        ?: "application/octet-stream",
+    contentType: String = currentService.getMimeType(fileName) ?: "application/octet-stream",
     progressListener: TransferProgressListener? = null
 ): InputStreamDownloadHandler {
     val callback = InputStreamDownloadCallback {
@@ -192,4 +217,23 @@ fun DownloadHandler(
     } else {
         DownloadHandler.fromInputStream(callback)
     }
+}
+
+/**
+ * Produces a [DownloadHandler] which always fails - never downloads anything successfully.
+ */
+fun failingDownloadHandler(
+    fileName: String,
+    contentType: String = currentService.getMimeType(fileName) ?: "application/octet-stream",
+    progressListener: TransferProgressListener
+): InputStreamDownloadHandler {
+    val callback = InputStreamDownloadCallback {
+        DownloadResponse(
+            BrokenInputStream(),
+            fileName,
+            contentType,
+            200L
+        )
+    }
+    return DownloadHandler.fromInputStream(callback, progressListener)
 }

@@ -77,10 +77,24 @@ abstract class AbstractDownloadTests() {
             tempFile.writeText("Hello!")
         }
 
-        @Test fun `file-handler-simple`() {
-            val link = UI.getCurrent().anchor("")
-            link.setHref(DownloadHandler.forFile(tempFile), AttachmentType.DOWNLOAD)
-            expect("Hello!") { link._download().toString(Charsets.UTF_8) }
+        @Nested inner class anchor {
+            @Test fun `file-handler-simple`() {
+                val link = UI.getCurrent().anchor("")
+                link.setHref(DownloadHandler.forFile(tempFile), AttachmentType.DOWNLOAD)
+                expect("Hello!") { link._download().toString(Charsets.UTF_8) }
+            }
+            @Test fun `file-handler-simple-inline`() {
+                val link = UI.getCurrent().anchor("")
+                link.setHref(DownloadHandler.forFile(tempFile), AttachmentType.INLINE)
+                expect("Hello!") { link._download().toString(Charsets.UTF_8) }
+            }
+        }
+        @Nested inner class image {
+            @Test fun `file-handler-simple`() {
+                val link = UI.getCurrent().image()
+                link.setSrc(DownloadHandler.forFile(tempFile))
+                expect("Hello!") { link.download().toString(Charsets.UTF_8) }
+            }
         }
 
         // @todo mavi also test transfer progress and that handler listener methods have been called (e.g. error)

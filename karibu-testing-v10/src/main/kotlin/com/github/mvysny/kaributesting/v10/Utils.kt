@@ -126,6 +126,12 @@ public val currentRequest: VaadinRequest
 public val currentResponse: VaadinResponse
     get() = VaadinService.getCurrentResponse()
             ?: throw IllegalStateException("No current response. Have you called MockVaadin.setup()?")
+public val currentSession: VaadinSession
+    get() = VaadinSession.getCurrent()
+        ?: throw IllegalStateException("No current session. Have you called MockVaadin.setup()?")
+public val currentService: VaadinService
+    get() = VaadinService.getCurrent()
+        ?: throw IllegalStateException("No current service. Have you called MockVaadin.setup()?")
 
 /**
  * Returns the [UI.getCurrent]; fails with informative error message if the UI.getCurrent() is null.

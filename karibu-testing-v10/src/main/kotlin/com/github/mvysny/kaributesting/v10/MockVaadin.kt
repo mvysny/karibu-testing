@@ -200,15 +200,22 @@ public object MockVaadin {
     @JvmStatic
     public var mockRequestFactory: (FakeHttpSession) -> FakeRequest = { FakeRequest(it) }
 
+    internal fun createVaadinRequest(httpSession: FakeHttpSession = currentSession.fake): VaadinServletRequest {
+        val mockRequest = mockRequestFactory(httpSession)
+        // so that session.browser.updateRequestDetails() also creates browserDetails
+        mockRequest.headers["User-Agent"] = listOf(userAgent)
+        return VaadinServletRequest(mockRequest, currentService as VaadinServletService)
+    }
+
+    internal fun createVaadinResponse() =
+        VaadinServletResponse(FakeResponse(), currentService as VaadinServletService)
+
     private fun createSession(ctx: ServletContext, uiFactory: () -> UI) {
         val service: VaadinServletService = checkNotNull(VaadinService.getCurrent()) as VaadinServletService
         val httpSession: FakeHttpSession = FakeHttpSession.create(ctx)
 
         // init Vaadin Request
-        val mockRequest = mockRequestFactory(httpSession)
-        // so that session.browser.updateRequestDetails() also creates browserDetails
-        mockRequest.headers["User-Agent"] = listOf(userAgent)
-        val request = VaadinServletRequest(mockRequest, service)
+        val request = createVaadinRequest(httpSession)
         strongRefReq.set(request)
         CurrentInstance.set(VaadinRequest::class.java, request)
 
@@ -231,7 +238,7 @@ public object MockVaadin {
         checkNotNull(session.browser.browserApplication) { "The WebBrowser has not been mocked properly" }
 
         // init Vaadin Response
-        val response = VaadinServletResponse(FakeResponse(), service)
+        val response = createVaadinResponse()
         strongRefRes.set(response)
         CurrentInstance.set(VaadinResponse::class.java, response)
 

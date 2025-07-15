@@ -1,4 +1,4 @@
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "DEPRECATION")
 
 package com.github.mvysny.kaributesting.v10
 
@@ -12,10 +12,10 @@ import java.io.ByteArrayOutputStream
 import java.lang.reflect.Field
 import java.net.URI
 import kotlin.test.expect
+import kotlin.test.fail
 
 /**
- * Downloads contents of this link. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
+ * Downloads contents of this link.
  * @throws IllegalStateException if the link was not visible, not enabled. See [checkEditableByUser] for
  * more details.
  */
@@ -25,8 +25,7 @@ public fun Anchor._download(): ByteArray {
 }
 
 /**
- * Downloads contents of this link. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
+ * Downloads contents of this link.
  */
 public fun Anchor.download(): ByteArray {
     val uri = href
@@ -38,8 +37,7 @@ public fun Anchor.download(): ByteArray {
 }
 
 /**
- * Downloads contents of this image. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
+ * Downloads contents of this image.
  */
 public fun Image.download(): ByteArray {
     val uri = src
@@ -51,8 +49,7 @@ public fun Image.download(): ByteArray {
 }
 
 /**
- * Downloads [StreamResource] with given [uri] and returns it as a [ByteArray]. Only works with [StreamResource]; all other resources
- * are rejected with [AssertionError].
+ * Downloads [AbstractStreamResource] with given [uri] and returns it as a [ByteArray].
  */
 public fun downloadResource(uri: String): ByteArray {
     require(!uri.isBlank()) { "uri is blank" }
@@ -65,13 +62,19 @@ public fun downloadResource(uri: String): ByteArray {
     ) {
         s != null
     }
-    expect(
-        true,
-        "Only StreamResources are supported but got $s"
-    ) { s is StreamResource }
-    val bout = ByteArrayOutputStream()
-    (s as StreamResource).writer.accept(bout, VaadinSession.getCurrent())
-    return bout.toByteArray()
+    if (s is StreamResource) {
+        val bout = ByteArrayOutputStream()
+        s.writer.accept(bout, VaadinSession.getCurrent())
+        return bout.toByteArray()
+    }
+    // Vaadin 24.8 DownloadHandler
+    if (s is StreamResourceRegistry.ElementStreamResource) {
+        val req = MockVaadin.createVaadinRequest()
+        val res = MockVaadin.createVaadinResponse()
+        s.elementRequestHandler.handleRequest(req, res, currentSession, s.owner)
+        return res.fake.buffer.toByteArray()
+    }
+    fail("Unsupported resource type: $s")
 }
 
 private val resField: Field =

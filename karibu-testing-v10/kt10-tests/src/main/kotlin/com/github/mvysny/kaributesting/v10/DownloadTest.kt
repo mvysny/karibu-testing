@@ -3,12 +3,16 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.karibudsl.v10.anchor
 import com.github.mvysny.karibudsl.v10.image
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.html.AttachmentType
 import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
+import com.vaadin.flow.server.streams.DownloadHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import kotlin.test.expect
 
 abstract class AbstractDownloadTests() {
@@ -60,5 +64,25 @@ abstract class AbstractDownloadTests() {
                 downloadResource("foo")
             }
         }
+    }
+
+    /**
+     * The new Vaadin 24.8 API
+     */
+    @Nested inner class handlers {
+        @TempDir lateinit var tempDir: File
+        lateinit var tempFile: File
+        @BeforeEach fun createTempFile() {
+            tempFile = File(tempDir, "foo.txt")
+            tempFile.writeText("Hello!")
+        }
+
+        @Test fun `file-handler-simple`() {
+            val link = UI.getCurrent().anchor("")
+            link.setHref(DownloadHandler.forFile(tempFile), AttachmentType.DOWNLOAD)
+            expect("Hello!") { link._download().toString(Charsets.UTF_8) }
+        }
+
+        // @todo mavi also test transfer progress and that handler listener methods have been called (e.g. error)
     }
 }

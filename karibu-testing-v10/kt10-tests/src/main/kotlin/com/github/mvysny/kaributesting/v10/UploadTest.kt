@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.UI

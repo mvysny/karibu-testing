@@ -4,6 +4,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.upload.*
 import java.net.URLConnection
+import kotlin.test.fail
 
 /**
  * Invokes [StartedEvent], then feeds given [file] to the [Upload.receiver], then
@@ -22,12 +23,20 @@ import java.net.URLConnection
 @JvmOverloads
 public fun Upload._upload(
     fileName: String,
-    mimeType: String = URLConnection.guessContentTypeFromName(
-        fileName
-    ),
+    mimeType: String = currentService.getMimeType(fileName),
     file: ByteArray
 ) {
     _expectEditableByUser()
+    val r = receiver
+    if (r != null) {
+        _uploadLegacy(fileName, mimeType, file)
+    } else {
+        // Vaadin 24.8 UploadHandler
+        fail("unsupported yet")
+    }
+}
+
+private fun Upload._uploadLegacy(fileName: String, mimeType: String, file: ByteArray) {
     _fireEvent(StartedEvent(this, fileName, mimeType, file.size.toLong()))
     val failure: Exception? = try {
         val r: Receiver =
@@ -65,9 +74,7 @@ public fun Upload._upload(
 @JvmOverloads
 public fun Upload._uploadInterrupt(
     fileName: String,
-    mimeType: String = URLConnection.guessContentTypeFromName(
-        fileName
-    )
+    mimeType: String = currentService.getMimeType(fileName)
 ) {
     _uploadFail(fileName, mimeType)
 }
@@ -81,9 +88,7 @@ public fun Upload._uploadInterrupt(
 @JvmOverloads
 public fun Upload._uploadFail(
     fileName: String,
-    mimeType: String = URLConnection.guessContentTypeFromName(
-        fileName
-    ),
+    mimeType: String = currentService.getMimeType(fileName),
     exception: Exception? = null
 ) {
     _expectEditableByUser()

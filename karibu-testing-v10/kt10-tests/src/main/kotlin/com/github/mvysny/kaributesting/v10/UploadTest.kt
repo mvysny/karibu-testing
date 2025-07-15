@@ -7,8 +7,10 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
+import com.vaadin.flow.server.streams.UploadHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -146,5 +148,24 @@ abstract class AbstractUploadTests() {
         expect(true) { startedCalled }
         expect(true) { failedCalled }
         expect(true) { finishedCalled }
+    }
+
+    /**
+     * The new Vaadin 24.8 [UploadHandler].
+     */
+    @Nested inner class handlers {
+        @Test fun `successful upload`() {
+            val upload = Upload()
+            var successCalled = false
+            upload.setUploadHandler(UploadHandler.inMemory { metadata, data ->
+                successCalled = true
+                expect("Hello!") { data.toString(Charsets.UTF_8) }
+                expect("hello.txt") { metadata.fileName }
+                expect("file/txt") { metadata.contentType }
+                expect(6L) { metadata.contentLength }
+            })
+            upload._upload("hello.txt", file = "Hello!".toByteArray())
+            expect(true) { successCalled }
+        }
     }
 }

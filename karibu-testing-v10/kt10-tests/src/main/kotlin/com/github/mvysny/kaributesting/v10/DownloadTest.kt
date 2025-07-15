@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.karibudsl.v10.anchor

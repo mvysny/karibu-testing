@@ -18,6 +18,7 @@ import java.net.URLConnection
  *   is reached.
  * * The upload "runs" in the UI thread, so there is no way to test thread safety.
  */
+@Suppress("DEPRECATION")
 @JvmOverloads
 public fun Upload._upload(
     fileName: String,
@@ -76,6 +77,7 @@ public fun Upload._uploadInterrupt(
  * [Upload.receiver] and closes it immediately without writing anything, then
  * fires [FailedEvent] with an [exception] as a reason and then [FinishedEvent].
  */
+@Suppress("DEPRECATION")
 @JvmOverloads
 public fun Upload._uploadFail(
     fileName: String,
@@ -86,7 +88,7 @@ public fun Upload._uploadFail(
 ) {
     _expectEditableByUser()
     _fireEvent(StartedEvent(this, fileName, mimeType, 100L))
-    receiver.receiveUpload(fileName, mimeType).use { }
+    receiver.receiveUpload(fileName, mimeType).close()
     _fireEvent(FailedEvent(this, fileName, mimeType, 0L, exception))
     _fireEvent(FinishedEvent(this, fileName, mimeType, 0L))
 }

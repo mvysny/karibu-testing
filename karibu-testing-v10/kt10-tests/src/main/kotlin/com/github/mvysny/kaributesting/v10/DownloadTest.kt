@@ -7,12 +7,19 @@ import com.vaadin.flow.component.html.AttachmentType
 import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
 import com.vaadin.flow.server.streams.DownloadHandler
+import com.vaadin.flow.server.streams.DownloadResponse
+import com.vaadin.flow.server.streams.InputStreamDownloadCallback
+import com.vaadin.flow.server.streams.InputStreamDownloadHandler
+import com.vaadin.flow.server.streams.TransferContext
+import com.vaadin.flow.server.streams.TransferProgressListener
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.IOException
 import kotlin.test.expect
 
 abstract class AbstractDownloadTests() {
@@ -88,6 +95,11 @@ abstract class AbstractDownloadTests() {
                 link.setHref(DownloadHandler.forFile(tempFile), AttachmentType.INLINE)
                 expect("Hello!") { link._download().toString(Charsets.UTF_8) }
             }
+            @Test fun `in-memory-handler-simple`() {
+                val link = UI.getCurrent().anchor("")
+                link.setHref(DownloadHandler("Hello!".toByteArray(), "greeting.txt"), AttachmentType.DOWNLOAD)
+                expect("Hello!") { link._download().toString(Charsets.UTF_8) }
+            }
         }
         @Nested inner class image {
             @Test fun `file-handler-simple`() {
@@ -95,8 +107,89 @@ abstract class AbstractDownloadTests() {
                 link.setSrc(DownloadHandler.forFile(tempFile))
                 expect("Hello!") { link.download().toString(Charsets.UTF_8) }
             }
+            @Test fun `in-memory-handler-simple`() {
+                val link = UI.getCurrent().image()
+                link.setSrc(DownloadHandler("Hello!".toByteArray(), "greeting.txt"))
+                expect("Hello!") { link.download().toString(Charsets.UTF_8) }
+            }
         }
 
         // @todo mavi also test transfer progress and that handler listener methods have been called (e.g. error)
+        @Test fun `progress-notifications`() {
+            val link = UI.getCurrent().anchor("")
+            val progress = TestTransferProgressListener()
+            val h = DownloadHandler("Hello!".toByteArray(), "greeting.txt", progressListener = progress)
+            link.setHref(h, AttachmentType.DOWNLOAD)
+            expect(false) { progress.started }
+            expect(false) { progress.progressReported }
+            expect(null) { progress.error }
+            expect(null) { progress.completedBytes }
+
+            expect("Hello!") { link.download().toString(Charsets.UTF_8) }
+            // notifications happen asynchronously
+            MockVaadin.clientRoundtrip()
+
+            expect(true) { progress.started }
+            expect(true) { progress.progressReported }
+            expect(null) { progress.error }
+            expect(6L) { progress.completedBytes }
+        }
+    }
+}
+
+class TestTransferProgressListener : TransferProgressListener {
+    var started = false
+    var progressReported = false
+    var error: IOException? = null
+    var completedBytes: Long? = null
+    val completed: Boolean get() = completedBytes != null
+
+    override fun onStart(context: TransferContext) {
+        started = true
+    }
+
+    override fun onProgress(context: TransferContext, transferredBytes: Long, totalBytes: Long) {
+        progressReported = true
+    }
+
+    override fun onError(
+        context: TransferContext,
+        reason: IOException
+    ) {
+        error = reason
+    }
+
+    override fun onComplete(
+        context: TransferContext,
+        transferredBytes: Long
+    ) {
+        completedBytes = transferredBytes
+    }
+
+    override fun progressReportInterval(): Long = 1L
+}
+
+/**
+ * Creates a [DownloadHandler] producing given [bytes].
+ */
+fun DownloadHandler(
+    bytes: ByteArray,
+    fileName: String,
+    contentType: String = currentService.getMimeType(fileName)
+        ?: "application/octet-stream",
+    progressListener: TransferProgressListener? = null
+): InputStreamDownloadHandler {
+    val callback = InputStreamDownloadCallback {
+        DownloadResponse(
+            bytes.inputStream(),
+            fileName,
+            contentType,
+            bytes.size.toLong()
+        )
+    }
+    return if (progressListener != null) {
+        DownloadHandler.fromInputStream(callback, progressListener)
+    } else {
+        DownloadHandler.fromInputStream(callback)
     }
 }

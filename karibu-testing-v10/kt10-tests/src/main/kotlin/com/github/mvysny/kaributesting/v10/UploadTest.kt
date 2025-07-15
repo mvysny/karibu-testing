@@ -156,16 +156,18 @@ abstract class AbstractUploadTests() {
     @Nested inner class handlers {
         @Test fun `successful upload`() {
             val upload = Upload()
+            UI.getCurrent().add(upload)
             var successCalled = false
             upload.setUploadHandler(UploadHandler.inMemory { metadata, data ->
                 successCalled = true
                 expect("Hello!") { data.toString(Charsets.UTF_8) }
                 expect("hello.txt") { metadata.fileName }
-                expect("file/txt") { metadata.contentType }
+                expect("text/plain") { metadata.contentType }
                 expect(6L) { metadata.contentLength }
             })
             upload._upload("hello.txt", file = "Hello!".toByteArray())
             expect(true) { successCalled }
         }
+        // @todo mavi unsuccessful upload
     }
 }

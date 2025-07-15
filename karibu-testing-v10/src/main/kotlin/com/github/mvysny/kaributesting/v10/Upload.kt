@@ -3,8 +3,15 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.upload.*
-import java.net.URLConnection
-import kotlin.test.fail
+import com.vaadin.flow.internal.streams.UploadCompleteEvent
+import com.vaadin.flow.internal.streams.UploadStartEvent
+import com.vaadin.flow.server.StreamResourceRegistry
+import com.vaadin.flow.server.streams.UploadEvent
+import com.vaadin.flow.server.streams.UploadHandler
+import org.apache.commons.fileupload2.core.FileItemHeaders
+import org.apache.commons.fileupload2.core.FileItemInput
+import java.io.InputStream
+import java.net.URI
 
 /**
  * Invokes [StartedEvent], then feeds given [file] to the [Upload.receiver], then
@@ -23,7 +30,7 @@ import kotlin.test.fail
 @JvmOverloads
 public fun Upload._upload(
     fileName: String,
-    mimeType: String = currentService.getMimeType(fileName),
+    mimeType: String = currentService.getMimeType(fileName) ?: "application/octet-stream",
     file: ByteArray
 ) {
     _expectEditableByUser()
@@ -32,7 +39,47 @@ public fun Upload._upload(
         _uploadLegacy(fileName, mimeType, file)
     } else {
         // Vaadin 24.8 UploadHandler
-        fail("unsupported yet")
+        _uploadNew(fileName, mimeType, file)
+        // events are fired asynchronously
+        MockVaadin.clientRoundtrip()
+    }
+}
+
+/**
+ * Returns the [UploadHandler] set to this [Upload]. Fails if no [UploadHandler]
+ * has been set.
+ */
+public val Upload._handler: UploadHandler get() {
+    require(isAttached) { "Karibu-Testing can't retrieve UploadHandler unless the Upload component is attached to the UI" }
+    var target = element.getAttribute("target")
+    if (target == null) {
+        MockVaadin.clientRoundtrip()
+        target = element.getAttribute("target")
+    }
+    checkNotNull(target) { "${toPrettyString()}: upload handler has not been set" }
+    val res = currentSession.resourceRegistry.getResource(URI(target))
+    val resource = res.get() as StreamResourceRegistry.ElementStreamResource
+    val handler = resource.elementRequestHandler
+    return handler as UploadHandler
+}
+
+private fun Upload._uploadNew(fileName: String, mimeType: String, file: ByteArray) {
+    val handler = _handler
+    val req = MockVaadin.createVaadinRequest()
+    val res = MockVaadin.createVaadinResponse()
+    val item = FakeFileItemInput(file.inputStream(), mimeType)
+    val event = UploadEvent(req, res, currentSession, fileName, file.size.toLong(), mimeType, element, item, null)
+    try {
+        _fireEvent(UploadStartEvent(this))
+        try {
+            handler.handleUploadRequest(event)
+        } finally {
+            _fireEvent(UploadCompleteEvent(this))
+        }
+        handler.responseHandled(true, res)
+    } catch (e: Exception) {
+        handler.responseHandled(false, res)
+        throw e
     }
 }
 
@@ -96,4 +143,25 @@ public fun Upload._uploadFail(
     receiver.receiveUpload(fileName, mimeType).close()
     _fireEvent(FailedEvent(this, fileName, mimeType, 0L, exception))
     _fireEvent(FinishedEvent(this, fileName, mimeType, 0L))
+}
+
+internal class FakeFileItemInput(val data: InputStream, val mimeType: String?) : FileItemInput {
+    override fun getContentType(): String? = mimeType
+    override fun getFieldName(): String? {
+        throw UnsupportedOperationException("unimplemented")
+    }
+    override fun getInputStream(): InputStream = data
+    override fun getName(): String? {
+        throw UnsupportedOperationException("unimplemented")
+    }
+    override fun isFormField(): Boolean {
+        throw UnsupportedOperationException("unimplemented")
+    }
+    override fun getHeaders(): FileItemHeaders? {
+        throw UnsupportedOperationException("unimplemented")
+    }
+
+    override fun setHeaders(p0: FileItemHeaders?): FileItemInput? {
+        throw UnsupportedOperationException("unimplemented")
+    }
 }

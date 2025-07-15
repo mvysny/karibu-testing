@@ -66,6 +66,9 @@ abstract class AbstractUploadTests() {
         expect("text/plain") { memoryBuffer.fileData.mimeType }
     }
 
+    /**
+     * Tests [_upload] for cases when the receiver throws an exception.
+     */
     @Test fun `unsuccessful upload`() {
         val upload = Upload()
         upload.receiver = Receiver { fileName, mimeType ->
@@ -103,6 +106,9 @@ abstract class AbstractUploadTests() {
         expect(true) { finishedCalled }
     }
 
+    /**
+     * Tests [_uploadFail].
+     */
     @Test fun `failed upload`() {
         val upload = Upload()
         upload.receiver = Receiver { fileName, mimeType ->

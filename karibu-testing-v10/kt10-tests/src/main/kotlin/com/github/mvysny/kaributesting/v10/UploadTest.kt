@@ -7,15 +7,19 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
-import com.vaadin.flow.server.streams.UploadHandler
+import com.vaadin.flow.server.streams.*
+import org.apache.commons.io.output.BrokenOutputStream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import kotlin.test.expect
 import kotlin.test.fail
+
 
 abstract class AbstractUploadTests() {
     @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
@@ -189,7 +193,7 @@ abstract class AbstractUploadTests() {
             expect(true) { successCalled }
         }
 
-        @Test fun notifications() {
+        @Test fun events() {
             val upload = Upload()
             UI.getCurrent().add(upload)
             var allFinishedCalled = false
@@ -198,5 +202,79 @@ abstract class AbstractUploadTests() {
             upload._upload("hello.txt", file = "Hello!".toByteArray())
             expect(true) { allFinishedCalled }
         }
+
+        @Test fun `transfer progress monitoring`() {
+            val upload = Upload()
+            UI.getCurrent().add(upload)
+            val tp = TestTransferProgressListener()
+            upload.setUploadHandler(UploadHandler.inMemory({ metadata, data -> }, tp))
+            upload._upload("hello.txt", file = "Hello!".toByteArray())
+            expect(true) { tp.started }
+            expect(6L) { tp.completedBytes }
+            expect(true) { tp.progressReported }
+            expect(null) { tp.error }
+        }
+
+        @Test fun `transfer progress monitoring on failure`() {
+            val upload = Upload()
+            UI.getCurrent().add(upload)
+            val tp = TestTransferProgressListener()
+            upload.setUploadHandler(OutputStreamUploadHandler.alwaysFail().withTransferProgressListener(tp))
+            assertThrows<IOException> {
+                upload._upload("hello.txt", file = "Hello!".toByteArray())
+            }
+
+            MockVaadin.clientRoundtrip()
+            expect(true) { tp.started }
+            expect(null) { tp.completedBytes }
+            // OutputStreamUploadHandler.alwaysFail() fails to read even a single byte, so no progress is reported.
+            expect(false) { tp.progressReported }
+            expect(IOException::class.java) { tp.error!!.javaClass }
+        }
+    }
+}
+
+/**
+ * Stores uploaded file to [out]. Calls [successCallback] when the transfer completes successfully.
+ */
+class OutputStreamUploadHandler(
+    val out: OutputStream,
+    val successCallback: (UploadMetadata) -> Unit
+) : TransferProgressAwareHandler<UploadEvent, OutputStreamUploadHandler>(), UploadHandler {
+    override fun getTransferContext(transferEvent: UploadEvent): TransferContext =
+        TransferContext(
+            transferEvent.request,
+            transferEvent.response, transferEvent.session,
+            transferEvent.fileName, transferEvent.owningElement,
+            transferEvent.fileSize
+        )
+
+    override fun handleUploadRequest(event: UploadEvent) {
+        try {
+            event.inputStream.use { inputStream ->
+                out.use { outputStream ->
+                    TransferUtil.transfer(inputStream, outputStream, getTransferContext(event), listeners)
+                }
+            }
+        } catch (e: IOException) {
+            notifyError(event, e)
+            throw e
+        }
+        event.getUI().access({
+            successCallback(UploadMetadata(event.fileName, event.contentType, event.fileSize))
+        })
+    }
+
+    fun withTransferProgressListener(listener: TransferProgressListener): OutputStreamUploadHandler = apply {
+        addTransferProgressListener(listener)
+    }
+
+    companion object {
+        /**
+         * Produces OutputStreamUploadHandler which fails to read anything and always throws
+         * [IOException]. Since this fails to read even a single byte, no progress is reported
+         * to [TransferProgressListener].
+         */
+        fun alwaysFail() = OutputStreamUploadHandler(BrokenOutputStream()) { fail("shouldn't be called") }
     }
 }

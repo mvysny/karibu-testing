@@ -198,7 +198,7 @@ class TestTransferProgressListener : TransferProgressListener {
 }
 
 /**
- * Creates a [DownloadHandler] producing given [bytes].
+ * Creates an in-memory [DownloadHandler] producing given [bytes].
  */
 fun DownloadHandler(
     bytes: ByteArray,

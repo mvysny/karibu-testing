@@ -188,6 +188,15 @@ abstract class AbstractUploadTests() {
             upload._upload("hello.txt", file = "Hello!".toByteArray())
             expect(true) { successCalled }
         }
-        // @todo mavi unsuccessful upload
+
+        @Test fun notifications() {
+            val upload = Upload()
+            UI.getCurrent().add(upload)
+            var allFinishedCalled = false
+            upload.addAllFinishedListener { allFinishedCalled = true }
+            upload.setUploadHandler(UploadHandler.inMemory { metadata, data -> })
+            upload._upload("hello.txt", file = "Hello!".toByteArray())
+            expect(true) { allFinishedCalled }
+        }
     }
 }

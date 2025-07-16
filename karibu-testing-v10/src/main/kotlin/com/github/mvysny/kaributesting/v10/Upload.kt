@@ -78,6 +78,8 @@ private fun Upload._uploadNew(fileName: String, mimeType: String, file: ByteArra
             _fireEvent(UploadCompleteEvent(this))
         }
         handler.responseHandled(true, res)
+        // emulate client-side Upload which fires this DOM event.
+        _fireEvent(AllFinishedEvent(this))
     } catch (e: Exception) {
         handler.responseHandled(false, res)
         throw e

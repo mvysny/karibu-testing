@@ -3,6 +3,8 @@ package com.github.mvysny.kaributesting.v10
 import com.vaadin.flow.component.AbstractField
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
+import com.vaadin.flow.component.internal.AbstractFieldSupport
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 
 /**
@@ -27,6 +29,29 @@ private val __AbstractField_setModelValue: Method by lazy {
     m
 }
 
+private fun <V> HasValue<*, V>.setModelValue(v: V?, fromClient: Boolean) {
+    __AbstractField_setModelValue.invoke(this, v, fromClient)
+}
+
+private val __AbstractField_fieldSupport: Field by lazy {
+    val f = AbstractField::class.java.getDeclaredField("fieldSupport")
+    f.isAccessible = true
+    f
+}
+
+@Suppress("UNCHECKED_CAST")
+private val <V> HasValue<*, V>._fieldSupport: AbstractFieldSupport<*, V>
+    get() = __AbstractField_fieldSupport.get(this) as AbstractFieldSupport<*, V>
+
+private val __AbstractFieldSupport_setValue: Method by lazy {
+    val m = AbstractFieldSupport::class.java.getDeclaredMethod("setValue", Object::class.java, Boolean::class.java, Boolean::class.java)
+    m.isAccessible = true
+    m
+}
+private fun <V> HasValue<*, V>.setValue(value: V?, fromInternal: Boolean, fromClient: Boolean) {
+    __AbstractFieldSupport_setValue.invoke(_fieldSupport, value, fromInternal, fromClient)
+}
+
 /**
  * Sets the [value] of given component, but only if it is actually possible to do so by the user.
  * If the component is read-only or disabled, an exception is thrown.
@@ -40,7 +65,9 @@ private val __AbstractField_setModelValue: Method by lazy {
 @JvmOverloads
 public fun <V> HasValue<*, V>._setValue(value: V?, fromClient: Boolean = true) {
     (this as Component)._expectEditableByUser()
-    __AbstractField_setModelValue.invoke(this, value, fromClient)
+    // this doesn't call the AbstractField.setPresentationValue(): https://github.com/mvysny/karibu-testing/issues/194#issuecomment-3077492570
+//    setModelValue(value, fromClient)
+    setValue(value, false, fromClient)
 }
 
 /**

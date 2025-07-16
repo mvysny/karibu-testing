@@ -151,13 +151,19 @@ abstract class AbstractHasValueTests {
     @Nested inner class RadioButtonGroupTests : TestImpl<String>({ RadioButtonGroup("label", "foo", "bar") }, "foo")
     @Nested inner class SelectTests : TestImpl<String>({ Select() }, "foo")
     @Nested inner class TimePickerTests : TestImpl<LocalTime>({ TimePicker() }, LocalTime.NOON)
-    @Nested inner class MyCustomFieldTests : TestImpl<String>({ MyCustomField() }, "foo")
-    // @todo mavi CustomField, AbstractField, all vaadin-core HasValues
-    // @todo mavi emulate maybe how client-side sets value, by calling AbstractField.setModelValue()
+    @Nested inner class MyCustomFieldTests : TestImpl<String>({ MyCustomField() }, "foo") {
+        // tests for https://github.com/mvysny/karibu-testing/issues/194#issuecomment-3077492570
+        @Test fun `setPresentationValue called`() {
+            val f = MyCustomField()
+            f._value = "foo"
+            expect("foo") { f._value }
+            expect("foo") { f.tf.value }
+        }
+    }
 }
 
 class MyCustomField : CustomField<String>() {
-    private val tf = TextField()
+    val tf = TextField()
     override fun generateModelValue(): String? = tf.value
     override fun setPresentationValue(newPresentationValue: String?) {
         tf.value = newPresentationValue

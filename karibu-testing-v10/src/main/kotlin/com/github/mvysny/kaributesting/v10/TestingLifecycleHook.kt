@@ -5,6 +5,7 @@ import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.card.Card
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.contextmenu.MenuItemBase
 import com.vaadin.flow.component.contextmenu.SubMenuBase
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.littemplate.LitTemplate
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.sidenav.SideNav
 import com.vaadin.flow.component.sidenav.SideNavItem
+import com.vaadin.flow.dom.Element
 
 /**
  * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
@@ -181,6 +183,16 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             // The latter causes the virtual child to be fetched as Composite direct child, thus duplicating any virtual children the child component might have.
             component.children.toList()
         }
+        component is Card -> {
+            // Card.getChildren() doesn't return footer nor header parts, nor the body - it
+            // doesn't return anything really. We need to hack things out of the component manually.
+            val childElements = component.element.children.toList()
+            val childComponents = childElements.mapNotNull { it.component.orElse(null) }
+            // unfortunately childComponents won't contain Card.contentRoot (which is just an Element, not a Component)
+            val childElementsWithNoComponent: List<Element> = childElements.filter { it.component.isEmpty }
+            val body = childElementsWithNoComponent.flatMap { it.children.toList() } .mapNotNull { it.component.orElse(null) }
+            (childComponents + body).distinct()
+        }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
         else -> (component.children.toList() + component._getVirtualChildren()).distinct()
@@ -270,7 +282,7 @@ private fun isDialogAndNeedsRemoval(component: Component): Boolean {
  * which then fires event back to the server that the dialog was closed, and removes itself from the DOM.
  * Since there's no browser with browserless testing, we need to cleanup closed dialogs manually, hence this method.
  *
- * Also see [com.github.mvysny.kaributesting.v10.mock.MockedUI] for more details
+ * Also see [mock.MockedUI] for more details
  */
 public fun cleanupDialogs() {
     // Starting with Vaadin 23, nested dialogs are also nested within respective

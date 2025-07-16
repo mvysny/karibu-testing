@@ -17,7 +17,7 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
 
 allprojects {
     group = "com.github.mvysny.kaributesting"
-    version = "2.4.2"
+    version = "2.4.3-SNAPSHOT"
     repositories {
         mavenCentral()
         maven(url = "https://maven.vaadin.com/vaadin-addons")

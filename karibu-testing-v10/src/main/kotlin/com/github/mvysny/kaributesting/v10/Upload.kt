@@ -43,8 +43,12 @@ public fun Upload._upload(
 }
 
 /**
- * Returns the [UploadHandler] set to this [Upload]. Fails if no [UploadHandler]
+ * Returns the [UploadHandler] set to this [Upload] via [Upload.setUploadHandler]. Fails if no [UploadHandler]
  * has been set.
+ *
+ * Technical limitation: The [Upload] component must be attached to the UI otherwise
+ * it's impossible to retrieve the [UploadHandler]. Explanation: the `target` attribute
+ * is only set after Upload is attached.
  */
 public val Upload._handler: UploadHandler get() {
     require(isAttached) { "Karibu-Testing can't retrieve UploadHandler unless the Upload component is attached to the UI" }

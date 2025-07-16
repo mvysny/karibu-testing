@@ -8,9 +8,6 @@ import com.vaadin.flow.internal.streams.UploadStartEvent
 import com.vaadin.flow.server.StreamResourceRegistry
 import com.vaadin.flow.server.streams.UploadEvent
 import com.vaadin.flow.server.streams.UploadHandler
-import org.apache.commons.fileupload2.core.FileItemHeaders
-import org.apache.commons.fileupload2.core.FileItemInput
-import java.io.InputStream
 import java.net.URI
 
 /**
@@ -66,9 +63,9 @@ public val Upload._handler: UploadHandler get() {
 private fun Upload._uploadNew(fileName: String, mimeType: String, file: ByteArray) {
     val handler = _handler
     val req = MockVaadin.createVaadinRequest()
+    req.fake.content = file
     val res = MockVaadin.createVaadinResponse()
-    val item = FakeFileItemInput(file.inputStream(), mimeType)
-    val event = UploadEvent(req, res, currentSession, fileName, file.size.toLong(), mimeType, element, item, null)
+    val event = UploadEvent(req, res, currentSession, fileName, file.size.toLong(), mimeType, element, null, null)
     try {
         _fireEvent(UploadStartEvent(this))
         try {
@@ -143,25 +140,4 @@ public fun Upload._uploadFail(
     receiver.receiveUpload(fileName, mimeType).close()
     _fireEvent(FailedEvent(this, fileName, mimeType, 0L, exception))
     _fireEvent(FinishedEvent(this, fileName, mimeType, 0L))
-}
-
-internal class FakeFileItemInput(val data: InputStream, val mimeType: String?) : FileItemInput {
-    override fun getContentType(): String? = mimeType
-    override fun getFieldName(): String? {
-        throw UnsupportedOperationException("unimplemented")
-    }
-    override fun getInputStream(): InputStream = data
-    override fun getName(): String? {
-        throw UnsupportedOperationException("unimplemented")
-    }
-    override fun isFormField(): Boolean {
-        throw UnsupportedOperationException("unimplemented")
-    }
-    override fun getHeaders(): FileItemHeaders? {
-        throw UnsupportedOperationException("unimplemented")
-    }
-
-    override fun setHeaders(p0: FileItemHeaders?): FileItemInput? {
-        throw UnsupportedOperationException("unimplemented")
-    }
 }

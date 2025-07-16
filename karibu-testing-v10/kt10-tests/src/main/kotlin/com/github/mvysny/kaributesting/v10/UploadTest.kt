@@ -168,6 +168,26 @@ abstract class AbstractUploadTests() {
             upload._upload("hello.txt", file = "Hello!".toByteArray())
             expect(true) { successCalled }
         }
+
+        @Test fun `when using UploadHandler, old listeners aren't called`() {
+            val upload = Upload()
+            UI.getCurrent().add(upload)
+            var successCalled = false
+            upload.setUploadHandler(UploadHandler.inMemory { metadata, data ->
+                successCalled = true
+                expect("Hello!") { data.toString(Charsets.UTF_8) }
+                expect("hello.txt") { metadata.fileName }
+                expect("text/plain") { metadata.contentType }
+                expect(6L) { metadata.contentLength }
+            })
+            upload.addFailedListener { fail("shouldn't be called") }
+            upload.addStartedListener { fail("shouldn't be called") }
+            upload.addSucceededListener { fail("shouldn't be called") }
+            upload.addFinishedListener { fail("shouldn't be called") }
+
+            upload._upload("hello.txt", file = "Hello!".toByteArray())
+            expect(true) { successCalled }
+        }
         // @todo mavi unsuccessful upload
     }
 }

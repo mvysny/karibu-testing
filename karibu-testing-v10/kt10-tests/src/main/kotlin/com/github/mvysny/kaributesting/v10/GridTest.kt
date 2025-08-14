@@ -145,6 +145,17 @@ abstract class AbstractGridTests {
             }
             grid.expectRow(0, "Span[text='Person']", "0", "Anchor[text='Person', href='VAADIN/dynamic/resource/*']", "Button[icon='vaadin:refresh', @theme='icon']")
         }
+
+        @Test fun componentsDsl() {
+            val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
+            val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
+                componentColumn({ span("Person") })
+                addColumnFor(TestPerson::age)
+                componentColumn({ anchor(emptyDownloadHandler(), "Person") })
+                componentColumn({ button(icon = VaadinIcon.REFRESH.create()) })
+            }
+            grid.expectRow(0, "Span[text='Person']", "0", "Anchor[text='Person', href='VAADIN/dynamic/resource/*']", "Button[icon='vaadin:refresh', @theme='icon']")
+        }
     }
 
     @Nested inner class expectRowRegex {

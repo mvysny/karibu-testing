@@ -65,6 +65,9 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
             expect("Anchor[DISABLED, text='testing', href='testing']") {
                 UI.getCurrent().anchor("testing") { isEnabled = false }.toPrettyString()
             }
+            expect("Anchor[text='testing', href='VAADIN/dynamic/resource/*']") {
+                UI.getCurrent().anchor(emptyDownloadHandler(), "testing").toPrettyString()
+            }
         }
         @Test fun `disabled link cannot be clicked`() {
             expectThrows(IllegalStateException::class, "The Anchor[DISABLED, text='testing', href='testing'] is not enabled") {

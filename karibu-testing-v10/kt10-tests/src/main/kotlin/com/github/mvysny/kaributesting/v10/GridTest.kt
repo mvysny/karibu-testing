@@ -13,8 +13,10 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
+import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.NativeLabel
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -22,6 +24,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
 import com.vaadin.flow.data.selection.SelectionEvent
 import com.vaadin.flow.function.ValueProvider
+import com.vaadin.flow.router.RouterLink
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -130,6 +133,17 @@ abstract class AbstractGridTests {
             expectThrows(AssertionError::class, "--[Name]-[Age]--\n0: name 0, 0") {
                 grid.expectRow(3, "should fail", "should fail") // should fail
             }
+        }
+
+        @Test fun components() {
+            val dp: ListDataProvider<TestPerson> = ListDataProvider((0 until 1).map { TestPerson("name $it", it) })
+            val grid: Grid<TestPerson> = UI.getCurrent().grid<TestPerson>(dp) {
+                addComponentColumn { Span("Person") }
+                addColumnFor(TestPerson::age)
+                addComponentColumn { Anchor(emptyDownloadHandler(), "Person") }
+                addComponentColumn { Button(VaadinIcon.REFRESH.create()) }
+            }
+            grid.expectRow(0, "Span[text='Person']", "0", "Anchor[text='Person', href='VAADIN/dynamic/resource/*']", "Button[icon='vaadin:refresh', @theme='icon']")
         }
     }
 

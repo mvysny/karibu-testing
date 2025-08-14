@@ -130,7 +130,13 @@ public fun Component.toPrettyString(): String {
         list.add("placeholder='$placeholder'")
     }
     if (this is Anchor) {
-        list.add("href='$_href'")
+        var href = _href
+        if (href.startsWith("VAADIN/dynamic/resource/")) {
+            // can't test against UUIDs present in Vaadin resources such as
+            // VAADIN/dynamic/resource/1/7c5bbdba-7b08-48f2-8268-4b6e17767bcd/
+            href = "VAADIN/dynamic/resource/*"
+        }
+        list.add("href='$href'")
     }
     if (_iconName != null) {
         list.add("icon='$_iconName'")

@@ -221,6 +221,8 @@ fun DownloadHandler(
     }
 }
 
+fun emptyDownloadHandler(): DownloadHandler = DownloadHandler(byteArrayOf(), "foo.txt", "text/plain")
+
 /**
  * Produces a [DownloadHandler] which always fails - never downloads anything successfully.
  */

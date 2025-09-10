@@ -1289,6 +1289,9 @@ The function will first invoke `StartedEvent`, then poll
 `Upload.receiver` and closes it immediately without writing anything, then
 fire `FailedEvent` and `FinishedEvent`.
 
+Vaadin 24.8 `UploadHandler` is supported as well; make sure you're using the newest Karibu-Testing for this.
+`UploadHandler`'s lifecycle events are fired accordingly.
+
 ### Support for ComboBox/Select
 
 You can use static methods from `ComboBox.kt` to assert on the state of the ComboBox or Select component.

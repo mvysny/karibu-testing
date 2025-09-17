@@ -661,7 +661,10 @@ abstract class AbstractMockVaadinTests() {
                 override fun isAtmosphereAvailable(): Boolean = false
                 override fun getMainDivId(session: VaadinSession, request: VaadinRequest): String = "ROOT-1"
                 override fun createVaadinSession(request: VaadinRequest): VaadinSession = MockVaadinSession(this) { MockedUI() }
-                override fun getDeploymentConfiguration(): DeploymentConfiguration = FakeDeploymentConfiguration(super.getDeploymentConfiguration())
+                private val config: DeploymentConfiguration by lazy {
+                    FakeDeploymentConfiguration(super.getDeploymentConfiguration())
+                }
+                override fun getDeploymentConfiguration(): DeploymentConfiguration = config
             }
             MockVaadin.tearDown()
             MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {

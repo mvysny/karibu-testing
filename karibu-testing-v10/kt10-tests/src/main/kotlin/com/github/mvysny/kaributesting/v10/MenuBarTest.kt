@@ -68,7 +68,7 @@ abstract class AbstractMenuBarTests() {
             // test for https://github.com/mvysny/karibu-testing/issues/163
             val menuBar: MenuBar = UI.getCurrent().menuBar {
                 item("foo") {
-                    subMenu.add(Span("foo"))
+                    subMenu.addComponent(Span("foo"))
                 }
             }
             menuBar._expectOne<Span>()
@@ -79,7 +79,7 @@ abstract class AbstractMenuBarTests() {
             val menuBar: MenuBar = UI.getCurrent().menuBar {
                 item("foo") {
                     item("bar") {
-                        subMenu.add(Span("foo"))
+                        subMenu.addComponent(Span("foo"))
                     }
                 }
             }

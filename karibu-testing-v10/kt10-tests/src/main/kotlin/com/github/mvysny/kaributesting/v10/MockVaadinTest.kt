@@ -89,7 +89,7 @@ abstract class AbstractMockVaadinTests() {
             expect(true) { UI.getCurrent().reconnectDialogConfiguration != null }
             expect(true) { UI.getCurrent().internals != null }
             expect(true) { UI.getCurrent().page != null }
-            expect(true) { UI.getCurrent().router != null }
+            expect(true) { UI.getCurrent().session.service.router != null }
         }
 
         @Test fun serializable() {
@@ -271,7 +271,7 @@ abstract class AbstractMockVaadinTests() {
         }
 
         @Test fun `UI-getUrl() to view works in mocked env`() {
-            val routeConfig = RouteConfiguration.forRegistry(UI.getCurrent().router.registry)
+            val routeConfig = RouteConfiguration.forSessionScope()
             expect("helloworld") { routeConfig.getUrl(HelloWorldView::class.java) }
             expect("params/1") { routeConfig.getUrl(ParametrizedView::class.java, 1) }
             expect("parent/child") { routeConfig.getUrl(ChildView::class.java) }

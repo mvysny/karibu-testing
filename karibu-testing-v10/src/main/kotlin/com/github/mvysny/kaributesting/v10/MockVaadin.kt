@@ -230,7 +230,13 @@ public object MockVaadin {
         session.refreshTransients(WrappedHttpSession(httpSession), service)
         check(session.lockInstance != null) { "$session created from $service has null lock. See the MockSession class on how to mock locks properly" }
         check((session.lockInstance as ReentrantLock).isLocked) { "$session created from $service: lock must be locked!" }
-        session.configuration = service.deploymentConfiguration
+        // make sure session has correct VaadinConfiguration
+        if (VaadinVersion.get.isAtLeast(25)) {
+            // In Vaadin 25, VaadinSession retrieves the configuration from VaadinService
+            check(session.configuration === service.deploymentConfiguration) { "Expected ${service.deploymentConfiguration} but got ${session.configuration}" }
+        } else {
+            session.configuration = service.deploymentConfiguration
+        }
 
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)

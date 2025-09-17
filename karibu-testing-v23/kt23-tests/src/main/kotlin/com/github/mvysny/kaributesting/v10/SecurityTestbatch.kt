@@ -6,6 +6,7 @@ import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.auth.AccessAnnotationChecker
 import com.vaadin.flow.server.auth.AnonymousAllowed
+import com.vaadin.flow.server.auth.NavigationAccessControl
 import com.vaadin.flow.server.auth.ViewAccessChecker
 import org.myapp.AdminView
 import org.myapp.LoginView
@@ -57,8 +58,7 @@ abstract class AbstractSecurityTests() {
             routes.add(LoginView::class.java)
             routes.add(AdminView::class.java)
         })
-        val checker = ViewAccessChecker()
-        checker.enable()
+        val checker = NavigationAccessControl()
         checker.setLoginView(LoginView::class.java)
         UI.getCurrent().addBeforeEnterListener(checker)
         navigateTo<AdminView>()

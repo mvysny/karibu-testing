@@ -6,8 +6,8 @@ junit5 = "5.11.0"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 vaadin24 = "24.9.0"
 vaadin24_spring = "24.9.0"
-vaadin24next = "24.9.0-rc2"
-vaadin24next_spring = "24.9.0-rc2"
+vaadin24next = "25.0.0-alpha8"
+vaadin24next_spring = "25.0.0-alpha8"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -29,6 +29,6 @@ jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 groovy = "org.apache.groovy:groovy:4.0.24"
 hibernate-validator = "org.hibernate.validator:hibernate-validator:8.0.1.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:5.0.1"
-spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.0.4"
-spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:3.0.4"
+spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.5.5"
+spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:3.5.5"
 fake-servlet5 = "com.github.mvysny.fake-servlet:fake-servlet5:1.3"

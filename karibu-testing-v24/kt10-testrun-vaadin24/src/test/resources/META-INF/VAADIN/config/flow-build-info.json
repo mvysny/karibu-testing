@@ -2,6 +2,5 @@
   "compatibilityMode": false,
   "productionMode": false,
   "npmFolder": ".",
-  "generatedFolder": "target/frontend",
-  "frontendFolder": "frontend"
+  "generatedFolder": "target/frontend"
 }

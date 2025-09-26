@@ -7,7 +7,6 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.auth.AccessAnnotationChecker
 import com.vaadin.flow.server.auth.AnonymousAllowed
 import com.vaadin.flow.server.auth.NavigationAccessControl
-import com.vaadin.flow.server.auth.ViewAccessChecker
 import org.myapp.AdminView
 import org.myapp.LoginView
 import java.security.Principal

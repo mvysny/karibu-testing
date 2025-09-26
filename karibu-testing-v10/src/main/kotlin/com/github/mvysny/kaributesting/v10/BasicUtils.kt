@@ -2,11 +2,14 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.getVirtualChildren
 import com.github.mvysny.kaributools.textRecursively2
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.dom.DomEvent
+import com.vaadin.flow.dom.Element
 import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.server.VaadinSession
 import elemental.json.Json
@@ -33,7 +36,14 @@ public fun Component._fireDomEvent(
     eventData: JsonObject = Json.createObject()
 ) {
     _expectEditableByUser()
-    element._fireDomEvent(DomEvent(element, eventType, eventData))
+    val event = if (VaadinVersion.get.isAtMost(25)) {
+        // DomEvent constructor now no longer accepts elemental.json
+        val ctor = DomEvent::class.java.getConstructor(Element::class.java, String::class.java, JsonNode::class.java)
+        ctor.newInstance(element, eventType, eventData.toJackson())
+    } else {
+        DomEvent(element, eventType, eventData)
+    }
+    element._fireDomEvent(event)
 }
 
 /**

@@ -1,5 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.fakeservlet.FakeHttpSession
 import com.github.mvysny.fakeservlet.FakeRequest
 import com.github.mvysny.fakeservlet.FakeResponse
@@ -267,4 +269,9 @@ public fun createExtendedClientDetails(
         curDate, touchDevice, devicePixelRatio, windowName, navigatorPlatform
     ) as ExtendedClientDetails
     return ecd
+}
+
+internal fun JsonObject.toJackson(): JsonNode {
+    val json = toJson()
+    return ObjectMapper().readTree(json)
 }

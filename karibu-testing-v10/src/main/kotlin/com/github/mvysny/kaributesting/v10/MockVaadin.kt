@@ -90,8 +90,8 @@ public object MockVaadin {
      */
     @JvmStatic
     public fun setup(uiFactory: () -> UI = @JvmSerializableLambda { MockedUI() }, servlet: VaadinServlet) {
-        check(VaadinVersion.get.isAtLeast(24)) {
-            "Karibu-Testing 2.x only works with Vaadin 24+ but you're using ${VaadinVersion.get}"
+        check(VaadinVersion.get.isAtLeast(25)) {
+            "Karibu-Testing 2.6.x only works with Vaadin 25+ but you're using ${VaadinVersion.get}"
         }
         check(!VaadinMeta.isCompatibilityMode)
 
@@ -231,12 +231,8 @@ public object MockVaadin {
         check(session.lockInstance != null) { "$session created from $service has null lock. See the MockSession class on how to mock locks properly" }
         check((session.lockInstance as ReentrantLock).isLocked) { "$session created from $service: lock must be locked!" }
         // make sure session has correct VaadinConfiguration
-        if (VaadinVersion.get.isAtLeast(25)) {
-            // In Vaadin 25, VaadinSession retrieves the configuration from VaadinService
-            check(session.configuration === service.deploymentConfiguration) { "Expected ${service.deploymentConfiguration} but got ${session.configuration}" }
-        } else {
-            session.configuration = service.deploymentConfiguration
-        }
+        // In Vaadin 25, VaadinSession retrieves the configuration from VaadinService
+        check(session.configuration === service.deploymentConfiguration) { "Expected ${service.deploymentConfiguration} but got ${session.configuration}" }
 
         VaadinSession.setCurrent(session)
         strongRefSession.set(session)

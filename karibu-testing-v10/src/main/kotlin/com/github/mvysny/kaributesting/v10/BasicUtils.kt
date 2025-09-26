@@ -3,6 +3,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.getVirtualChildren
 import com.github.mvysny.kaributools.textRecursively2
@@ -33,16 +34,10 @@ public fun Component._fireEvent(event: ComponentEvent<*>) {
 @JvmOverloads
 public fun Component._fireDomEvent(
     eventType: String,
-    eventData: JsonObject = Json.createObject()
+    eventData: JsonNode = ObjectMapper().createObjectNode()
 ) {
     _expectEditableByUser()
-    val event = if (VaadinVersion.get.isAtMost(25)) {
-        // DomEvent constructor now no longer accepts elemental.json
-        val ctor = DomEvent::class.java.getConstructor(Element::class.java, String::class.java, JsonNode::class.java)
-        ctor.newInstance(element, eventType, eventData.toJackson())
-    } else {
-        DomEvent(element, eventType, eventData)
-    }
+    val event = DomEvent(element, eventType, eventData)
     element._fireDomEvent(event)
 }
 
@@ -61,13 +56,13 @@ public fun Component._fireDomClickEvent(
     altKey: Boolean = false,
     metaKey: Boolean = false
 ) {
-    val json = Json.createObject().apply {
-        put("event.button", Json.create(button.toDouble()))
-        put("event.detail", Json.create(clickCount.toDouble()))
-        put("event.shiftKey", Json.create(shiftKey))
-        put("event.ctrlKey", Json.create(ctrlKey))
-        put("event.altKey", Json.create(altKey))
-        put("event.metaKey", Json.create(metaKey))
+    val json = ObjectMapper().createObjectNode().apply {
+        put("event.button", button.toDouble())
+        put("event.detail", clickCount.toDouble())
+        put("event.shiftKey", shiftKey)
+        put("event.ctrlKey", ctrlKey)
+        put("event.altKey", altKey)
+        put("event.metaKey", metaKey)
     }
     _fireDomEvent("click", json)
 }

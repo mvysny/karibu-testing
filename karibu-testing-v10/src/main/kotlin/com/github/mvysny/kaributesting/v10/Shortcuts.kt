@@ -1,18 +1,20 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.BooleanNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Key
 import com.vaadin.flow.component.KeyModifier
 import com.vaadin.flow.component.ShortcutRegistration
-import elemental.json.impl.JreJsonFactory
-import elemental.json.impl.JreJsonObject
 
 /**
  * Take a look at `DomEventListenerWrapper.matchesFilter()` to see why this is necessary.
- * If this stuff stops working, place a breakpoint into the [getBoolean]/[hasKey] function,
+ * If this stuff stops working, place a breakpoint into the [get]/[has] function,
  * to see what kind of keys you're receiving and whether it matches [filter].
  */
-private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>) : JreJsonObject(JreJsonFactory()) {
+private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>) : ObjectNode(ObjectMapper().deserializationConfig.nodeFactory) {
     val filter: String
     init {
         // compute the filter
@@ -23,12 +25,12 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
         put("event.key", key.keys.first())
     }
 
-    override fun hasKey(key: String): Boolean {
+    override fun has(key: String): Boolean {
         // the "key" is a JavaScript expression which matches the key pressed.
         // we need to match it against the 'filter'
         if (!key.startsWith("([")) {
             // not a filter
-            return super.hasKey(key)
+            return super.has(key)
         }
         return matchesFilter(key)
     }
@@ -41,14 +43,14 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
         return probeFilter.startsWith(filter)
     }
 
-    override fun getBoolean(key: String): Boolean {
+    override fun get(key: String): JsonNode {
         // the "key" is a JavaScript expression which matches the key pressed.
         // we need to match it against the 'filter'
         if (!key.startsWith("([")) {
             // not a filter
-            return super.getBoolean(key)
+            return super.get(key)
         }
-        return matchesFilter(key)
+        return BooleanNode.valueOf(matchesFilter(key))
     }
 
     companion object {

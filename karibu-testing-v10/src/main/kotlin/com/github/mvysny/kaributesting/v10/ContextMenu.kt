@@ -284,27 +284,13 @@ public fun ContextMenu.setOpened(opened: Boolean) {
 }
 
 private val __ContextMenuBase_onBeforeOpenMenu: Method by lazy {
-    val m = ContextMenuBase::class.java.getDeclaredMethod("onBeforeOpenMenu", JsonObject::class.java)
-    m.isAccessible = true
-    m
-}
-
-private val __ContextMenuBase_onBeforeOpenMenu_Vaadin25: Method by lazy {
     val m = ContextMenuBase::class.java.getDeclaredMethod("onBeforeOpenMenu", ObjectNode::class.java)
     m.isAccessible = true
     m
 }
 
 private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, columnId: String?): Boolean {
-    if (VaadinVersion.get.isAtLeast(25)) {
-        val json = ObjectMapper().createObjectNode().apply {
-            put("key", itemKey ?: "")
-            put("columnId", columnId ?: "")
-        }
-        val obj = __ContextMenuBase_onBeforeOpenMenu_Vaadin25.invoke(this, json) as Boolean
-        return obj
-    }
-    val json = Json.createObject().apply {
+    val json = ObjectMapper().createObjectNode().apply {
         put("key", itemKey ?: "")
         put("columnId", columnId ?: "")
     }

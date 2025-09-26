@@ -270,8 +270,3 @@ public fun createExtendedClientDetails(
     ) as ExtendedClientDetails
     return ecd
 }
-
-internal fun JsonObject.toJackson(): JsonNode {
-    val json = toJson()
-    return ObjectMapper().readTree(json)
-}

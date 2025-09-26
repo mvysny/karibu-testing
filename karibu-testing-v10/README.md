@@ -17,7 +17,8 @@ Compatibility chart:
 | 2.0.x                  | no         | Java 17+                                                          | Vaadin 24.0+                                         |
 | 2.1.x                  | no         | Java 17+                                                          | Vaadin 24.1+                                         |
 | 2.3.x                  | no         | Java 17+                                                          | Vaadin 24.5+                                         |
-| **2.4.x**              | **yes**    | Java 17+                                                          | Vaadin 24.8+                                         |
+| **2.4.x**              | **yes**    | Java 17+                                                          | Vaadin 24.8+ but not Vaadin 25+                      |
+| **2.5.x**              | **yes**    | Java 17+                                                          | Vaadin 24.8+                                         |
 
 To start, just add the following lines into your Gradle `build.gradle` file:
 

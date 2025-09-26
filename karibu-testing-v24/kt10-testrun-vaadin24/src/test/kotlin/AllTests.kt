@@ -18,7 +18,7 @@ class AllTests {
         @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
 
         @Test fun vaadinVersion() {
-            expect(24) { VaadinVersion.get.major }
+            expect(25) { VaadinVersion.get.major }
             expect(false) { VaadinMeta.isCompatibilityMode }
         }
     }

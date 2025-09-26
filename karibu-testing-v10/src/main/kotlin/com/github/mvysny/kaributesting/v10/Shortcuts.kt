@@ -43,7 +43,7 @@ private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>
         return probeFilter.startsWith(filter)
     }
 
-    override fun get(key: String): JsonNode {
+    override fun get(key: String): JsonNode? {
         // the "key" is a JavaScript expression which matches the key pressed.
         // we need to match it against the 'filter'
         if (!key.startsWith("([")) {

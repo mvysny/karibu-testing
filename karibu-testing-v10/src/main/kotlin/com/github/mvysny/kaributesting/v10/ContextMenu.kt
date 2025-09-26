@@ -2,7 +2,10 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.mvysny.kaributools.IconName
+import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.iconName
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
@@ -286,7 +289,21 @@ private val __ContextMenuBase_onBeforeOpenMenu: Method by lazy {
     m
 }
 
+private val __ContextMenuBase_onBeforeOpenMenu_Vaadin25: Method by lazy {
+    val m = ContextMenuBase::class.java.getDeclaredMethod("onBeforeOpenMenu", ObjectNode::class.java)
+    m.isAccessible = true
+    m
+}
+
 private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, columnId: String?): Boolean {
+    if (VaadinVersion.get.isAtLeast(25)) {
+        val json = ObjectMapper().createObjectNode().apply {
+            put("key", itemKey ?: "")
+            put("columnId", columnId ?: "")
+        }
+        val obj = __ContextMenuBase_onBeforeOpenMenu_Vaadin25.invoke(this, json) as Boolean
+        return obj
+    }
     val json = Json.createObject().apply {
         put("key", itemKey ?: "")
         put("columnId", columnId ?: "")

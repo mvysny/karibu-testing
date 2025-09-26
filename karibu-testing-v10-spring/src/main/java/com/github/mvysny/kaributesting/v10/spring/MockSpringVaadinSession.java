@@ -4,7 +4,6 @@ import com.github.mvysny.kaributesting.v10.MockVaadin;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.spring.SpringVaadinSession;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,5 +1,7 @@
 package com.github.mvysny.kaributesting.v10.pro
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.mvysny.kaributesting.v10._fireEvent
 import com.github.mvysny.kaributesting.v10.toPrettyString
 import com.github.mvysny.kaributools._internalId
@@ -7,8 +9,6 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.gridpro.EditorType
 import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.gridpro.ItemUpdater
-import elemental.json.Json
-import elemental.json.JsonObject
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -20,7 +20,7 @@ public fun <T> GridPro<T>._fireCellEditStartedEvent(item: T, column: Grid.Column
     require(column is GridPro.EditColumn) {
         "The column must be of type GridPro.EditColumn but was ${column.toPrettyString()}"
     }
-    val itemJson: JsonObject = Json.createObject()
+    val itemJson: ObjectNode = ObjectMapper().createObjectNode()
     itemJson.put("key", dataCommunicator.keyMapper.key(item))
     val event = GridPro.CellEditStartedEvent<T>(this, fromClient,
             itemJson, column._internalId)

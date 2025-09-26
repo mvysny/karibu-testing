@@ -1,5 +1,7 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
 import com.github.mvysny.kaributesting.v10.ElementUtilsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
@@ -51,7 +53,7 @@ class BasicUtils {
      * @param eventType the event type, e.g. "click"
      * @param eventData optional event data, defaults to an empty object.
      */
-    static void _fireDomEvent(@NotNull Component self, @NotNull String eventType, @NotNull JsonObject eventData = Json.createObject()) {
+    static void _fireDomEvent(@NotNull Component self, @NotNull String eventType, @NotNull ObjectNode eventData = new ObjectMapper().createObjectNode()) {
         BasicUtilsKt._fireDomEvent(self, eventType, eventData)
     }
 

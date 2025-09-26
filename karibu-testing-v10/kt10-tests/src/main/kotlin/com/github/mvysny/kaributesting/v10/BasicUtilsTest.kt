@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
@@ -89,7 +90,7 @@ abstract class AbstractBasicUtilsTests {
             val div = Div()
             lateinit var event: ClickEvent<Div>
             div.addClickListener { e -> event = e }
-            div._fireDomEvent("click", Json.createObject().apply { put("event.screenX", 20.0) })
+            div._fireDomEvent("click", ObjectMapper().createObjectNode().apply { put("event.screenX", 20.0) })
             expect(20) { event.screenX }
         }
         @Test fun `fails for non-editable component`() {

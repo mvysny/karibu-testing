@@ -1,5 +1,6 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.kaributesting.v10.MockVaadin
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Component
@@ -32,7 +33,7 @@ class BasicUtilsTest {
 
     @Test void api() {
         new Button()._fireEvent(new ClickEvent<Component>(new Button()))
-        new Button().element._fireDomEvent(new DomEvent(new Button().element, "foo", Json.createObject()))
+        new Button().element._fireDomEvent(new DomEvent(new Button().element, "foo", new ObjectMapper().createObjectNode()))
         new Button()._fireDomEvent("foo")
         new Checkbox().getLabel()
         new Checkbox().setLabel("foo")

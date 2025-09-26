@@ -2,6 +2,8 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onClick
 import com.github.mvysny.karibudsl.v10.onLeftClick
@@ -624,24 +626,24 @@ abstract class AbstractMockVaadinTests() {
             @Test fun javascriptCallsGoThroughHandlers() {
                 pendingJavascriptInvocationHandlers.add { it ->
                     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
-                        it.complete(Json.create("Success!"))
+                        it.complete(ObjectMapper().nodeFactory.textNode("Success!"))
                     }
                 }
-                lateinit var result: JsonValue
+                lateinit var result: JsonNode
                 UI.getCurrent().button {
                     element.executeJs("return this.getBoundingClientRect();").then { result = it }
                 }
                 MockVaadin.clientRoundtrip()
-                expect("\"Success!\"") { result.toJson() }
+                expect("Success!") { result.textValue() }
             }
 
             @Test fun javascriptHandlersCalledAutomatically() {
                 pendingJavascriptInvocationHandlers.add { it ->
                     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
-                        it.complete(Json.create("Success!"))
+                        it.complete(ObjectMapper().nodeFactory.textNode("Success!"))
                     }
                 }
-                lateinit var result: JsonValue
+                lateinit var result: JsonNode
                 val btn = UI.getCurrent().button {
                     onClick {
                         element.executeJs("return this.getBoundingClientRect();")
@@ -650,7 +652,7 @@ abstract class AbstractMockVaadinTests() {
                 }
                 btn._click()
                 MockVaadin.clientRoundtrip() // still necessary
-                expect("\"Success!\"") { result.toJson() }
+                expect("Success!") { result.textValue() }
             }
         }
     }

@@ -1,20 +1,20 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.BooleanNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Key
 import com.vaadin.flow.component.KeyModifier
 import com.vaadin.flow.component.ShortcutRegistration
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.BooleanNode
+import tools.jackson.databind.node.ObjectNode
 
 /**
  * Take a look at `DomEventListenerWrapper.matchesFilter()` to see why this is necessary.
  * If this stuff stops working, place a breakpoint into the [get]/[has] function,
  * to see what kind of keys you're receiving and whether it matches [filter].
  */
-private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>) : ObjectNode(ObjectMapper().deserializationConfig.nodeFactory) {
+private class MockFilterJsonObject(val key: Key, val modifiers: Set<KeyModifier>) : ObjectNode(ObjectMapper().deserializationConfig().nodeFactory) {
     val filter: String
     init {
         // compute the filter

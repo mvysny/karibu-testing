@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.fakeservlet.FakeHttpSession
 import com.github.mvysny.fakeservlet.FakeRequest
 import com.github.mvysny.fakeservlet.FakeResponse
@@ -21,7 +19,6 @@ import java.io.Serializable
 import jakarta.servlet.Servlet
 import jakarta.servlet.ServletContext
 import java.lang.reflect.Constructor
-import kotlin.random.Random
 import kotlin.test.expect
 
 public fun Serializable.serializeToBytes(): ByteArray = ByteArrayOutputStream().use { ObjectOutputStream(it).writeObject(this); it }.toByteArray()

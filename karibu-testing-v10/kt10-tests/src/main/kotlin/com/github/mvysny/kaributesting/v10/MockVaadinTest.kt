@@ -2,8 +2,6 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onClick
 import com.github.mvysny.karibudsl.v10.onLeftClick
@@ -20,14 +18,10 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.page.ExtendedClientDetails
-import com.vaadin.flow.component.page.PendingJavaScriptResult
 import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.auth.AnonymousAllowed
-import elemental.json.Json
-import elemental.json.JsonObject
-import elemental.json.JsonValue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -40,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.ExecutionException
 import kotlin.concurrent.read
 import kotlin.concurrent.thread

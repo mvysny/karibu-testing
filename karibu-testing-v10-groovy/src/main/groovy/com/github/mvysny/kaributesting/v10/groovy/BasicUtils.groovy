@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10.groovy
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.mvysny.kaributesting.v10.BasicUtilsKt
 import com.github.mvysny.kaributesting.v10.ElementUtilsKt
 import com.github.mvysny.kaributesting.v10.SearchSpec
@@ -16,8 +14,6 @@ import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.dom.DomEvent
 import com.vaadin.flow.dom.Element
-import elemental.json.Json
-import elemental.json.JsonObject
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import kotlin.Unit
@@ -25,6 +21,8 @@ import kotlin.jvm.functions.Function1
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import org.jsoup.nodes.Node
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 
 /**
  * A set of basic extension methods for all Vaadin components.

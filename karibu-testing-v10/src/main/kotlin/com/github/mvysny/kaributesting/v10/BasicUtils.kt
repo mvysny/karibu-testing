@@ -2,19 +2,15 @@
 
 package com.github.mvysny.kaributesting.v10
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.mvysny.kaributools.VaadinVersion
 import com.github.mvysny.kaributools.getVirtualChildren
 import com.github.mvysny.kaributools.textRecursively2
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.dom.DomEvent
-import com.vaadin.flow.dom.Element
 import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.server.VaadinSession
-import elemental.json.Json
-import elemental.json.JsonObject
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 import kotlin.test.fail
 
 /**

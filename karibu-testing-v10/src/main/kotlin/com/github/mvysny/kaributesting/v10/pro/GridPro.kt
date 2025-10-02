@@ -1,7 +1,5 @@
 package com.github.mvysny.kaributesting.v10.pro
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.mvysny.kaributesting.v10._fireEvent
 import com.github.mvysny.kaributesting.v10.toPrettyString
 import com.github.mvysny.kaributools._internalId
@@ -9,6 +7,8 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.gridpro.EditorType
 import com.vaadin.flow.component.gridpro.GridPro
 import com.vaadin.flow.component.gridpro.ItemUpdater
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 

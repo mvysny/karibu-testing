@@ -1,11 +1,9 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Text
-import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -19,14 +17,11 @@ import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.router.Route
-import com.vaadin.flow.router.Router
-import com.vaadin.flow.server.RouteRegistry
-import com.vaadin.flow.server.startup.ApplicationRouteRegistry
-import elemental.json.Json
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.ObjectMapper
 import kotlin.test.expect
 import kotlin.test.fail
 

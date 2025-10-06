@@ -1,11 +1,11 @@
 [versions]
-slf4j = "2.0.16"
+slf4j = "2.0.17"
 kaributools = "0.24"
 karibudsl = "2.4.0"
 junit5 = "5.11.0"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "24.9.0"
-vaadin24_spring = "24.9.0"
+vaadin24 = "24.9.2"
+vaadin24_spring = "24.9.2"
 vaadin24next = "25.0.0-alpha8"
 vaadin24next_spring = "25.0.0-alpha8"
 

@@ -2,6 +2,7 @@
 
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.upload.Receiver
@@ -250,6 +251,9 @@ class OutputStreamUploadHandler(
         )
 
     override fun handleUploadRequest(event: UploadEvent) {
+        if (VaadinVersion.get.isAtLeast(24, 9, 4) && VaadinVersion.get.isAtMost(24)) {
+            setTransferUI(event.ui)
+        }
         try {
             event.inputStream.use { inputStream ->
                 out.use { outputStream ->

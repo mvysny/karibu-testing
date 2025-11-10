@@ -241,6 +241,9 @@ class OutputStreamUploadHandler(
     val out: OutputStream,
     val successCallback: (UploadMetadata) -> Unit
 ) : TransferProgressAwareHandler<UploadEvent, OutputStreamUploadHandler>(), UploadHandler {
+    init {
+        setTransferUI(currentUI)
+    }
     override fun getTransferContext(transferEvent: UploadEvent): TransferContext =
         TransferContext(
             transferEvent.request,

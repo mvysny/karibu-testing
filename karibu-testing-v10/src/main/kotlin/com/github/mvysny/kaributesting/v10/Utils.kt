@@ -10,8 +10,6 @@ import com.vaadin.flow.router.AccessDeniedException
 import com.vaadin.flow.router.HasErrorParameter
 import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.server.*
-import elemental.json.*
-import elemental.json.impl.JreJsonValue
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -32,55 +30,6 @@ public val IntRange.size: Int get() = (endInclusive + 1 - start).coerceAtLeast(0
  */
 public fun <T> expectList(vararg expected: T, actual: ()->List<T>) {
     expect(expected.toList(), actual)
-}
-
-/**
- * Adds a [value] at the end of the array.
- */
-public fun JsonArray.add(value: JsonValue) {
-    set(length(), value)
-}
-
-/**
- * Adds a [string] at the end of the array.
- */
-public fun JsonArray.add(string: String) {
-    add(Json.create(string))
-}
-
-/**
- * Adds a [bool] at the end of the array.
- */
-public fun JsonArray.add(bool: Boolean) {
-    add(Json.create(bool))
-}
-
-/**
- * Adds a [number] at the end of the array.
- */
-public fun JsonArray.add(number: Double) {
-    add(Json.create(number))
-}
-
-/**
- * Returns the contents of this array as an immutable [List]. The returned list
- * is a copy and doesn't reflect mutations done in the array.
- */
-public fun JsonArray.toList(): List<JsonValue> =
-    (0 until length()).map { get(it) }
-
-/**
- * Unwraps all items in given list.
- */
-public fun List<JsonValue>.unwrap(): List<Any?> =
-    map { it.unwrap() }
-
-/**
- * Unwraps this value into corresponding Java type. Unwraps arrays recursively.
- */
-public fun JsonValue.unwrap(): Any? = when(this) {
-    is JsonArray -> this.toList().unwrap()
-    else -> (this as JreJsonValue).`object`
 }
 
 /**

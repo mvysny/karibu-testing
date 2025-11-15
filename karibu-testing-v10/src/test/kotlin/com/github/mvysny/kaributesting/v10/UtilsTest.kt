@@ -1,7 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.router.*
-import elemental.json.Json
 import org.junit.jupiter.api.Nested
 import java.io.Serializable
 import java.util.concurrent.Callable
@@ -17,51 +16,6 @@ class UtilsTest {
         @Test fun primitives() {
             expect("foo") { "foo".serializeDeserialize() }
             expect(false) { false.serializeDeserialize() }
-        }
-    }
-
-    @Nested inner class JsonTests() {
-        @Nested inner class unwrap() {
-            @Test fun primitives() {
-                expect(false) { Json.create(false).unwrap() }
-                expect("foo") { Json.create("foo").unwrap() }
-                expect(null) { Json.createNull().unwrap() }
-                expect(4.0) { Json.create(4.0).unwrap() }
-            }
-            @Nested inner class array() {
-                @Test fun empty() {
-                    expectList() { Json.createArray().unwrap() as List<*> }
-                }
-                @Test fun `populated with primitives`() {
-                    val a = Json.createArray()
-                    a.set(0, false)
-                    a.set(1, 1.0)
-                    a.set(2, "hello")
-                    a.set(3, Json.createNull())
-                    expectList(false, 1.0, "hello", null) { a.unwrap() as List<*> }
-                }
-            }
-        }
-        @Nested inner class `JsonArray-toList` {
-            @Test fun empty() {
-                expectList() { Json.createArray().toList() }
-            }
-            @Test fun primitives() {
-                val a = Json.createArray()
-                a.set(0, false)
-                a.set(1, 1.0)
-                a.set(2, "hello")
-                a.set(3, Json.createNull())
-                expectList(false, 1.0, "hello", null) { a.toList().unwrap() }
-            }
-        }
-        @Test fun `JsonArray-add`() {
-            val a = Json.createArray()
-            a.add(true)
-            a.add(2.0)
-            a.add("hello")
-            a.add(Json.createNull())
-            expectList(true, 2.0, "hello", null) { a.toList().unwrap() }
         }
     }
 

@@ -5,9 +5,9 @@ import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.vaadin.flow.server.VaadinContext
 import com.vaadin.flow.server.VaadinServlet
 import com.vaadin.flow.server.VaadinServletContext
-import elemental.json.JsonObject
 import java.io.File
 import jakarta.servlet.ServletContext
+import tools.jackson.databind.JsonNode
 
 public object MockVaadinHelper {
     @JvmStatic
@@ -32,7 +32,7 @@ public object MockVaadinHelper {
     public fun createMockVaadinContext(): VaadinContext =
         VaadinServletContext(createMockContext())
 
-    public fun getTokenFileFromClassloader(): JsonObject? {
+    public fun getTokenFileFromClassloader(): JsonNode? {
         // no need to optimize this method; the output is cached in VaadinMeta.flowBuildInfo
         checkVaadinSupportedByKaribuTesting()
 

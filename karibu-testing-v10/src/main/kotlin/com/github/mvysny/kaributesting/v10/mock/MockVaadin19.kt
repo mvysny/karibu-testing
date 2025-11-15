@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10.mock
 
-import com.github.mvysny.kaributesting.v10.VaadinMeta
 import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.di.Lookup
 import com.vaadin.flow.di.LookupInitializer
@@ -9,9 +8,9 @@ import com.vaadin.flow.server.VaadinServletContext
 import com.vaadin.flow.server.startup.ApplicationConfigurationFactory
 import com.vaadin.flow.server.startup.DefaultApplicationConfigurationFactory
 import com.vaadin.flow.server.startup.LookupServletContainerInitializer
-import elemental.json.Json
-import elemental.json.JsonObject
 import jakarta.servlet.ServletContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 
 /**
  * Makes sure to call LookupInitializer (present in Vaadin 19+).
@@ -66,7 +65,7 @@ public object MockVaadin19 {
         return lookup.lookup(clazz)
     }
 
-    public fun getTokenFileFromClassloader(): JsonObject? {
+    public fun getTokenFileFromClassloader(): JsonNode? {
         // Use DefaultApplicationConfigurationFactory.getTokenFileFromClassloader() to make sure to read
         // the same flow-build-info.json that Vaadin reads.
 
@@ -78,7 +77,7 @@ public object MockVaadin19 {
             val m = DefaultApplicationConfigurationFactory::class.java.getDeclaredMethod("getTokenFileFromClassloader", VaadinContext::class.java)
             m.isAccessible = true
             val json = m.invoke(acf, ctx) as String? ?: return null
-            return Json.parse(json)
+            return ObjectMapper().readTree(json)
         }
         return null
     }

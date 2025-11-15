@@ -2,10 +2,10 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.mock.MockVaadinHelper
 import com.github.mvysny.kaributesting.v10.mock.checkVaadinSupportedByKaribuTesting
-import elemental.json.JsonObject
+import tools.jackson.databind.JsonNode
 
 public object VaadinMeta {
-    public val flowBuildInfo: JsonObject? by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    public val flowBuildInfo: JsonNode? by lazy(LazyThreadSafetyMode.PUBLICATION) {
         MockVaadinHelper.getTokenFileFromClassloader()
     }
 

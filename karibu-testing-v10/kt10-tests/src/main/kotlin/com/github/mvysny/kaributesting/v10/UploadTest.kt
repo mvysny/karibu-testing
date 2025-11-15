@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.upload.Receiver
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
+import com.vaadin.flow.server.communication.TransferUtil
 import com.vaadin.flow.server.streams.*
 import org.apache.commons.io.output.BrokenOutputStream
 import org.junit.jupiter.api.AfterEach
@@ -173,6 +174,7 @@ abstract class AbstractUploadTests() {
             expect(true) { successCalled }
         }
 
+        @Suppress("removal")
         @Test fun `when using UploadHandler, old listeners aren't called`() {
             val upload = Upload()
             UI.getCurrent().add(upload)

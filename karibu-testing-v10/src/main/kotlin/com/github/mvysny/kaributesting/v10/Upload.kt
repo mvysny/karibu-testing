@@ -69,7 +69,7 @@ private fun Upload._uploadNew(fileName: String, mimeType: String, file: ByteArra
     val req = MockVaadin.createVaadinRequest()
     req.fake.content = file
     val res = MockVaadin.createVaadinResponse()
-    val event = UploadEvent(req, res, currentSession, fileName, file.size.toLong(), mimeType, element, null, null)
+    val event = UploadEvent(req, res, currentSession, fileName, file.size.toLong(), mimeType, element, null)
     try {
         _fireEvent(UploadStartEvent(this))
         try {

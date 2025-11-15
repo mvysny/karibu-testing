@@ -1,5 +1,5 @@
 [versions]
-slf4j = "2.0.16"
+slf4j = "2.0.17"
 kaributools = "0.24"
 karibudsl = "2.4.0"
 junit5 = "5.11.0"

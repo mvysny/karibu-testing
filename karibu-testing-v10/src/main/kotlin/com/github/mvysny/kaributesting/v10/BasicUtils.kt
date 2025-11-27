@@ -88,7 +88,7 @@ public val Component._isVisible: Boolean
             // TabSheet doesn't hide contents of the unselected tabs: it only marks them
             // disabled on server-side (and hides them on the client-side, but we can't see that).
             // We have to have a special workaround for TabSheet
-            if (this == p._tabs) {
+            if (this == p._tabs || this == p.prefixComponent || this == p.suffixComponent) {
                 return isVisible
             }
             val tab = p.selectedTab

@@ -6,6 +6,7 @@ import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.component.textfield.TextField
@@ -226,6 +227,17 @@ abstract class AbstractBasicUtilsTests {
             expect(false) { c1._isVisible }
             expect(true) { c2._isVisible }
             expect(true) { ts._tabs._isVisible }
+        }
+        // tests https://github.com/mvysny/karibu-testing/issues/198
+        @Test fun tabSheetPrefixSuffixVisibility() {
+            val ts = TabSheet()
+            ts.prefixComponent = Button("Prefix")
+            ts.suffixComponent = Button("Suffix")
+            expect(true) { ts.prefixComponent._isVisible }
+            expect(true) { ts.suffixComponent._isVisible }
+            ts.add("tab1", Span("Hi"))
+            expect(true) { ts.prefixComponent._isVisible }
+            expect(true) { ts.suffixComponent._isVisible }
         }
     }
 }

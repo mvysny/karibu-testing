@@ -1,6 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.tabs.TabSheet
 import com.vaadin.flow.component.tabs.Tabs
 import org.junit.jupiter.api.AfterEach
@@ -27,5 +28,24 @@ abstract class AbstractTabSheetTests {
         t.selectedIndex = 1
         t._expectOne<Button> { text = "Tab2" }
         t._expectNone<Button> { text = "Tab1" }
+    }
+
+    // tests https://github.com/mvysny/karibu-testing/issues/198
+    @Test fun prefixAndSuffixComponentsFound() {
+        val t = TabSheet()
+        t.prefixComponent = Button("Prefix")
+        t.suffixComponent = Button("Suffix")
+        t._expectOne<Button> { text = "Prefix" }
+        t._expectOne<Button> { text = "Suffix" }
+    }
+
+    // tests https://github.com/mvysny/karibu-testing/issues/198
+    @Test fun prefixAndSuffixComponentsFound2() {
+        val t = TabSheet()
+        t.prefixComponent = Button("Prefix")
+        t.suffixComponent = Button("Suffix")
+        t.add("tab1", Span("Hello"))
+        t._expectOne<Button> { text = "Prefix" }
+        t._expectOne<Button> { text = "Suffix" }
     }
 }

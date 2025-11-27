@@ -4,10 +4,10 @@ kaributools = "0.24"
 karibudsl = "2.4.0"
 junit5 = "5.11.0"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "25.0.0-beta5"
-vaadin24_spring = "25.0.0-beta5"
-vaadin24next = "25.0.0-beta5"
-vaadin24next_spring = "25.0.0-beta5"
+vaadin24 = "25.0.0-beta7"
+vaadin24_spring = "25.0.0-beta7"
+vaadin24next = "25.0.0-beta7"
+vaadin24next_spring = "25.0.0-beta7"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -26,9 +26,10 @@ vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin
 vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }
 classgraph = "io.github.classgraph:classgraph:4.8.151"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
-groovy = "org.apache.groovy:groovy:5.0.2"
+groovy = "org.apache.groovy:groovy:4.0.29"
 hibernate-validator = "org.hibernate.validator:hibernate-validator:8.0.1.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:5.0.1"
 spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.5.5"
 spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:3.5.5"
 fake-servlet5 = "com.github.mvysny.fake-servlet:fake-servlet5:1.3"
+commons-io = "commons-io:commons-io:2.21.0"

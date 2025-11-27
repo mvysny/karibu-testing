@@ -204,15 +204,11 @@ public fun createExtendedClientDetails(
     devicePixelRatio: String = "1.0",
     windowName: String = "ROOT-2521314-0.2626611481",
     navigatorPlatform: String = "Linux x86_64"
-): ExtendedClientDetails {
-    val constructor: Constructor<*> =
-        ExtendedClientDetails::class.java.declaredConstructors[0]
-    constructor.isAccessible = true
-    val ecd: ExtendedClientDetails = constructor.newInstance(
-        screenWidth, screenHeight, windowInnerWidth, windowInnerHeight,
+): ExtendedClientDetails =
+    ExtendedClientDetails(currentUI, screenWidth, screenHeight, windowInnerWidth, windowInnerHeight,
         bodyClientWidth, bodyClientHeight,
         tzOffset, rawTzOffset, dstShift, dstInEffect, tzId,
         curDate, touchDevice, devicePixelRatio, windowName, navigatorPlatform
-    ) as ExtendedClientDetails
-    return ecd
-}
+    )
+
+public val ExtendedClientDetails?.initialized: Boolean get() = this != null && this.screenWidth >= 0

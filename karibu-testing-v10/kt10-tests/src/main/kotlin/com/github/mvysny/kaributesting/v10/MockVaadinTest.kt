@@ -390,7 +390,7 @@ abstract class AbstractMockVaadinTests() {
 
         @Test fun `proper retrieval`() {
             // by default they're null but a mock one can be retrieved.
-            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            expect(false) { UI.getCurrent().internals.extendedClientDetails.initialized }
             var ecd: ExtendedClientDetails? = null
             UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
 
@@ -406,7 +406,7 @@ abstract class AbstractMockVaadinTests() {
 
         @Test fun `double retrieval doesn't create new ECD instances`() {
             // by default ECD is null but a mock one can be retrieved.
-            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            expect(false) { UI.getCurrent().internals.extendedClientDetails.initialized }
             var ecd: ExtendedClientDetails? = null
             UI.getCurrent().page.retrieveExtendedClientDetails { ecd = it }
             MockVaadin.clientRoundtrip()
@@ -422,12 +422,12 @@ abstract class AbstractMockVaadinTests() {
 
         @Test fun `nothing is fetched when fakeExtendedClientDetails=false`() {
             fakeExtendedClientDetails = false
-            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            expect(false) { UI.getCurrent().internals.extendedClientDetails.initialized }
             UI.getCurrent().page.retrieveExtendedClientDetails {
                 fail("shouldn't be called")
             }
             MockVaadin.clientRoundtrip()
-            expect(null) { UI.getCurrent().internals.extendedClientDetails }
+            expect(false) { UI.getCurrent().internals.extendedClientDetails.initialized }
         }
 
         @Test fun `view is created with ECD already populated`() {

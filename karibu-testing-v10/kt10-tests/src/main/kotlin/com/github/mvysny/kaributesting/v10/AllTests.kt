@@ -2,6 +2,7 @@ package com.github.mvysny.kaributesting.v10
 
 import com.github.mvysny.kaributesting.v10.pro.AbstractGridProTests
 import com.github.mvysny.kaributesting.v10.pro.AbstractRichTextEditorTests
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -61,6 +62,8 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class CardTests : AbstractCardTests()
 
     @Nested inner class UtilsTests {
+        @BeforeEach fun fakeVaadin() { MockVaadin.setup() }
+        @AfterEach fun tearDownVaadin() { MockVaadin.tearDown() }
         // test that the function succeeds on every Vaadin version
         @Test fun createECD() {
             val ecd = createExtendedClientDetails()

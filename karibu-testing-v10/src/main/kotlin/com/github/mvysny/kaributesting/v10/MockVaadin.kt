@@ -467,7 +467,7 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
             return
         }
 
-        if (ui.internals.extendedClientDetails != null) {
+        if (ui.internals.extendedClientDetails.initialized) {
             // already retrieved. just call super - it will call receiver right away.
             super.retrieveExtendedClientDetails(receiver)
             return

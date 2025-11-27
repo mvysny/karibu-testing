@@ -24,4 +24,7 @@ dependencies {
     // don't test EnhancedDialog: it's deprecated and doesn't work with Vaadin 24: https://vaadin.com/directory/component/enhanced-dialog
     // Issue: https://github.com/mvysny/karibu-testing/issues/85
 //    implementation("com.vaadin.componentfactory:enhanced-dialog:1.0.4")
+
+    // Vaadin no longer depends on commons-io
+    implementation(libs.commons.io)
 }

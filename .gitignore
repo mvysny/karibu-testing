@@ -9,3 +9,6 @@ styles.css.gz
 out
 .attach_pid*
 .kotlin
+.settings
+.project
+

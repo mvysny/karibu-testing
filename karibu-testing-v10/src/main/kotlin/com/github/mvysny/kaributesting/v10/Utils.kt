@@ -208,7 +208,8 @@ public fun createExtendedClientDetails(
     ExtendedClientDetails(currentUI, screenWidth, screenHeight, windowInnerWidth, windowInnerHeight,
         bodyClientWidth, bodyClientHeight,
         tzOffset, rawTzOffset, dstShift, dstInEffect, tzId,
-        curDate, touchDevice, devicePixelRatio, windowName, navigatorPlatform
+        curDate, touchDevice, devicePixelRatio, windowName, navigatorPlatform,
+        "light", "aura"
     )
 
 public val ExtendedClientDetails?.initialized: Boolean get() = this != null && this.screenWidth >= 0

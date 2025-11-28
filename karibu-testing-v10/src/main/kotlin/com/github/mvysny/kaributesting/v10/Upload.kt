@@ -8,6 +8,7 @@ import com.vaadin.flow.internal.streams.UploadStartEvent
 import com.vaadin.flow.server.StreamResourceRegistry
 import com.vaadin.flow.server.streams.UploadEvent
 import com.vaadin.flow.server.streams.UploadHandler
+import com.vaadin.flow.server.streams.UploadResult
 import java.net.URI
 
 /**
@@ -77,11 +78,11 @@ private fun Upload._uploadNew(fileName: String, mimeType: String, file: ByteArra
         } finally {
             _fireEvent(UploadCompleteEvent(this))
         }
-        handler.responseHandled(true, res)
+        handler.responseHandled(UploadResult(true, res))
         // emulate client-side Upload which fires this DOM event.
         _fireEvent(AllFinishedEvent(this))
     } catch (e: Exception) {
-        handler.responseHandled(false, res)
+        handler.responseHandled(UploadResult(false, res, e))
         throw e
     }
 }

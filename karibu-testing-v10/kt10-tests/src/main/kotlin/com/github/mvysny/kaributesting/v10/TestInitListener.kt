@@ -1,6 +1,5 @@
 package com.github.mvysny.kaributesting.v10
 
-import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.server.ServiceInitEvent
 import com.vaadin.flow.server.VaadinServiceInitListener
 import kotlin.test.expect

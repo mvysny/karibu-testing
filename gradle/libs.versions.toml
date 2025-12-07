@@ -27,7 +27,7 @@ vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin
 vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }
 classgraph = "io.github.classgraph:classgraph:4.8.151"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
-groovy = "org.apache.groovy:groovy:4.0.24"
+groovy = "org.apache.groovy:groovy:4.0.29"
 hibernate-validator = "org.hibernate.validator:hibernate-validator:8.0.1.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:5.0.1"
 spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.5.5"

@@ -2,7 +2,7 @@
 slf4j = "2.0.17"
 kaributools = "0.24"
 karibudsl = "2.4.0"
-junit5 = "5.11.0"
+junit5 = "6.0.1"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 vaadin24 = "25.0.0-beta9"
 vaadin24_spring = "25.0.0-beta9"
@@ -27,7 +27,7 @@ vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "va
 classgraph = "io.github.classgraph:classgraph:4.8.151"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 groovy = "org.apache.groovy:groovy:4.0.29"
-hibernate-validator = "org.hibernate.validator:hibernate-validator:8.0.1.Final"
+hibernate-validator = "org.hibernate.validator:hibernate-validator:9.1.0.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:5.0.1"
 spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:3.5.5"
 spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:3.5.5"

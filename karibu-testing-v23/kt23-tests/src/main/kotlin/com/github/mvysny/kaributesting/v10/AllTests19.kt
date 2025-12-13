@@ -16,4 +16,5 @@ abstract class AbstractAllTests19(val isModuleTest: Boolean) {
     @Nested inner class SideNavTests : AbstractSideNavTests()
     @Nested inner class TabsTests : AbstractTabsTests()
     @Nested inner class LayoutTests : AbstractLayoutTests()
+    @Nested inner class MasterDetailLayoutTests: AbstractMasterDetailLayoutTests()
 }

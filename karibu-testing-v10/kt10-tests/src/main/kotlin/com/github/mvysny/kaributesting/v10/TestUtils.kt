@@ -1,10 +1,6 @@
 package com.github.mvysny.kaributesting.v10
 
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.io.PrintStream
-import java.io.Serializable
+import java.io.*
 import kotlin.reflect.KClass
 import kotlin.test.assertFailsWith
 
@@ -57,3 +53,23 @@ inline fun <reified T: Serializable> ByteArray.deserialize(): T? = T::class.java
  * @return the clone of this
  */
 fun <T : Serializable> T.cloneBySerialization(): T = javaClass.cast(serializeToBytes().deserialize())
+
+/**
+ * Throws [IOException] from all methods.
+ */
+class BrokenOutputStream : OutputStream() {
+    override fun close() = throw IOException("close()")
+    override fun flush() = throw IOException("flush()")
+    override fun write(b: Int) = throw IOException("write(int)")
+}
+
+/**
+ * Throws [IOException] from all methods.
+ */
+class BrokenInputStream : InputStream() {
+    override fun available(): Int = throw IOException("available()")
+    override fun close() = throw IOException("close()")
+    override fun read(): Int = throw IOException()
+    override fun reset() = throw IOException()
+    override fun skip(n: Long): Long = throw IOException()
+}

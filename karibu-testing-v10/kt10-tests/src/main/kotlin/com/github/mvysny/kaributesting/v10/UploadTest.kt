@@ -9,7 +9,6 @@ import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
 import com.vaadin.flow.server.communication.TransferUtil
 import com.vaadin.flow.server.streams.*
-import org.apache.commons.io.output.BrokenOutputStream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested

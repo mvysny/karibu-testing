@@ -14,7 +14,6 @@ import com.vaadin.flow.server.streams.InputStreamDownloadCallback
 import com.vaadin.flow.server.streams.InputStreamDownloadHandler
 import com.vaadin.flow.server.streams.TransferContext
 import com.vaadin.flow.server.streams.TransferProgressListener
-import org.apache.commons.io.input.BrokenInputStream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested

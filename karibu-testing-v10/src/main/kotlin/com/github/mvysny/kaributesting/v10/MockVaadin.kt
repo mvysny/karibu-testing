@@ -311,12 +311,15 @@ public object MockVaadin {
      * * [cleanupDialogs]
      *
      * If you'd like to test your [ErrorHandler] then take a look at [runUIQueue] instead.
+     * @param propagateExceptionToHandler defaults to false. If true and [VaadinSession.errorHandler]
+     * is set, any exceptions thrown from [Command]s scheduled via the [UI.access] will be
+     * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
      * @throws IllegalStateException if the environment is not mocked
      */
     @JvmStatic
-    public fun clientRoundtrip() {
+    public fun clientRoundtrip(propagateExceptionToHandler: Boolean = false) {
         checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
-        runUIQueue()
+        runUIQueue(propagateExceptionToHandler)
         UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
         cleanupDialogs()
         testingLifecycleHook.handlePendingJavascriptInvocations(UI.getCurrent().internals.dumpPendingJavaScriptInvocations())

@@ -1,5 +1,7 @@
 package com.github.mvysny.kaributesting.v10
 
+import com.github.mvysny.kaributools.SemanticVersion
+import com.github.mvysny.kaributools.VaadinVersion
 import com.vaadin.flow.component.AbstractField
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.HasValue
@@ -44,12 +46,20 @@ private val <V> HasValue<*, V>._fieldSupport: AbstractFieldSupport<*, V>
     get() = __AbstractField_fieldSupport.get(this) as AbstractFieldSupport<*, V>
 
 private val __AbstractFieldSupport_setValue: Method by lazy {
-    val m = AbstractFieldSupport::class.java.getDeclaredMethod("setValue", Object::class.java, Boolean::class.java, Boolean::class.java)
+    val m = if (VaadinVersion.get >= SemanticVersion(25, 1, 0, "alpha3")) {
+        AbstractFieldSupport::class.java.getDeclaredMethod("setValue", Object::class.java, Boolean::class.java, Boolean::class.java, Boolean::class.java)
+    } else {
+        AbstractFieldSupport::class.java.getDeclaredMethod("setValue", Object::class.java, Boolean::class.java, Boolean::class.java)
+    }
     m.isAccessible = true
     m
 }
-private fun <V> HasValue<*, V>.setValue(value: V?, fromInternal: Boolean, fromClient: Boolean) {
-    __AbstractFieldSupport_setValue.invoke(_fieldSupport, value, fromInternal, fromClient)
+private fun <V> HasValue<*, V>.setValue(value: V?, fromInternal: Boolean, fromClient: Boolean, fromSignal: Boolean) {
+    if (__AbstractFieldSupport_setValue.parameterCount == 4) {
+        __AbstractFieldSupport_setValue.invoke(_fieldSupport, value, fromInternal, fromClient, fromSignal)
+    } else {
+        __AbstractFieldSupport_setValue.invoke(_fieldSupport, value, fromInternal, fromClient)
+    }
 }
 
 /**
@@ -67,7 +77,7 @@ public fun <V> HasValue<*, V>._setValue(value: V?, fromClient: Boolean = true) {
     (this as Component)._expectEditableByUser()
     // this doesn't call the AbstractField.setPresentationValue(): https://github.com/mvysny/karibu-testing/issues/194#issuecomment-3077492570
 //    setModelValue(value, fromClient)
-    setValue(value, false, fromClient)
+    setValue(value, false, fromClient, false)
 }
 
 /**

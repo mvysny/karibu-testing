@@ -37,7 +37,7 @@ abstract class  AbstractRouterLinkTests() {
             }
         }
         @Test fun `navigation to non-existing route blows immediately`() {
-            expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
+            expectThrows(NotFoundError::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {
                 UI.getCurrent().apply {
@@ -78,7 +78,7 @@ If you'd like to revert back to the original Vaadin RouteNotFoundError, please r
             }
         }
         @Test fun `navigation to non-existing route blows immediately`() {
-            expectThrows(NotFoundException::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
+            expectThrows(NotFoundError::class, """No route found for 'nonexisting': Couldn't find route for 'nonexisting'
 Available routes: [TestingView at '/testing']
 If you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the class com.github.mvysny.kaributesting.v10.MockRouteNotFoundError from Routes.errorRoutes""") {
                 UI.getCurrent().apply {

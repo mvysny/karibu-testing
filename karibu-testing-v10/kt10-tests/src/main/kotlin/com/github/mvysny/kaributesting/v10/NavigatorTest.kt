@@ -10,10 +10,8 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.router.AccessDeniedException
 import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
-import com.vaadin.flow.router.NotFoundException
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.VaadinRequest
 import com.vaadin.flow.server.auth.NavigationAccessControl
@@ -286,7 +284,7 @@ abstract class AbstractNavigatorSecurityTests(val classpathScanPackage: String?)
         }
         @Test fun `when access is rejected and no login view is set, redirects to MockRouteNotFoundError`() {
             UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl())
-            expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+            expectThrows<NotFoundError>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
                 navigateTo<TestingView>()
             }
         }
@@ -298,13 +296,13 @@ abstract class AbstractNavigatorSecurityTests(val classpathScanPackage: String?)
             MockVaadin.setup(routes)
 
             UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
-            expectThrows<NotFoundException>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
+            expectThrows<NotFoundError>("No route found for 'testing': Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed.") {
                 navigateTo<TestingView>()
             }
         }
-        @Test fun `when access is rejected, Karibu's MockRouteAccessDeniedError throws AccessDeniedException`() {
+        @Test fun `when access is rejected, Karibu's MockRouteAccessDeniedError throws MockAccessDeniedException`() {
             UI.getCurrent().addBeforeEnterListener(SimpleNavigationAccessControl("admin"))
-            expectThrows<AccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
+            expectThrows<MockAccessDeniedException>("Consider adding one of the following annotations to make the view accessible: @AnonymousAllowed, @PermitAll, @RolesAllowed") {
                 navigateTo<TestingView>()
             }
         }

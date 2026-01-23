@@ -141,9 +141,16 @@ public open class MockRouteNotFoundError: Component(), HasErrorParameter<NotFoun
             append(routes.map { it.toPrettyString() })
             append("\nIf you'd like to revert back to the original Vaadin RouteNotFoundError, please remove the ${MockRouteNotFoundError::class.java} from Routes.errorRoutes")
         }
-        throw NotFoundException(message).apply { initCause(parameter.caughtException) }
+        throw NotFoundError(message, parameter.caughtException)
     }
 }
+
+/**
+ * When [MockRouteNotFoundError] throws an exception, Vaadin 25.1+ will catch it in
+ * `UI.handleNavigation()` catch block and handle it. The easiest way is to use [Error]
+ * since that is not caught.
+ */
+public class NotFoundError(message: String, cause: Throwable) : Error(message, cause)
 
 /**
  * This route gets registered by default in [Routes], so that Karibu-Testing can catch
@@ -168,11 +175,13 @@ public open class MockRouteAccessDeniedError: Component(), HasErrorParameter<Acc
     }
 }
 
-public class MockAccessDeniedException(override val message: String, cause: Throwable?) : AccessDeniedException() {
+/**
+ * When [MockRouteAccessDeniedError] throws an exception, Vaadin 25.1+ will catch it in
+ * `UI.handleNavigation()` catch block and handle it. The easiest way is to use [Error]
+ * since that is not caught.
+ */
+public class MockAccessDeniedException(message: String, cause: Throwable?) : Error(message, cause) {
     public constructor(param: ErrorParameter<AccessDeniedException>) : this(param.customMessage, param.caughtException)
-    init {
-        initCause(cause)
-    }
 }
 
 internal fun RouteData.toPrettyString(): String {

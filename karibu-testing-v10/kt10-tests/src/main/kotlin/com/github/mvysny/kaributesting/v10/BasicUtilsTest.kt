@@ -117,7 +117,10 @@ abstract class AbstractBasicUtilsTests {
     @Test fun testFocus() {
         val f = TextField()
         var called = false
-        f.addFocusListener { called = true }
+        f.addFocusListener {
+            expect(true) { it.isFromClient }
+            called = true
+        }
         f._focus()
         expect(true) { called }
     }
@@ -125,7 +128,10 @@ abstract class AbstractBasicUtilsTests {
     @Test fun _blur() {
         val f = TextField()
         var called = false
-        f.addBlurListener { called = true }
+        f.addBlurListener {
+            expect(true) { it.isFromClient }
+            called = true
+        }
         f._blur()
         expect(true) { called }
     }

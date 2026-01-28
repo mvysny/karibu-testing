@@ -23,6 +23,18 @@ public fun Component._fireEvent(event: ComponentEvent<*>) {
 }
 
 /**
+ * Fires event of given [eventClass] on a Vaadin component. Uses reflection to
+ * construct the event; `null` is passed to any `@EventData`-annotated parameters.
+ */
+public fun <E: ComponentEvent<*>> Component._fireEvent(eventClass: Class<E>, isFromClient: Boolean) {
+    val c = ComponentEventBusUtil.getEventConstructor(eventClass)
+    val args = mutableListOf<Any?>(this, isFromClient)
+    while (args.size < c.parameterCount) args.add(null)
+    val event = c.newInstance(*args.toTypedArray())
+    _fireEvent(event)
+}
+
+/**
  * Fires a DOM event on this component. Checks whether the component is [_expectEditableByUser].
  * @param eventType the event type, e.g. "click"
  * @param eventData optional event data, defaults to an empty object.
@@ -206,7 +218,9 @@ public fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
  */
 public fun <T> T._focus() where T : Focusable<*>, T : Component {
     _expectEditableByUser()
-    _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
+    // Vaadin 25.0.3 -> 25.0.4: FocusEvent has three parameters instead of just two.
+    // use reflection
+    _fireEvent(FocusNotifier.FocusEvent::class.java, true)
 }
 
 /**
@@ -214,7 +228,9 @@ public fun <T> T._focus() where T : Focusable<*>, T : Component {
  */
 public fun <T> T._blur() where T : Focusable<*>, T : Component {
     _expectEditableByUser()
-    _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
+    // Vaadin 25.0.3 -> 25.0.4: FocusEvent has three parameters instead of just two.
+    // use reflection
+    _fireEvent(BlurNotifier.BlurEvent::class.java, true)
 }
 
 /**

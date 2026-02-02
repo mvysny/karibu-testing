@@ -204,16 +204,14 @@ public fun Component.matches(spec: SearchSpec<Component>.() -> Unit): Boolean =
  * Fires [FocusNotifier.FocusEvent] on the component, but only if it's editable.
  */
 public fun <T> T._focus() where T : Focusable<*>, T : Component {
-    _expectEditableByUser()
-    _fireEvent(FocusNotifier.FocusEvent<T>(this, true))
+    _fireDomEvent("focus")
 }
 
 /**
  * Fires [BlurNotifier.BlurEvent] on the component, but only if it's editable.
  */
 public fun <T> T._blur() where T : Focusable<*>, T : Component {
-    _expectEditableByUser()
-    _fireEvent(BlurNotifier.BlurEvent<T>(this, true))
+    _fireDomEvent("blur")
 }
 
 /**

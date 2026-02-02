@@ -33,7 +33,7 @@ dependencies {
 }
 ```
 
-For additional support for **Vaadin 23** (e.g. support for testing Vaadin 23 components such as `VirtualList`
+For additional support for **Vaadin 23+** (e.g. support for testing Vaadin 23+ components such as `VirtualList`
 and `MultiselectComboBox`), use `com.github.mvysny.kaributesting:karibu-testing-v23:x.y.z` instead (starting with Karibu-Testing 1.3.16).
 
 > Note: obtain the newest version from the tag name above

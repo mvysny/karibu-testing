@@ -4,7 +4,9 @@ import com.github.mvysny.kaributools.label
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
+import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.card.Card
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.contextmenu.MenuItemBase
@@ -192,6 +194,11 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             val childElementsWithNoComponent: List<Element> = childElements.filter { it.component.isEmpty }
             val body = childElementsWithNoComponent.flatMap { it.children.toList() } .mapNotNull { it.component.orElse(null) }
             (childComponents + body).distinct()
+        }
+        component is Button -> {
+            // Since Vaadin 25.1.0-alpha5 Button has a Text component as its child.
+            // To maintain backwards compatibility with Karibu tests, pretend there is no Text node
+            component.children.toList().filterNot { it is Text }
         }
         // Also include virtual children.
         // Issue: https://github.com/mvysny/karibu-testing/issues/85

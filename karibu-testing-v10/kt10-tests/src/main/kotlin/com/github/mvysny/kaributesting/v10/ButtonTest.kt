@@ -73,6 +73,14 @@ abstract class AbstractButtonTests {
         }
     }
 
+    @Test fun `button has no children`() {
+        expectList() { testingLifecycleHook.getAllChildren(Button()) }
+    }
+
+    @Test fun `button pretty print`() {
+        expect("Button[text='foo']") { Button("foo").toPrettyString() }
+    }
+
     @Nested inner class _click() {
         @Nested inner class ButtonTests : AbstractClickTests("Button", true, { Button() })
         @Nested inner class CheckboxTests : AbstractClickTests("Checkbox", true, { Checkbox() })

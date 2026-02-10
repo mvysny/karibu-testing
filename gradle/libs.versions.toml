@@ -6,8 +6,8 @@ junit5 = "6.0.1"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
 vaadin24 = "25.0.5"
 vaadin24_spring = "25.0.5"
-vaadin24next = "25.1.0-alpha5"
-vaadin24next_spring = "25.1.0-alpha5"
+vaadin24next = "25.1.0-alpha6"
+vaadin24next_spring = "25.1.0-alpha6"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }

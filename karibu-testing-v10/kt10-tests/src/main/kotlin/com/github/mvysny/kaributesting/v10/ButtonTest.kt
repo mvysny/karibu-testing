@@ -74,7 +74,7 @@ abstract class AbstractButtonTests {
     }
 
     @Test fun `button has no children`() {
-        expectList() { testingLifecycleHook.getAllChildren(Button()) }
+        expectList() { KaribuConfig.testingLifecycleHook.getAllChildren(Button()) }
     }
 
     @Test fun `button pretty print`() {

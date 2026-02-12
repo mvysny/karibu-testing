@@ -386,7 +386,7 @@ abstract class AbstractMockVaadinTests() {
     }
 
     @Nested inner class ExtendedClientDetailsTests {
-        @BeforeEach @AfterEach fun resetFakeExtendedClientDetails() { fakeExtendedClientDetails = true }
+        @BeforeEach @AfterEach fun resetFakeExtendedClientDetails() { KaribuConfig.fakeExtendedClientDetails = true }
 
         @Test fun `proper retrieval`() {
             // by default they're null but a mock one can be retrieved.
@@ -421,7 +421,7 @@ abstract class AbstractMockVaadinTests() {
         }
 
         @Test fun `nothing is fetched when fakeExtendedClientDetails=false`() {
-            fakeExtendedClientDetails = false
+            KaribuConfig.fakeExtendedClientDetails = false
             expect(false) { UI.getCurrent().internals.extendedClientDetails.initialized }
             UI.getCurrent().page.retrieveExtendedClientDetails {
                 fail("shouldn't be called")
@@ -616,11 +616,11 @@ abstract class AbstractMockVaadinTests() {
 
         @Nested inner class javascript {
             @AfterEach fun cleanup() {
-                pendingJavascriptInvocationHandlers.clear()
+                KaribuConfig.pendingJavascriptInvocationHandlers.clear()
             }
 
             @Test fun javascriptCallsGoThroughHandlers() {
-                pendingJavascriptInvocationHandlers.add { it ->
+                KaribuConfig.pendingJavascriptInvocationHandlers.add { it ->
                     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
                         it.complete(ObjectMapper().nodeFactory.textNode("Success!"))
                     }
@@ -634,7 +634,7 @@ abstract class AbstractMockVaadinTests() {
             }
 
             @Test fun javascriptHandlersCalledAutomatically() {
-                pendingJavascriptInvocationHandlers.add { it ->
+                KaribuConfig.pendingJavascriptInvocationHandlers.add {
                     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
                         it.complete(ObjectMapper().nodeFactory.textNode("Success!"))
                     }

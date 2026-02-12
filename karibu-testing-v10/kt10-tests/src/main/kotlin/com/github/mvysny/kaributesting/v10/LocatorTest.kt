@@ -84,10 +84,10 @@ abstract class AbstractLocatorTest2 {
 abstract class AbstractLocatorTest {
     @BeforeEach fun fakeVaadin() {
         MockVaadin.setup()
-        testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
+        KaribuConfig.testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
     }
     @AfterEach fun tearDownVaadin() {
-        testingLifecycleHook = TestingLifecycleHook.default
+        KaribuConfig.testingLifecycleHook = TestingLifecycleHook.default
         MockVaadin.tearDown()
     }
 
@@ -294,7 +294,7 @@ abstract class AbstractLocatorTest {
     }
 
     @Nested inner class `unmocked env`() {
-        @BeforeEach fun unfakeEnv() { MockVaadin.tearDown(); testingLifecycleHook = TestingLifecycleHook.default }
+        @BeforeEach fun unfakeEnv() { MockVaadin.tearDown(); KaribuConfig.testingLifecycleHook = TestingLifecycleHook.default }
         @Test fun `lookup functions should work in unmocked environment`() {
             Button()._get(Button::class.java)
             expectThrows(AssertionError::class) {
@@ -422,7 +422,7 @@ class MyLifecycleHook(
 }
 
 fun expectAfterLookupCalled() {
-    expect(true) { (testingLifecycleHook as MyLifecycleHook).isBeforeLookupCalled }
-    expect(true) { (testingLifecycleHook as MyLifecycleHook).isAfterLookupCalled }
-    testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
+    expect(true) { (KaribuConfig.testingLifecycleHook as MyLifecycleHook).isBeforeLookupCalled }
+    expect(true) { (KaribuConfig.testingLifecycleHook as MyLifecycleHook).isAfterLookupCalled }
+    KaribuConfig.testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
 }

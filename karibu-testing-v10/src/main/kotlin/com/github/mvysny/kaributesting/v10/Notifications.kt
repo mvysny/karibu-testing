@@ -13,7 +13,7 @@ public fun getNotifications(): List<Notification> {
     // Notifications attach themselves directly amongst the children of the UI. However,
     // notifications are opened lazily; make sure to run the runExecutionsBeforeClientResponse()
     // in order for the Notifications to actually add themselves to the UI.
-    testingLifecycleHook.awaitBeforeLookup()
+    KaribuConfig.testingLifecycleHook.awaitBeforeLookup()
 
     // Vaadin 23: It's not enough to only consider the children of UI.getCurrent().
     // The server-side modality curtain introduced in Vaadin 23 will cause notifications
@@ -25,7 +25,7 @@ public fun getNotifications(): List<Notification> {
         .filterIsInstance<Notification>()
         .filter { it.isOpened }
 
-    testingLifecycleHook.awaitAfterLookup()
+    KaribuConfig.testingLifecycleHook.awaitAfterLookup()
     return notifications
 }
 

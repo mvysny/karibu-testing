@@ -571,7 +571,7 @@ That makes it impossible for Karibu-Testing to look up components inside of a Po
 Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
 There are three ways to work around the look-up issue:
 
-1. Set `includeVirtualChildrenInTemplates` to true (`TestingLifecycleHookKt.setIncludeVirtualChildrenInTemplates(true)`) -
+1. Set `KaribuConfig.includeVirtualChildrenInTemplates` to true (`KaribuConfig.setIncludeVirtualChildrenInTemplates(true)`) -
    the easiest option but also may expose too much. Use at your own risk. Since Karibu-Testing 1.3.14.
 2. Manual workaround: publish your `@Id`-annotated fields as `public` or `internal` (Kotlin) or with package visibility (Java),
    then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
@@ -665,7 +665,7 @@ class MyLifecycleHook(val delegate: TestingLifecycleHook) : TestingLifecycleHook
     return delegate.getAllChildren(component)
   }
 }
-testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
+KaribuConfig.testingLifecycleHook = MyLifecycleHook(TestingLifecycleHook.default)
 ```
 
 Java:
@@ -752,8 +752,8 @@ The `@PreserveOnRefresh` annotation is supported since Karibu 1.3.17, see [Issue
 for details. In order for this to work, we faked the `ExtendedClientDetails` fetching which now also works correctly.
 
 However, looks that it broke Spring `RouteScope` [Issue #129](https://github.com/mvysny/karibu-testing/issues/129).
-Since Karibu 1.3.20 you can turn the `ExtendedClientDetails` faking off, by setting `fakeExtendedClientDetails`
-to `false` (Java: `TestingLifecycleHookKt.setFakeExtendedClientDetails(false)`).
+Since Karibu 1.3.20 you can turn the `ExtendedClientDetails` faking off, by setting `KaribuConfig.fakeExtendedClientDetails`
+to `false` (Java: `KaribuConfig.setFakeExtendedClientDetails(false)`).
 
 ## API
 
@@ -1641,7 +1641,7 @@ on the state of the chat component. That's something you can do in that one part
 Hoever, imagine that your app uses async and push heavily; say that all of your data fetching code runs asynchronously.
 You would have to await for async to finish basically after every UI component lookup.
 
-We have added support to implement this kind of behavior. There is a global variable named `testingLifecycleHook`, which
+We have added support to implement this kind of behavior. There is a global variable named `KaribuConfig.testingLifecycleHook`, which
 contains hooks which by default do nothing. You can simply provide your own custom implementation of `TestingLifecycleHook`
 interface which would await for async, and then set it to the `testingLifecycleHook` global variable.
 
@@ -1663,12 +1663,12 @@ You can change this behavior by providing your own `TestingLifecycleHook` implem
 
 Whenever a JavaScript execution is scheduled (e.g. via `Element.executeJs()`), it's possible to
 capture such call and return a meaningful value. The easiest way is to add a handler
-to `pendingJavascriptInvocationHandlers` (`TestingLifecycleHookKt.getPendingJavascriptInvocationHandlers()`):
+to `KaribuConfig.pendingJavascriptInvocationHandlers` (`KaribuConfig.getPendingJavascriptInvocationHandlers()`):
 
 ```kotlin
 // register a handler; don't forget to unregister at the end of the test so that
 // old handlers won't interfere with new ones. Alternatively, populate once before any of your tests are run.
-pendingJavascriptInvocationHandlers.add { it ->
+KaribuConfig.pendingJavascriptInvocationHandlers.add { it ->
     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
         it.complete(Json.create("something"))
     }
@@ -1741,7 +1741,7 @@ object UIQueueRunnerHook : TestingLifecycleHook {
     }
 }
 
-beforeGroup { testingLifecycleHook = UIQueueRunnerHook }
+beforeGroup { KaribuConfig.testingLifecycleHook = UIQueueRunnerHook }
 ```
 
 This is what Karibu-Testing does by default.

@@ -22,7 +22,7 @@ public var <V> HasValue<*, V>._value: V?
     get() = value
     set(v) {
         (this as Component)._expectEditableByUser()
-        _setValue(v, defaultIsFromClient)
+        _setValue(v, KaribuConfig.defaultIsFromClient)
     }
 
 private val __AbstractField_setModelValue: Method by lazy {

@@ -90,7 +90,7 @@ public class SearchSpec<T : Component>(
         val p = mutableListOf<(Component)->Boolean>()
         p.add { component -> clazz.isInstance(component)}
         if (id != null) p.add { component -> component.id_ == id }
-        if (label != null) p.add { component -> testingLifecycleHook.getLabel(component) == label }
+        if (label != null) p.add { component -> KaribuConfig.testingLifecycleHook.getLabel(component) == label }
         @Suppress("DEPRECATION")
         if (caption != null) p.add { component -> component.caption == caption }
         if (placeholder != null) p.add { component -> component.placeholder == placeholder }
@@ -242,9 +242,9 @@ public fun <T: Component> _find(clazz: Class<T>, block: SearchSpec<T>.()->Unit =
         currentUI._find(clazz, block)
 
 private fun Component.find(predicate: (Component)->Boolean): List<Component> {
-    testingLifecycleHook.awaitBeforeLookup()
+    KaribuConfig.testingLifecycleHook.awaitBeforeLookup()
     val descendants: List<Component> = _walkAll().toList()
-    testingLifecycleHook.awaitAfterLookup()
+    KaribuConfig.testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error != null) {
         throw AssertionError("An internal server error occurred; please check log for the actual stack-trace. Error text: ${error._errorMessage}\n${currentUI.toPrettyTree()}")
@@ -268,7 +268,7 @@ private fun <T> Iterable<(T) -> Boolean>.and(): (T) -> Boolean =
  * Please consider using [find] instead: `component.find<Component>()`
  */
 public fun Component._walkAll(): Iterable<Component> = Iterable {
-    DepthFirstTreeIterator(this) { component: Component -> testingLifecycleHook.getAllChildren(component) }
+    DepthFirstTreeIterator(this) { component: Component -> KaribuConfig.testingLifecycleHook.getAllChildren(component) }
 }
 
 /**
@@ -422,9 +422,9 @@ public fun <T : Component> _expect(clazz: Class<T>, count: Int = 1, block: Searc
  * with given [expectedErrorMessage].
  */
 public fun _expectInternalServerError(expectedErrorMessage: String = "") {
-    testingLifecycleHook.awaitBeforeLookup()
+    KaribuConfig.testingLifecycleHook.awaitBeforeLookup()
     val descendants: List<Component> = currentUI._walkAll().toList()
-    testingLifecycleHook.awaitAfterLookup()
+    KaribuConfig.testingLifecycleHook.awaitAfterLookup()
     val error: InternalServerError? = descendants.filterIsInstance<InternalServerError>().firstOrNull()
     if (error == null) {
         throw AssertionError("Expected an internal server error but none happened. Component tree:\n${currentUI.toPrettyTree()}")
@@ -443,6 +443,6 @@ public fun _expectInternalServerError(expectedErrorMessage: String = "") {
  */
 @JvmOverloads
 public fun _dump(output: PrintStream = System.out) {
-    testingLifecycleHook.awaitBeforeLookup()
+    KaribuConfig.testingLifecycleHook.awaitBeforeLookup()
     output.print(currentUI.toPrettyTree())
 }

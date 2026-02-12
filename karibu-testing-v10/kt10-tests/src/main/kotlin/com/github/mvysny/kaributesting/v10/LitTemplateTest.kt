@@ -64,14 +64,14 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
     }
 
     @Nested inner class includeVirtualChildrenInTemplates() {
-        @AfterEach fun resetConfig() { includeVirtualChildrenInTemplates = false }
+        @AfterEach fun resetConfig() { KaribuConfig.includeVirtualChildrenInTemplates = false }
         @Test fun `false`() {
             val form = MyForm()
             expect(setOf(form)) { form._find<Component>().toSet() }
             form._expectNone<EmailField>()
         }
         @Test fun `true`() {
-            includeVirtualChildrenInTemplates = true
+            KaribuConfig.includeVirtualChildrenInTemplates = true
             val form = MyForm()
             expect(setOf(form, form.emailField, form.firstNameField, form.lastNameField)) { form._find<Component>().toSet() }
             expect(form.emailField) { form._get<EmailField>() }
@@ -85,7 +85,7 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
                 form._expectNone<EmailField>()
             }
             @Test fun `true`() {
-                includeVirtualChildrenInTemplates = true
+                KaribuConfig.includeVirtualChildrenInTemplates = true
                 val form = CompositeForm()
                 expect(setOf(form, form.content, form.content.emailField, form.content.firstNameField, form.content.lastNameField)) { form._find<Component>().toSet() }
                 expect(form.content.emailField) { form._get<EmailField>() }

@@ -54,7 +54,7 @@ public class PrettyPrintTree(public val name: String, public val children: Mutab
 
         public fun ofVaadin(root: Component): PrettyPrintTree {
             val result = PrettyPrintTree(root.toPrettyString(), mutableListOf())
-            for (child: Component in testingLifecycleHook.getAllChildren(root)) {
+            for (child: Component in KaribuConfig.testingLifecycleHook.getAllChildren(root)) {
                 result.children.add(ofVaadin(child))
             }
             return result
@@ -96,7 +96,7 @@ public fun Component.toPrettyString(): String {
     if (!isEnabled) {
         list.add("DISABLED")
     }
-    val label = testingLifecycleHook.getLabel(this)
+    val label = KaribuConfig.testingLifecycleHook.getLabel(this)
     if (!label.isNullOrBlank()) {
         list.add("label='$label'")
     }

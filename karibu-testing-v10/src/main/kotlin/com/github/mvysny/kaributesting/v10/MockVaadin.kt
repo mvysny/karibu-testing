@@ -322,7 +322,7 @@ public object MockVaadin {
         runUIQueue(propagateExceptionToHandler)
         UI.getCurrent().internals.stateTree.runExecutionsBeforeClientResponse()
         cleanupDialogs()
-        testingLifecycleHook.handlePendingJavascriptInvocations(UI.getCurrent().internals.dumpPendingJavaScriptInvocations())
+        KaribuConfig.testingLifecycleHook.handlePendingJavascriptInvocations(UI.getCurrent().internals.dumpPendingJavaScriptInvocations())
     }
 
     /**
@@ -465,7 +465,7 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
      * Also see [fakeExtendedClientDetails] for more details.
      */
     override fun retrieveExtendedClientDetails(receiver: ExtendedClientDetailsReceiver) {
-        if (!fakeExtendedClientDetails) {
+        if (!KaribuConfig.fakeExtendedClientDetails) {
             super.retrieveExtendedClientDetails(receiver)
             return
         }

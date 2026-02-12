@@ -39,9 +39,13 @@ public fun resolveRoute(path: String): Class<out Component>? {
 
 /**
  * Returns the current view class.
+ * @return class of the current view; `null` if no navigation was performed yet.
  */
-public val currentView: Class<out Component>
-    get() = currentUI.internals.activeRouterTargetsChain.first().javaClass.asSubclass(Component::class.java)
+public val currentView: Class<out Component>?
+    get() {
+        val first = currentUI.internals.activeRouterTargetsChain.firstOrNull() ?: return null
+        return first.javaClass.asSubclass(Component::class.java)
+    }
 
 /**
  * Expects that given [view] is the currently displayed view.

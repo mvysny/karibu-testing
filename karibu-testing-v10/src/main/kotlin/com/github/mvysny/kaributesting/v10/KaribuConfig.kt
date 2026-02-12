@@ -65,4 +65,10 @@ public object KaribuConfig {
      */
     @JvmStatic
     public var defaultIsFromClient: Boolean = true
+
+    /**
+     * If `true` (the default), [MockVaadin.setup] also navigates to the root route (`""`).
+     */
+    @JvmStatic
+    public var initDefaultRoute: Boolean = true
 }

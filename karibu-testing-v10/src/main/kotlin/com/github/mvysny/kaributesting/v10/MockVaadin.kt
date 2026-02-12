@@ -285,7 +285,7 @@ public object MockVaadin {
             UI.getCurrent().internals.router.navigate(UI.getCurrent(), lastUILocation.get()!!, NavigationTrigger.PROGRAMMATIC)
             lastUILocation.remove()
         } else {
-            if (UI.getCurrent().internals.router.registry.getNavigationTarget("").isPresent) {
+            if (KaribuConfig.initDefaultRoute && UI.getCurrent().internals.router.registry.getNavigationTarget("").isPresent) {
                 UI.getCurrent().navigate("")
             }
         }

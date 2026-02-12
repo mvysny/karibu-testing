@@ -53,6 +53,16 @@ abstract class AbstractNavigatorTests {
             navigateTo("params/5?foo=bar")
             expect(ParametrizedView::class.java) { currentView }
         }
+        @Test fun `no currentView when initDefaultRoute=false`() {
+            KaribuConfig.initDefaultRoute = false
+            try {
+               MockVaadin.tearDown()
+               MockVaadin.setup(routes)
+               expect(null) { currentView }
+            } finally {
+                KaribuConfig.initDefaultRoute = true
+            }
+        }
     }
     @Nested inner class expectView {
         @Test fun `simple view`() {

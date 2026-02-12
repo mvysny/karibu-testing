@@ -180,6 +180,19 @@ abstract class AbstractMockVaadinTests() {
             expect(true) { beforeEnterListenerCalled }
             expect(true) { afterNavigationListenerCalled }
         }
+
+        @Test fun `no view set when initDefaultRoute=false`() {
+            KaribuConfig.initDefaultRoute = false
+            try {
+                MockVaadin.tearDown()
+                MockVaadin.setup(routes)
+                expect("""
+└── MockedUI[]
+""".trim()) { UI.getCurrent().toPrettyTree().trim() }
+            } finally {
+                KaribuConfig.initDefaultRoute = true
+            }
+        }
     }
 
     @Nested inner class `proper mocking` {

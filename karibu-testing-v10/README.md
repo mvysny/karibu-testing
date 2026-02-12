@@ -547,6 +547,11 @@ will fail with an informative exception. That's exactly what `MockRouteNotFoundE
 replaces `RouteNotFoundError` and throws the `NotFoundException` navigation exception in its constructor,
 which then bubbles out and makes the test fail.
 
+#### Initial navigation
+
+`MockVaadin.setup()` also navigates to the main/default route (`@Route("")`).
+To prevent that, set `Karibu.Config.initDefaultRoute` to `false`. Since Karibu-Testing 2.7.0.
+
 ### Polymer Templates / Lit Templates
 
 > Note: Polymer Templates has been removed from Vaadin 24 and are no longer supported in Karibu-Testing 2.0.0+
@@ -1841,17 +1846,9 @@ MockVaadin.setup(new Routes(), () -> {
 });
 ```
 
-## Bower versus NPM mode
-
-Vaadin 13 used Bower+webjars to manage JavaScript dependencies; Vaadin 14 switched to
-the npm+webpack management but still supports Bower+webjars dependency management.
-You can read more about both modes in the [Vaadin 13 -> Vaadin 14 migration guide](https://vaadin.com/docs/v14/flow/v14-migration/v14-migration-guide.html).
-
-Karibu-Testing supports both modes.
-
 ## Checking for Vaadin Versions
 
-The `VaadinMeta.version: Int` provides the current Vaadin version, e.g. `13` for Vaadin 13, `14` for Vaadin 14 or later.
+The `VaadinVersion.get` provides the current Vaadin version.
 
 ## Firing Keyboard Shortcuts
 

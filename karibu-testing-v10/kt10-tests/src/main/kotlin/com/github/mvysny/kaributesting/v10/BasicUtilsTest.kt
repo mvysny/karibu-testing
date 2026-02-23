@@ -4,6 +4,7 @@ import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.textField
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Text
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Span
@@ -210,6 +211,12 @@ abstract class AbstractBasicUtilsTests {
     }
 
     @Nested inner class visibilityTests {
+        @BeforeEach fun fakeVaadin() {
+            MockVaadin.setup()
+        }
+        @AfterEach fun tearDownVaadin() {
+            MockVaadin.tearDown()
+        }
         @Test fun unattachedComponentVisible() {
             expect(true) { Button("foo")._isVisible }
             expect(true) { Text("foo")._isVisible }
@@ -226,10 +233,13 @@ abstract class AbstractBasicUtilsTests {
             ts.add("tab1", c1)
             ts.add("tab2", c2)
             expect(true) { c1._isVisible }
-            expect(null) { c2.parent.orElse(null) } // c2 not yet attached to TabSheet - lazy initialization
+            expect(ts) { c1._parent }
+            expect(null) { c2._parent } // c2 not yet attached to TabSheet - lazy initialization
             expect(true) { c2._isVisible } // c2 not yet attached to TabSheet - lazy initialization
             expect(true) { ts._tabs._isVisible }
             ts.selectedIndex = 1
+            expect(ts) { c1._parent }
+            expect(ts) { c2._parent }
             expect(false) { c1._isVisible }
             expect(true) { c2._isVisible }
             expect(true) { ts._tabs._isVisible }
@@ -241,9 +251,13 @@ abstract class AbstractBasicUtilsTests {
             ts.suffixComponent = Button("Suffix")
             expect(true) { ts.prefixComponent._isVisible }
             expect(true) { ts.suffixComponent._isVisible }
+            expect(ts) { ts.prefixComponent._parent }
+            expect(ts) { ts.suffixComponent._parent }
             ts.add("tab1", Span("Hi"))
             expect(true) { ts.prefixComponent._isVisible }
             expect(true) { ts.suffixComponent._isVisible }
+            expect(ts) { ts.prefixComponent._parent }
+            expect(ts) { ts.suffixComponent._parent }
         }
     }
 }

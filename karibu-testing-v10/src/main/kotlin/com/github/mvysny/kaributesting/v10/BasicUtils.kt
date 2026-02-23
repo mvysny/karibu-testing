@@ -118,6 +118,11 @@ public val Component._text: String?
     }
 
 /**
+ * Returns parent component or null if there's no parent.
+ */
+public val Component._parent: Component? get() = parent.orElse(null)
+
+/**
  * Returns text contents of this node and all of its descendant nodes.
  */
 public val Component._textRecursively: String get() = element.textRecursively2

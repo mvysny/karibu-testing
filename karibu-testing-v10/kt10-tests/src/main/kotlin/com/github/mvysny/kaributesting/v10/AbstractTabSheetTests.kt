@@ -20,6 +20,7 @@ abstract class AbstractTabSheetTests {
 
     @Test fun unselectedContentsNotFound() {
         val t = TabSheet()
+        currentUI.add(t)
         t.add("tab1", Button("Tab1"))
         t.add("tab2", Button("Tab2"))
         t._expectOne<Button> { text = "Tab1" }

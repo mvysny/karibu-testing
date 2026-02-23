@@ -228,16 +228,19 @@ abstract class AbstractBasicUtilsTests {
         }
         @Test fun tabSheetContentsVisibility() {
             val ts = TabSheet()
+            currentUI.add(ts)
             val c1 = Button("Tab1")
             val c2 = Button("Tab2")
             ts.add("tab1", c1)
             ts.add("tab2", c2)
+            MockVaadin.clientRoundtrip()
             expect(true) { c1._isVisible }
             expect(ts) { c1._parent }
             expect(null) { c2._parent } // c2 not yet attached to TabSheet - lazy initialization
             expect(true) { c2._isVisible } // c2 not yet attached to TabSheet - lazy initialization
             expect(true) { ts._tabs._isVisible }
             ts.selectedIndex = 1
+            MockVaadin.clientRoundtrip()
             expect(ts) { c1._parent }
             expect(ts) { c2._parent }
             expect(false) { c1._isVisible }

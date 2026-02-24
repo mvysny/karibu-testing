@@ -11,8 +11,8 @@ plugins {
 
 defaultTasks("clean", "build")
 
-if (JavaVersion.current() < JavaVersion.VERSION_17) {
-    throw GradleException("Karibu-Testing 2+ requires JDK 17; current JDK is ${JavaVersion.current()}")
+if (JavaVersion.current() < JavaVersion.VERSION_21) {
+    throw GradleException("Karibu-Testing 2+ requires JDK 21; current JDK is ${JavaVersion.current()}")
 }
 
 allprojects {
@@ -25,7 +25,7 @@ allprojects {
         maven(url = "https://repo.spring.io/milestone")
     }
     tasks.withType<KotlinCompile> {
-        compilerOptions.jvmTarget = JvmTarget.JVM_17
+        compilerOptions.jvmTarget = JvmTarget.JVM_21
     }
 }
 
@@ -98,8 +98,8 @@ subprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 

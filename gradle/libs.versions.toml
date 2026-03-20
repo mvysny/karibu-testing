@@ -4,10 +4,10 @@ kaributools = "0.27"
 karibudsl = "2.4.0"
 junit5 = "6.0.1"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin24 = "25.0.7"
-vaadin24_spring = "25.0.7"
-vaadin24next = "25.1.0-rc1"
-vaadin24next_spring = "25.1.0-rc1"
+vaadin = "25.0.7"
+vaadin_spring = "25.0.7"
+vaadin_next = "25.1.0-rc1"
+vaadin_next_spring = "25.1.0-rc1"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -18,12 +18,12 @@ karibudsl = { module = "com.github.mvysny.karibudsl:karibu-dsl", version.ref = "
 karibudsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.ref = "karibudsl" }
 junit-jupiterapi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
-vaadin-v24-all = { module = "com.vaadin:vaadin", version.ref = "vaadin24" }
-vaadin-v24-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24" }
-vaadin-v24-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24_spring" }
-vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin24next" }
-vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin24next" }
-vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin24next_spring" }
+vaadin-v24-all = { module = "com.vaadin:vaadin", version.ref = "vaadin" }
+vaadin-v24-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin" }
+vaadin-v24-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_spring" }
+vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin_next" }
+vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin_next" }
+vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_next_spring" }
 classgraph = "io.github.classgraph:classgraph:4.8.151"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 groovy = "org.apache.groovy:groovy:4.0.29"

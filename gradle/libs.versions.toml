@@ -4,10 +4,10 @@ kaributools = "0.27"
 karibudsl = "2.4.0"
 junit5 = "6.0.1"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin = "25.0.7"
-vaadin_spring = "25.0.7"
-vaadin_next = "25.1.0-rc2"
-vaadin_next_spring = "25.1.0-rc1"
+vaadin = "25.1.0"
+vaadin_spring = "25.1.0"
+vaadin_next = "25.1.0"
+vaadin_next_spring = "25.1.0"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }

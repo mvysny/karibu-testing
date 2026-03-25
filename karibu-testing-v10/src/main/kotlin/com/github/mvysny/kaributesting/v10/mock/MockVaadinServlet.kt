@@ -3,8 +3,8 @@ package com.github.mvysny.kaributesting.v10.mock
 import com.github.mvysny.kaributesting.v10.*
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.function.DeploymentConfiguration
+import com.vaadin.flow.internal.FrontendUtils
 import com.vaadin.flow.server.*
-import com.vaadin.flow.server.frontend.FrontendUtils
 import jakarta.servlet.ServletException
 import java.io.File
 import java.lang.reflect.Constructor

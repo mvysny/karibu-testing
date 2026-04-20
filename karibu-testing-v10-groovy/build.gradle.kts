@@ -22,7 +22,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 
     // needs to be here otherwise Groovy compiler crashes
-    testImplementation("org.springframework.data:spring-data-commons:4.0.0")
+    testImplementation("org.springframework.data:spring-data-commons:4.0.5")
 }
 
 @Suppress("UNCHECKED_CAST")

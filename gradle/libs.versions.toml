@@ -8,6 +8,7 @@ vaadin = "25.1.3"
 vaadin_spring = "25.1.3"
 vaadin_next = "25.1.3"
 vaadin_next_spring = "25.1.3"
+spring_boot = "4.0.5"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -29,6 +30,7 @@ jetbrains-annotations = "org.jetbrains:annotations:26.1.0"
 groovy = "org.apache.groovy:groovy:4.0.29"
 hibernate-validator = "org.hibernate.validator:hibernate-validator:9.1.0.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:6.0.1"
-spring-boot-starter-test = "org.springframework.boot:spring-boot-starter-test:4.0.5"
-spring-boot-starter-web = "org.springframework.boot:spring-boot-starter-web:4.0.5"
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring_boot" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring_boot" }
+spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "spring_boot" }
 fake-servlet5 = "com.github.mvysny.fake-servlet:fake-servlet5:1.3"

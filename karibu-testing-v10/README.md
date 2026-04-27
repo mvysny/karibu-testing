@@ -286,22 +286,22 @@ We need some kind of a lookup function which will find the appropriate component
 The Karibu-Testing library provides three functions for this purpose; for now we are only interested in one of them:
 
 * `_get<type of component> { criteria }` will find exactly one component of given type, matching given criteria, in the current UI. The function will fail
-  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { caption = "Click me" }`.
+  if there is no such component, or if there are too many of matching components. For example: `_get<Button> { text = "Click me" }`.
   In Java you need to `import static com.github.mvysny.kaributesting.v10.LocatorJ.*;`; then you can call
-  `_get(Button.class, spec -> spec.withCaption("Click me"));`. In Groovy you'll need
+  `_get(Button.class, spec -> spec.withText("Click me"));`. In Groovy you'll need
   to `import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;`; then you can call
-    `_get(Button) { caption = "Click me" }` 
+    `_get(Button) { text = "Click me" }` 
 
 This particular function will search for all components nested within `UI.getCurrent()`.
 You can call the function in a different way, which will restrict the search to some particular layout
 which is handy when you're testing a standalone custom UI component outside of the `UI` class:
 
 * `component._get<type of component> { criteria }` will find exactly one component of given type amongst the `component` and all of its children and descendants.
-  In Java: `_get(component, Button.class, spec -> spec.withCaption("Click me"));`.
-  In Groovy: `component._get(Button) { caption = "Click me" }`
+  In Java: `_get(component, Button.class, spec -> spec.withText("Click me"));`.
+  In Groovy: `component._get(Button) { text = "Click me" }`
 
-> **Info:** `_get<Button> { caption = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { caption = 'Click me' }`,
-  or for `_get(UI.getCurrent(), Button.class, spec -> spec.withCaption("Click me"));`
+> **Info:** `_get<Button> { text = 'Click me' }` is merely an shorthand for `UI.getCurrent()._get<Button> { text = 'Click me' }`,
+  or for `_get(UI.getCurrent(), Button.class, spec -> spec.withText("Click me"));`
 
 With this arsenal at hand, we can rewrite the test:
 
@@ -317,7 +317,7 @@ class MainViewTest {
 
     test("test greeting") {
         // simulate a button click as if clicked by the user
-        _get<Button> { caption = "Click me" } ._click()
+        _get<Button> { text = "Click me" } ._click()
 
         // look up the Example Template and assert on its value
         expect("Clicked!") { _get<ExampleTemplate>().value }
@@ -349,7 +349,7 @@ public class MyUITest {
     @Test
     public void testGreeting() {
         // simulate a button click as if clicked by the user
-        _click(_get(Button.class, spec -> spec.withCaption("Click me")));
+        _click(_get(Button.class, spec -> spec.withText("Click me")));
 
         // look up the Example Template and assert on its value
         assertEquals("Clicked!", _get(ExampleTemplate.class).getValue());
@@ -381,7 +381,7 @@ import static com.github.mvysny.kaributesting.v10.groovy.LocatorG.*;
     @Test
     void testGreeting() {
         // simulate a button click as if clicked by the user
-        _get(Button) { caption = "Click me" } ._click()
+        _get(Button) { text = "Click me" } ._click()
 
         // look up the Example Template and assert on its value
         assertEquals("Clicked!", _get(ExampleTemplate)._value)
@@ -552,34 +552,34 @@ which then bubbles out and makes the test fail.
 `MockVaadin.setup()` also navigates to the main/default route (`@Route("")`).
 To prevent that, set `Karibu.Config.initDefaultRoute` to `false`. Since Karibu-Testing 2.7.0.
 
-### Polymer Templates / Lit Templates
+### Lit Templates
 
-> Note: Polymer Templates has been removed from Vaadin 24 and are no longer supported in Karibu-Testing 2.0.0+
+> Note: PolymerTemplate has been removed from Vaadin 24 and is no longer supported in Karibu-Testing 2.0.0+. Use `LitTemplate` instead.
 
-Testing PolymerTemplates/LitTemplates with Karibu is a bit tricky.
-The purpose of PolymerTemplates is to move as much code as possible to the
+Testing `LitTemplate`s with Karibu is a bit tricky.
+The purpose of LitTemplate is to move as much code as possible to the
 client-side, while Karibu is designed to test server-side code only. The child components are either
 not accessible from the server-side altogether, or they are only
 "shallow shells" of components constructed server-side - almost none of their properties
 are transferred to the server-side.
 
-For example, a Vaadin `Button` nested in a Template will have empty caption server-side,
-even though the element clearly has a text client-side (and the caption shows properly in the browser).
+For example, a Vaadin `Button` nested in a template will have empty `text` server-side,
+even though the element clearly has a text client-side (and the text shows properly in the browser).
 Please read the discussion at [Can't look up components inside of PolymerTemplate](https://github.com/mvysny/karibu-testing/issues/1)
-for a technical explanation of this phenomenon.
+for a technical explanation of this phenomenon (the same applies to LitTemplate).
 
 Also the Vaadin's `VerticalLayout` (and all other layouts) will not have any child
 components present on the server-side, even though they're present in the template itself:
 the `verticalLayout.getChildren()` will return an empty Stream.
-That makes it impossible for Karibu-Testing to look up components inside of a Polymer Template.
+That makes it impossible for Karibu-Testing to look up components inside of a Lit Template.
 
-Fear not! It is still possible to use Karibu-Testing with Polymer Templates.
+Fear not! It is still possible to use Karibu-Testing with Lit Templates.
 There are three ways to work around the look-up issue:
 
 1. Set `KaribuConfig.includeVirtualChildrenInTemplates` to true (`KaribuConfig.setIncludeVirtualChildrenInTemplates(true)`) -
    the easiest option but also may expose too much. Use at your own risk. Since Karibu-Testing 1.3.14.
 2. Manual workaround: publish your `@Id`-annotated fields as `public` or `internal` (Kotlin) or with package visibility (Java),
-   then call `_get(MyPolymerTemplate.class).myDiv` to obtain the reference to the div.
+   then call `_get(MyLitTemplate.class).myDiv` to obtain the reference to the div.
 3. Override `TestingLifecycleHook.getAllComponents()` to include fields from your templates.
 4. (the best) stop using templates in your app.
 
@@ -595,7 +595,9 @@ Kotlin:
 
 ```kotlin
 @Route("reviews")
-class ReviewsList : PolymerTemplate<TemplateModel>() {
+@Tag("reviews-list")
+@JsModule("./reviews-list.ts")
+class ReviewsList : LitTemplate() {
     @Id("search")
     internal lateinit var search: TextField
     @Id("addReview")
@@ -605,9 +607,9 @@ class ReviewsList : PolymerTemplate<TemplateModel>() {
 
 test("create review") {
    // this doesn't work because of https://github.com/mvysny/karibu-testing/issues/1
-   //  _get<Button> { caption = "New review" } ._click()
+   //  _get<Button> { text = "New review" } ._click()
    
-   // You'll need to look up the PolymerTemplate itself, then retrieve the button from the Kotlin field:
+   // You'll need to look up the LitTemplate itself, then retrieve the button from the Kotlin field:
    _get<ReviewsList>().addReview._click()
 }
 ```
@@ -616,7 +618,9 @@ Java:
 
 ```java
 @Route("reviews")
-public class ReviewsList extends PolymerTemplate<TemplateModel> {
+@Tag("reviews-list")
+@JsModule("./reviews-list.ts")
+public class ReviewsList extends LitTemplate {
     @Id("search")
     TextField search;
     @Id("addReview")
@@ -627,32 +631,32 @@ public class ReviewsList extends PolymerTemplate<TemplateModel> {
 @Test
 public void createReviewTest() {
    // this doesn't work because of https://github.com/mvysny/karibu-testing/issues/1
-   // _click(_get(Button, spec -> spec.withCaption("New review"));
+   // _click(_get(Button.class, spec -> spec.withText("New review")));
 
-   // You'll need to look up the PolymerTemplate itself, then retrieve the button from the Java field:
+   // You'll need to look up the LitTemplate itself, then retrieve the button from the Java field:
    ReviewsList list = _get(ReviewsList.class);
    _click(list.addReview);
 }
 ```
 
-##### Nested Polymer Templates
+##### Nested Lit Templates
 
-Sometimes you have a PolymerTemplate nested inside another PolymerTemplate, etc.
-In order to access components from the inner PolymerTemplate, you will have to do
+Sometimes you have a LitTemplate nested inside another LitTemplate, etc.
+In order to access components from the inner LitTemplate, you will have to do
 the following:
 
-1. Use Karibu-Testing to discover the outermost PolymerTemplate
-2. Now Karibu-Testing is unable to discover the children of that PolymerTemplate;
-   you will therefore have to expose the inner PolymerTemplate via a field of the outer PolymerTemplate,
-   then access the inner PolymerTemplate via that field.
+1. Use Karibu-Testing to discover the outermost LitTemplate
+2. Now Karibu-Testing is unable to discover the children of that LitTemplate;
+   you will therefore have to expose the inner LitTemplate via a field of the outer LitTemplate,
+   then access the inner LitTemplate via that field.
 
 Even better, read below on how to make Karibu-Testing recognize certain children of
-certain PolymerTemplates/LitTemplates.
+certain LitTemplates.
 
 #### Overriding `TestingLifecycleHook.getAllComponents()`
 
-In certain cases/apps the PolymerTemplate is ultimately populated by components that
-are constructed on the server-side. For example, you could have a PolymerTemplate
+In certain cases/apps the LitTemplate is ultimately populated by components that
+are constructed on the server-side. For example, you could have a LitTemplate
 for the main app route, which would nest individual routes inside.
 The routes are server-constructed and have proper state management (so they're not just "shells");
 having access to the routes themselves would therefore be valuable.
@@ -705,47 +709,6 @@ public static void configureKaribu() {
 }
 ```
 
-#### PolymerTemplates which load stuff from the `node_modules` folder
-
-(Requires Karibu-Testing 1.1.16 or higher)
-
-If you try to use `JsModule(@foo/bar.js)` with your PolymerTemplate, Karibu-Testing
-will try to load the JS file from the local `node_modules/` folder. That will usually
-work in your dev env, but fail in your CI since `node_modules/` is not created.
-
-In CI, you will thus receive the following error message:
-
-> `node_modules` folder doesn't exist, cannot load template sources for <my-component> @mycomponent/my-component.js
-
-or
-
-> Can't load template sources for <my-component> @mycomponent/my-component.js. Please: ...
-
-In such case, you need to run `mvn vaadin:build-frontend` goal (Maven) or
-`gradle vaadinBuildFrontend` (Gradle) before
-you run your tests, to populate the
-`node_modules/` folder. Be sure to run `vaadin:build-frontend` goal after your classes
-has been compiled (since build-frontend analyzes `*.class` files), otherwise the `node_modules/` folder
-will simply be empty, and Karibu-Testing will still complain about the missing template file.
-
-The best way is to run `mvn clean package vaadin:build-frontend verify` (Maven) or
-`gradle clean vaadinBuildFrontend build -Pvaadin.productionMode` (Gradle) from your CI, to
-run the plugins in correct order.
-
-It is also handy to cache the `node_modules/` folder with your CI, since the folder is huge
-and it takes 60 seconds to just populate it from the NPM Interwebz. For example with GitLab CI:
-
-```yaml
-cache:
-  paths:
-    - .m2
-    - node_modules
-```
-
-Populating `node_modules/` requires the `node` and `npm` programs to be present.
-However Vaadin 14.2.0 Maven plugin (Gradle plugin 0.7.0) will
-install those for you automatically, there's no need for you to do anything.
-
 #### LitElement
 
 `LitElement`-based components are supported. After all, from the server-side perspective
@@ -767,22 +730,22 @@ to `false` (Java: `KaribuConfig.setFakeExtendedClientDetails(false)`).
 This library provides three methods for looking up components.
 
 * `_get<type of component> { criteria }` will find exactly one **visible** component of given type in the current UI, matching given criteria. The function will fail
-  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { caption = "Click me" }`.
-  Java: `_get(Button.class, spec -> spec.withCaption("Click me"));`.
-  Groovy: `_get(Button) { caption = "Click me" }`.
+  if there is no such component, or if there are too many of matching **visible** components. For example: `_get<Button> { text = "Click me" }`.
+  Java: `_get(Button.class, spec -> spec.withText("Click me"));`.
+  Groovy: `_get(Button) { text = "Click me" }`.
 * `_find<type of component> { criteria }` will find a list of matching **visible** components of given type in the current UI. The function will return
   an empty list if there is no such component. For example: `_find<VerticalLayout> { id = "form" }`;
   Java: `_find(VerticalLayout.class, spec -> spec.withId("form"));`.
   Groovy: `_find(VerticalLayout) { id = "form" }`.
 * `_expectNone<type of component> { criteria }` will expect that there is no **visible** component matching given criteria in the current UI; the function will fail if
-  one or more components are matching. For example: `_expectNone<Button> { caption = "Delete" }`;
-  Java: `_expectNone(Button.class, spec -> spec.withCaption("Delete"));`.
-  Groovy: `_expectNone(Button) { caption = "Delete" }`.
+  one or more components are matching. For example: `_expectNone<Button> { text = "Delete" }`;
+  Java: `_assertNone(Button.class, spec -> spec.withText("Delete"));`.
+  Groovy: `_expectNone(Button) { text = "Delete" }`.
 * `_expectOne<type of component> { criteria }` will expect that there is
   exactly one **visible** component matching given criteria in the current UI; the function will fail if
-  none, or more than one components are matching. For example: `_expectOne<Button> { caption = "Delete" }`. Java:
-  `_assertOne(Button.class, spec -> spec.withCaption("Delete"));`.
-  Groovy: `_assertOne(Button) { caption = "Delete" }`.
+  none, or more than one components are matching. For example: `_expectOne<Button> { text = "Delete" }`. Java:
+  `_assertOne(Button.class, spec -> spec.withText("Delete"));`.
+  Groovy: `_assertOne(Button) { text = "Delete" }`.
   Note: this is
   exactly the same as `_get()`, but it may communicate the intent of the test better in the case when you're
   only asserting that there is exactly one such component.
@@ -792,7 +755,7 @@ This library provides three methods for looking up components.
   Note: this is exactly the same as `_find()`, but it may communicate the intent of the test better in the case when you're
   only asserting on the state of the UI.
 
-> I can't stress the **visible** part enough. Often the dump will show the button, the caption will be correct and everything
+> I can't stress the **visible** part enough. Often the dump will show the button, the text will be correct and everything
   will look OK but the lookup method will claim the component is not there. The lookup methods only search for visible
   components - they will simply ignore invisible ones.
 
@@ -810,8 +773,8 @@ class AddNewPersonForm : VerticalLayout() {
 
 test("add new person happy flow") {
     val form = AddNewPersonForm()
-    form._get<TextField> { caption = "Name:" } ._value = "John Doe"
-    form._get<Button> { caption = "Create" } ._click()
+    form._get<TextField> { label = "Name:" } ._value = "John Doe"
+    form._get<Button> { text = "Create" } ._click()
 }
 ```
 
@@ -823,8 +786,8 @@ class AddNewPersonForm : VerticalLayout() {
 
 @Test void "add new person happy flow"() {
     def form = new AddNewPersonForm()
-    form._get(TextField) { caption = "Name:" } ._value = "John Doe"
-    form._get(Button) { caption = "Create" } ._click()
+    form._get(TextField) { label = "Name:" } ._value = "John Doe"
+    form._get(Button) { text = "Create" } ._click()
 }
 ```
 
@@ -840,29 +803,29 @@ public class AddNewPersonForm extends VerticalLayout {
 @Test
 public void addNewPersonHappyFlow() {
     final AddNewPersonForm form = new AddNewPersonForm();
-    _setValue(_get(form, TextField.class, spec -> spec.withCaption("Name:")), "John Doe");
-    _click(_get(form, Button.class, spec -> spec.withCaption("Create")));
+    _setValue(_get(form, TextField.class, spec -> spec.withLabel("Name:")), "John Doe");
+    _click(_get(form, Button.class, spec -> spec.withText("Create")));
 }
 ```
 
 
 Such methods are also useful for example when locking the lookup scope into a particular container, say, some particular layout:
 ```kotlin
-_get<FlexLayout> { id = "form" } ._get<TextField> { caption = "Age" } ._value = "45"
+_get<FlexLayout> { id = "form" } ._get<TextField> { label = "Age" } ._value = "45"
 ```
 ```groovy
-_get(FlexLayout) { id = "form" } ._get(TextField) { caption = "Age" } ._value = "45"
+_get(FlexLayout) { id = "form" } ._get(TextField) { label = "Age" } ._value = "45"
 ```
 
 Since there is no way to see the UI of the app with this kind of approach
 (since there's no browser), the lookup functions will dump the component tree
-on failure. For example if I make a mistake in the lookup caption, the `_get()` function will fail:
+on failure. For example if I make a mistake in the lookup label, the `_get()` function will fail:
 ```
-java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and caption='Type your name': []. Component tree:
+java.lang.IllegalArgumentException: No visible TextField in MyUI[] matching TextField and label='Type your name': []. Component tree:
 └── MyUI[]
     └── VerticalLayout[]
-        ├── TextField[caption='Type your name here:', value='']
-        └── Button[caption='Click Me']
+        ├── TextField[label='Type your name here:', value='']
+        └── Button[text='Click Me']
 
 
 	at com.github.karibu.testing.LocatorKt._find(Locator.kt:102)
@@ -1021,9 +984,11 @@ and receives `screenX` as `@EventData("event.screenX")`:
 
 ```kotlin
 val div = Div()
-div._fireDomEvent("click", Json.createObject().apply { put("event.screenX", 20.0) })
+div._fireDomEvent("click", ObjectMapper().createObjectNode().apply { put("event.screenX", 20.0) })
 div.addClickListener { e -> print(e.screenX) }
 ```
+
+> Note: since Vaadin 24.5 the event data is a Jackson `tools.jackson.databind.JsonNode` (not the old `elemental.json.JsonValue`).
 
 ### Focus/Blur
 
@@ -1195,27 +1160,9 @@ root items of a TreeGrid. In order for the `_size()` and all index-based functio
 items in the Grid, you have to expand all of the nodes, by calling
 `treeGrid._expandAll()`/`GridKt._expandAll(treeGrid)`.
 
-### IronList
-
-Similar to Grid, but one column only, no sorting, no filtering, no header,
-good for lazy list of items akin to Android's ListView.
-
-* You can retrieve a bean at particular index; for example `ironList._get(0)` will return the first item (Kotlin, Groovy).
-  Java: you need to `import static com.github.mvysny.kaributesting.v10.IronListKt.*;`, then you can call `_get(ironList, 0);`.
-* You can check for the total amount of items shown in the list, by calling `ironList._size()` (Kotlin, Groovy). Java: `_size(ironList);`
-* You can obtain a full formatted row as seen by the user, by calling `ironList._getFormattedRow(rowIndex)` - it will return that particular row as
-  `String`. In Java: `_getFormattedRow(ironList, rowIndex)`
-* You can assert on the number of rows in the list, by calling `ironList.expectRows(25)`. If there is a different amount of rows, the function will
-  fail and will dump first 10 rows of the list, so that you can see the actual contents of the ironList.
-  In Java: `expectRows(ironList, 25)`
-* You can assert on a formatted output of particular row of the iron list: `ironList.expectRow(rowIndex, "John Doe")`. If the row looks different,
-  the function will fail with a proper list dump.
-
-See `IronListKt` class for more details.
-
 ### Support for VirtualList
 
-Similar to Grid/IronList, but one column only, no sorting, no filtering, no header,
+Similar to Grid, but one column only, no sorting, no filtering, no header,
 good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3.16 and Vaadin 23; you need to use the
 `karibu-testing-v23` Maven dependency - see the top of this page for more information.
 
@@ -1225,9 +1172,9 @@ good for lazy list of items akin to Android's ListView. Since Karibu-Testing 1.3
 * You can obtain a full formatted row as seen by the user, by calling `virtualList._getFormattedRow(rowIndex)` - it will return that particular row as
   `String`. In Java: `_getFormattedRow(virtualList, rowIndex)`
 * You can assert on the number of rows in the list, by calling `virtualList.expectRows(25)`. If there is a different amount of rows, the function will
-  fail and will dump first 10 rows of the list, so that you can see the actual contents of the ironList.
+  fail and will dump first 10 rows of the list, so that you can see the actual contents of the virtualList.
   In Java: `expectRows(virtualList, 25)`
-* You can assert on a formatted output of particular row of the iron list: `virtualList.expectRow(rowIndex, "John Doe")`. If the row looks different,
+* You can assert on a formatted output of particular row of the virtual list: `virtualList.expectRow(rowIndex, "John Doe")`. If the row looks different,
   the function will fail with a proper list dump.
 
 See `VirtualListsKt` class for more details.
@@ -1441,7 +1388,7 @@ class AddressPanel : FormLayout() {
 You can easily retrieve the fields nested in FormItems as follows:
 
 ```kotlin
-val isPrimary = _get<FormLayout.FormItem> { caption = "Primary Address" } .field as Checkbox
+val isPrimary = _get<FormLayout.FormItem> { label = "Primary Address" } .field as Checkbox
 expect(true) { isPrimary._value }
 ```
 
@@ -1555,7 +1502,7 @@ class AddressPanel : FormLayout() {
 The class seems to be lacking a property telling whether the address is primary or not. Luckily, we can fix that with the help of extension properties:
 
 ```kotlin
-val AddressPanel.isPrimary: Boolean get() = _get<CheckBox> { caption = "Primary Address" } ._value
+val AddressPanel.isPrimary: Boolean get() = _get<Checkbox> { label = "Primary Address" } ._value
 ```
 
 Now suppose we want to find the primary address, failing if there is none. The `_get()` function uses the `SearchSpec<T>` to filter
@@ -1605,8 +1552,8 @@ The error message of a failed test is now clear:
 java.lang.IllegalArgumentException: No visible AddressPanel in MockUI[] matching AddressPanel and isPrimary==true: []. Component tree:
 └── MockUI[]
     └── AddressPanel[]
-        ├── CheckBox[caption='Primary Address', value='false']
-        └── TextField[caption='Street', value='']
+        ├── Checkbox[label='Primary Address', value='false']
+        └── TextField[label='Street', value='']
 ```
 
 Groovy: Similar thing can be done by using the Groovy extension methods mechanism.
@@ -1675,10 +1622,10 @@ to `KaribuConfig.pendingJavascriptInvocationHandlers` (`KaribuConfig.getPendingJ
 // old handlers won't interfere with new ones. Alternatively, populate once before any of your tests are run.
 KaribuConfig.pendingJavascriptInvocationHandlers.add { it ->
     if (it.invocation.expression.contains("return this.getBoundingClientRect();")) {
-        it.complete(Json.create("something"))
+        it.complete(ObjectMapper().nodeFactory.textNode("something"))
     }
 }
-lateinit var result: JsonValue
+lateinit var result: JsonNode
 val btn = UI.getCurrent().button {
     onClick {
         element.executeJs("return this.getBoundingClientRect();")
@@ -1689,6 +1636,8 @@ btn._click()
 MockVaadin.clientRoundtrip() // necessary, to run the handlers. However, this is called automatically
 // if your looks up a component as a next action.
 ```
+
+> Note: since Vaadin 24.5 the result type is Jackson `tools.jackson.databind.JsonNode` (not the old `elemental.json.JsonValue`). Use `ObjectMapper` to construct values.
 
 Since Karibu-Testing 2.2.1.
 
@@ -1716,7 +1665,7 @@ background process when the `Buy Ticket` button is pressed. Then,
 the test checks that a dialog has popped up. Here is the source of the test method:
 
 ```kotlin
-_get<Button> { caption = "Buy Ticket" } ._click()
+_get<Button> { text = "Buy Ticket" } ._click()
 MockVaadin.clientRoundtrip()
 Thread.sleep(200)
 MockVaadin.clientRoundtrip()
@@ -2094,10 +2043,10 @@ try {
         e.submit {
             try {
                 UI.getCurrent().navigate("helloworld")
-                _get<Button> { caption = "Hello, World!" }.onLeftClick {
+                _get<Button> { text = "Hello, World!" }.onLeftClick {
                     service.callService()
                 }
-                _get<Button> { caption = "Hello, World!" }._click()
+                _get<Button> { text = "Hello, World!" }._click()
             } catch (e: Throwable) {
                 e.printStackTrace()
             }

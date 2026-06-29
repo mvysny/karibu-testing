@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import org.junit.jupiter.api.Test
 
 import static com.github.mvysny.kaributesting.v10.groovy.TestUtils.expectThrows
-import static kotlin.test.AssertionsKt.expect
 
 @CompileStatic
 class TestUtilsTest {
@@ -21,8 +20,8 @@ class TestUtilsTest {
             throw new RuntimeException("Should have failed")
         } catch (AssertionError e) {
             // okay
-            expect("Expected to fail with java.lang.RuntimeException but completed successfully") { e.message }
-            expect(null) { e.cause }
+            assert e.message == "Expected to fail with java.lang.RuntimeException but completed successfully"
+            assert e.cause == null
         }
     }
 
@@ -36,8 +35,8 @@ class TestUtilsTest {
             throw new RuntimeException("Should have failed")
         } catch (AssertionError e) {
             // okay
-            expect("Expected to fail with java.lang.RuntimeException but failed with java.io.IOException: simulated") { e.message }
-            expect(IOException) { e.cause?.class }
+            assert e.message == "Expected to fail with java.lang.RuntimeException but failed with java.io.IOException: simulated"
+            assert e.cause?.class == IOException
         }
     }
 
@@ -53,7 +52,7 @@ class TestUtilsTest {
             throw new RuntimeException("Should have failed")
         } catch (AssertionError e) {
             // expected
-            expect("java.lang.RuntimeException message: Expected 'foo' but was 'actual'") { e.message }
+            assert e.message == "java.lang.RuntimeException message: Expected 'foo' but was 'actual'"
         }
     }
 
@@ -65,7 +64,7 @@ class TestUtilsTest {
             throw new RuntimeException("Should have failed")
         } catch (AssertionError e) {
             // okay
-            expect("Expected to fail with java.lang.RuntimeException but completed successfully") { e.message }
+            assert e.message == "Expected to fail with java.lang.RuntimeException but completed successfully"
         }
     }
 
@@ -88,8 +87,8 @@ class TestUtilsTest {
             throw new RuntimeException("Should have failed")
         } catch (AssertionError e) {
             // okay
-            expect("java.io.IOException message: Expected 'foo' but was 'simulated'") { e.message }
-            expect(IOException) { e.cause.class }
+            assert e.message == "java.io.IOException message: Expected 'foo' but was 'simulated'"
+            assert e.cause.class == IOException
         }
     }
 

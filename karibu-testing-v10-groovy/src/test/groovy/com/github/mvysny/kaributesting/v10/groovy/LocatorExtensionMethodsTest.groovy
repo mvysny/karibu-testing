@@ -10,8 +10,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import static kotlin.test.AssertionsKt.expect
-
 /**
  * @author mavi
  */
@@ -24,8 +22,8 @@ class LocatorExtensionMethodsTest {
 
     @Test
     void apiTest() {
-        expect(UI.current) { UI.current._get(UI) }
-        expect(UI.current) { UI.current._get(UI) { withoutClasses = "foo" } }
+        assert UI.current._get(UI) == UI.current
+        assert (UI.current._get(UI) { withoutClasses = "foo" }) == UI.current
         UI.current._find(UI)
         UI.current._find(UI) { text = "foo" }
         UI.current.add(new TextField("bar"))

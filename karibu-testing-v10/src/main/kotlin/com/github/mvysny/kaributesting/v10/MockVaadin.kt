@@ -311,11 +311,22 @@ public object MockVaadin {
      * * [cleanupDialogs]
      *
      * If you'd like to test your [ErrorHandler] then take a look at [runUIQueue] instead.
-     * @param propagateExceptionToHandler defaults to false. If true and [VaadinSession.errorHandler]
-     * is set, any exceptions thrown from [Command]s scheduled via the [UI.access] will be
-     * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
+     * @param propagateExceptionToHandler defaults to false. Controls what happens to an exception
+     * thrown from a [Command] scheduled via [UI.access]:
+     * * **false (default):** Karibu captures any such exception and re-throws it from this method,
+     * so it fails your test (fail-fast). This is the right choice for normal testing, where
+     * background jobs aren't expected to throw and an accidental exception should surface as a test
+     * failure.
+     * * **true:** the exception is instead routed to your [VaadinSession.errorHandler] and is not
+     * re-thrown - exactly as Vaadin behaves in production. Use this when you want to verify that
+     * error handling works end-to-end the way it would in production: either you're testing a
+     * custom [VaadinSession.errorHandler] directly (e.g. asserting it shows a notification), or
+     * you're checking that your app's background jobs have their failures handled correctly. Note:
+     * `true` only takes effect when a non-[DefaultErrorHandler] [VaadinSession.errorHandler] is
+     * installed; otherwise Karibu still fails the test so the exception isn't silently swallowed.
      * @throws IllegalStateException if the environment is not mocked
      */
+    @JvmOverloads
     @JvmStatic
     public fun clientRoundtrip(propagateExceptionToHandler: Boolean = false) {
         checkNotNull(VaadinSession.getCurrent()) { "No VaadinSession" }
@@ -339,9 +350,19 @@ public object MockVaadin {
      * Called automatically by [clientRoundtrip] which is by default called automatically from [TestingLifecycleHook]. You generally
      * don't need to call this method unless you need to test your [ErrorHandler].
      *
-     * @param propagateExceptionToHandler defaults to false. If true and [VaadinSession.errorHandler]
-     * is set, any exceptions thrown from [Command]s scheduled via the [UI.access] will be
-     * redirected to [VaadinSession.errorHandler] and will not be re-thrown from this method.
+     * @param propagateExceptionToHandler defaults to false. Controls what happens to an exception
+     * thrown from a [Command] scheduled via [UI.access]:
+     * * **false (default):** Karibu captures any such exception and re-throws it from this method,
+     * so it fails your test (fail-fast). This is the right choice for normal testing, where
+     * background jobs aren't expected to throw and an accidental exception should surface as a test
+     * failure.
+     * * **true:** the exception is instead routed to your [VaadinSession.errorHandler] and is not
+     * re-thrown - exactly as Vaadin behaves in production. Use this when you want to verify that
+     * error handling works end-to-end the way it would in production: either you're testing a
+     * custom [VaadinSession.errorHandler] directly (e.g. asserting it shows a notification), or
+     * you're checking that your app's background jobs have their failures handled correctly. Note:
+     * `true` only takes effect when a non-[DefaultErrorHandler] [VaadinSession.errorHandler] is
+     * installed; otherwise Karibu still fails the test so the exception isn't silently swallowed.
      * @throws IllegalStateException if the environment is not mocked
      */
     @JvmOverloads

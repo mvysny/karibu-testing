@@ -11,5 +11,7 @@ out
 .kotlin
 .settings
 .project
+.classpath
+bin/
 
 kls_database.db

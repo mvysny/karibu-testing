@@ -100,6 +100,7 @@ because `@BeforeEach` re-applies them every test.
 |---|---|---|---|
 | `includeVirtualChildrenInTemplates` | `false` | reset (test-scoped) | This repo resets it per-test already. An app that always wants virtual children would set it per-`@BeforeEach`. |
 | `fakeExtendedClientDetails` | `true` | reset (test-scoped) | "Expert setting." Consumed during `setup()`. Flipped per-test in this repo. |
+| `windowName` | `"ROOT-2521314-0.2626611481"` | reset (test-scoped) | Seed for tab #1's `window.name`; consumed during `setup()`. A test that sets a specific initial tab id would want it back to the default afterwards. |
 | `defaultIsFromClient` | `true` | **contested** | Compat switch, KDoc frames it as suite-wide ("emulate previous versions"). Suite-scoped *and* per-test flippable — the fuzzy slash in one field. |
 | `initDefaultRoute` | `true` | **contested** | Consumed during `setup()`. Per-test in this repo, but an app could reasonably set it once globally. |
 | `unloadBeaconTiming` | `EAGER` | reset (test-scoped) | Per-test F5 scenarios. Leak is mostly harmless (default == old behavior) but it's one more flag on the pile. |

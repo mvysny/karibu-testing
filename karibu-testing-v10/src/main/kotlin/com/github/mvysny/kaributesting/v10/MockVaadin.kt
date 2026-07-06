@@ -33,6 +33,12 @@ public object MockVaadin {
     private val strongRefRes = ThreadLocal<VaadinResponse>()
 
     /**
+     * The UI factory passed to [setup]; remembered so [MockBrowser] can spawn additional tabs
+     * (UIs) into the current session using the same factory.
+     */
+    private val strongRefUiFactory = ThreadLocal<() -> UI>()
+
+    /**
      * When closing UI via [MockVaadin.closeCurrentUI], the UI location is remembered here.
      *
      * The reason is: when reloading the page via [Page.reload], the current UI is closed
@@ -167,35 +173,40 @@ public object MockVaadin {
      * old UI ends up closed (via [UI.close]), detached and removed from the session - matching Flow's
      * `ui.close()` + end-of-request `removeClosedUIs()`.
      */
-    internal fun reloadCurrentUI(uiFactory: () -> UI, session: VaadinSession) {
+    internal fun reloadCurrentUI(uiFactory: () -> UI, session: VaadinSession, newWindowName: String? = null) {
         val oldUI: UI = checkNotNull(UI.getCurrent()) { "No current UI to reload" }
+        // The new UI keeps the reloaded tab's window.name unless the caller overrides it. A changed
+        // window.name models browsers/navigations that don't preserve it across reload (e.g. Safari
+        // with dev tools closed, or typed-URL navigation) - see MockBrowser.reload.
+        val windowName: String = newWindowName ?: oldUI.windowName
         // remember the current location so the new UI navigates to the same place.
         lastUILocation.set(oldUI.internals.activeViewLocation)
 
+        // createUI() picks a fresh uiId that steps past every tab currently in the session, so
+        // addUI() never evicts a still-live UI - neither the reloaded-but-not-yet-discarded old UI
+        // nor any other open browser tab.
         if (isPreserveOnRefreshTarget(oldUI)) {
             // Keep the old UI alive & registered so the new UI's navigation can teleport overlays
-            // off it and close it (see kdoc). The new UI gets a fresh uiId so addUI() doesn't evict
-            // the still-live old UI from VaadinSession.uIs. Then discard the old UI.
-            createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+            // off it and close it (see kdoc). Then discard the old UI.
+            createUI(uiFactory, session, windowName = windowName)
             discardOldUI(oldUI)
         } else when (KaribuConfig.unloadBeaconTiming) {
             UnloadBeaconTiming.EAGER -> {
-                // Beacon before the new UI exists: close+detach+remove the old UI, then create the
-                // new one. The old UI is gone before addUI(), so the new UI can reuse uiId 1.
+                // Beacon before the new UI exists: close+detach+remove the old UI, then create the new.
                 discardOldUI(oldUI)
-                createUI(uiFactory, session)
+                createUI(uiFactory, session, windowName = windowName)
             }
             UnloadBeaconTiming.LATE -> {
-                // Beacon after the new UI is created: both are briefly live (fresh uiId to avoid
-                // eviction), then the old UI is closed+detached+removed.
-                createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+                // Beacon after the new UI is created: both are briefly live, then the old UI is
+                // closed+detached+removed.
+                createUI(uiFactory, session, windowName = windowName)
                 discardOldUI(oldUI)
             }
             UnloadBeaconTiming.NEVER -> {
-                // Beacon lost: leave the old UI alive alongside the new one (fresh uiId). Flag it so
+                // Beacon lost: leave the old UI alive alongside the new one. Flag it so
                 // reapInactiveUIs() can later close it the way Flow's heartbeat/idle-UI cleanup would.
                 ComponentUtil.setData(oldUI, UNLOAD_BEACON_LOST_KEY, true)
-                createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+                createUI(uiFactory, session, windowName = windowName)
             }
         }
     }
@@ -278,6 +289,7 @@ public object MockVaadin {
 
     private fun clearVaadinInstances(fireUIDetach: Boolean) {
         try {
+            discardBackgroundUIs()
             closeCurrentUI(fireUIDetach)
             closeCurrentSession()
         } finally {
@@ -285,7 +297,24 @@ public object MockVaadin {
             CurrentInstance.set(VaadinResponse::class.java, null)
             strongRefReq.remove()
             strongRefRes.remove()
+            strongRefUiFactory.remove()
         }
+    }
+
+    /**
+     * Closes, detaches and removes every UI (browser tab) in the current session **except** the
+     * current one, which [closeCurrentUI]/[closeCurrentSession] handle. Ensures teardown nukes all
+     * tabs opened via [MockBrowser.newTab] and any UIs left lingering by a lost unload beacon, not
+     * just the focused tab. A no-op if there is no session or no extra tabs.
+     */
+    private fun discardBackgroundUIs() {
+        val session: VaadinSession = VaadinSession.getCurrent() ?: return
+        val current: UI? = UI.getCurrent()
+        // filter{} snapshots into a fresh list so discardOldUI() -> session.removeUI() below does not
+        // concurrently modify the collection we're iterating.
+        session.uIs
+            .filter { it !== current }
+            .forEach { discardOldUI(it) }
     }
 
     /**
@@ -315,7 +344,13 @@ public object MockVaadin {
      *
      * The default is Firefox 94 on Ubuntu Linux.
      */
-    public var userAgent: String = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:94.0) Gecko/20100101 Firefox/94.0"
+    @Deprecated(
+        "Browser identity moved to MockBrowser; use MockBrowser.userAgent instead.",
+        ReplaceWith("MockBrowser.userAgent", "com.github.mvysny.kaributesting.v10.MockBrowser")
+    )
+    public var userAgent: String
+        get() = MockBrowser.userAgent
+        set(value) { MockBrowser.userAgent = value }
 
     /**
      * Creates [MockRequest]; override if you need to return a class that extends [MockRequest]
@@ -327,7 +362,7 @@ public object MockVaadin {
     internal fun createVaadinRequest(httpSession: FakeHttpSession = currentSession.fake): VaadinServletRequest {
         val mockRequest = mockRequestFactory(httpSession)
         // so that session.browser.updateRequestDetails() also creates browserDetails
-        mockRequest.headers["User-Agent"] = listOf(userAgent)
+        mockRequest.headers["User-Agent"] = listOf(MockBrowser.userAgent)
         return VaadinServletRequest(mockRequest, currentService as VaadinServletService)
     }
 
@@ -371,11 +406,74 @@ public object MockVaadin {
         // fire session init listeners
         service.fireSessionInitListeners(SessionInitEvent(service, session, request))
 
-        // create UI
+        // remember the factory so MockBrowser.newTab()/reload() can spawn more tabs into this session.
+        strongRefUiFactory.set(uiFactory)
+
+        // create the first UI/tab, seeded with KaribuConfig.windowName.
         createUI(uiFactory, session)
     }
 
-    internal fun createUI(uiFactory: () -> UI, session: VaadinSession, uiId: Int = 1) {
+    /**
+     * The [setup]-supplied UI factory for the current session, used by [MockBrowser] to spawn
+     * additional tabs. Throws if [setup] was not called.
+     */
+    internal val currentUiFactory: () -> UI
+        get() = checkNotNull(strongRefUiFactory.get()) {
+            "No UI factory - was MockVaadin.setup() called?"
+        }
+
+    /**
+     * Makes [ui] the current UI (and keeps a strong ref to it). Used by [MockBrowser.switchTo] to
+     * move focus between tabs of the same session.
+     */
+    internal fun focusUI(ui: UI) {
+        UI.setCurrent(ui)
+        strongRefUI.set(ui)
+    }
+
+    /**
+     * Closes, detaches and removes [ui] from its session - see [discardOldUI]. Exposed for
+     * [MockBrowser.closeTab] (beacon delivered).
+     */
+    internal fun discardUI(ui: UI) {
+        discardOldUI(ui)
+    }
+
+    /**
+     * Marks [ui] as having lost its unload beacon, so a later [reapInactiveUIs] closes it. Used by
+     * [MockBrowser.closeTab] with `beaconLost = true`, mirroring the [UnloadBeaconTiming.NEVER]
+     * reload path.
+     */
+    internal fun markUnloadBeaconLost(ui: UI) {
+        ComponentUtil.setData(ui, UNLOAD_BEACON_LOST_KEY, true)
+    }
+
+    /**
+     * Opens a new UI (browser tab) in the current session, alongside the existing tabs: a fresh
+     * `uiId` (so [VaadinSession.addUI] doesn't evict the others), the given [windowName], navigated to
+     * [path] (a *fresh* navigation, unlike a location-preserving reload). The new UI becomes current.
+     * Backs [MockBrowser.newTab].
+     */
+    internal fun openNewTab(windowName: String, path: String): UI {
+        val session: VaadinSession = checkNotNull(VaadinSession.getCurrent()) {
+            "No VaadinSession - was MockVaadin.setup() called?"
+        }
+        // createUI() assigns a fresh uiId that doesn't evict the existing tabs.
+        lastUILocation.set(Location(path))
+        createUI(currentUiFactory, session, windowName = windowName)
+        return checkNotNull(UI.getCurrent())
+    }
+
+    internal fun createUI(
+        uiFactory: () -> UI,
+        session: VaadinSession,
+        // uiId doubles as the key in VaadinSession.uIs, so it must not clash with any UI already in
+        // the session, else session.addUI() would evict that (still-live) UI. Default to the next free
+        // id: for the first UI of a fresh session that is 1; for a reload/new tab it steps past every
+        // tab currently open (the reloaded-but-not-yet-discarded old UI, plus any other browser tabs).
+        uiId: Int = (session.uIs.maxOfOrNull { it.uiId } ?: 0) + 1,
+        windowName: String = KaribuConfig.windowName
+    ) {
         val request: VaadinRequest = checkNotNull(VaadinRequest.getCurrent())
         val ui: UI = uiFactory()
         require(ui.session == null) {
@@ -385,6 +483,10 @@ public object MockVaadin {
                     "using Spring which reuses a scoped instance of the UI?"
         }
 
+        // remember this tab's window.name eagerly (the faked ECD is populated lazily); MockPage
+        // reads it back when faking ExtendedClientDetails, and MockBrowser uses it to identify tabs.
+        ComponentUtil.setData(ui, WINDOW_NAME_KEY, windowName)
+
         // hook into Page.reload() and recreate the UI
         UI::class.java.getDeclaredField("page").apply {
             isAccessible = true
@@ -392,9 +494,8 @@ public object MockVaadin {
         }
         ui.internals.session = session
         UI.setCurrent(ui)
-        // uiId doubles as the key in VaadinSession.uIs; a reloaded UI must therefore get a fresh
-        // uiId, otherwise session.addUI() would evict the old (still-live) UI from the session,
-        // breaking the transient two-live-UI window that real Flow exhibits across an F5.
+        // see the uiId parameter kdoc: it is the key in VaadinSession.uIs and must not collide with
+        // any UI already there (the transient two-live-UI window on F5, or other open browser tabs).
         ui.doInit(request, uiId, "ROOT-1")
         strongRefUI.set(ui)
 
@@ -594,6 +695,22 @@ private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent
     }
 }
 
+/**
+ * Stores a UI's `window.name` (browser tab identity) as component data, populated eagerly when the
+ * UI is created (unlike the *lazily* faked [ExtendedClientDetails], which only materializes when the
+ * app asks for it). This is the source of truth [MockBrowser] uses to identify tabs; the faked ECD
+ * honors the same value. See [KaribuConfig.windowName].
+ */
+internal const val WINDOW_NAME_KEY: String =
+    "com.github.mvysny.kaributesting.v10.windowName"
+
+/**
+ * The `window.name` (browser tab identity) of this UI, as assigned when the UI was created by
+ * [MockVaadin.createUI]. See [WINDOW_NAME_KEY]. Empty string if the UI was not created by Karibu.
+ */
+internal val UI.windowName: String
+    get() = ComponentUtil.getData(this, WINDOW_NAME_KEY) as? String ?: ""
+
 private class MockPage(private val ui: UI, private val uiFactory: () -> UI, private val session: VaadinSession) : Page(ui) {
     override fun reload() {
         // recreate the UI on reload(), to simulate browser's F5
@@ -625,8 +742,9 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
 
         // need to call this lazily: https://github.com/mvysny/karibu-testing/issues/184#issuecomment-2639789774
         ui.access {
-            // construct mock ExtendedClientDetails then set it to ui.internals
-            val ecd = createExtendedClientDetails()
+            // construct mock ExtendedClientDetails then set it to ui.internals. Honor this tab's
+            // window.name (assigned at UI creation) so the faked ECD matches the tab identity.
+            val ecd = createExtendedClientDetails(windowName = ui.windowName)
             ui.internals.extendedClientDetails = ecd
             super.retrieveExtendedClientDetails(receiver)
         }

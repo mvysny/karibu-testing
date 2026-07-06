@@ -29,6 +29,7 @@ open class AbstractAllTests10(val isModuleTest: Boolean) {
     @Nested inner class LocatorTest : AbstractLocatorTest()
     @Nested inner class LocatorTest2 : AbstractLocatorTest2()
     @Nested inner class MockVaadinTests : AbstractMockVaadinTests()
+    @Nested inner class MockBrowserTests : AbstractMockBrowserTests()
     @Nested inner class BinderTests : AbstractBinderTests()
     @Nested inner class PrettyPrintTests : AbstractPrettyPrintTreeTests()
     @Nested inner class SearchSpecTests : AbstractSearchSpecTests()

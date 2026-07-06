@@ -723,6 +723,28 @@ However, looks that it broke Spring `RouteScope` [Issue #129](https://github.com
 Since Karibu 1.3.20 you can turn the `ExtendedClientDetails` faking off, by setting `KaribuConfig.fakeExtendedClientDetails`
 to `false` (Java: `KaribuConfig.setFakeExtendedClientDetails(false)`).
 
+### Multiple browser tabs
+
+A real `VaadinSession` backs many browser tabs of the same app; each tab has its own `UI` and its own
+`window.name`. `MockVaadin.setup()` starts you with a single tab (the current `UI`). To model more than
+one tab in the same session — e.g. to test tab-scoped state — use `MockBrowser`, the client-side
+counterpart of the server-side `MockVaadin`. Tabs are identified by their `window.name`:
+
+```kotlin
+val main = MockBrowser.currentWindowName    // the first tab, seeded from KaribuConfig.windowName
+val otherUI = MockBrowser.newTab("second")  // a second tab (window.name "second"), now focused
+_get<WelcomeView>()                         // the new tab navigated to the app root; act in it...
+MockBrowser.switchTo(main)                  // ...then move focus back to the first tab
+MockBrowser.closeTab("second")              // close a background tab (must not be the focused one)
+```
+
+`newTab(windowName, path)` opens a tab with an explicit name and/or initial route; `reload()` performs
+an F5 of the current tab and can even arrive with a *changed* `window.name` (modelling browsers that
+don't preserve it, e.g. Safari with dev tools closed). `closeTab(name, beaconLost = true)` models a
+lost unload beacon: the tab lingers server-side until `MockVaadin.reapInactiveUIs()` reaps it.
+`MockVaadin.tearDown()` closes every tab. All of `MockBrowser` is available from Java as static methods
+(`MockBrowser.newTab(...)`).
+
 ## API
 
 ### Looking up components

@@ -42,6 +42,20 @@ public object KaribuConfig {
     public var fakeExtendedClientDetails: Boolean = true
 
     /**
+     * The `window.name` (browser tab identity) given to the **first** UI/tab that
+     * [MockVaadin.setup] creates. It is surfaced to the app via
+     * [com.vaadin.flow.component.page.ExtendedClientDetails.getWindowName] whenever the faked ECD is
+     * requested (see [fakeExtendedClientDetails]).
+     *
+     * This is only the **seed** for tab #1. Additional tabs get their own distinct names via
+     * [MockBrowser.newTab], and [MockBrowser.reload] can change a tab's `window.name` on F5 (modelling
+     * browsers/navigations that don't preserve it). Set this before [MockVaadin.setup] if a test needs
+     * a specific initial tab id.
+     */
+    @JvmStatic
+    public var windowName: String = "ROOT-2521314-0.2626611481"
+
+    /**
      * If you need to hook into the testing lifecycle (e.g. you need to wait for any async operations to finish),
      * set your custom implementation here. See [TestingLifecycleHook] for more info on
      * where exactly you can hook into. The best way is to delegate to the [TestingLifecycleHook.default] implementation.

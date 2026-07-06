@@ -9,6 +9,82 @@ Newest entries on top.
 
 ---
 
+## 2026-07-06 — Multiple browser tabs in one session: `MockBrowser`
+
+**Context.** `MockVaadin.setup()` created exactly one `UI` (`createUI` was `internal`), so there was
+no public way to have a **second tab** — a second `UI` sharing the same `VaadinSession` — nor to vary a
+tab's `window.name`. Anything fundamentally *per-tab* was untestable. The downstream `vaadin-tab-scope`
+library rests entirely on this: two tabs → two independent scopes, no cross-tab leakage, independent
+lifecycles. Unparks and merges `ideas/multiple-uis-per-session.md` + `ideas/configurable-window-name.md`
+(they turned out to be one feature).
+
+**What real Flow does.** One `VaadinSession` backs many tabs; each has its own `UI` and its own
+`window.name` (surfaced as `ExtendedClientDetails.getWindowName()`); `VaadinSession.getUIs()` returns
+all of them. Tabs share session state but are otherwise independent. Closing a tab fires the unload
+beacon that closes its `UI`; a lost beacon leaves it to the heartbeat reap.
+
+**Decisions.**
+
+1. **New `MockBrowser` object, not more methods on `MockVaadin`.** `MockVaadin` is the *server-side*
+   test double (fabricates session/service/request); tab open/switch/close/reload are *client-side*
+   browser actions. A dedicated `MockBrowser` façade keeps `MockVaadin` from becoming a god-object and
+   gives both parked ideas (`window.name` + tabs) one coherent home. `MockBrowser` reaches server-side
+   internals via small `internal` helpers on `MockVaadin` (`openNewTab`, `focusUI`, `discardUI`,
+   `markUnloadBeaconLost`, `currentUiFactory`, `reloadCurrentUI`) — no public ThreadLocal leakage.
+
+2. **Identify tabs by `window.name`, derive the mapping (no registry).** Tests key on the string, not
+   `UI` objects (`newTab(name)`, `switchTo(name)`, `closeTab(name)`); `newTab` still *returns* the `UI`
+   to act on. The name→UI mapping is **derived** on demand from `session.getUIs()` — no
+   `Map<String,UI>` to drift across reload/close. Source of truth is a per-UI `window.name` stored as
+   component data (`WINDOW_NAME_KEY`) eagerly at `createUI`, because the faked ECD is populated
+   *lazily*; the faked ECD honors the same value. `currentWindowName` lets a test switch back to a tab
+   without hard-coding names.
+
+3. **`KaribuConfig.windowName` seeds tab #1 only.** The global knob sets the first tab's identity
+   before `setup()` reads it (the one thing `MockBrowser` can't retro-set); `newTab` gives further tabs
+   distinct **monotonic** (`ROOT-tab-N`) names — deterministic/reproducible, unlike Flow's random
+   suffix — and `reload(newWindowName=…)` can change a tab's name on F5 (modelling Safari/typed-URL
+   non-preservation). Rejected a `() -> String` factory as premature.
+
+4. **`closeTab(name, beaconLost=false)` — a boolean, not the 3-value `UnloadBeaconTiming`.** A close
+   creates no new UI, so the enum's `EAGER`/`LATE` (early/late *relative to the new UI*) have nothing
+   to order against and collapse to one outcome; only delivered-vs-lost is real. A boolean states that
+   honestly instead of offering two synonymous enum values. `beaconLost=true` reuses the exact
+   `UNLOAD_BEACON_LOST_KEY` marking of a `NEVER` reload, so the same `reapInactiveUIs()` cleans both.
+
+5. **Closing the current tab throws `IllegalArgumentException`, uniformly.** In a browser, closing the
+   active tab moves focus to an arbitrary sibling — poison for a scripted test. Refuse rather than
+   guess; `switchTo` another tab first. Throws even with `beaconLost=true` (the tab is gone from the
+   browser's view regardless). Produce a lingering-UI-to-reap by closing a *background* tab with
+   `beaconLost=true`. Relaxable later if a real need appears.
+
+6. **`tearDown()` nukes every tab.** `closeCurrentUI` only handled the focused UI; teardown now also
+   discards all background tabs (`discardBackgroundUIs`) so no UI (opened tab or lost-beacon lingerer)
+   leaks into the next test.
+
+7. **`userAgent` moved to `MockBrowser`.** Browser identity belongs on the browser; `MockVaadin.userAgent`
+   remains as a `@Deprecated` alias delegating to `MockBrowser.userAgent` (source-compatible).
+
+**Supersedes** decision #2 of the F5/beacon entry below ("give the reloaded UI a fresh `uiId`; the
+eager path can reuse `uiId 1`"). With multiple tabs, reusing `uiId 1` on an eager reload evicts *another*
+open tab (same `uiId` key), and `oldUI.uiId + 1` on late/never/preserve can collide with a sibling tab.
+`createUI` now always assigns the **next free** `uiId` (`max(uIs.uiId) + 1`, or `1` for a fresh
+session) — which still yields `uiId 1` for the single-tab eager case, so that entry's observable
+single-tab behavior is unchanged.
+
+**Consequences / limitations.** No wall-clock heartbeat timing (inherited from the beacon/reap design);
+`MockBrowser.reload()` skips the client-side `Page.reload()` JS command that the `page.reload()` path
+issues (irrelevant to a browserless test). Java sees `MockBrowser.newTab()` etc. via `@JvmStatic` /
+`@JvmOverloads`.
+
+**Where it lives.** `MockBrowser` (all mechanics in its KDoc); `KaribuConfig.windowName`; `MockVaadin`
+internal helpers (`openNewTab`, `focusUI`, `discardUI`, `markUnloadBeaconLost`, `currentUiFactory`,
+`discardBackgroundUIs`) and the per-UI `windowName` plumbing in `createUI`/`MockPage`; test matrix in
+`MockBrowserTest`. Superseded idea files: `ideas/multiple-uis-per-session.md`,
+`ideas/configurable-window-name.md` (deleted on implementation).
+
+---
+
 ## 2026-07-06 — Reaping a lost-beacon UI: `MockVaadin.reapInactiveUIs()`
 
 **Context.** The `2026-07-06` F5/beacon entry below shipped `UnloadBeaconTiming.NEVER` = "the unload

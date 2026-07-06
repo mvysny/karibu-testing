@@ -10,12 +10,14 @@ import com.github.mvysny.karibudsl.v10.verticalLayout
 import com.github.mvysny.kaributesting.v10.mock.*
 import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.AttachEvent
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.page.ExtendedClientDetails
 import com.vaadin.flow.function.DeploymentConfiguration
@@ -395,6 +397,131 @@ abstract class AbstractMockVaadinTests() {
             val viewInstance = _get<PreserveOnRefreshView>()
             UI.getCurrent().page.reload()
             expect(true) { viewInstance === _get<PreserveOnRefreshView>() }
+        }
+    }
+
+    // Higher-fidelity F5 lifecycle: real Flow keeps the old UI alive while the new one navigates,
+    // so AbstractNavigationStateRenderer.disconnectElements() can teleport UI-level overlays
+    // (dialogs/notifications) onto the new UI for a @PreserveOnRefresh target, then close the old UI.
+    // https://github.com/mvysny/karibu-testing/issues/207
+    @Nested inner class `page reload F5 lifecycle (issue 207)` {
+        @Test fun `a dialog open across F5 survives on the new UI (@PreserveOnRefresh)`() {
+            navigateTo<PreserveOnRefreshView>()
+            val oldUI = UI.getCurrent()
+            var clicked = false
+            val okButton = Button("OK") { clicked = true }
+            val dialog = Dialog(okButton)
+            dialog.open()
+            _expectOne<Dialog>()   // flush the deferred attach, as if the dialog was opened in a prior request
+            expect(true) { dialog.isOpened }
+            expect(oldUI) { dialog.ui.get() }
+
+            oldUI.page.reload()
+
+            val newUI = UI.getCurrent()
+            expect(false) { newUI === oldUI }
+            // In real Flow the SAME overlay instance is moved onto the new UI - not dropped, not recreated.
+            expect(true) { dialog.isOpened }
+            expect(newUI) { dialog.ui.get() }
+            _get<Dialog>()   // the overlay is present on the new UI
+            // ...and it's still interactive: the same button instance still fires its listener.
+            okButton._click()
+            expect(true) { clicked }
+        }
+
+        @Test fun `the same dialog instance is teleported, not recreated`() {
+            navigateTo<PreserveOnRefreshView>()
+            val dialog = Dialog(Button("OK"))
+            dialog.open()
+            _expectOne<Dialog>()
+            UI.getCurrent().page.reload()
+            expect(true) { dialog === _get<Dialog>() }
+        }
+
+        @Test fun `a Notification teleports across F5 (@PreserveOnRefresh)`() {
+            navigateTo<PreserveOnRefreshView>()
+            val oldUI = UI.getCurrent()
+            val notification = Notification("hello")
+            notification.open()
+            _expectOne<Notification>()
+            expect(oldUI) { notification.ui.get() }
+
+            oldUI.page.reload()
+
+            val newUI = UI.getCurrent()
+            expect(true) { notification.isOpened }
+            expect(newUI) { notification.ui.get() }
+            _get<Notification>()
+        }
+
+        @Test fun `an overlay is NOT carried over across F5 of a non-@PreserveOnRefresh view`() {
+            navigateTo<HelloWorldView>()
+            val oldUI = UI.getCurrent()
+            val dialog = Dialog(Button("OK"))
+            dialog.open()
+            _expectOne<Dialog>()
+            expect(true) { dialog.isOpened }
+
+            oldUI.page.reload()
+
+            val newUI = UI.getCurrent()
+            _expectNone<Dialog>()   // the overlay is absent from the new UI
+            // it was not teleported: it stays behind on the discarded old UI, not moved onto the new one.
+            expect(false) { dialog.ui.orElse(null) === newUI }
+        }
+
+        @Test fun `child order on the new UI matches Flow (route root, then teleported overlays)`() {
+            navigateTo<PreserveOnRefreshView>()
+            val view = _get<PreserveOnRefreshView>()
+            val dialog1 = Dialog().apply { open() }
+            val dialog2 = Dialog().apply { open() }
+            _expect<Dialog>(2)
+
+            UI.getCurrent().page.reload()
+
+            // Karibu drives Flow's real navigation pipeline, so the child ordering it produces IS
+            // Flow's ordering: the preserved route root is re-attached first, then the overlays
+            // teleported off the old UI (via UIInternals.moveElementsFrom) are appended after it,
+            // preserving their relative order.
+            expect(listOf<Component>(view, dialog1, dialog2)) { UI.getCurrent().children.toList() }
+        }
+
+        @Test fun `old UI is marked closing after F5 (@PreserveOnRefresh)`() {
+            navigateTo<PreserveOnRefreshView>()
+            val oldUI = UI.getCurrent()
+            oldUI.page.reload()
+            expect(true) { oldUI.isClosing }
+        }
+
+        @Test fun `old UI is marked closing after F5 (plain view)`() {
+            navigateTo<HelloWorldView>()
+            val oldUI = UI.getCurrent()
+            oldUI.page.reload()
+            expect(true) { oldUI.isClosing }
+        }
+
+        @Test fun `session ends with exactly one live UI after F5`() {
+            navigateTo<PreserveOnRefreshView>()
+            val oldUI = UI.getCurrent()
+            oldUI.page.reload()
+            val session = VaadinSession.getCurrent()
+            expect(listOf(UI.getCurrent())) { session.uIs.toList() }
+            expect(false) { session.uIs.contains(oldUI) }
+        }
+
+        // The transient window where both the old and the new UI are live at the same time is a
+        // real production state (a "there is exactly one UI" assumption passes Karibu today but
+        // throws in production). The new UI is created & registered before it navigates, while the
+        // old one is still around.
+        @Test fun `both old and new UI are alive during the new UI init (transient two-UI window)`() {
+            navigateTo<PreserveOnRefreshView>()
+            val oldUI = UI.getCurrent()
+            var uiCountDuringInit = -1
+            VaadinService.getCurrent().addUIInitListener { event ->
+                uiCountDuringInit = event.ui.session.uIs.size
+            }
+            oldUI.page.reload()
+            expect(2) { uiCountDuringInit }
         }
     }
 

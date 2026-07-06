@@ -15,3 +15,4 @@ out
 bin/
 
 kls_database.db
+.claude/worktrees/

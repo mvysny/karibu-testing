@@ -8,6 +8,10 @@ Karibu-Testing is a browserless, containerless unit-testing library for Vaadin F
 
 The library is Kotlin-first and leans on Kotlin extension functions; Java consumers go through static helper classes (`LocatorJ`, `SearchSpecJ`); Groovy has its own modules.
 
+## Ideas / design notes
+
+The `ideas/` folder holds one markdown file per non-trivial idea or design, brainstormed before (and kept alongside) its implementation. When starting substantial new functionality, capture the design there first and keep it updated as the design settles.
+
 ## Build / test commands
 
 - `./gradlew test` — run all tests across all Vaadin-variant test-runner modules. This is the CI command (see `.github/workflows/gradle.yml`).

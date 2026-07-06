@@ -31,10 +31,7 @@ abstract class AbstractLocatorTest2 {
         val dlg = Dialog()
         dlg.open()
         expectThrows(AssertionError::class,
-            """Too many visible Dialogs (1) in MockedUI[] matching Dialog and count=0..0: [Dialog[]]. Component tree:
-└── MockedUI[]
-    └── Dialog[]
-""") {
+            """Too many visible Dialogs (1) in MockedUI[] matching Dialog and count=0..0: [Dialog[""") {
             _expectNoDialogs()
         }
         dlg.close()

@@ -129,6 +129,55 @@ public object MockVaadin {
     }
 
     /**
+     * Simulates a browser F5 reload of the current UI, as closely to real Vaadin Flow
+     * as a server-side-only test double allows. See
+     * [issue 207](https://github.com/mvysny/karibu-testing/issues/207) for the full analysis.
+     *
+     * Real Flow keeps the *old* UI alive while the *new* UI navigates, so that
+     * [com.vaadin.flow.router.internal.AbstractNavigationStateRenderer] `.disconnectElements()`
+     * can, for a [com.vaadin.flow.router.PreserveOnRefresh] target:
+     * 1. mark the old UI with Flow's internal `ReplacedViaPreserveOnRefresh` sentinel (via
+     *    `Element.removeFromTree()`),
+     * 2. **teleport UI-level overlays (dialogs/notifications) off the old UI onto the new UI**
+     *    (via [com.vaadin.flow.component.internal.UIInternals.moveElementsFrom]),
+     * 3. close the old UI.
+     *
+     * Because Karibu drives Flow's *real* navigation pipeline, we get all of the above (the
+     * sentinel, the overlay teleport, the overlays-before-route child ordering and `oldUI.close()`)
+     * for free - **as long as the old UI is still alive and still owns the preserved route root
+     * when the new UI navigates.** So the sole job here is to fix the ordering: create the new UI
+     * first, then discard the old one.
+     *
+     * For a non-[com.vaadin.flow.router.PreserveOnRefresh] target Flow does not go through
+     * `disconnectElements()`; the browser's unload beacon closes the old UI instead. We emulate
+     * that by closing the old UI ourselves, so [UI.isClosing] is consistent regardless of the
+     * navigation target.
+     */
+    internal fun reloadCurrentUI(uiFactory: () -> UI, session: VaadinSession) {
+        val oldUI: UI = checkNotNull(UI.getCurrent()) { "No current UI to reload" }
+        // remember the current location so the new UI navigates to the same place.
+        lastUILocation.set(oldUI.internals.activeViewLocation)
+
+        // Deliberately DO NOT close/detach the old UI yet: it must stay alive & registered in the
+        // session so that the new UI's navigation can teleport overlays off it (see kdoc above).
+        // The new UI gets a fresh uiId so it doesn't evict the old one from VaadinSession.uIs.
+        createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+        val newUI: UI = checkNotNull(UI.getCurrent())
+
+        // Now discard the old UI, mirroring Vaadin's end-of-request cleanup.
+        // Flow's disconnectElements() already closed the old UI for a @PreserveOnRefresh target;
+        // for any other target we close it here to emulate the browser unload beacon.
+        // UI._close() removes the UI from the session and fires the detach listeners; it asserts
+        // that the UI being removed is the current one, so briefly restore the old UI as current.
+        UI.setCurrent(oldUI)
+        try {
+            oldUI._close()
+        } finally {
+            UI.setCurrent(newUI)
+        }
+    }
+
+    /**
      * Cleans up and removes the Vaadin UI and Vaadin Session. You can call this function in `afterEach{}` block,
      * to clean up after the test. This comes handy when you want to be extra-sure that the next test won't accidentally reuse old UI,
      * should you forget to call [setup] properly.
@@ -251,7 +300,7 @@ public object MockVaadin {
         createUI(uiFactory, session)
     }
 
-    internal fun createUI(uiFactory: () -> UI, session: VaadinSession) {
+    internal fun createUI(uiFactory: () -> UI, session: VaadinSession, uiId: Int = 1) {
         val request: VaadinRequest = checkNotNull(VaadinRequest.getCurrent())
         val ui: UI = uiFactory()
         require(ui.session == null) {
@@ -268,7 +317,10 @@ public object MockVaadin {
         }
         ui.internals.session = session
         UI.setCurrent(ui)
-        ui.doInit(request, 1, "ROOT-1")
+        // uiId doubles as the key in VaadinSession.uIs; a reloaded UI must therefore get a fresh
+        // uiId, otherwise session.addUI() would evict the old (still-live) UI from the session,
+        // breaking the transient two-live-UI window that real Flow exhibits across an F5.
+        ui.doInit(request, uiId, "ROOT-1")
         strongRefUI.set(ui)
 
         session.addUI(ui)
@@ -471,8 +523,7 @@ private class MockPage(private val ui: UI, private val uiFactory: () -> UI, priv
     override fun reload() {
         // recreate the UI on reload(), to simulate browser's F5
         super.reload()
-        MockVaadin.closeCurrentUI(true)
-        MockVaadin.createUI(uiFactory, session)
+        MockVaadin.reloadCurrentUI(uiFactory, session)
     }
 
     /**

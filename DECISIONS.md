@@ -15,7 +15,10 @@ Newest entries on top.
 detached the old UI *before* creating the new one, which silently dropped any open
 `Dialog`/`Notification` on an F5 of a `@PreserveOnRefresh` view. A downstream "Vaadin tab scope"
 library also needed to test that server-side state tied to the UI lifecycle survives F5, including the
-adversarial ordering where the old UI dies before the new one is created.
+adversarial ordering where the old UI dies before the new one is created. (Such a tab-scope test is
+feasible in Karibu because the faked window name is a stable constant — `createExtendedClientDetails`,
+documented "persists on reload" — so the old and new UI share a tab id, and the preserved-chain lookup,
+which keys on window name, is unaffected by the beacon timing.)
 
 **What real Flow does (traced against flow-server 25.2.1).** On F5 the browser fires an unload beacon
 (`navigator.sendBeacon`, a POST with `unload=true`) during `pagehide`, *before* it requests the new
@@ -73,6 +76,11 @@ closed+removed, one live UI); they differ only in the transient ordering that mi
 *orderings* are reproduced — not wall-clock timing (e.g. "old UI survives N heartbeats then dies").
 That's inherent to a synchronous, browserless, heartbeat-less test double. Naming follows Flow's own
 vocabulary (`isUnloadBeaconRequest`) and the browser Beacon API.
+
+The EAGER default also fixes a pre-#207 defect: the old code left the old UI detached-but-not-closed
+(`isClosing()` stayed `false`) and effectively leaked it; the beacon path now closes and removes it
+properly, matching Flow's real `ui.close()` — a strict improvement over the pre-#207 ordering it
+otherwise restores.
 
 **Where it lives.** `MockVaadin.reloadCurrentUI()` / `discardOldUI()` / `isPreserveOnRefreshTarget()`,
 `KaribuConfig.unloadBeaconTiming`, `UnloadBeaconTiming`; test matrix in `MockVaadinTest`

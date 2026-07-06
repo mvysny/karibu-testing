@@ -8,9 +8,16 @@ Karibu-Testing is a browserless, containerless unit-testing library for Vaadin F
 
 The library is Kotlin-first and leans on Kotlin extension functions; Java consumers go through static helper classes (`LocatorJ`, `SearchSpecJ`); Groovy has its own modules.
 
-## Ideas / design notes
+## Documentation — where each kind of doc lives
 
-The `ideas/` folder holds one markdown file per non-trivial idea or design, brainstormed before (and kept alongside) its implementation. When starting substantial new functionality, capture the design there first and keep it updated as the design settles.
+Four homes, by audience and lifecycle. Put content where it belongs and don't duplicate across them:
+
+- **`README.md` (per-module, scattered)** — user-facing "book" prose: how to *use* the library. Kept current.
+- **Code KDoc/Javadoc** — the authoritative "how it works now" (mechanics). Lives with the code so it can't drift; the single source of truth for current behavior. Don't restate mechanics in standalone docs.
+- **`ideas/`** — forward-looking design notes, one markdown file per non-trivial idea, brainstormed before/alongside implementation. **Deleted once implemented** (ideas are forward-looking only).
+- **`DECISIONS.md`** — append-only, dated log of technical decisions and their *rationale* (the "why", alternatives rejected, evidence). Permanent; never edit an old entry — supersede it with a new one.
+
+Handoff when an idea ships: delete its `ideas/` file, record the rationale as a new `DECISIONS.md` entry, and ensure the mechanics are covered by code KDoc.
 
 ## Build / test commands
 

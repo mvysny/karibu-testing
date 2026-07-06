@@ -1,7 +1,7 @@
 # Emulating Vaadin heartbeats / idle-UI reaping
 
-Status: **parked** (idea only, not scheduled). Split out of
-[beacon-reload-timing.md](beacon-reload-timing.md).
+Status: **parked** (idea only, not scheduled). Split out of the F5 reload / unload-beacon work
+(see the `2026-07-06` entry in [../DECISIONS.md](../DECISIONS.md)).
 
 ## The idea
 

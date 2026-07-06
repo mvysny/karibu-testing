@@ -15,6 +15,7 @@ import com.vaadin.flow.internal.CurrentInstance
 import com.vaadin.flow.internal.StateTree
 import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
+import com.vaadin.flow.router.PreserveOnRefresh
 import com.vaadin.flow.server.*
 import com.vaadin.flow.shared.communication.PushMode
 import java.lang.reflect.Field
@@ -131,11 +132,12 @@ public object MockVaadin {
     /**
      * Simulates a browser F5 reload of the current UI, as closely to real Vaadin Flow
      * as a server-side-only test double allows. See
-     * [issue 207](https://github.com/mvysny/karibu-testing/issues/207) for the full analysis.
+     * [issue 207](https://github.com/mvysny/karibu-testing/issues/207) and
+     * `ideas/beacon-reload-timing.md` for the full analysis.
      *
-     * Real Flow keeps the *old* UI alive while the *new* UI navigates, so that
-     * [com.vaadin.flow.router.internal.AbstractNavigationStateRenderer] `.disconnectElements()`
-     * can, for a [com.vaadin.flow.router.PreserveOnRefresh] target:
+     * **[com.vaadin.flow.router.PreserveOnRefresh] target.** Real Flow keeps the *old* UI alive
+     * while the *new* UI navigates, so that
+     * [com.vaadin.flow.router.internal.AbstractNavigationStateRenderer] `.disconnectElements()` can:
      * 1. mark the old UI with Flow's internal `ReplacedViaPreserveOnRefresh` sentinel (via
      *    `Element.removeFromTree()`),
      * 2. **teleport UI-level overlays (dialogs/notifications) off the old UI onto the new UI**
@@ -145,37 +147,74 @@ public object MockVaadin {
      * Because Karibu drives Flow's *real* navigation pipeline, we get all of the above (the
      * sentinel, the overlay teleport, the overlays-before-route child ordering and `oldUI.close()`)
      * for free - **as long as the old UI is still alive and still owns the preserved route root
-     * when the new UI navigates.** So the sole job here is to fix the ordering: create the new UI
-     * first, then discard the old one.
+     * when the new UI navigates.** So for this case the job is: create the new UI first, then discard
+     * the old one. The browser unload beacon is ignored by Flow here
+     * (`ServerRpcHandler.handleUnloadBeaconRequest` skips it), so [KaribuConfig.unloadBeaconTiming]
+     * has no effect.
      *
-     * For a non-[com.vaadin.flow.router.PreserveOnRefresh] target Flow does not go through
-     * `disconnectElements()`; the browser's unload beacon closes the old UI instead. We emulate
-     * that by closing the old UI ourselves, so [UI.isClosing] is consistent regardless of the
-     * navigation target.
+     * **Non-[com.vaadin.flow.router.PreserveOnRefresh] target.** Flow does not go through
+     * `disconnectElements()`; the browser's unload beacon closes the old UI instead. Its timing
+     * relative to the creation of the new UI is best-effort in a real browser, so it is configurable
+     * via [KaribuConfig.unloadBeaconTiming] ([UnloadBeaconTiming.EAGER] by default). Either way the
+     * old UI ends up closed (via [UI.close]), detached and removed from the session - matching Flow's
+     * `ui.close()` + end-of-request `removeClosedUIs()`.
      */
     internal fun reloadCurrentUI(uiFactory: () -> UI, session: VaadinSession) {
         val oldUI: UI = checkNotNull(UI.getCurrent()) { "No current UI to reload" }
         // remember the current location so the new UI navigates to the same place.
         lastUILocation.set(oldUI.internals.activeViewLocation)
 
-        // Deliberately DO NOT close/detach the old UI yet: it must stay alive & registered in the
-        // session so that the new UI's navigation can teleport overlays off it (see kdoc above).
-        // The new UI gets a fresh uiId so it doesn't evict the old one from VaadinSession.uIs.
-        createUI(uiFactory, session, uiId = oldUI.uiId + 1)
-        val newUI: UI = checkNotNull(UI.getCurrent())
+        if (isPreserveOnRefreshTarget(oldUI)) {
+            // Keep the old UI alive & registered so the new UI's navigation can teleport overlays
+            // off it and close it (see kdoc). The new UI gets a fresh uiId so addUI() doesn't evict
+            // the still-live old UI from VaadinSession.uIs. Then discard the old UI.
+            createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+            discardOldUI(oldUI)
+        } else when (KaribuConfig.unloadBeaconTiming) {
+            UnloadBeaconTiming.EAGER -> {
+                // Beacon before the new UI exists: close+detach+remove the old UI, then create the
+                // new one. The old UI is gone before addUI(), so the new UI can reuse uiId 1.
+                discardOldUI(oldUI)
+                createUI(uiFactory, session)
+            }
+            UnloadBeaconTiming.LATE -> {
+                // Beacon after the new UI is created: both are briefly live (fresh uiId to avoid
+                // eviction), then the old UI is closed+detached+removed.
+                createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+                discardOldUI(oldUI)
+            }
+            UnloadBeaconTiming.NEVER -> {
+                // Beacon lost: leave the old UI alive alongside the new one (fresh uiId).
+                createUI(uiFactory, session, uiId = oldUI.uiId + 1)
+            }
+        }
+    }
 
-        // Now discard the old UI, mirroring Vaadin's end-of-request cleanup.
-        // Flow's disconnectElements() already closed the old UI for a @PreserveOnRefresh target;
-        // for any other target we close it here to emulate the browser unload beacon.
-        // UI._close() removes the UI from the session and fires the detach listeners; it asserts
-        // that the UI being removed is the current one, so briefly restore the old UI as current.
+    /**
+     * Closes, detaches and removes [oldUI] from its session, mirroring Vaadin's end-of-request
+     * cleanup (`removeClosedUIs()`) after a UI is closed. [UI._close] removes the UI from the session
+     * and fires its detach listeners; it asserts that the UI being removed is the current one, so we
+     * briefly restore [oldUI] as current and then restore whatever was current before (unless that
+     * was [oldUI] itself, which is now gone).
+     */
+    private fun discardOldUI(oldUI: UI) {
+        val previous: UI? = UI.getCurrent()
         UI.setCurrent(oldUI)
         try {
             oldUI._close()
         } finally {
-            UI.setCurrent(newUI)
+            UI.setCurrent(if (previous === oldUI) null else previous)
         }
     }
+
+    /**
+     * Mirrors `ServerRpcHandler.isPreserveOnRefreshTarget`: whether the UI currently shows a
+     * [com.vaadin.flow.router.PreserveOnRefresh] route target.
+     */
+    private fun isPreserveOnRefreshTarget(ui: UI): Boolean =
+        ui.internals.activeRouterTargetsChain.any {
+            it.javaClass.isAnnotationPresent(PreserveOnRefresh::class.java)
+        }
 
     /**
      * Cleans up and removes the Vaadin UI and Vaadin Session. You can call this function in `afterEach{}` block,

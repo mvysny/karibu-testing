@@ -1,6 +1,7 @@
 # F5 reload: unload-beacon timing fidelity
 
-Status: **plan agreed — ready to implement.** Ships in the same release as the #207 overlay-teleport
+Status: **implemented** (`KaribuConfig.unloadBeaconTiming` + `UnloadBeaconTiming`, `reloadCurrentUI()`
+branching, test matrix in `MockVaadinTest`). Ships in the same release as the #207 overlay-teleport
 fix, because a downstream "Vaadin tab scope" library needs it to test scope preservation across F5.
 
 ## Background

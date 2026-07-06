@@ -525,6 +525,97 @@ abstract class AbstractMockVaadinTests() {
         }
     }
 
+    // The browser unload beacon (navigator.sendBeacon) closes the old UI on F5; its timing relative
+    // to the new UI's creation is configurable for non-@PreserveOnRefresh targets. Flow ignores the
+    // beacon for @PreserveOnRefresh. See ideas/beacon-reload-timing.md.
+    @Nested inner class `unload beacon timing on F5` {
+        @BeforeEach @AfterEach fun resetTiming() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.EAGER
+        }
+
+        /**
+         * Registers detach/init listeners on the current UI + service, reloads, and reports the
+         * observed ordering and the session UI count seen during the new UI's init.
+         */
+        private fun reloadAndCapture(): ReloadCapture {
+            val oldUI: UI = UI.getCurrent()
+            val order: MutableList<String> = mutableListOf()
+            var uiCountDuringNewInit = -1
+            oldUI.addDetachListener { order.add("old-detach") }
+            VaadinService.getCurrent().addUIInitListener { event ->
+                order.add("new-init")
+                uiCountDuringNewInit = event.ui.session.uIs.size
+            }
+            oldUI.page.reload()
+            return ReloadCapture(oldUI, UI.getCurrent(), order, uiCountDuringNewInit)
+        }
+
+        // --- non-@PreserveOnRefresh: the beacon closes the old UI, timing is configurable ---
+
+        @Test fun `EAGER (default) closes the old UI before creating the new one`() {
+            navigateTo<HelloWorldView>()
+            val c = reloadAndCapture()
+            expect(listOf("old-detach", "new-init")) { c.eventOrder }  // detach-before-attach
+            expect(1) { c.uiCountDuringNewInit }                       // old already gone
+            expect(true) { c.oldUI.isClosing }
+            expect(listOf(c.newUI)) { VaadinSession.getCurrent().uIs.toList() }
+        }
+
+        @Test fun `LATE closes the old UI after creating the new one`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.LATE
+            navigateTo<HelloWorldView>()
+            val c = reloadAndCapture()
+            expect(listOf("new-init", "old-detach")) { c.eventOrder }  // attach-before-detach
+            expect(2) { c.uiCountDuringNewInit }                       // both briefly live
+            expect(true) { c.oldUI.isClosing }
+            expect(listOf(c.newUI)) { VaadinSession.getCurrent().uIs.toList() }
+        }
+
+        @Test fun `NEVER leaves the old UI alive alongside the new one`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.NEVER
+            navigateTo<HelloWorldView>()
+            val c = reloadAndCapture()
+            expect(listOf("new-init")) { c.eventOrder }                // old never closed/detached
+            expect(2) { c.uiCountDuringNewInit }
+            expect(false) { c.oldUI.isClosing }
+            // both UIs linger; the current one is the new UI
+            expect(setOf(c.oldUI, c.newUI)) { VaadinSession.getCurrent().uIs.toSet() }
+            expect(c.newUI) { UI.getCurrent() }
+        }
+
+        // --- @PreserveOnRefresh: Flow ignores the beacon, so the timing has NO effect ---
+
+        private fun verifyPreserveUnaffectedByTiming() {
+            navigateTo<PreserveOnRefreshView>()
+            val dialog = Dialog(Button("OK"))
+            dialog.open()
+            _expectOne<Dialog>()
+            val c = reloadAndCapture()
+            // preserve always creates the new UI first, then teleports overlays off the old one and
+            // discards it - regardless of the beacon timing.
+            expect(listOf("new-init", "old-detach")) { c.eventOrder }
+            expect(c.newUI) { dialog.ui.get() }   // overlay teleported onto the new UI
+            _get<Dialog>()
+            expect(true) { c.oldUI.isClosing }
+            expect(listOf(c.newUI)) { VaadinSession.getCurrent().uIs.toList() }
+        }
+
+        @Test fun `@PreserveOnRefresh ignores EAGER timing`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.EAGER
+            verifyPreserveUnaffectedByTiming()
+        }
+
+        @Test fun `@PreserveOnRefresh ignores LATE timing`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.LATE
+            verifyPreserveUnaffectedByTiming()
+        }
+
+        @Test fun `@PreserveOnRefresh ignores NEVER timing`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.NEVER
+            verifyPreserveUnaffectedByTiming()
+        }
+    }
+
     @Nested inner class ExtendedClientDetailsTests {
         @BeforeEach @AfterEach fun resetFakeExtendedClientDetails() { KaribuConfig.fakeExtendedClientDetails = true }
 
@@ -880,3 +971,15 @@ class ParentView : VerticalLayout(), RouterLayout
 @Route("preserveonrefresh")
 @PreserveOnRefresh
 class PreserveOnRefreshView : VerticalLayout()
+
+/**
+ * Captures what an F5 [com.vaadin.flow.component.page.Page.reload] did: the ordering of old-UI
+ * detach vs. new-UI init (as a list of `"old-detach"` / `"new-init"` markers), and the number of
+ * UIs live in the session at the moment the new UI was initialized.
+ */
+private class ReloadCapture(
+    val oldUI: UI,
+    val newUI: UI,
+    val eventOrder: List<String>,
+    val uiCountDuringNewInit: Int,
+)

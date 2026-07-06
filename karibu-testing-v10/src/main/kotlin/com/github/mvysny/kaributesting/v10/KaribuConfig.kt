@@ -117,8 +117,8 @@ public enum class UnloadBeaconTiming {
     /**
      * The beacon is never delivered ("beacon lost"): the old UI is left alive alongside the new one
      * and is not closed. Real Flow would eventually reap the lingering UI via the heartbeat timeout;
-     * Karibu does not model that clock, so under this setting the old UI simply lingers for the rest
-     * of the test.
+     * Karibu does not model that clock, so under this setting the old UI lingers until you call
+     * [MockVaadin.reapInactiveUIs], which simulates that reap (its outcome, not its timing).
      */
     NEVER,
 }

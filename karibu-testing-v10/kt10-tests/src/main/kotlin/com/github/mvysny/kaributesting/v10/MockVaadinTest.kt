@@ -583,6 +583,45 @@ abstract class AbstractMockVaadinTests() {
             expect(c.newUI) { UI.getCurrent() }
         }
 
+        // --- reapInactiveUIs(): simulate the heartbeat reap of a NEVER-abandoned (lost-beacon) UI ---
+
+        @Test fun `reapInactiveUIs closes a NEVER-abandoned UI`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.NEVER
+            navigateTo<HelloWorldView>()
+            val c = reloadAndCapture()
+            // precondition: both UIs linger after the lost beacon.
+            expect(setOf(c.oldUI, c.newUI)) { VaadinSession.getCurrent().uIs.toSet() }
+            val reapOrder: MutableList<String> = mutableListOf()
+            c.oldUI.addDetachListener { reapOrder.add("old-detach") }
+
+            MockVaadin.reapInactiveUIs()
+
+            expect(listOf("old-detach")) { reapOrder }              // detach listener fired on reap
+            expect(true) { c.oldUI.isClosing }
+            expect(listOf(c.newUI)) { VaadinSession.getCurrent().uIs.toList() }  // only the new UI remains
+            expect(c.newUI) { UI.getCurrent() }                     // current UI untouched
+        }
+
+        @Test fun `reapInactiveUIs never reaps the current UI`() {
+            KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.NEVER
+            navigateTo<HelloWorldView>()
+            val c = reloadAndCapture()
+            MockVaadin.reapInactiveUIs()
+            // the current (new) UI survives even though it is not @PreserveOnRefresh.
+            expect(c.newUI) { UI.getCurrent() }
+            expect(false) { c.newUI.isClosing }
+            expect(true) { VaadinSession.getCurrent().uIs.contains(c.newUI) }
+        }
+
+        @Test fun `reapInactiveUIs is a no-op when no beacon was lost`() {
+            navigateTo<HelloWorldView>()          // EAGER default: a plain reload closes the old UI itself
+            val c = reloadAndCapture()
+            MockVaadin.reapInactiveUIs()
+            expect(c.newUI) { UI.getCurrent() }
+            expect(false) { c.newUI.isClosing }
+            expect(listOf(c.newUI)) { VaadinSession.getCurrent().uIs.toList() }
+        }
+
         // --- @PreserveOnRefresh: Flow ignores the beacon, so the timing has NO effect ---
 
         private fun verifyPreserveUnaffectedByTiming() {

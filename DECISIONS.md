@@ -9,6 +9,64 @@ Newest entries on top.
 
 ---
 
+## 2026-07-06 — Reaping a lost-beacon UI: `MockVaadin.reapInactiveUIs()`
+
+**Context.** The `2026-07-06` F5/beacon entry below shipped `UnloadBeaconTiming.NEVER` = "the unload
+beacon was lost, so the old UI lingers alive alongside the new one," but deliberately did *not* model
+the heartbeat/idle-UI reap that would eventually close it in production. A downstream Vaadin tab-scope
+library now needs exactly that follow-up: assert that a UI abandoned by a lost beacon eventually gets
+closed and detached (so its per-UI resources are released). This unparks `ideas/heartbeat-emulation.md`.
+
+**What real Flow does.** `VaadinService.cleanupSession()` (from `requestEnd`) runs `closeInactiveUIs()`
+— for each UI with `!isUIActive(ui) && !ui.isClosing()`, calls `ui.close()` — then `removeClosedUIs()`
+detaches + `session.removeUI()`s them. `isUIActive` is **time-based**: a UI is inactive once it has
+missed ~3 heartbeats (`getHeartbeatTimeout() = heartbeatInterval * 3.1`, vs. the UI's last-heartbeat
+timestamp).
+
+**Decisions.**
+
+1. **Emulate the outcome, not the timing.** Karibu is synchronous and clock-less, so we reproduce the
+   *effect* of the reap (UI closed, detach listeners fire, removed from session) but not *when* it
+   happens — `reapInactiveUIs()` reaps immediately when called. A test therefore cannot assert
+   "not reaped before N intervals, reaped after"; that assertion tests Flow's timeout machinery, not
+   app code, so it is out of scope. **Rejected: a virtual/advanceable mock clock** (stamping heartbeat
+   timestamps, faking `HeartbeatHandler`) — large machinery that fights Karibu's clock-less core, and
+   it only buys the ability to test Flow's own behavior, near-zero value for app authors.
+
+2. **Flag the abandoned UI; reap by flag, not by "non-current".** In Karibu's model the *only* way a
+   live, non-current UI can linger is `UnloadBeaconTiming.NEVER` — the other real reap causes (frozen
+   tab, laptop asleep, background-tab throttling) can't even be expressed. So the `NEVER` branch of
+   `reloadCurrentUI()` marks the old UI via `ComponentUtil.setData(ui, <key>, true)`, and
+   `reapInactiveUIs()` closes exactly the flagged, non-current UIs (reusing the private `discardOldUI()`
+   for close + detach + `removeUI` + current-UI juggling). **Rejected: a generic "close all
+   non-current, non-closing UIs" reaper** (the working name `expireInactiveUIs()`): it defines
+   eligibility by an *incidental* property rather than the *meaningful* one (this UI was abandoned by a
+   lost beacon); the flag is honest, future-proof against legitimate multi-UI tests, and
+   self-documenting.
+
+3. **Never reap the current UI.** In a test the current UI is the live one under test; real Flow would
+   reap even an active tab's UI if the whole browser died, but doing so here would break the harness.
+
+4. **Naming: `reapInactiveUIs()`.** Mirrors Flow's own `closeInactiveUIs()` / `isUIActive()`
+   vocabulary (discoverable by grepping flow-server), and names the *production behavior emulated*
+   rather than the mock mechanics — consistent with `MockPage.reload()`. **Rejected:**
+   `reapUIsThatMissedHeartbeats()` (the body never counts a heartbeat — re-introduces the
+   `expireInactiveUIs` overclaim, and reads as a clause not an identifier) and `reapUnloadedUIs()`
+   (backwards — these UIs are precisely the ones that *failed* to unload). "Heartbeat" and "beacon"
+   live in the method KDoc, not the signature.
+
+**Consequences / limitations.** Reproduces only the lost-beacon subset of Flow's reap causes — which
+is the only subset a browserless double can produce, so it is complete within Karibu's model, not a
+general heartbeat emulation. No timing is modeled. `@PreserveOnRefresh` UIs are never flagged (Flow
+ignores the beacon there), so they are never reaped by this.
+
+**Where it lives.** `MockVaadin.reapInactiveUIs()` + `UNLOAD_BEACON_LOST_KEY` marker set in
+`reloadCurrentUI()`'s `NEVER` branch; `UnloadBeaconTiming.NEVER` KDoc points at it. Tests in
+`MockVaadinTest` (`unload beacon timing on F5` → the three `reapInactiveUIs …` cases). Superseded idea
+file: `ideas/heartbeat-emulation.md` (deleted on implementation).
+
+---
+
 ## 2026-07-06 — F5 reload lifecycle: overlay teleport & unload-beacon timing
 
 **Context.** [#207](https://github.com/mvysny/karibu-testing/issues/207): `MockPage.reload()` closed &

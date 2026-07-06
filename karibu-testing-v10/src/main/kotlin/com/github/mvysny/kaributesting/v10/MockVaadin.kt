@@ -43,6 +43,14 @@ public object MockVaadin {
     private val lastUILocation = ThreadLocal<Location>()
 
     /**
+     * Marks a UI that Karibu left alive because its unload beacon was lost
+     * ([UnloadBeaconTiming.NEVER] on an F5 [Page.reload]). [reapInactiveUIs] reaps exactly these,
+     * emulating the outcome of Flow's heartbeat / idle-UI cleanup.
+     */
+    private const val UNLOAD_BEACON_LOST_KEY: String =
+        "com.github.mvysny.kaributesting.v10.unloadBeaconLost"
+
+    /**
      * Mocks Vaadin for the current test method:
      * ```
      * MockVaadin.setup(Routes().autoDiscoverViews("com.myapp"))
@@ -184,7 +192,9 @@ public object MockVaadin {
                 discardOldUI(oldUI)
             }
             UnloadBeaconTiming.NEVER -> {
-                // Beacon lost: leave the old UI alive alongside the new one (fresh uiId).
+                // Beacon lost: leave the old UI alive alongside the new one (fresh uiId). Flag it so
+                // reapInactiveUIs() can later close it the way Flow's heartbeat/idle-UI cleanup would.
+                ComponentUtil.setData(oldUI, UNLOAD_BEACON_LOST_KEY, true)
                 createUI(uiFactory, session, uiId = oldUI.uiId + 1)
             }
         }
@@ -205,6 +215,32 @@ public object MockVaadin {
         } finally {
             UI.setCurrent(if (previous === oldUI) null else previous)
         }
+    }
+
+    /**
+     * Reaps UIs that were abandoned by a **lost unload beacon** — i.e. left alive by
+     * [UnloadBeaconTiming.NEVER] on an F5 [Page.reload] (the "browser tab was closed but the beacon
+     * was lost" case). Each such UI is closed ([UI.close]), detached (its detach listeners fire) and
+     * removed from the session, exactly the way [discardOldUI] handles the eager/late beacon.
+     *
+     * This emulates the **outcome** of Flow's heartbeat / idle-UI cleanup
+     * (`VaadinService.closeInactiveUIs`, which reaps a UI once it has missed ~3 heartbeat intervals)
+     * for the one lingering-UI scenario a browserless test can produce. It deliberately does **not**
+     * model the timing: the reap happens immediately when you call this, not after N intervals, and
+     * Karibu tracks no heartbeats. The current UI is never reaped — in a test it is the live UI under
+     * test. A no-op if no beacon was lost.
+     */
+    @JvmStatic
+    public fun reapInactiveUIs() {
+        val session: VaadinSession = checkNotNull(VaadinSession.getCurrent()) {
+            "No VaadinSession - was MockVaadin.setup() called?"
+        }
+        val current: UI? = UI.getCurrent()
+        // filter{} snapshots into a fresh list, so discardOldUI() -> session.removeUI() below won't
+        // concurrently modify the collection we're iterating.
+        session.uIs
+            .filter { it !== current && ComponentUtil.getData(it, UNLOAD_BEACON_LOST_KEY) == true }
+            .forEach { discardOldUI(it) }
     }
 
     /**

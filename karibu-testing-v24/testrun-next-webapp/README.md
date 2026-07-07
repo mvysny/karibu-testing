@@ -1,7 +1,8 @@
-# Test Runner For Vaadin 24 tests
+# Test Runner: Vaadin next (prerelease), WAR/webapp app
 
-Runs all tests from the [kt10-tests](../kt10-tests) test battery.
-Simulates a WAR app with Vaadin 23.
+Runs [the core test battery](../../karibu-testing-v10/tests) against the
+Vaadin "next" prerelease (`vaadin_next` in `libs.versions.toml`).
+Simulates a WAR/webapp-style app.
 
 The setup is activated by having
 a specially placed [flow-build-info.json](src/test/resources/META-INF/VAADIN/config/flow-build-info.json)

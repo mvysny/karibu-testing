@@ -1,3 +1,10 @@
+// Distinct group so this and karibu-testing-v23:tests don't collapse to the same
+// group:name module identity: both are leaf-named `tests`, and v23:tests depends on
+// this one, so identical coordinates make Gradle substitute one for the other and
+// create a self-referential circular task dependency. These libs are never published,
+// so the group is cosmetic. See DECISIONS.md.
+group = "com.github.mvysny.kaributesting.v10"
+
 dependencies {
     api(project(":karibu-testing-v10"))
 

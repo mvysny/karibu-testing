@@ -1,7 +1,8 @@
-# Test Runner For Vaadin 24 tests
+# Test Runner: stable Vaadin, jar-module app
 
-Runs all tests from the [kt10-tests](../kt10-tests) test battery.
-Simulates a jar reusable component with Vaadin 23.
+Runs [the core test battery](../../karibu-testing-v10/tests) against the
+pinned stable Vaadin version (`vaadin` in `libs.versions.toml`).
+Simulates a jar reusable component.
 
 The "-module" part means that this test doesn't test a WAR application,
 but instead we test a reusable component which is supposed to be packaged

@@ -23,8 +23,8 @@ Handoff when an idea ships: delete its `ideas/` file, record the rationale as a 
 
 - `./gradlew test` — run all tests across all Vaadin-variant test-runner modules. This is the CI command (see `.github/workflows/gradle.yml`).
 - `./gradlew build` — default task chain is `clean`, `build`.
-- `./gradlew :karibu-testing-v24:kt10-testrun-vaadin24:test` — run the Vaadin 24 test battery only. Substitute the module name for other variants.
-- `./gradlew :karibu-testing-v24:kt10-testrun-vaadin24:test --tests "AllTests.flow-build-info-json exists"` — run a single test.
+- `./gradlew :karibu-testing-v24:testrun-stable-webapp:test` — run the stable-Vaadin test battery only. Substitute the module name for other variants.
+- `./gradlew :karibu-testing-v24:testrun-stable-webapp:test --tests "AllTests.flow-build-info-json exists"` — run a single test.
 - JDK 21 is the minimum (enforced in `build.gradle.kts`). CI matrix covers JDK 21 and 25 on Linux/macOS/Windows.
 - Dependency versions (Vaadin, Kotlin, JUnit, kaributools, etc.) live in `gradle/libs.versions.toml` — edit there, not in individual `build.gradle.kts` files.
 
@@ -47,14 +47,14 @@ The project is one Gradle multi-module build. Published artifacts live under gro
 
 Tests for the library itself do **not** live next to the code they test. Instead:
 
-- `karibu-testing-v10/kt10-tests` and `karibu-testing-v23/kt23-tests` are **test-source libraries** — they contain test classes but no `src/test`, only `src/main`. They are internal (not published).
-- The real test execution happens in `karibu-testing-v24/kt10-testrun-*` projects, each of which depends on `kt23-tests` and runs the whole battery against a different simulated environment:
-  - `kt10-testrun-vaadin24` — WAR-style app, Vaadin 24 LTS, with `flow-build-info.json` on the classpath.
-  - `kt10-testrun-vaadin24-module` — jar-module-style app (no `flow-build-info.json`), Vaadin 24 LTS.
-  - `kt10-testrun-vaadin24next` — WAR-style, Vaadin "next" (the newer prerelease pinned in `libs.versions.toml` as `vaadin_next`).
-  - `kt10-testrun-vaadin24next-module` — jar-module-style, Vaadin next.
+- `karibu-testing-v10/tests` and `karibu-testing-v23/tests` are **test-source libraries** — they contain test classes but no `src/test`, only `src/main`. They are internal (not published). (Their module *directory* is `tests`; the parent `-v10`/`-v23` carries the Vaadin baseline.)
+- The real test execution happens in `karibu-testing-v24/testrun-*` projects, each of which depends on `karibu-testing-v23:tests` and runs the whole battery against a different simulated environment. The name encodes two axes — `{stable|next}` Vaadin version × `{webapp|module}` packaging:
+  - `testrun-stable-webapp` — WAR/webapp-style app, stable Vaadin (the pinned `vaadin` version in `libs.versions.toml`), with `flow-build-info.json` on the classpath.
+  - `testrun-stable-module` — jar-module-style app (no `flow-build-info.json`), stable Vaadin.
+  - `testrun-next-webapp` — WAR/webapp-style, Vaadin "next" (the newer prerelease pinned as `vaadin_next`).
+  - `testrun-next-module` — jar-module-style, Vaadin next.
 
-Consequence: when you add a new test, put it in `kt10-tests` (or `kt23-tests` if it needs Vaadin 23+ APIs), and it will automatically run in every environment. When debugging an environment-specific failure, run the specific `kt10-testrun-*` module.
+Consequence: when you add a new test, put it in `karibu-testing-v10:tests` (or `karibu-testing-v23:tests` if it needs Vaadin 23+ APIs), and it will automatically run in every environment. When debugging an environment-specific failure, run the specific `testrun-*` module.
 
 **Caveat — mind which Vaadin version you're reasoning about vs. testing against.** The library *compiles* against `libs.vaadin.stable.all` (one pinned version, currently 25.x), but the tests *run* against several different Vaadin versions (24 LTS and `vaadin_next`), and Vaadin's own class hierarchies shift between them. For example, `TextRenderer` and `ComponentRenderer` **extend `LitRenderer` in Vaadin 24** but **not** in Vaadin 25. So when you inspect a Vaadin jar / `javap` / source to predict behavior, confirm it's the *same* version the failing test actually runs with — a 25.x jar will mislead you about a Vaadin-24 test run, and vice versa.
 

@@ -9,6 +9,47 @@ Newest entries on top.
 
 ---
 
+## 2026-07-07 — Rename stale `v24`/`kt10` build tokens to `stable`/`next` + `testrun-*`
+
+**Context.** The Gradle Vaadin-dependency aliases were named `vaadin-v24-*` / `vaadin-v24next-*`
+but actually pointed at Vaadin **25.2.1** and **25.3.0-alpha3** (`libs.versions.toml`). The "v24"
+read as "Vaadin 24" and repeatedly misled readers (human and agent) about which version the build
+compiles/tests against. The internal test modules carried the same rot: a `kt10-` prefix (Vaadin
+**10** — ice age, and redundant with the parent module path) and `vaadin24` in the runner names.
+
+**Decisions.**
+
+1. **Catalog aliases → `stable` / `next`**, mirroring the existing `vaadin` / `vaadin_next` version
+   keys: `vaadin-v24-*` → `vaadin-stable-*`, `vaadin-v24next-*` → `vaadin-next-*`. Chose `stable`
+   over `latest` (the pinned one isn't necessarily the newest release) and `next` over `prerelease`
+   (`next` stays correct if `vaadin_next` later tracks a released newer minor rather than an alpha).
+
+2. **Internal (non-published) test modules renamed**, dropping `kt10`/`kt23`/`vaadin24`:
+   - `karibu-testing-v10:kt10-tests` → `karibu-testing-v10:tests`
+   - `karibu-testing-v23:kt23-tests` → `karibu-testing-v23:tests`
+   - `kt10-testrun-vaadin24{,-module}` → `testrun-stable-{webapp,module}`
+   - `kt10-testrun-vaadin24next{,-module}` → `testrun-next-{webapp,module}`
+   Runner names now encode the two real axes: `{stable|next}` Vaadin version × `{webapp|module}`
+   packaging (webapp = WAR-style with `flow-build-info.json`; module = jar-reusable-component
+   without it). Published coordinates (`karibu-testing-v10/-v23/-v24/...`) were **not** touched.
+
+3. **Distinct `group` on the two `:tests` libs** (`…kaributesting.v10` / `…kaributesting.v23`).
+   Giving both the leaf name `tests` made them share the module identity
+   `com.github.mvysny.kaributesting:tests`; since `v23:tests` depends on `v10:tests`, Gradle's
+   conflict resolution substituted one for the other (`v10:tests -> v23:tests`), producing a
+   self-referential **circular task dependency** (`compileKotlin → jar → compileKotlin`). Project
+   module identity is `group` + project *name* (the leaf dir) — **not** `archivesName` (an
+   `archivesName` override was tried first and did *not* break the cycle). Differentiating `group`
+   was chosen over reintroducing distinct leaf names so the clean `:tests` path could be kept; the
+   libs are never published, so their group is cosmetic.
+
+**Module-naming rule (recorded in CLAUDE.md).** The `vNN` suffix on a *published* `karibu-testing-vNN`
+module marks the highest Vaadin version whose version-specific APIs it supports — not the version it
+runs against. `karibu-testing-v24` supports APIs up to Vaadin 24, runs fine on Vaadin 25, and is a
+frozen published coordinate; a Vaadin-25-specific API would get a new `karibu-testing-v25` module.
+
+---
+
 ## 2026-07-07 — Browser-free login helper + OAuth stance: `MockVaadin.login()`/`logout()` (issue #143)
 
 **Context.** [Issue #143](https://github.com/mvysny/karibu-testing/issues/143): a Keycloak-OAuth app

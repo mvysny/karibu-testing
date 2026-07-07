@@ -30,7 +30,8 @@ Handoff when an idea ships: delete its `ideas/` file, record the rationale as a 
 
 ## Release process
 
-See `CONTRIBUTING.md`.
+See `CONTRIBUTING.md`. The current `-SNAPSHOT` version *is* the next release number: `2.7.2-SNAPSHOT`
+ships as `2.7.2` (or `2.8` for a major change). Use that when writing "since KT x.y" docs — don't bump it yourself.
 
 ## Module layout
 

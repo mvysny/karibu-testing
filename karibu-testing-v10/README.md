@@ -1076,6 +1076,41 @@ val buttons = grid._getCellComponent(0, "buttons") as HorizontalLayout
 buttons._get { id = "edit" } ._click()
 ```
 
+#### LitRenderer
+
+`_getFormattedRow()`/`_getFormatted()` reduce a `LitRenderer` cell to plain text (e.g. `Foo Bar`),
+which is enough for most assertions but throws away the markup. When you need to assert on the
+rendered HTML itself — say a `LitRenderer` that conditionally emits an `<a>` tag — you can get
+either the raw HTML or a [JSoup](https://jsoup.org/) `Element` you can query further (since Karibu-Testing 2.7.2):
+
+Kotlin:
+```kotlin
+// on a LitRenderer directly:
+val html: String = litRenderer._getPresentationHtml(person)          // "<span><a href='person/1'>Foo</a></span>"
+val body: Element = litRenderer._getPresentationJsoup(person)        // parsed by JSoup
+expect(1) { body.select("a[href]").size }
+expect("person/1") { body.select("a").attr("href") }
+
+// or straight off a Grid column (fails if that column doesn't use a LitRenderer):
+grid._getColumnByKey("name")._getPresentationJsoup(person).select("a")
+```
+
+Java — these are Kotlin extension functions, so call them as statics on `RenderersKt`/`GridKt`
+with the receiver passed as the first argument:
+```java
+import static com.github.mvysny.kaributesting.v10.RenderersKt.*;
+import static com.github.mvysny.kaributesting.v10.GridKt.*;
+
+Element body = _getPresentationJsoup(litRenderer, person);
+assertEquals(1, body.select("a[href]").size());
+
+// off a Grid column:
+Element cell = _getPresentationJsoup(_getColumnByKey(grid, "name"), person);
+```
+
+`_getPresentationJsoup()` returns the `<body>` of the parsed fragment; `Element.select()` queries
+its descendants recursively. See [issue #175](https://github.com/mvysny/karibu-testing/issues/175).
+
 #### Grid Filters
 
 The filtering code is not called when your code calls `DataProvider.refreshAll()`,

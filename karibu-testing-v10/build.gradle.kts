@@ -9,6 +9,8 @@ dependencies {
 
     api(libs.fake.servlet5)
     api(libs.kaributools)
+    // exposed by _getPresentationJsoup(); api so consumers get the JSoup query types transitively.
+    api(libs.jsoup)
 
     testImplementation(libs.junit.jupiter)
     api(kotlin("test"))

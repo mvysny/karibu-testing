@@ -101,6 +101,43 @@ snippet previously documented there.
 
 ---
 
+## 2026-07-07 — Assert on `LitRenderer` HTML via JSoup (issue #175)
+
+**Context.** [Issue #175](https://github.com/mvysny/karibu-testing/issues/175): `_getFormattedRow()`
+/ `_getPresentationValue()` reduce a `LitRenderer` cell to plain text (JSoup `textRecursively` over
+the rendered template), so tests could assert `Foo Bar` but not that the cell contains, say, a
+conditionally-emitted `<a>` tag. The reporter wanted to inspect the markup without rolling their own
+template renderer.
+
+**Alternatives.**
+1. **Config flag to make `_getPresentationValue()` return the raw template HTML** (the maintainer's
+   first instinct on the issue). Rejected: a raw `String` just pushes the user into `contains("<a")`
+   / regex land — the brittle "roll my own" the issue wanted to avoid — and overloading the return
+   type of an existing function via global config is a sharp edge.
+2. **Expose the parsed JSoup tree.** Chosen. JSoup already gives a solid, well-known query API
+   (`select("a[href]")`, `attr()`, …), which is exactly the downstream ergonomics asked for.
+
+**Decisions.**
+
+1. **New functions, `_getPresentationValue()` unchanged (non-breaking).**
+   `LitRenderer._getPresentationHtml()` returns the raw rendered template; `_getPresentationJsoup()`
+   returns the parsed `<body>` `Element` (via `Jsoup.parseBodyFragment(...).body()` — a Lit template
+   is a fragment, not a full page, so returning `body()` avoids the synthetic `<html>/<head>`
+   wrapper while `select()` still recurses). Both are also exposed on `Grid.Column` (delegating down;
+   fail with a clear message if the column's renderer isn't a `LitRenderer`) so they sit next to
+   `_getFormatted`. `_getPresentationValue()`'s LitRenderer branch was refactored to reuse
+   `_getPresentationJsoup().textRecursively`.
+
+2. **JSoup made an explicit `api` dependency of `karibu-testing-v10`.** JSoup is *already* on every
+   consumer's classpath transitively (`com.vaadin:flow-server` → `org.jsoup:jsoup`), so this adds no
+   new artifact in practice; we depend on it explicitly (pinned to the same 1.22.2 Flow ships) so the
+   API keeps working even if Flow ever drops it, and `api` scope because `_getPresentationJsoup()`
+   returns a JSoup type. No Java-facing mirror (`LocatorJ`-style) was added: the Kotlin extension
+   functions are already callable from Java as `RenderersKt`/`GridKt` statics; the README documents
+   that instead.
+
+---
+
 ## 2026-07-07 — Open/click a `ContextMenu` via its target component (issue #20)
 
 **Context.** [Issue #20](https://github.com/mvysny/karibu-testing/issues/20): tests could only

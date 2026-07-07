@@ -56,6 +56,8 @@ Tests for the library itself do **not** live next to the code they test. Instead
 
 Consequence: when you add a new test, put it in `kt10-tests` (or `kt23-tests` if it needs Vaadin 23+ APIs), and it will automatically run in every environment. When debugging an environment-specific failure, run the specific `kt10-testrun-*` module.
 
+**Caveat — mind which Vaadin version you're reasoning about vs. testing against.** The library *compiles* against `libs.vaadin.v24.all` (one pinned version, currently 25.x), but the tests *run* against several different Vaadin versions (24 LTS and `vaadin_next`), and Vaadin's own class hierarchies shift between them. For example, `TextRenderer` and `ComponentRenderer` **extend `LitRenderer` in Vaadin 24** but **not** in Vaadin 25. So when you inspect a Vaadin jar / `javap` / source to predict behavior, confirm it's the *same* version the failing test actually runs with — a 25.x jar will mislead you about a Vaadin-24 test run, and vice versa.
+
 ## API conventions
 
 - All published modules set `kotlin { explicitApi() }` — every top-level/public declaration must carry an explicit visibility modifier (`public`, `internal`, etc.). Gradle build fails otherwise.

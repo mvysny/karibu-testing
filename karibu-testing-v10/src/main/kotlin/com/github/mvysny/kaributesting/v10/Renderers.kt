@@ -7,6 +7,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.ValueProvider
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import java.lang.reflect.Method
 
 private val _BasicRenderer_getFormattedValue: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
@@ -32,12 +33,38 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
         val component: Component? = createComponent(rowObject)
         component?.toPrettyString() ?: ""
     }
-    this is LitRenderer -> {
-        val renderedLitTemplateHtml: String = renderLitTemplate(template, valueProviders, rowObject)
-        Jsoup.parse(renderedLitTemplateHtml).textRecursively
+    this is LitRenderer<*> -> {
+        @Suppress("UNCHECKED_CAST")
+        (this as LitRenderer<T>)._getPresentationJsoup(rowObject).textRecursively
     }
     else -> null
 }
+
+/**
+ * Renders this Lit renderer's template for given [rowObject] and returns the resulting HTML
+ * as-is, before any text extraction.
+ *
+ * Whereas [_getPresentationValue] strips everything down to text (`FOO Bar`), this keeps the
+ * markup (`<a href='...'>FOO</a> <span>Bar</span>`), so you can assert on the presence of
+ * particular tags or attributes. See [_getPresentationJsoup] for a directly queryable form.
+ */
+public fun <T> LitRenderer<T>._getPresentationHtml(rowObject: T): String =
+    renderLitTemplate(template, valueProviders, rowObject)
+
+/**
+ * Renders this Lit renderer's template for given [rowObject] and returns it parsed by JSoup,
+ * so that you can query the rendered markup further, for example:
+ * ```
+ * expect(1) { litRenderer._getPresentationJsoup(row).select("a[href]").size }
+ * ```
+ * The returned [Element] is the `<body>` of the parsed fragment; [Element.select] queries
+ * its descendants recursively.
+ *
+ * See [_getPresentationHtml] for the raw HTML string and [_getPresentationValue] for the
+ * text-only counterpart.
+ */
+public fun <T> LitRenderer<T>._getPresentationJsoup(rowObject: T): Element =
+    Jsoup.parseBodyFragment(_getPresentationHtml(rowObject)).body()
 
 public fun <T> renderLitTemplate(template: String, valueProviders: Map<String, ValueProvider<T, *>>, item: T): String {
     var renderedTemplate = template;

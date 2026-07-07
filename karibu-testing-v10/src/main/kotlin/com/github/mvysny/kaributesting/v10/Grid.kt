@@ -24,6 +24,7 @@ import com.vaadin.flow.data.renderer.*
 import com.vaadin.flow.function.SerializablePredicate
 import com.vaadin.flow.function.ValueProvider
 import org.intellij.lang.annotations.RegExp
+import org.jsoup.nodes.Element
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
@@ -446,6 +447,30 @@ public fun <T : Any> Grid.Column<T>.getPresentationValue(rowObject: T): Any? {
     }
     return renderer._getPresentationValue(rowObject)
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun <T : Any> Grid.Column<T>.litRendererOrFail(): LitRenderer<T> {
+    val renderer: Renderer<T> = this.renderer
+    require(renderer is LitRenderer<*>) {
+        "Expected column ${key ?: this} to use a LitRenderer but it uses $renderer"
+    }
+    return renderer as LitRenderer<T>
+}
+
+/**
+ * If this column uses a [LitRenderer], renders its template for given [rowObject] and returns
+ * the raw HTML; fails otherwise. Convenience delegating to [LitRenderer._getPresentationHtml].
+ */
+public fun <T : Any> Grid.Column<T>._getPresentationHtml(rowObject: T): String =
+    litRendererOrFail()._getPresentationHtml(rowObject)
+
+/**
+ * If this column uses a [LitRenderer], renders its template for given [rowObject] and returns
+ * it parsed by JSoup for further querying; fails otherwise. Convenience delegating to
+ * [LitRenderer._getPresentationJsoup].
+ */
+public fun <T : Any> Grid.Column<T>._getPresentationJsoup(rowObject: T): Element =
+    litRendererOrFail()._getPresentationJsoup(rowObject)
 
 private fun <T> Grid<T>.getSortIndicator(column: Grid.Column<T>): String {
     val so: GridSortOrder<T>? = sortOrder.firstOrNull { it.sorted == column }

@@ -27,6 +27,9 @@ vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin_next"
 vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin_next" }
 vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_next_spring" }
 classgraph = "io.github.classgraph:classgraph:4.8.184"
+# Vaadin Flow brings JSoup in transitively; we depend on it explicitly so LitRenderer HTML
+# assertions keep working even if Flow ever drops it. See _getPresentationJsoup().
+jsoup = "org.jsoup:jsoup:1.22.2"
 jetbrains-annotations = "org.jetbrains:annotations:26.1.0"
 groovy = "org.apache.groovy:groovy:4.0.29"
 hibernate-validator = "org.hibernate.validator:hibernate-validator:9.1.0.Final"

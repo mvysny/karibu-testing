@@ -1991,20 +1991,67 @@ RichTextEditorsKt._setHtmlValue(rte, "<b>hello</b>");
 
 ## Security/Principal/isUserInRole
 
-(Since Karibu-Testing 1.3.8):
-It's possible to override `HttpRequest.getUserPrincipal()` and `isUserInRole()`; see the
-`MockRequest` class for more details. It's even
-possible to provide a custom implementation of `MockRequest` by modifying the
-`MockVaadin.mockRequestFactory` closure accordingly; see [issue #180](https://github.com/mvysny/karibu-testing/issues/180)
-for more details.
+Karibu runs no servlet container and no security filter chain, so nothing populates
+`HttpServletRequest.getUserPrincipal()` / `isUserInRole()` - the two values Vaadin's route
+security (`AccessAnnotationChecker`, `NavigationAccessControl`) reads to enforce `@PermitAll`,
+`@RolesAllowed`, `@AnonymousAllowed` and friends. You supply those values yourself, browser-free.
 
-An example which will fool
-Vaadin's `AccessAnnotationChecker` and `ViewAccessChecker`:
+### `MockVaadin.login()` / `logout()`
+
+(Since Karibu-Testing 2.7.2): the simplest way is to log a user in after `MockVaadin.setup()` and
+before navigating to a protected view:
 
 ```kotlin
-currentRequest.mock.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
-currentRequest.mock.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+MockVaadin.setup(routes)
+MockVaadin.login("admin", roles = listOf("ADMIN"))
+UI.getCurrent().navigate("admin")
+_expectOne<AdminView>()
+
+MockVaadin.logout()   // subsequent navigation is treated as anonymous
 ```
+Java:
+```java
+MockVaadin.setup(routes);
+MockVaadin.login("admin", List.of("ADMIN"));
+```
+`login()` installs a `MockPrincipal` into the current faked request; a `@RolesAllowed("ADMIN")`
+view is reachable once `"ADMIN"` is present in the roles list. Since Karibu drives Flow's *real*
+navigation pipeline, any `NavigationAccessControl` your app registers runs for real, so `login()`
+is enough to make protected routes navigable.
+
+### Lower-level: overriding the request directly
+
+`login()`/`logout()` are convenience wrappers over `HttpServletRequest.getUserPrincipal()` and
+`isUserInRole()`, which you can also set by hand (see the `FakeRequest` class for details). It's
+even possible to provide a custom `FakeRequest` by modifying the `MockVaadin.mockRequestFactory`
+closure; see [issue #180](https://github.com/mvysny/karibu-testing/issues/180) for more details.
+
+```kotlin
+currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
+currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+```
+
+### OAuth / OpenID Connect (Keycloak, Google, …) apps
+
+An OAuth-secured app logs users in via an *external* redirect to the identity provider - a flow
+that needs a real browser and a running IdP and therefore can't run browser-free. In a Karibu test
+you simply **skip that redirect** and assert on the authenticated behavior directly: call
+`MockVaadin.login()` (or, for Spring Security apps, `MockSpringSecurity.mock()` + `@WithMockUser` -
+see the [Spring module README](../karibu-testing-v10-spring/README.md)), then navigate.
+
+Two things trip people up (see [issue #143](https://github.com/mvysny/karibu-testing/issues/143)):
+
+* **Keep `@PermitAll` on your views** - do *not* switch them to `@AnonymousAllowed` just to make
+  tests pass. Authenticate the faked request instead.
+* **The root route.** `MockVaadin.setup()` navigates to the empty route `""` only when such a route
+  is actually registered, so an app whose views all live under `/events`, `/status`, … (no `""`
+  route) no longer fails during setup. If your `""` route *is* protected and you want setup to skip
+  the initial navigation entirely, set `KaribuConfig.initDefaultRoute = false` and navigate yourself
+  after logging in.
+
+If your view reads OpenID claims off the principal (e.g. casts it to `OidcUser`), a plain
+`MockPrincipal` / `@WithMockUser` won't carry them - populate an `OAuth2AuthenticationToken`
+yourself; see the [Spring module README](../karibu-testing-v10-spring/README.md#oauth--openid-connect).
 
 ### `AccessDeniedException`
 

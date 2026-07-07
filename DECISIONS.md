@@ -9,6 +9,45 @@ Newest entries on top.
 
 ---
 
+## 2026-07-07 — Browser-free login helper + OAuth stance: `MockVaadin.login()`/`logout()` (issue #143)
+
+**Context.** [Issue #143](https://github.com/mvysny/karibu-testing/issues/143): a Keycloak-OAuth app
+with all views `@PermitAll` hit a `NotFoundException` from `MockVaadin.setup()` navigating to `""`,
+and the reporter "fixed" it by relaxing the root view to `@AnonymousAllowed` — defeating the security
+model under test. The issue predates two things that already changed the picture: (a) setup's initial
+navigation is now guarded by `initDefaultRoute && registry.getNavigationTarget("").isPresent`
+(`MockVaadin.kt`), so an app with no `""` route no longer crashes at setup; (b) the
+`MockSpringSecurity.mock()` bridge (entry below). What remained was ergonomics: everyone hand-copied
+the same two-line `userPrincipalInt` + `isUserInRole` snippet from the README.
+
+**Decisions.**
+
+1. **Ship `MockVaadin.login(userName, roles)` / `logout()` in core (v10), framework-agnostic.**
+   Sugar over the existing `FakeRequest.userPrincipalInt` + `isUserInRole` primitives, backed by a
+   new **public** `MockPrincipal` (previously an `internal` test-only class, now promoted so both the
+   helper and user code can name it). `@JvmStatic @JvmOverloads` keep the Java/Groovy call site clean
+   (`MockVaadin.login("admin", List.of("ADMIN"))`) — no `LocatorJ` mirror needed. Placed on
+   `MockVaadin` alongside `setup`/`tearDown` for discoverability.
+2. **Do NOT emulate the OAuth redirect flow.** The external redirect to the IdP is done by a servlet
+   filter before Vaadin runs and needs a real browser + running IdP — squarely outside a browser-free
+   library. The documented stance: skip the redirect, `login()` (or `MockSpringSecurity.mock()` +
+   `@WithMockUser`), then navigate and assert on authenticated behavior. Rejected any filter-chain or
+   `forwardToExternalUrl` emulation as untestable browser-free and out of scope.
+3. **OIDC-claims case stays docs-only, no new dependency.** Apps that read `OidcUser` claims off the
+   principal populate an `OAuth2AuthenticationToken` in `SecurityContextHolder` themselves (which
+   `MockSpringSecurity.mock()` already reads). Adding a `MockSpringSecurity.loginOidc(...)` helper was
+   rejected: it would pull `spring-security-oauth2-client` into the module and duplicate what Spring
+   Security Test / a two-line context setup already do. Documented in the Spring README instead.
+
+**Where it lives.** `Security.kt` (public `MockPrincipal`), `MockVaadin.login`/`logout` (mechanics in
+their KDoc); tests reuse `SecurityTestbatch` (`AbstractSecurityTests`) — `user`/`admin` converted to
+`login()`, plus a `logout()` test and a login→navigate→logout→reroute check against
+`NavigationAccessControl`. README "Security/Principal/isUserInRole" section rewritten (adds the OAuth
+cookbook and updates the deprecated `.mock` → `.fake`); Spring README gains an "OAuth / OpenID
+Connect" section.
+
+---
+
 ## 2026-07-07 — Spring Security support: `MockSpringSecurity.mock()` (issues #94, #180)
 
 **Context.** [Issue #94](https://github.com/mvysny/karibu-testing/issues/94) asked for Spring

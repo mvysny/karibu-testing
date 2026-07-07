@@ -287,6 +287,52 @@ public object MockVaadin {
         }
     }
 
+    /**
+     * Logs in a user browser-free, so that Vaadin's route security lets protected views through.
+     *
+     * Karibu runs no servlet container and no security filter chain, so nothing populates the
+     * request's [jakarta.servlet.http.HttpServletRequest.getUserPrincipal] /
+     * [jakarta.servlet.http.HttpServletRequest.isUserInRole] - the two values Vaadin's
+     * [com.vaadin.flow.server.auth.AccessAnnotationChecker] and
+     * [com.vaadin.flow.server.auth.NavigationAccessControl] read to enforce `@PermitAll`,
+     * `@RolesAllowed` and friends. This installs a [MockPrincipal] into the current faked request so
+     * those checks see a logged-in user with the given [roles].
+     *
+     * Call this **after** [setup] (it mutates the current request) and **before** navigating to the
+     * protected view. Handy for testing OAuth/OpenID-secured apps, whose real login happens via an
+     * external redirect that can't run browser-free - here you skip that redirect and assert on the
+     * authenticated behavior directly. This does **not** exercise any servlet-container login
+     * mechanism; it only makes the faked request report the user as authenticated.
+     *
+     * For Spring Security apps, prefer `MockSpringSecurity.mock()` + `@WithMockUser` so that
+     * `SecurityContextHolder` stays the single source of truth.
+     *
+     * @param userName the logged-in user's name, returned from
+     * [jakarta.servlet.http.HttpServletRequest.getUserPrincipal].getName().
+     * @param roles roles granted to the user; a `@RolesAllowed("admin")` view is reachable when
+     * `"admin"` is present here. Empty by default, which still satisfies `@PermitAll`.
+     */
+    @JvmStatic
+    @JvmOverloads
+    public fun login(userName: String, roles: List<String> = listOf()) {
+        val request: FakeRequest = currentRequest.fake
+        request.userPrincipalInt = MockPrincipal(userName, roles)
+        request.isUserInRole = { p, role -> (p as? MockPrincipal)?.isUserInRole(role) ?: false }
+    }
+
+    /**
+     * Logs the current user out (the counterpart of [login]): clears the faked request's user
+     * principal and roles, so Vaadin's route security treats subsequent navigation as anonymous.
+     * Call after [setup]. A no-op-friendly way to test that an unauthenticated user is denied a
+     * protected view mid-test.
+     */
+    @JvmStatic
+    public fun logout() {
+        val request: FakeRequest = currentRequest.fake
+        request.userPrincipalInt = null
+        request.isUserInRole = { _, _ -> false }
+    }
+
     private fun clearVaadinInstances(fireUIDetach: Boolean) {
         try {
             discardBackgroundUIs()

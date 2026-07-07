@@ -82,3 +82,47 @@ security context over to the faked request. You still log the user in via Spring
   example app which demoes the Spring Security as well
 * [Browserless Testing of Vaadin Apps With Karibu Testing](https://martinelli.ch/browserless-testing-of-vaadin-applications-with-karibu-testing/)
   by Simon Martinelli.
+
+### OAuth / OpenID Connect
+
+An app secured with OAuth2 / OpenID Connect (Keycloak, Google, …) logs the user in via an
+*external* redirect to the identity provider. That flow needs a real browser and a running IdP,
+so it can't run browser-free; a servlet filter (`OAuth2LoginAuthenticationFilter`) performs it in
+production, before Vaadin ever runs, and Karibu starts no filter. In a Karibu test you therefore
+**skip the redirect** and assert on the authenticated behavior directly. See
+[issue #143](https://github.com/mvysny/karibu-testing/issues/143).
+
+Keep `@PermitAll` on your views (don't relax them to `@AnonymousAllowed` just for tests). Then:
+
+* If your views only gate on *roles/authorities*, `MockSpringSecurity.mock()` + `@WithMockUser`
+  (above) is enough - `@WithMockUser` yields a `UsernamePasswordAuthenticationToken`, whose
+  authorities drive `@RolesAllowed` / `@PermitAll` exactly like the real token would.
+* If your view reads *OIDC claims* off the principal (e.g. `authentication.principal as OidcUser`
+  to get the email or a custom claim), `@WithMockUser` won't carry them. Populate an
+  `OAuth2AuthenticationToken` in the `SecurityContextHolder` yourself before navigating -
+  `MockSpringSecurity.mock()` reads whatever `Authentication` is present, including an OAuth2 one:
+
+```kotlin
+@BeforeEach fun setup() {
+    MockSpringSecurity.mock()
+    MockVaadin.setup(routes, ctx) { MyUI() }
+}
+
+@Test fun oidcUserCanReachDashboard() {
+    val oidcUser = DefaultOidcUser(
+        listOf(SimpleGrantedAuthority("ROLE_USER")),
+        OidcIdToken.withTokenValue("fake-token")
+            .claim("sub", "1234").claim("email", "user@acme.com").build()
+    )
+    SecurityContextHolder.getContext().authentication =
+        OAuth2AuthenticationToken(oidcUser, oidcUser.authorities, "keycloak")
+
+    UI.getCurrent().navigate("dashboard")
+    _expectOne<DashboardView>()
+}
+```
+
+`DefaultOidcUser` / `OAuth2AuthenticationToken` come from `spring-security-oauth2-client`, which
+your app already depends on. Spring Security Test also ships an `oidcLogin()` request
+post-processor, but that targets `MockMvc`/`WebTestClient`; under Karibu, populate the
+`SecurityContextHolder` directly as shown above.

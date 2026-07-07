@@ -9,7 +9,6 @@ import com.vaadin.flow.server.auth.AnonymousAllowed
 import com.vaadin.flow.server.auth.NavigationAccessControl
 import org.myapp.AdminView
 import org.myapp.LoginView
-import java.security.Principal
 import jakarta.annotation.security.DenyAll
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
@@ -34,8 +33,7 @@ abstract class AbstractSecurityTests() {
     }
 
     @Test fun user() {
-        currentRequest.fake.userPrincipalInt = MockPrincipal("user", listOf("user"))
-        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        MockVaadin.login("user", listOf("user"))
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
@@ -43,12 +41,20 @@ abstract class AbstractSecurityTests() {
     }
 
     @Test fun admin() {
-        currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
-        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        MockVaadin.login("admin", listOf("admin"))
         expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestDenyAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
         expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAdminOnly::class.java) }
+    }
+
+    @Test fun `logout() clears the principal`() {
+        MockVaadin.login("admin", listOf("admin"))
+        expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
+        MockVaadin.logout()
+        expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestPermitAll::class.java) }
+        expect(false) { AccessAnnotationChecker().hasAccess(SecurityTestAdminOnly::class.java) }
+        expect(true) { AccessAnnotationChecker().hasAccess(SecurityTestAnonymous::class.java) }
     }
 
     @Test fun `navigation honors ViewAccessChecker`() {
@@ -63,10 +69,14 @@ abstract class AbstractSecurityTests() {
         navigateTo<AdminView>()
         _expectOne<LoginView>()
 
-        currentRequest.fake.userPrincipalInt = MockPrincipal("admin", listOf("admin"))
-        currentRequest.fake.isUserInRole = { p, r -> (p as MockPrincipal).isUserInRole(r) }
+        MockVaadin.login("admin", listOf("admin"))
         navigateTo<AdminView>()
         _expectOne<AdminView>()
+
+        // logging out reroutes a protected view back to the login view
+        MockVaadin.logout()
+        navigateTo<AdminView>()
+        _expectOne<LoginView>()
     }
 }
 
@@ -81,10 +91,3 @@ internal class SecurityTestAdminOnly
 
 @AnonymousAllowed
 internal class SecurityTestAnonymous
-
-internal data class MockPrincipal(private val name: String, val allowedRoles: List<String> = listOf()) :
-    Principal {
-    override fun getName(): String = name
-
-    fun isUserInRole(role: String): Boolean = allowedRoles.contains(role)
-}

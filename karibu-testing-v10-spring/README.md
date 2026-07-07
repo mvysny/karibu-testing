@@ -40,33 +40,43 @@ start any Servlet Container. See [Issue #47](https://github.com/mvysny/karibu-te
 for more details. One of the workarounds is to [Manually Authenticate User with Spring Security](https://www.baeldung.com/manually-set-user-authentication-spring-security),
 before navigating to a view.
 
-There are ways to enable Spring Security in Karibu's faked environment though, please
-take a look at [issue #94](https://github.com/mvysny/karibu-testing/issues/94) and
-[issue #180](https://github.com/mvysny/karibu-testing/issues/180). Namely, users
-reported the following snippet to work - must be called before `MockVaadin.setup()`:
+You can, however, bridge Spring Security into Karibu's faked environment. Since KT 2.7.2,
+`MockSpringSecurity.mock()` installs a fake request that sources both the user principal and
+its roles from Spring Security's `SecurityContextHolder` - the job usually done by Spring's
+servlet filter (`SecurityContextHolderAwareRequestWrapper`), which isn't triggered in the faked
+environment. Call it **before** `MockVaadin.setup()`, ideally from `@BeforeEach`:
+
 ```kotlin
-MockVaadin.mockRequestFactory = {
-    object : FakeRequest(it) {
-        override fun getUserPrincipal() = SecurityContextHolder.getContext().authentication
-    }
+@BeforeEach fun setup() {
+    MockSpringSecurity.mock()   // optionally MockSpringSecurity.mock(rolePrefix = "ROLE_")
+    MockVaadin.setup(routes, ctx) { MyUI() }
 }
 ```
 Java:
 ```java
-MockVaadin.INSTANCE.setMockRequestFactory(session -> new FakeRequest(session) {
-    @Override
-    public @Nullable Principal getUserPrincipal() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
-});
+@BeforeEach void setup() {
+    MockSpringSecurity.mock();
+    MockVaadin.setup(routes, ctx, MyUI::new);
+}
 ```
 
-Note that this will only carry the currently logged-in user (Principal) from Spring Security
-over to the faked Vaadin environment - a job that's usually done by Spring servlet filter.
-In this faked environment the filter is not triggered, and therefore this manual step is necessary.
-Note that the code above **doesn't** log in the user: you'll need to
-log in user in Spring Security beforehand, either via annotations or manually.
-See below for an example on how to do that.
+Now Vaadin's route security (`@RolesAllowed`, `@PermitAll`, `NavigationAccessControl`, …) sees the
+currently logged-in Spring Security user. The `rolePrefix` (default `ROLE_`, mirroring Spring's
+`GrantedAuthorityDefaults`) is prepended to the role before it's matched against the user's
+authorities: `@RolesAllowed("ADMIN")` matches the authority `ROLE_ADMIN`. Pass `rolePrefix = ""`
+if your app gates on raw authorities.
+
+`MockSpringSecurity.mock()` **doesn't** log in the user - it only carries an already-established
+security context over to the faked request. You still log the user in via Spring Security Test's
+`@WithMockUser` / `@WithUserDetails` (which populate `SecurityContextHolder` for you) or manually:
+
+```kotlin
+@WithMockUser(username = "admin", roles = ["ADMIN"])
+@Test fun adminCanReachAdminView() {
+    UI.getCurrent().navigate("admin")
+    _expectOne<AdminView>()
+}
+```
 
 * The [vaadin-spring-karibu-testing](https://github.com/mvysny/vaadin-spring-karibu-testing)
   example app which demoes the Spring Security as well

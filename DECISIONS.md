@@ -9,6 +9,59 @@ Newest entries on top.
 
 ---
 
+## 2026-07-07 — Spring Security support: `MockSpringSecurity.mock()` (issues #94, #180)
+
+**Context.** [Issue #94](https://github.com/mvysny/karibu-testing/issues/94) asked for Spring
+Security Test's `@WithMockUser` to work under Karibu; [#180](https://github.com/mvysny/karibu-testing/issues/180)
+is the same gap seen from `NavigationAccessControl` redirecting to login instead of the error view.
+Root cause: `@WithMockUser`/`@WithUserDetails`/`@WithSecurityContext` only populate
+`SecurityContextHolder`. In production a servlet filter (`SecurityContextHolderAwareRequestWrapper`)
+copies that context onto the request, and Vaadin route security
+(`NavigationAccessControl`/`AccessAnnotationChecker`) reads **exactly** `request.getUserPrincipal()`
+and `request.isUserInRole()`. Karibu runs no filter, so those two request methods stayed empty.
+
+**The README's prior workaround was insufficient.** It overrode only `getUserPrincipal()`, never
+`isUserInRole()` — so an authenticated user passed `@PermitAll` but **failed every `@RolesAllowed`
+gate**. Bridging *both* methods is the actual fix.
+
+**Decisions.**
+
+1. **Opt-in helper, not auto-install.** `MockSpringSecurity.mock(rolePrefix = "ROLE_")` installs a
+   `MockVaadin.mockRequestFactory` that sources principal + roles from `SecurityContextHolder`.
+   Auto-installing (e.g. from `MockSpringServletService`) was rejected: the Spring module is used by
+   non-security apps too, and referencing `SecurityContextHolder` unconditionally would
+   `NoClassDefFoundError` when spring-security is absent. Kept `spring-security-core` a `compileOnly`
+   dependency so non-security users never need it on the classpath.
+2. **Mirror `SecurityContextHolderAwareRequestWrapper` faithfully.** Anonymous is *not* logged in:
+   both `null` and `AnonymousAuthenticationToken` map to a `null` principal, via
+   `AuthenticationTrustResolverImpl.isAnonymous()` (picks up custom anonymous tokens too) rather than
+   a raw `instanceof`. The holder is read **lazily inside** the overridden methods, so it works
+   whether the user logs in before or after `MockVaadin.setup()`, and login/logout mid-test is
+   honored (verified by a test).
+3. **Configurable role prefix, default `ROLE_`.** Mirrors Spring's `GrantedAuthorityDefaults`:
+   `@RolesAllowed("ADMIN")` → `isUserInRole("ADMIN")` → matches authority `ROLE_ADMIN`. `""` supports
+   apps gating on raw authorities.
+4. **Kotlin source in the (otherwise-Java) Spring module.** The `kotlin` plugin is already applied to
+   every subproject, so a Kotlin file gives the `mock(rolePrefix = "ROLE_")` default-arg ergonomics;
+   `@JvmStatic @JvmOverloads` keep the Java call site clean (`MockSpringSecurity.mock()`).
+5. **Self-contained behavioral test in the Spring module.** The module wasn't part of the
+   `kt10-testrun-*` battery and its `src/test` had only a compile smoke test. Since `mock()` only
+   touches `mockRequestFactory` + `FakeRequest` + `SecurityContextHolder`, a plain `MockVaadin.setup()`
+   test suffices; the test populates `SecurityContextHolder` directly (exactly what `@WithMockUser`
+   does under the hood), avoiding a full `SpringExtension`/`spring-security-test` context.
+
+**Known caveat (accepted).** `MockVaadin.mockRequestFactory` is a global that `tearDown()` does not
+reset (same class of issue as `ideas/karibuconfig-reset.md`) — hence the "call from `@BeforeEach`"
+guidance. The leak is harmless: a later non-security test runs with an empty `SecurityContextHolder`,
+so `getUserPrincipal()` returns `null`, identical to the default `FakeRequest`.
+
+**Where it lives.** `karibu-testing-v10-spring`: `MockSpringSecurity.kt` (mechanics in its KDoc);
+`compileOnly`/`testImplementation` `spring-security-core` in `build.gradle.kts`; tests in
+`MockSpringSecurityTest`. README "Spring Security" section rewritten. Supersedes the principal-only
+snippet previously documented there.
+
+---
+
 ## 2026-07-07 — Open/click a `ContextMenu` via its target component (issue #20)
 
 **Context.** [Issue #20](https://github.com/mvysny/karibu-testing/issues/20): tests could only

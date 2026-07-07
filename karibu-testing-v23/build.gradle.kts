@@ -4,8 +4,8 @@ dependencies {
     //   npm mode and exclude all webjars.
     // - depend on "vaadin" instead of just "vaadin-core", to bring in Grid Pro.
     // - depend on the latest Vaadin (Vaadin 23 LTS)
-    compileOnly(libs.vaadin.v24.all)
-    testImplementation(libs.vaadin.v24.all)
+    compileOnly(libs.vaadin.stable.all)
+    testImplementation(libs.vaadin.stable.all)
     api(project(":karibu-testing-v10"))
     api(libs.kaributools23)
 

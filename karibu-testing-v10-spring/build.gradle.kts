@@ -1,11 +1,11 @@
 dependencies {
     api(project(":karibu-testing-v10"))
-    compileOnly(libs.vaadin.v24.spring)
+    compileOnly(libs.vaadin.stable.spring)
     // Spring Security is optional: only needed by apps that call MockSpringSecurity.mock().
     // Keep it compileOnly so non-security apps don't drag it in.
     compileOnly(libs.spring.security.core)
 
-    testImplementation(libs.vaadin.v24.all)
+    testImplementation(libs.vaadin.stable.all)
     testImplementation(libs.spring.security.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.slf4j.simple)

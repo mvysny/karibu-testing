@@ -1,6 +1,6 @@
 dependencies {
-    compileOnly(libs.vaadin.v24.all)
-    testImplementation(libs.vaadin.v24.all)
+    compileOnly(libs.vaadin.stable.all)
+    testImplementation(libs.vaadin.stable.all)
     api(project(":karibu-testing-v23"))
 
     testImplementation(libs.slf4j.simple)

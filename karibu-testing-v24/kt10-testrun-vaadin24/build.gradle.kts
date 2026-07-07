@@ -1,5 +1,5 @@
 dependencies {
-    testImplementation(libs.vaadin.v24.all)
+    testImplementation(libs.vaadin.stable.all)
     testImplementation(project(":karibu-testing-v23:kt23-tests"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

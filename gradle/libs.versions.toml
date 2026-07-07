@@ -20,12 +20,12 @@ karibudsl = { module = "com.github.mvysny.karibudsl:karibu-dsl", version.ref = "
 karibudsl23 = { module = "com.github.mvysny.karibudsl:karibu-dsl-v23", version.ref = "karibudsl" }
 junit-jupiterapi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
-vaadin-v24-all = { module = "com.vaadin:vaadin", version.ref = "vaadin" }
-vaadin-v24-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin" }
-vaadin-v24-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_spring" }
-vaadin-v24next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin_next" }
-vaadin-v24next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin_next" }
-vaadin-v24next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_next_spring" }
+vaadin-stable-all = { module = "com.vaadin:vaadin", version.ref = "vaadin" }
+vaadin-stable-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin" }
+vaadin-stable-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_spring" }
+vaadin-next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin_next" }
+vaadin-next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin_next" }
+vaadin-next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_next_spring" }
 classgraph = "io.github.classgraph:classgraph:4.8.184"
 # Vaadin Flow brings JSoup in transitively; we depend on it explicitly so LitRenderer HTML
 # assertions keep working even if Flow ever drops it. See _getPresentationJsoup().

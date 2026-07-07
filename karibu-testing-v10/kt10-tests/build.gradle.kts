@@ -10,7 +10,7 @@ dependencies {
     implementation(libs.hibernate.validator)
     implementation(libs.jakarta.el.api)
 
-    api(libs.vaadin.v24.all)
+    api(libs.vaadin.stable.all)
 
     api(libs.spring.boot.starter.test) {
         exclude(group = "ch.qos.logback")
@@ -18,6 +18,6 @@ dependencies {
     api(libs.spring.boot.starter.web) {
         exclude(group = "ch.qos.logback")
     }
-    api(libs.vaadin.v24.spring)
+    api(libs.vaadin.stable.spring)
     api(project(":karibu-testing-v10-spring"))
 }

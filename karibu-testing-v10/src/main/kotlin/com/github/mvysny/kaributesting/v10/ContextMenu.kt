@@ -288,23 +288,12 @@ public fun ContextMenu.setOpened(opened: Boolean) {
     element.setProperty("opened", opened)
 }
 
-private val __ContextMenuBase_onBeforeOpenMenu: Method by lazy {
-    val m = ContextMenuBase::class.java.getDeclaredMethod("onBeforeOpenMenu", ObjectNode::class.java)
-    m.isAccessible = true
-    m
-}
-
-private fun ContextMenuBase<*, *, *>.invokeOnBeforeOpenMenu(itemKey: String?, columnId: String?): Boolean {
-    val json = ObjectMapper().createObjectNode().apply {
-        put("key", itemKey ?: "")
-        put("columnId", columnId ?: "")
-    }
-    val obj = __ContextMenuBase_onBeforeOpenMenu.invoke(this, json) as Boolean
-    return obj
-}
-
 /**
  * Opens or closes the menu. Fires the [ContextMenuBase.OpenedChangeEvent].
+ *
+ * On open, fires the real `vaadin-context-menu-before-open` DOM event, which runs the dynamic
+ * content generator and attaches the menu to the UI (so it's discoverable via [_find] while open).
+ * On close, detaches the menu again.
  */
 @Suppress("UNCHECKED_CAST")
 @JvmOverloads
@@ -316,15 +305,25 @@ public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, colum
         target.element.setProperty("_contextMenuTargetColumnId", id)
     }
     if (opened) {
-        // notify the context menu dynamic item generator
+        // Fire the real before-open event: it runs the dynamic content generator (onBeforeOpenMenu)
+        // and attaches the menu to the UI. If the dynamic content handler vetoes opening, the menu
+        // is not attached.
         val grid = target as Grid<T>
         val itemKey = if (gridItem == null) null else grid.dataCommunicator.keyMapper.key(gridItem)
-        // call onBeforeOpenMenu() instead of calling dynamicContentGenerator, for better compatibility
-        if (!invokeOnBeforeOpenMenu(itemKey, column?.id_)) {
+        val detail: ObjectNode = ObjectMapper().createObjectNode()
+        detail.put("key", itemKey ?: "")
+        detail.put("columnId", column?.id_ ?: "")
+        val wasAttached = element.parent != null
+        fireContextMenuBeforeOpen(grid, detail)
+        if (!wasAttached && element.parent == null) {
             fail("The dynamic content handler returned false signalling the menu should not open:\n${toPrettyTree()}")
         }
     }
     element.setProperty("opened", opened)
+    if (!opened) {
+        // detach the menu again (it was attached to the UI by the before-open event on open)
+        _fireClosed()
+    }
 }
 
 /**
@@ -434,6 +433,14 @@ public fun <T> Grid<T>._openContextMenu(item: T?, column: Grid.Column<T>? = null
  */
 public fun ContextMenuBase<*, *, *>._close() {
     element.setProperty("opened", false)
+    _fireClosed()
+}
+
+/**
+ * Fires the `closed` DOM event on this menu's element, which detaches it from the UI (if it was
+ * auto-added on open). Expects [ContextMenuBase.isOpened] to already be `false`.
+ */
+private fun ContextMenuBase<*, *, *>._fireClosed() {
     element._fireDomEvent(DomEvent(element, "closed", ObjectMapper().createObjectNode()))
 }
 

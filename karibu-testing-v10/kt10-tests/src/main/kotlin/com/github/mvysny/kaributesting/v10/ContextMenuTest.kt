@@ -546,6 +546,19 @@ abstract class AbstractContextMenuTests {
             expect("foo") { clicked }
         }
 
+        @Test fun `dynamic content handler vetoing open fails`() {
+            lateinit var cm: GridContextMenu<String>
+            UI.getCurrent().grid<String> {
+                cm = gridContextMenu {
+                    item("click me", { fail("should not be called") })
+                    setDynamicContentHandler { false } // veto opening
+                }
+            }
+            expectThrows(AssertionError::class, "The dynamic content handler returned false signalling the menu should not open") {
+                cm._clickItemWithCaption("click me", "foo")
+            }
+        }
+
         @Test fun `setOpened(true) fires GridContextMenuOpenedEvent`() {
             var called = false
             lateinit var cm: GridContextMenu<String>

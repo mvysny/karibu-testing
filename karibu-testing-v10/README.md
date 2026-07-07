@@ -1039,6 +1039,9 @@ contents of the Grid.
   * *TreeGrid Note:* This function will **not** expand/collapse the item being clicked. Please call `TreeGrid.expand()/.collapse()` directly.
     See [Issue #121](https://github.com/mvysny/karibu-testing/issues/121) for more details.
 * Use `grid._doubleClickItem(rowIndex)`/`GridKt._doubleClickItem(grid, rowIndex)` to fire a listener added via `addItemDoubleClickListener()`.
+  * Pass the double-clicked column via `grid._doubleClickItem(rowIndex, column)` or `grid._doubleClickItem(rowIndex, columnKey)`
+    (mirroring `_clickItem`) so that `ItemDoubleClickEvent.getColumn()` returns it — essential for testing e.g. inline
+    editing that starts on a double-click of a specific cell.
 
 #### Clicking Renderers
 

@@ -12,6 +12,7 @@ import com.vaadin.flow.component.grid.FooterRow
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.HeaderRow
 import com.vaadin.flow.component.grid.ItemClickEvent
+import com.vaadin.flow.component.grid.ItemDoubleClickEvent
 import com.vaadin.flow.component.grid.dnd.GridDropMode
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.NativeLabel
@@ -654,6 +655,45 @@ abstract class AbstractGridTests {
             expect(false) { event.isCtrlKey }
             expect(false) { event.isMetaKey }
             expect(false) { event.isShiftKey }
+        }
+        @Test fun `column is null when unspecified`() {
+            lateinit var event: ItemDoubleClickEvent<TestPerson>
+            val grid = UI.getCurrent().grid<TestPerson> {
+                addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemDoubleClickListener { e -> event = e }
+            }
+            grid._doubleClickItem(2)
+            expect(null) { event.column }
+        }
+        @Test fun `get double-clicked column`() {
+            // see https://github.com/mvysny/karibu-testing/issues/209
+            lateinit var event: ItemDoubleClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = UI.getCurrent().grid<TestPerson> {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemDoubleClickListener { e -> event = e }
+            }
+            grid._doubleClickItem(2, nameColumn)
+            expect(nameColumn) { event.column }
+        }
+        @Test fun `get double-clicked column by columnKey`() {
+            // see https://github.com/mvysny/karibu-testing/issues/209
+            lateinit var event: ItemDoubleClickEvent<TestPerson>
+            lateinit var nameColumn: Grid.Column<*>
+
+            val grid = UI.getCurrent().grid<TestPerson> {
+                nameColumn = addColumnFor(TestPerson::name)
+                addColumnFor(TestPerson::age)
+                setItems2((0..10).map { TestPerson("name $it", it) })
+                addItemDoubleClickListener { e -> event = e }
+            }
+            grid._doubleClickItem(2, nameColumn.key)
+            expect(nameColumn) { event.column }
         }
     }
 

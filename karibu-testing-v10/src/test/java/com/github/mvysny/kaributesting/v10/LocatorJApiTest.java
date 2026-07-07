@@ -93,6 +93,14 @@ public class LocatorJApiTest {
 
         _fireValueChange(new TextField());
         _fireValueChange(new TextField(), true);
+
+        // context menu, located via the target component - https://github.com/mvysny/karibu-testing/issues/20
+        _clickContextMenuItemWithCaption(new Button(), "Delete");
+        _clickContextMenuItemWithID(new Button(), "delete");
+        _clickContextMenuItemWithIcon(new Button(), com.github.mvysny.kaributools.IconName.of(VaadinIcon.TRASH));
+        _clickContextMenuItemWithCaption(new Grid<Person>(), "Delete", new Person());
+        _clickContextMenuItemWithID(new Grid<Person>(), "delete", new Person());
+        _clickContextMenuItemWithIcon(new Grid<Person>(), com.github.mvysny.kaributools.IconName.of(VaadinIcon.TRASH), null);
     }
 
     public static class Person {}

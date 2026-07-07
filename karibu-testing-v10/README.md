@@ -1328,12 +1328,8 @@ Call `image.download()`/`DownloadKt.download(image)` to download contents of the
 
 ### Support for ContextMenu
 
-It's currently not possible to retrieve `ContextMenu` from the component it is attached to,
-nor `GridContextMenu` from the Grid it is attached to. Please add your vote for adding support for this
-to Vaadin: [https://github.com/vaadin/vaadin-context-menu-flow/issues/43](https://github.com/vaadin/vaadin-context-menu-flow/issues/43).
-
-As a workaround, you will have to remember references to ContextMenu in your views and components,
-and retrieve them via getters. Then, it's very easy to click on a menu item; simply call
+If you hold a reference to the `ContextMenu` (or `GridContextMenu`), it's very easy to click on a
+menu item; simply call
 
 Kotlin, Groovy:
 ```kotlin
@@ -1347,6 +1343,34 @@ Java:
 ```java
 ContextMenuKt._clickItemWithCaption(contextMenu, "Save");
 ContextMenuKt._clickItemWithCaption(gridContextMenu, "Delete", person);
+```
+
+You no longer need to keep a reference to the `ContextMenu`: since KT 2.7.2 you can locate and click
+it via the component it is attached to (see [Issue #20](https://github.com/mvysny/karibu-testing/issues/20)).
+This simulates the user right-clicking the component: it opens the menu (running its dynamic content
+generator so the menu is fully populated), clicks the item, then closes the menu again.
+
+Kotlin, Groovy:
+```kotlin
+button._clickContextMenuItemWithCaption("Save")
+button._clickContextMenuItemWithID("save")
+grid._clickContextMenuItemWithCaption("Delete", person)   // pass in the right-clicked item
+grid._clickContextMenuItemWithID("delete", person)
+```
+
+Java:
+```java
+LocatorJ._clickContextMenuItemWithCaption(button, "Save");
+LocatorJ._clickContextMenuItemWithCaption(grid, "Delete", person);
+```
+
+If you need to inspect the open menu (e.g. assert on its items via `_find`/`_expectOne`), open it
+explicitly and close it afterwards:
+
+```kotlin
+val menu: ContextMenu = button._openContextMenu()   // now attached to the UI and discoverable
+_expectOne<MenuItem> { text = "Save" }
+menu._close()
 ```
 
 ### Support for MenuBar

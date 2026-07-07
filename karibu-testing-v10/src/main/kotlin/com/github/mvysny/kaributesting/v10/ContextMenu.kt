@@ -9,6 +9,8 @@ import com.vaadin.flow.component.contextmenu.*
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem
+import com.vaadin.flow.dom.DomEvent
+import com.vaadin.flow.dom.Element
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.node.ObjectNode
 import java.lang.reflect.Method
@@ -24,14 +26,22 @@ public fun HasMenuItems._clickItemMatching(searchSpec: SearchSpec<MenuItemBase<*
     // fires ContextMenuOpenedListener to simulate menu opening
     (this as? ContextMenu)?.setOpened(true)
 
+    _findAndClickItem(searchSpec)
+
+    // fires ContextMenuOpenedListener to simulate menu closing
+    (this as? ContextMenu)?.setOpened(false)
+}
+
+/**
+ * Finds a menu item matching given [searchSpec] in this menu and clicks it. Doesn't open/close
+ * the menu - use e.g. [_clickItemMatching] or [Component._openContextMenu] for that.
+ */
+private fun HasMenuItems._findAndClickItem(searchSpec: SearchSpec<MenuItemBase<*, *, *>>) {
     val parentMap: Map<MenuItemBase<*, *, *>, Component> = (this as Component).getParentMap()
     val predicate = searchSpec.toPredicate()
     val item: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull(predicate)
             ?: fail("No menu item with ${searchSpec.toString().removePrefix("MenuItemBase and ")} in this menu:\n${(this as Component).toPrettyTree()}")
     (item as MenuItem)._click(parentMap)
-
-    // fires ContextMenuOpenedListener to simulate menu closing
-    (this as? ContextMenu)?.setOpened(false)
 }
 
 /**
@@ -315,4 +325,201 @@ public fun <T> GridContextMenu<T>.setOpened(opened: Boolean, gridItem: T?, colum
         }
     }
     element.setProperty("opened", opened)
+}
+
+/**
+ * The DOM event fired by the target component to make its [ContextMenu] open. Registered on
+ * the target's element by [ContextMenuBase.setTarget]; its handler runs the dynamic content
+ * generator and attaches the menu to the UI.
+ */
+private const val CONTEXT_MENU_BEFORE_OPEN_EVENT = "vaadin-context-menu-before-open"
+
+/**
+ * Fires the [CONTEXT_MENU_BEFORE_OPEN_EVENT] DOM event on [target]'s element, passing given
+ * [detail] as the `event.detail`. This makes Vaadin run the context menu's dynamic content
+ * generator and attach the menu to the UI (so it becomes discoverable via [_find] and visible
+ * in [toPrettyTree]), exactly as if the user right-clicked the component in the browser.
+ *
+ * Uses the low-level [Element._fireDomEvent] to bypass the visible+enabled check, since a
+ * context menu also opens on disabled components (see [`clicking menu on disabled component succeeds`]).
+ */
+private fun fireContextMenuBeforeOpen(target: Component, detail: ObjectNode) {
+    val eventData: ObjectNode = ObjectMapper().createObjectNode()
+    eventData.set("event.detail", detail)
+    val element: Element = target.element
+    // The before-open listener is registered as ONLY_WHEN_ENABLED, so ElementListenerMap.fireEvent
+    // would drop it on a disabled target. But a ContextMenu opens even on a disabled component (parity
+    // with the reference-based _clickItemMatching, whose checkMenuItemEnabled skips the target). The
+    // enabled gate checks event.source.isEnabled(), so we present an enabled source when the target is
+    // disabled - the handler only reads event.detail, never the source.
+    val source: Element = if (element.isEnabled) element else currentUI.element
+    element._fireDomEvent(DomEvent(source, CONTEXT_MENU_BEFORE_OPEN_EVENT, eventData))
+}
+
+/**
+ * Opens the [ContextMenu] attached to this component, simulating the user right-clicking (or
+ * long-touching) the component in the browser. See [Issue 20](https://github.com/mvysny/karibu-testing/issues/20).
+ *
+ * The menu is attached to the UI - becoming discoverable via [_find] and visible in [toPrettyTree] -
+ * and its dynamic content generator runs, so the menu is fully populated. Remember to [_close]
+ * the returned menu afterwards; or use [_clickContextMenuItemWithCaption] and friends which
+ * open and close the menu automatically.
+ *
+ * For [Grid]s use [Grid._openContextMenu] instead, to pass in the item/column being right-clicked.
+ * @return the now-open context menu.
+ * @throws AssertionError if no context menu is attached to this component (or it refused to open),
+ * or if more than one context menu is attached (unsupported).
+ */
+public fun Component._openContextMenu(): ContextMenu {
+    fireContextMenuBeforeOpen(this, ObjectMapper().createObjectNode())
+    // The menu attaches to the UI (as a sibling), not under this component, so search from the UI.
+    val menus: List<ContextMenu> = currentUI._find<ContextMenu>().filter { it.target === this }
+    val menu: ContextMenu = when (menus.size) {
+        0 -> fail("No ContextMenu is attached to ${toPrettyString()}, or it refused to open:\n${toPrettyTree()}")
+        1 -> menus[0]
+        else -> fail("Multiple ContextMenus are attached to ${toPrettyString()}; this is unsupported:\n${toPrettyTree()}")
+    }
+    // fire the ContextMenuBase.OpenedChangeEvent
+    menu.setOpened(true)
+    return menu
+}
+
+/**
+ * Opens the [GridContextMenu] attached to this grid, simulating the user right-clicking (or
+ * long-touching) the grid in the browser. See [Issue 20](https://github.com/mvysny/karibu-testing/issues/20).
+ *
+ * The menu is attached to the UI - becoming discoverable via [_find] and visible in [toPrettyTree] -
+ * and its dynamic content generator runs, so the menu is fully populated. Remember to [_close]
+ * the returned menu afterwards; or use [_clickContextMenuItemWithCaption] and friends which
+ * open and close the menu automatically.
+ * @param item the item which was right-clicked. `null` when the grid is right-clicked outside
+ * of any item (e.g. if there are no items shown in the grid).
+ * @param column the column which was right-clicked, or `null` if unknown. Must have an ID
+ * assigned via [Grid.Column.setId] in order to be identifiable.
+ * @return the now-open context menu.
+ * @throws AssertionError if no grid context menu is attached to this grid (or its dynamic content
+ * handler refused to open), or if more than one is attached (unsupported).
+ */
+@JvmOverloads
+public fun <T> Grid<T>._openContextMenu(item: T?, column: Grid.Column<T>? = null): GridContextMenu<T> {
+    val key: String? = if (item == null) null else dataCommunicator.keyMapper.key(item)
+    // set the properties read by the GridContextMenuItemClickEvent
+    element.setProperty("_contextMenuTargetItemKey", key ?: "")
+    if (column != null) {
+        val id: String? = column.id_
+        require(!id.isNullOrBlank()) { "Column $column must have an ID assigned in order to be identifiable in the event object" }
+        element.setProperty("_contextMenuTargetColumnId", id)
+    }
+    val detail: ObjectNode = ObjectMapper().createObjectNode()
+    detail.put("key", key ?: "")
+    detail.put("columnId", column?.id_ ?: "")
+    fireContextMenuBeforeOpen(this, detail)
+    // The menu attaches to the UI (as a sibling), not under this grid, so search from the UI.
+    @Suppress("UNCHECKED_CAST")
+    val menus: List<GridContextMenu<T>> =
+        currentUI._find<GridContextMenu<*>>().filter { it.target === this } as List<GridContextMenu<T>>
+    val menu: GridContextMenu<T> = when (menus.size) {
+        0 -> fail("No GridContextMenu is attached to ${toPrettyString()}, or its dynamic content handler refused to open:\n${toPrettyTree()}")
+        1 -> menus[0]
+        else -> fail("Multiple GridContextMenus are attached to ${toPrettyString()}; this is unsupported:\n${toPrettyTree()}")
+    }
+    // fire the ContextMenuBase.OpenedChangeEvent
+    menu.element.setProperty("opened", true)
+    return menu
+}
+
+/**
+ * Closes this context menu (the opposite of [Component._openContextMenu]): fires the
+ * `opened-changed` event with `false` and detaches the menu from the UI.
+ */
+public fun ContextMenuBase<*, *, *>._close() {
+    element.setProperty("opened", false)
+    element._fireDomEvent(DomEvent(element, "closed", ObjectMapper().createObjectNode()))
+}
+
+/**
+ * Opens the [ContextMenu] attached to this component, clicks the menu item with given [caption],
+ * then closes the menu again. See [Issue 20](https://github.com/mvysny/karibu-testing/issues/20).
+ *
+ * Doesn't require a reference to the [ContextMenu] - the menu is located via this target component.
+ * For [Grid]s use [Grid._clickContextMenuItemWithCaption] instead.
+ * @throws AssertionError if no such menu item exists, or the menu item is not enabled or visible,
+ * or it's nested in a menu item which is invisible or disabled, or it's attached to a component
+ * that's invisible, or no/multiple context menus are attached to this component.
+ */
+public fun Component._clickContextMenuItemWithCaption(caption: String) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, text = caption))
+}
+
+/**
+ * Opens the [ContextMenu] attached to this component, clicks the menu item with given [id],
+ * then closes the menu again. See [Component._clickContextMenuItemWithCaption].
+ */
+public fun Component._clickContextMenuItemWithID(id: String) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, id = id))
+}
+
+/**
+ * Opens the [ContextMenu] attached to this component, clicks the menu item with given [icon],
+ * then closes the menu again. See [Component._clickContextMenuItemWithCaption].
+ */
+public fun Component._clickContextMenuItemWithIcon(icon: IconName) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon))
+}
+
+private fun Component._clickContextMenuItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>) {
+    val menu: ContextMenu = _openContextMenu()
+    try {
+        menu._findAndClickItem(searchSpec)
+    } finally {
+        menu._close()
+    }
+}
+
+/**
+ * Opens the [GridContextMenu] attached to this grid (passing in the right-clicked [item] and
+ * [column]), clicks the menu item with given [caption], then closes the menu again.
+ * See [Issue 20](https://github.com/mvysny/karibu-testing/issues/20).
+ *
+ * Doesn't require a reference to the [GridContextMenu] - the menu is located via this grid.
+ * @param item the item which was right-clicked. `null` when the grid is right-clicked outside
+ * of any item.
+ * @param column the column which was right-clicked, or `null` if unknown.
+ * @throws AssertionError if no such menu item exists, or it (or a parent) is disabled/invisible,
+ * or the grid is invisible, or no/multiple grid context menus are attached to this grid.
+ */
+@JvmOverloads
+public fun <T> Grid<T>._clickContextMenuItemWithCaption(caption: String, item: T?, column: Grid.Column<T>? = null) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, text = caption), item, column)
+}
+
+/**
+ * Opens the [GridContextMenu] attached to this grid, clicks the menu item with given [id], then
+ * closes the menu again. See [Grid._clickContextMenuItemWithCaption].
+ */
+@JvmOverloads
+public fun <T> Grid<T>._clickContextMenuItemWithID(id: String, item: T?, column: Grid.Column<T>? = null) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, id = id), item, column)
+}
+
+/**
+ * Opens the [GridContextMenu] attached to this grid, clicks the menu item with given [icon], then
+ * closes the menu again. See [Grid._clickContextMenuItemWithCaption].
+ */
+@JvmOverloads
+public fun <T> Grid<T>._clickContextMenuItemWithIcon(icon: IconName, item: T?, column: Grid.Column<T>? = null) {
+    _clickContextMenuItemMatching(SearchSpec(MenuItemBase::class.java, icon = icon), item, column)
+}
+
+private fun <T> Grid<T>._clickContextMenuItemMatching(searchSpec: SearchSpec<MenuItemBase<*, *, *>>, item: T?, column: Grid.Column<T>?) {
+    val menu: GridContextMenu<T> = _openContextMenu(item, column)
+    try {
+        val parentMap: Map<MenuItemBase<*, *, *>, Component> = (menu as Component).getParentMap()
+        val menuItem: MenuItemBase<*, *, *> = parentMap.keys.firstOrNull(searchSpec.toPredicate())
+            ?: fail("No menu item with ${searchSpec.toString().removePrefix("MenuItemBase and ")} in GridContextMenu:\n${menu.toPrettyTree()}")
+        @Suppress("UNCHECKED_CAST")
+        (menuItem as GridMenuItem<T>)._click(item)
+    } finally {
+        menu._close()
+    }
 }

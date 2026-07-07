@@ -235,6 +235,176 @@ abstract class AbstractContextMenuTests {
         expect(true) { called }
     }
 
+    // Tests for opening/clicking a ContextMenu via its target component, without holding a
+    // reference to the ContextMenu. https://github.com/mvysny/karibu-testing/issues/20
+    @Nested inner class `open via target component` {
+        @Test fun `_openContextMenu attaches the menu and makes it findable`() {
+            lateinit var cm: ContextMenu
+            val div = UI.getCurrent().div {
+                cm = contextMenu {
+                    item("click me")
+                }
+            }
+            expect(0) { _find<ContextMenu>().size } // not attached until opened
+            val opened: ContextMenu = div._openContextMenu()
+            expect(cm) { opened }
+            expect(1) { _find<ContextMenu>().size }
+            expect(true) { cm.isOpened }
+        }
+
+        @Test fun `_openContextMenu fires OpenedChangeEvent`() {
+            lateinit var cm: ContextMenu
+            var called = false
+            val div = UI.getCurrent().div {
+                cm = contextMenu {
+                    item("click me")
+                }
+            }
+            cm.addOpenedChangeListener { e ->
+                called = true
+                expect(true) { e.isOpened }
+                expect(false) { e.isFromClient }
+            }
+            div._openContextMenu()
+            expect(true) { called }
+        }
+
+        @Test fun `_close detaches the menu`() {
+            lateinit var cm: ContextMenu
+            val div = UI.getCurrent().div {
+                cm = contextMenu {
+                    item("click me")
+                }
+            }
+            div._openContextMenu()
+            expect(1) { _find<ContextMenu>().size }
+            cm._close()
+            expect(0) { _find<ContextMenu>().size }
+            expect(false) { cm.isOpened }
+        }
+
+        @Test fun `_openContextMenu throws when no context menu attached`() {
+            val div = UI.getCurrent().div { }
+            expectThrows(AssertionError::class, "No ContextMenu is attached to Div[]") {
+                div._openContextMenu()
+            }
+        }
+
+        @Test fun `_openContextMenu throws when multiple context menus attached`() {
+            val div = UI.getCurrent().div { }
+            ContextMenu(div).apply { addItem("one") }
+            ContextMenu(div).apply { addItem("two") }
+            expectThrows(AssertionError::class, "Multiple ContextMenus are attached to Div[]") {
+                div._openContextMenu()
+            }
+        }
+
+        @Test fun `click by caption clicks and auto-closes`() {
+            var clicked = 0
+            val div = UI.getCurrent().div {
+                contextMenu {
+                    item("click me", { clicked++ })
+                }
+            }
+            div._clickContextMenuItemWithCaption("click me")
+            expect(1) { clicked }
+            expect(0) { _find<ContextMenu>().size } // auto-closed
+        }
+
+        @Test fun `click by ID clicks and auto-closes`() {
+            var clicked = 0
+            val div = UI.getCurrent().div {
+                contextMenu {
+                    item("click me", { clicked++ }) { setId("clickme") }
+                }
+            }
+            div._clickContextMenuItemWithID("clickme")
+            expect(1) { clicked }
+            expect(0) { _find<ContextMenu>().size }
+        }
+
+        @Test fun `click by icon clicks and auto-closes`() {
+            var clicked = 0
+            val div = UI.getCurrent().div {
+                contextMenu {
+                    item(VaadinIcon.MENU.create(), { clicked++ })
+                }
+            }
+            div._clickContextMenuItemWithIcon(IconName.of(VaadinIcon.MENU))
+            expect(1) { clicked }
+            expect(0) { _find<ContextMenu>().size }
+        }
+
+        @Test fun `click on disabled component succeeds`() {
+            var clicked = 0
+            val div = UI.getCurrent().div {
+                isEnabled = false
+                contextMenu {
+                    item("click me", { clicked++ })
+                }
+            }
+            div._clickContextMenuItemWithCaption("click me")
+            expect(1) { clicked }
+        }
+
+        @Test fun `click on invisible component throws`() {
+            val div = UI.getCurrent().div {
+                isVisible = false
+                contextMenu {
+                    item("click me", { fail("shouldn't be called") })
+                }
+            }
+            expectThrows(AssertionError::class, "which is not effectively visible") {
+                div._clickContextMenuItemWithCaption("click me")
+            }
+        }
+
+        @Test fun `clicking non-existent item fails`() {
+            val div = UI.getCurrent().div {
+                contextMenu {
+                    item("click me")
+                }
+            }
+            expectThrows(AssertionError::class, "No menu item with text='non-existent'") {
+                div._clickContextMenuItemWithCaption("non-existent")
+            }
+            expect(0) { _find<ContextMenu>().size } // still auto-closed on failure
+        }
+
+        @Test fun `grid _openContextMenu populates dynamic content`() {
+            lateinit var cm: GridContextMenu<String>
+            val grid = UI.getCurrent().grid<String> {
+                setItems2(listOf("foo", "bar"))
+                cm = gridContextMenu {
+                    setDynamicContentHandler { item ->
+                        removeAll()
+                        this.item("dynamic for $item")
+                        true
+                    }
+                }
+                _prepare()
+            }
+            val opened: GridContextMenu<String> = grid._openContextMenu("foo")
+            expect(cm) { opened }
+            expect(1) { _find<GridContextMenu<*>>().size }
+            opened._clickItemWithCaption("dynamic for foo", "foo")
+        }
+
+        @Test fun `grid click by caption clicks and auto-closes`() {
+            lateinit var clicked: String
+            val grid = UI.getCurrent().grid<String> {
+                setItems2(listOf("foo", "bar"))
+                gridContextMenu {
+                    item("click me", { e -> clicked = e!! })
+                }
+                _prepare()
+            }
+            grid._clickContextMenuItemWithCaption("click me", "foo")
+            expect("foo") { clicked }
+            expect(0) { _find<GridContextMenu<*>>().size }
+        }
+    }
+
     @Nested inner class `grid context menu` {
         @Test fun `simple click`() {
             lateinit var clicked: String

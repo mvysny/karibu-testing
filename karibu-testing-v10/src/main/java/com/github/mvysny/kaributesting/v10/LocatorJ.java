@@ -1,6 +1,8 @@
 package com.github.mvysny.kaributesting.v10;
 
 import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.grid.Grid;
+import com.github.mvysny.kaributools.IconName;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -427,5 +429,87 @@ public class LocatorJ {
      */
     public static void _dump() {
         LocatorKt._dump();
+    }
+
+    /**
+     * Opens the {@link com.vaadin.flow.component.contextmenu.ContextMenu} attached to given
+     * component, clicks the menu item with given caption, then closes the menu again. Doesn't
+     * require a reference to the context menu - it is located via the target component.
+     * See <a href="https://github.com/mvysny/karibu-testing/issues/20">Issue 20</a>.
+     *
+     * @param component the component the context menu is attached to.
+     * @param caption the caption of the menu item to click.
+     */
+    public static void _clickContextMenuItemWithCaption(@NotNull Component component, @NotNull String caption) {
+        ContextMenuKt._clickContextMenuItemWithCaption(component, caption);
+    }
+
+    /**
+     * Opens the {@link com.vaadin.flow.component.contextmenu.ContextMenu} attached to given
+     * component, clicks the menu item with given ID, then closes the menu again.
+     * See {@link #_clickContextMenuItemWithCaption(Component, String)}.
+     */
+    public static void _clickContextMenuItemWithID(@NotNull Component component, @NotNull String id) {
+        ContextMenuKt._clickContextMenuItemWithID(component, id);
+    }
+
+    /**
+     * Opens the {@link com.vaadin.flow.component.contextmenu.ContextMenu} attached to given
+     * component, clicks the menu item with given icon, then closes the menu again.
+     * See {@link #_clickContextMenuItemWithCaption(Component, String)}.
+     */
+    public static void _clickContextMenuItemWithIcon(@NotNull Component component, @NotNull IconName icon) {
+        ContextMenuKt._clickContextMenuItemWithIcon(component, icon);
+    }
+
+    /**
+     * Opens the {@link com.vaadin.flow.component.grid.contextmenu.GridContextMenu} attached to
+     * given grid (passing in the right-clicked item and column), clicks the menu item with given
+     * caption, then closes the menu again. Doesn't require a reference to the context menu.
+     * See <a href="https://github.com/mvysny/karibu-testing/issues/20">Issue 20</a>.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param caption the caption of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param column the column which was right-clicked, or null if unknown.
+     * @param <T> the type of items in the grid.
+     */
+    public static <T> void _clickContextMenuItemWithCaption(@NotNull Grid<T> grid, @NotNull String caption, @Nullable T item, @Nullable Grid.Column<T> column) {
+        ContextMenuKt._clickContextMenuItemWithCaption(grid, caption, item, column);
+    }
+
+    /**
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     */
+    public static <T> void _clickContextMenuItemWithCaption(@NotNull Grid<T> grid, @NotNull String caption, @Nullable T item) {
+        ContextMenuKt._clickContextMenuItemWithCaption(grid, caption, item, null);
+    }
+
+    /**
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     */
+    public static <T> void _clickContextMenuItemWithID(@NotNull Grid<T> grid, @NotNull String id, @Nullable T item, @Nullable Grid.Column<T> column) {
+        ContextMenuKt._clickContextMenuItemWithID(grid, id, item, column);
+    }
+
+    /**
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     */
+    public static <T> void _clickContextMenuItemWithID(@NotNull Grid<T> grid, @NotNull String id, @Nullable T item) {
+        ContextMenuKt._clickContextMenuItemWithID(grid, id, item, null);
+    }
+
+    /**
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     */
+    public static <T> void _clickContextMenuItemWithIcon(@NotNull Grid<T> grid, @NotNull IconName icon, @Nullable T item, @Nullable Grid.Column<T> column) {
+        ContextMenuKt._clickContextMenuItemWithIcon(grid, icon, item, column);
+    }
+
+    /**
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     */
+    public static <T> void _clickContextMenuItemWithIcon(@NotNull Grid<T> grid, @NotNull IconName icon, @Nullable T item) {
+        ContextMenuKt._clickContextMenuItemWithIcon(grid, icon, item, null);
     }
 }

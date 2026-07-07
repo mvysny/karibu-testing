@@ -9,6 +9,67 @@ Newest entries on top.
 
 ---
 
+## 2026-07-07 — Open/click a `ContextMenu` via its target component (issue #20)
+
+**Context.** [Issue #20](https://github.com/mvysny/karibu-testing/issues/20): tests could only
+interact with a `ContextMenu` if they held a reference to it; `_find(ContextMenu.class)` returned
+nothing. Root cause (verified against Vaadin 25.2.1 and 25.3.0-alpha3): a `ContextMenu` is **not in
+the server-side element tree** until it is *opened*. `OverlayAutoAddController` attaches the menu to
+the UI (`ui.addToModalComponent`) only on open and removes it on close; the `opened`-property path
+defers the add to `beforeClientResponse`, which is never flushed browserlessly. The target holds no
+reference back to the menu — the only link is `ContextMenu.getTarget()`. Vaadin exposes no reverse
+lookup (no `Component.getContextMenu()`, no registry), so this had to be solved on our side.
+
+**Two mechanisms were found (both reflection-free at the dispatch layer):**
+1. **Discovery** — the target's element retains a `vaadin-context-menu-before-open` DOM listener
+   (registered by `ContextMenuBase.setTarget`) whose bound method-ref captures the menu; it can be
+   recovered by reflection. Rejected here: it needs internal reflection *and* a discovered-but-unopened
+   menu is **incompletely populated** (static `addItem` items are present, but dynamic content —
+   `GridContextMenu.setDynamicContentHandler`, or items added in open/before-open listeners — is not).
+2. **Faithful open** — firing the `vaadin-context-menu-before-open` DOM event on the target runs
+   Vaadin's real `beforeOpenHandler`, which calls `onBeforeOpenMenu()` (populates dynamic content)
+   **and** `overlayAutoAddController.add()` (synchronously attaches the menu). **Chosen.**
+
+Mechanism 1's neutral, side-effect-free accessor was instead proposed upstream to karibu-tools
+([karibu-tools#16](https://github.com/mvysny/karibu-tools/issues/16)); karibu-testing only ever wants
+to *drive* the menu, for which mechanism 2 is strictly better (fully-populated, tree-visible menu via
+Vaadin's own code path).
+
+**Decisions.**
+
+1. **New target-based API built on mechanism 2.** `Component._openContextMenu(): ContextMenu` and
+   `Grid._openContextMenu(item, column): GridContextMenu` fire the before-open event, then locate the
+   now-attached menu by `getTarget() === this` (searched from `currentUI`, since the menu attaches as
+   a UI sibling — *not* under the target; using the `Component`-receiver `_find` was the first-cut bug).
+   `ContextMenuBase._close()` sets `opened=false` and fires the `closed` DOM event to detach.
+   Convenience `Component._clickContextMenuItemWith{Caption,ID,Icon}` (+ `Grid` overloads with
+   item/column) open → click → close in a `try/finally`.
+
+2. **Auto-close in the convenience API.** Matches what a user does: open, click, menu closes itself.
+   `_openContextMenu`/`_close` remain as the low-level pair for inspection/assertions.
+
+3. **No menu → throw; multiple menus → throw (unsupported).** A component with no context menu (or one
+   whose dynamic handler vetoes opening) fails clearly; multiple menus on one target is explicitly
+   unsupported rather than guessing.
+
+4. **Disabled targets still open (parity with the reference-based API).** The before-open listener is
+   `ONLY_WHEN_ENABLED`, so `ElementListenerMap.fireEvent` drops it on a disabled element. Since the
+   existing `_clickItemMatching`/`checkMenuItemEnabled` deliberately does *not* gate a ContextMenu on
+   its target's enabled state, `fireContextMenuBeforeOpen` presents an enabled `event.source` (the UI
+   element) when the target is disabled — the handler only reads `event.detail`, never the source.
+   Invisible targets still fail, enforced by the existing item-visibility checks.
+
+**Consequences.** `_find<ContextMenu>()` now works *while the menu is open* (it's a real UI child then),
+and pretty-tree shows it. The reflection into Vaadin internals is avoided entirely; the only Vaadin
+contract relied upon is the public `vaadin-context-menu-before-open` / `closed` DOM events and
+`getTarget()`. Java parity via `LocatorJ._clickContextMenuItemWith*`.
+
+**Where it lives.** `ContextMenu.kt`: `_openContextMenu`, `Grid._openContextMenu`, `_close`,
+`_clickContextMenuItemWith{Caption,ID,Icon}` (+ grid), private `fireContextMenuBeforeOpen`;
+`LocatorJ`; tests in `ContextMenuTest.AbstractContextMenuTests."open via target component"`.
+
+---
+
 ## 2026-07-06 — Multiple browser tabs in one session: `MockBrowser`
 
 **Context.** `MockVaadin.setup()` created exactly one `UI` (`createUI` was `internal`), so there was

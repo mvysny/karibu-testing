@@ -1104,10 +1104,28 @@ public fun <T> Grid<T>._fireColumnResizedEvent(column: Grid.Column<T>, newWidth:
     _fireEvent(ColumnResizeEvent(this, true, id))
 }
 
-private val __Grid_itemDetailsDataGenerator: Field by lazy {
-    val f = Grid::class.java.getDeclaredField("itemDetailsDataGenerator")
-    f.isAccessible = true
-    f
+// Vaadin < 25.3 keeps the item-details DataGenerator as a top-level Grid field;
+// 25.3 moved it into Grid.detailsManager.rendererDataGenerator. Probe both so one
+// build spans versions. Absent field -> null (that version uses the other layout).
+private val __Grid_itemDetailsDataGenerator: Field? by lazy {
+    runCatching { Grid::class.java.getDeclaredField("itemDetailsDataGenerator").apply { isAccessible = true } }.getOrNull()
+}
+private val __Grid_detailsManager: Field by lazy {
+    Grid::class.java.getDeclaredField("detailsManager").apply { isAccessible = true }
+}
+private val __DetailsManager_rendererDataGenerator: Field by lazy {
+    Class.forName("com.vaadin.flow.component.grid.Grid\$DetailsManager")
+        .getDeclaredField("rendererDataGenerator").apply { isAccessible = true }
+}
+
+/**
+ * The [DataGenerator] backing [Grid.setItemDetailsRenderer], or null if no item-details renderer was set.
+ */
+@Suppress("UNCHECKED_CAST")
+private fun <T> Grid<T>._itemDetailsDataGenerator(): DataGenerator<T>? {
+    __Grid_itemDetailsDataGenerator?.let { return it.get(this) as DataGenerator<T>? }
+    val detailsManager = __Grid_detailsManager.get(this)
+    return __DetailsManager_rendererDataGenerator.get(detailsManager) as DataGenerator<T>?
 }
 private val __CompositeDataGenerator_dataGenerators: Field by lazy {
     val f = CompositeDataGenerator::class.java.getDeclaredField("dataGenerators")
@@ -1144,8 +1162,7 @@ internal fun <T> DataGenerator<T>._findComponentDataGenerator(): AbstractCompone
  * @return the Component created by the Item Details Renderer.
  */
 public fun <T> Grid<T>._getItemDetailsComponent(item: T): Component {
-    @Suppress("UNCHECKED_CAST")
-    val dataGenerator: DataGenerator<T>? = __Grid_itemDetailsDataGenerator.get(this) as DataGenerator<T>?
+    val dataGenerator: DataGenerator<T>? = _itemDetailsDataGenerator()
     check(dataGenerator != null) {
         "${this.toPrettyString()}: the Item Details Renderer was not set"
     }

@@ -108,8 +108,12 @@ public object MockBrowser {
      * Closes the tab identified by [windowName].
      *
      * By default ([beaconLost] `= false`) this models the normal case: the browser's unload beacon is
-     * delivered, so the tab's [UI] is closed, detached and removed from the session immediately -
-     * exactly as an F5 reload closes the old UI.
+     * delivered - through the app's real `ServerRpcHandler`, so a custom handler sees it - and Flow
+     * decides the tab's fate. A normal tab's [UI] is closed, detached and removed from the session
+     * immediately, exactly as an F5 reload closes the old UI. A
+     * [com.vaadin.flow.router.PreserveOnRefresh] tab, whose beacon Flow **ignores**, is instead left
+     * lingering (like a real browser leaves it for the heartbeat cleanup) and reaped by a later
+     * [MockVaadin.reapInactiveUIs].
      *
      * With [beaconLost] `= true` it models a **lost** unload beacon (the tab closed but the server
      * never learned): the UI is *not* removed but left lingering, flagged so a later

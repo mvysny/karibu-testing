@@ -27,6 +27,7 @@ Handoff when an idea ships: delete its `ideas/` file, record the rationale as a 
 - `./gradlew :karibu-testing-v24:testrun-stable-webapp:test --tests "AllTests.flow-build-info-json exists"` — run a single test.
 - JDK 21 is the minimum (enforced in `build.gradle.kts`). CI matrix covers JDK 21 and 25 on Linux/macOS/Windows.
 - Dependency versions (Vaadin, Kotlin, JUnit, kaributools, etc.) live in `gradle/libs.versions.toml` — edit there, not in individual `build.gradle.kts` files.
+- **Supported Vaadin version.** Karibu-Testing **2.6.0+ (the current line, incl. the `2.7.x-SNAPSHOT` we ship) supports Vaadin 25+ *only*.** Vaadin 24 is supported only up to KT 2.4.x; 2.5.x is a do-not-use dead end. Full KT-version → Vaadin-version table: the compatibility chart at the top of `karibu-testing-v10/README.md` — treat it as the source of truth over any Vaadin-24 references that survive elsewhere.
 
 ## Release process
 
@@ -56,7 +57,7 @@ Tests for the library itself do **not** live next to the code they test. Instead
 
 Consequence: when you add a new test, put it in `karibu-testing-v10:tests` (or `karibu-testing-v23:tests` if it needs Vaadin 23+ APIs), and it will automatically run in every environment. When debugging an environment-specific failure, run the specific `testrun-*` module.
 
-**Caveat — mind which Vaadin version you're reasoning about vs. testing against.** The library *compiles* against `libs.vaadin.stable.all` (one pinned version, currently 25.x), but the tests *run* against several different Vaadin versions (24 LTS and `vaadin_next`), and Vaadin's own class hierarchies shift between them. For example, `TextRenderer` and `ComponentRenderer` **extend `LitRenderer` in Vaadin 24** but **not** in Vaadin 25. So when you inspect a Vaadin jar / `javap` / source to predict behavior, confirm it's the *same* version the failing test actually runs with — a 25.x jar will mislead you about a Vaadin-24 test run, and vice versa.
+**Caveat — mind which Vaadin version you're reasoning about vs. testing against.** The library *compiles* against `libs.vaadin.stable.all` (one pinned version, `vaadin` in `libs.versions.toml`, currently 25.2.x), but the tests *run* against two different Vaadin versions: the same `stable` and the newer prerelease `vaadin_next` (currently a 25.3 alpha). Vaadin's own class hierarchies and internals shift between them (e.g. an internal method extracted or a class's supertype changed between 25.2 and 25.3). So when you inspect a Vaadin jar / `javap` / source to predict behavior, confirm it's the *same* version the failing test actually runs with — a `stable` jar can mislead you about a `next` test run, and vice versa. (Both are Vaadin 25+; KT no longer runs against Vaadin 24 — see the compatibility chart in `karibu-testing-v10/README.md`.)
 
 ## API conventions
 
@@ -67,6 +68,6 @@ Consequence: when you add a new test, put it in `karibu-testing-v10:tests` (or `
 
 ## Dependency notes
 
-- v10 and v23 use `compileOnly(libs.vaadin.v24.all)` — the library does **not** pull Vaadin transitively; the consuming app picks its Vaadin version. Preserve this pattern when adding dependencies.
+- v10 and v23 use `compileOnly(libs.vaadin.stable.all)` — the library does **not** pull Vaadin transitively; the consuming app picks its Vaadin version. Preserve this pattern when adding dependencies.
 - `fake-servlet5` (separate library by the same author) provides the `jakarta.servlet` fakes — we don't roll our own.
 - `kaributools` / `kaributools23` (separate libraries) provide general Vaadin utilities (e.g. `VaadinVersion`) that Karibu-Testing builds on.

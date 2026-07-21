@@ -9,6 +9,80 @@ Newest entries on top.
 
 ---
 
+## 2026-07-21 — Deliver the F5/tab-close unload beacon through Flow's *real* `ServerRpcHandler`
+
+**Context.** [#210](https://github.com/mvysny/karibu-testing/issues/210): the F5/beacon design below
+(2026-07-06) *reimplemented* the browser unload beacon in Kotlin — Karibu decided "close the old UI"
+itself and mirrored `ServerRpcHandler.isPreserveOnRefreshTarget`. Two costs: (a) a custom
+`ServerRpcHandler` (e.g. a tab-scope add-on hooking `handleUnloadBeaconRequest`) was **invisible** to
+Karibu tests — the beacon never reached it; (b) `MockBrowser.closeTab` force-detached a
+`@PreserveOnRefresh` UI, whereas real Flow *ignores* the beacon for such a UI and leaves it lingering
+until the heartbeat reap. The proposal: route beacon simulation through the app's actual handler.
+
+**What real Flow does (traced against flow-server 25.2.4 & 25.3.0-alpha3).** A closing tab POSTs an
+unload beacon; `UidlRequestHandler.getRpcHandler().handleRpc(ui, body, request)` runs it. Beacon
+detection is just `json.has(ApplicationConstants.UNLOAD_BEACON)` (`"UNLOAD"`); the marker makes
+`RpcRequest` skip the sync-id and client-id checks. `handleUnloadBeaconRequest` (extracted into a
+`protected` method in 25.2; inline in `handleRpc` before that) closes a normal UI but **ignores the
+beacon for a `@PreserveOnRefresh` target**. The app customizes the handler by overriding
+`UidlRequestHandler.createRpcHandler()` (installed via `VaadinService.createRequestHandlers()`).
+
+**Decisions.**
+
+1. **Route through the *public* `handleRpc(UI, String, VaadinRequest)`, not the protected
+   `handleUnloadBeaconRequest`.** `deliverUnloadBeacon(ui)` builds a minimal beacon **string** —
+   `{"csrfToken":<ui token>,"rpcInvocations":[],"UNLOAD":0}` — and lets Flow parse it. Consequences:
+   Karibu never touches Flow's version-specific internal JSON types (it only produces a String); the
+   empty `rpcInvocations` keeps `handleInvocations()` a no-op (a `null` array NPEs — it is
+   dereferenced immediately); the CSRF token matches the UI's so `isCsrfTokenValid` passes whatever
+   the XSRF config; and it works on every supported version (public `handleRpc` is ancient), unlike
+   `handleUnloadBeaconRequest` which is 25.2+.
+
+2. **Reach the app's *custom* handler via `UidlRequestHandler.createRpcHandler()`, reflectively.**
+   `deliverUnloadBeacon` pulls the `UidlRequestHandler` from `service.getRequestHandlers()` and
+   invokes its `protected createRpcHandler()` by reflection (one reflective call; consistent with
+   Karibu's existing reflection style). This is what makes a custom `ServerRpcHandler` observable —
+   the whole point of the issue. Rejected: the fully-public `synchronizedHandleRequest(session,
+   request, response, body)` — it re-derives the UI from a `v-uiId` request param and then
+   `writeUidl()`s a response, both pointless (and fragile) noise for a close simulation.
+
+3. **Split close (Flow's) from finalize (Karibu's).** `handleRpc` only sets `UI.isClosing`; Flow's
+   end-of-request `removeClosedUIs()` does the detach + `session.removeUI`. Karibu mirrors that split:
+   `deliverUnloadBeacon` sets `isClosing` (or not, for preserve), then `finalizeClosedUI(ui)` removes
+   it **iff** `isClosing`. The `EAGER`/`LATE`/`NEVER` knob is now *when Karibu delivers the beacon and
+   finalizes* relative to new-UI creation — not *what the beacon does*. `NEVER` = don't deliver.
+
+4. **`closeTab` lets Flow decide the tab's fate.** Beacon delivered → normal UI removed immediately;
+   `@PreserveOnRefresh` UI (beacon ignored → `isClosing` stays false) is flagged
+   `UNLOAD_BEACON_LOST_KEY` and left lingering for `reapInactiveUIs`, exactly as a real browser leaves
+   it for the heartbeat. **Behavioral change** vs. the prior force-detach.
+
+5. **Kept `isPreserveOnRefreshTarget` (did *not* fully delete the mirror).** For a preserve target the
+   close is *navigation-driven* (the new UI's `disconnectElements()` teleports overlays off the old UI
+   and closes it), not beacon-driven — the beacon is a no-op there. So the reload path still needs
+   preserve-awareness to order new-UI-creation vs. beacon delivery (enforced by
+   `@PreserveOnRefresh ignores {EAGER,LATE,NEVER} timing` tests). The "mirror" is a 3-line annotation
+   read on the public `activeRouterTargetsChain`, negligible drift risk. Partial win #3; accepted.
+
+**Consequences / limitations.** A custom `ServerRpcHandler` now sees the beacon (new tests:
+`unload beacon reaches a custom ServerRpcHandler (issue 210)`), and closing a `@PreserveOnRefresh`
+tab now lingers-then-reaps instead of detaching (new test in `MockBrowserTest`). `createRpcHandler()`
+is invoked per delivery, yielding a fresh handler instance each time (Flow caches one via
+`getRpcHandler()`); fine for the stateless norm, revisit if a stateful custom handler needs it. The
+`closeTab`-preserve behavioral change may warrant a major-version note in the changelog.
+
+**Supersedes** decision #1 ("Reorder rather than re-implement") of the 2026-07-06 F5/beacon entry
+below *for the non-preserve path*: the old UI is no longer closed by Karibu directly but by Flow's
+real handler. The preserve path (nav-driven teleport + close) is unchanged.
+
+**Where it lives.** `MockVaadin.deliverUnloadBeacon()` / `obtainServerRpcHandler()` /
+`finalizeClosedUI()` / `reloadCurrentUI()` / `discardUI()`; `MockBrowser.closeTab` KDoc. Tests:
+`MockVaadinTest` (`unload beacon reaches a custom ServerRpcHandler (issue 210)`, plus the unchanged
+`unload beacon timing on F5` matrix) and `MockBrowserTest` (`closing a @PreserveOnRefresh tab leaves
+it lingering until reapInactiveUIs`).
+
+---
+
 ## 2026-07-07 — Rename stale `v24`/`kt10` build tokens to `stable`/`next` + `testrun-*`
 
 **Context.** The Gradle Vaadin-dependency aliases were named `vaadin-v24-*` / `vaadin-v24next-*`

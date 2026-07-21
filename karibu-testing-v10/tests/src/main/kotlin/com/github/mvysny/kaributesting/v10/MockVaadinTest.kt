@@ -24,6 +24,9 @@ import com.vaadin.flow.function.DeploymentConfiguration
 import com.vaadin.flow.router.*
 import com.vaadin.flow.server.*
 import com.vaadin.flow.server.auth.AnonymousAllowed
+import com.vaadin.flow.server.communication.ServerRpcHandler
+import com.vaadin.flow.server.communication.UidlRequestHandler
+import com.vaadin.flow.shared.ApplicationConstants
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -652,6 +655,59 @@ abstract class AbstractMockVaadinTests() {
         @Test fun `@PreserveOnRefresh ignores NEVER timing`() {
             KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.NEVER
             verifyPreserveUnaffectedByTiming()
+        }
+    }
+
+    // issue #210: Karibu delivers the unload beacon through the app's *real* (possibly customized)
+    // ServerRpcHandler, so a tab-scope add-on that hooks handleUnloadBeaconRequest is exercised by
+    // Karibu tests - instead of Karibu reimplementing the close and leaving the custom handler blind.
+    @Nested inner class `unload beacon reaches a custom ServerRpcHandler (issue 210)` {
+        /** Counts how many unload beacons the app's own ServerRpcHandler observes. */
+        private var beaconsSeen = 0
+
+        /**
+         * Re-runs [MockVaadin.setup] with a custom [UidlRequestHandler] whose [ServerRpcHandler]
+         * counts the unload beacons it is handed - the way a tab-scope add-on would hook them.
+         */
+        private fun setupWithCountingRpcHandler() {
+            MockVaadin.tearDown()
+            beaconsSeen = 0
+            val countingHandler = object : ServerRpcHandler() {
+                override fun handleUnloadBeaconRequest(ui: UI, rpcRequest: RpcRequest) {
+                    if (rpcRequest.rawJson.has(ApplicationConstants.UNLOAD_BEACON)) beaconsSeen++
+                    super.handleUnloadBeaconRequest(ui, rpcRequest)
+                }
+            }
+            MockVaadin.setup(servlet = object : MockVaadinServlet(routes) {
+                override fun createServletService(deploymentConfiguration: DeploymentConfiguration): VaadinServletService {
+                    val service = object : MockService(this, deploymentConfiguration) {
+                        override fun createRequestHandlers(): MutableList<RequestHandler> {
+                            val handlers = super.createRequestHandlers()
+                            val i = handlers.indexOfFirst { it is UidlRequestHandler }
+                            handlers[i] = object : UidlRequestHandler() {
+                                override fun createRpcHandler(): ServerRpcHandler = countingHandler
+                            }
+                            return handlers
+                        }
+                    }
+                    service.init()
+                    return service
+                }
+            })
+        }
+
+        @Test fun `F5 reload of a plain view delivers the beacon to the custom handler`() {
+            setupWithCountingRpcHandler()   // the default WelcomeView is a plain, non-@PreserveOnRefresh view
+            UI.getCurrent().page.reload()
+            expect(1) { beaconsSeen }
+        }
+
+        @Test fun `closing a tab delivers the beacon to the custom handler`() {
+            setupWithCountingRpcHandler()
+            MockBrowser.newTab("tab-B")
+            MockBrowser.switchTo(MockBrowser.tabs.first { it != "tab-B" })
+            MockBrowser.closeTab("tab-B")
+            expect(1) { beaconsSeen }
         }
     }
 

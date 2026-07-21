@@ -150,6 +150,24 @@ abstract class AbstractMockBrowserTests {
             expect(false) { session.uIs.contains(tab) }
         }
 
+        // issue #210: Flow ignores the unload beacon for a @PreserveOnRefresh target, so closing such
+        // a tab must leave its UI lingering (as a real browser does, until the heartbeat reap) rather
+        // than detach it immediately - the fidelity gap the real-handler beacon delivery fixes.
+        @Test fun `closing a @PreserveOnRefresh tab leaves it lingering until reapInactiveUIs`() {
+            val tab = MockBrowser.newTab("tab-B", "preserveonrefresh")
+            MockBrowser.switchTo(MockBrowser.tabs.first { it != "tab-B" })
+
+            MockBrowser.closeTab("tab-B")
+            // Flow ignored the beacon: the tab's UI is still there, not closed.
+            expect(true) { session.uIs.contains(tab) }
+            expect(false) { tab.isClosing }
+
+            MockVaadin.reapInactiveUIs()
+            // the heartbeat reap eventually closes and removes it.
+            expect(true) { tab.isClosing }
+            expect(false) { session.uIs.contains(tab) }
+        }
+
         @Test fun `the current tab cannot be closed (beacon delivered)`() {
             expectThrows<IllegalArgumentException>("Cannot close the currently focused tab") {
                 MockBrowser.closeTab(MockBrowser.currentWindowName)

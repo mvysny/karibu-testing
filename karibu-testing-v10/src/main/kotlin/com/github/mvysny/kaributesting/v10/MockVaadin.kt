@@ -17,6 +17,9 @@ import com.vaadin.flow.router.Location
 import com.vaadin.flow.router.NavigationTrigger
 import com.vaadin.flow.router.PreserveOnRefresh
 import com.vaadin.flow.server.*
+import com.vaadin.flow.server.communication.ServerRpcHandler
+import com.vaadin.flow.server.communication.UidlRequestHandler
+import com.vaadin.flow.shared.ApplicationConstants
 import com.vaadin.flow.shared.communication.PushMode
 import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
@@ -167,11 +170,13 @@ public object MockVaadin {
      * has no effect.
      *
      * **Non-[com.vaadin.flow.router.PreserveOnRefresh] target.** Flow does not go through
-     * `disconnectElements()`; the browser's unload beacon closes the old UI instead. Its timing
-     * relative to the creation of the new UI is best-effort in a real browser, so it is configurable
-     * via [KaribuConfig.unloadBeaconTiming] ([UnloadBeaconTiming.EAGER] by default). Either way the
-     * old UI ends up closed (via [UI.close]), detached and removed from the session - matching Flow's
-     * `ui.close()` + end-of-request `removeClosedUIs()`.
+     * `disconnectElements()`; the browser's unload beacon closes the old UI instead. Karibu delivers
+     * that beacon through the app's real [ServerRpcHandler] (see [deliverUnloadBeacon]) rather than
+     * reimplementing the close, so a custom handler is exercised and the close decision stays Flow's.
+     * The beacon's timing relative to the creation of the new UI is best-effort in a real browser, so
+     * it is configurable via [KaribuConfig.unloadBeaconTiming] ([UnloadBeaconTiming.EAGER] by
+     * default). Either way the old UI ends up closed (via [UI.close]), detached and removed from the
+     * session - matching Flow's `ui.close()` + end-of-request `removeClosedUIs()`.
      */
     internal fun reloadCurrentUI(uiFactory: () -> UI, session: VaadinSession, newWindowName: String? = null) {
         val oldUI: UI = checkNotNull(UI.getCurrent()) { "No current UI to reload" }
@@ -187,27 +192,102 @@ public object MockVaadin {
         // nor any other open browser tab.
         if (isPreserveOnRefreshTarget(oldUI)) {
             // Keep the old UI alive & registered so the new UI's navigation can teleport overlays
-            // off it and close it (see kdoc). Then discard the old UI.
+            // off it and close it (see kdoc). Then discard the old UI. Flow ignores the unload beacon
+            // for a @PreserveOnRefresh target, so we do not deliver one here.
             createUI(uiFactory, session, windowName = windowName)
             discardOldUI(oldUI)
         } else when (KaribuConfig.unloadBeaconTiming) {
             UnloadBeaconTiming.EAGER -> {
-                // Beacon before the new UI exists: close+detach+remove the old UI, then create the new.
-                discardOldUI(oldUI)
+                // Beacon before the new UI exists: deliver it (Flow closes the old UI), finalize the
+                // close (detach+remove), then create the new UI.
+                deliverUnloadBeacon(oldUI)
+                finalizeClosedUI(oldUI)
                 createUI(uiFactory, session, windowName = windowName)
             }
             UnloadBeaconTiming.LATE -> {
-                // Beacon after the new UI is created: both are briefly live, then the old UI is
-                // closed+detached+removed.
+                // Beacon after the new UI is created: deliver it (Flow closes the old UI), create the
+                // new UI (both briefly live), then finalize the old UI's close.
+                deliverUnloadBeacon(oldUI)
                 createUI(uiFactory, session, windowName = windowName)
-                discardOldUI(oldUI)
+                finalizeClosedUI(oldUI)
             }
             UnloadBeaconTiming.NEVER -> {
-                // Beacon lost: leave the old UI alive alongside the new one. Flag it so
-                // reapInactiveUIs() can later close it the way Flow's heartbeat/idle-UI cleanup would.
+                // Beacon lost: never delivered, so the old UI lingers alive alongside the new one.
+                // Flag it so reapInactiveUIs() can later close it the way Flow's heartbeat/idle-UI
+                // cleanup would.
                 ComponentUtil.setData(oldUI, UNLOAD_BEACON_LOST_KEY, true)
                 createUI(uiFactory, session, windowName = windowName)
             }
+        }
+    }
+
+    /**
+     * Delivers a browser unload beacon (`navigator.sendBeacon`, a POST with `UNLOAD=…`) to [ui]
+     * through the app's *real* - and possibly customized -
+     * [com.vaadin.flow.server.communication.ServerRpcHandler], i.e. the exact server code path a
+     * closing browser tab hits. This is what lets a custom `ServerRpcHandler` (e.g. a tab-scope
+     * add-on that hooks `handleUnloadBeaconRequest`) observe the beacon in a Karibu test, and it
+     * delegates the "should the UI close?" decision to Flow itself: Flow closes a normal UI
+     * ([UI.isClosing] becomes `true`) but deliberately **ignores** the beacon for a
+     * [PreserveOnRefresh] target, leaving that UI alive.
+     *
+     * Only [UI.close] (setting [UI.isClosing]) happens here; the subsequent detach +
+     * [VaadinSession.removeUI] - Flow's end-of-request `removeClosedUIs()` - is done separately by
+     * [finalizeClosedUI], so the caller controls its timing relative to the new UI's creation.
+     *
+     * The beacon is a JSON **string** we hand to the stable, public
+     * `ServerRpcHandler.handleRpc(UI, String, VaadinRequest)`, so Karibu never touches Flow's
+     * version-specific internal JSON types - Flow parses it. The message is minimal: the
+     * [ApplicationConstants.UNLOAD_BEACON] marker makes `ServerRpcHandler` skip the sync-id and
+     * client-id checks, the empty [ApplicationConstants.RPC_INVOCATIONS] array keeps
+     * `handleInvocations()` a no-op, and the CSRF token matches [ui]'s so it passes
+     * [VaadinService.isCsrfTokenValid] whatever the XSRF config.
+     */
+    private fun deliverUnloadBeacon(ui: UI) {
+        val request: VaadinRequest = checkNotNull(VaadinRequest.getCurrent()) {
+            "No current VaadinRequest - was MockVaadin.setup() called?"
+        }
+        val handler: ServerRpcHandler = obtainServerRpcHandler(ui.session.service)
+        val message = """{"${ApplicationConstants.CSRF_TOKEN}":"${ui.csrfToken}",""" +
+                """"${ApplicationConstants.RPC_INVOCATIONS}":[],""" +
+                """"${ApplicationConstants.UNLOAD_BEACON}":0}"""
+        // handleRpc / UI.close() operate on the given UI; make it current for the duration (it may be
+        // a background tab in closeTab), then restore.
+        val previous: UI? = UI.getCurrent()
+        UI.setCurrent(ui)
+        try {
+            handler.handleRpc(ui, message, request)
+        } finally {
+            UI.setCurrent(if (previous === ui) null else previous)
+        }
+    }
+
+    /**
+     * Returns the app's [ServerRpcHandler] the way Flow does: from the [UidlRequestHandler] installed
+     * in the service's request-handler chain. `UidlRequestHandler.createRpcHandler()` is `protected`,
+     * so it is invoked reflectively - which honors a custom `UidlRequestHandler` that overrides it to
+     * install a custom `ServerRpcHandler` (the whole point of routing the beacon through the real
+     * handler; karibu-testing issue #210).
+     */
+    private fun obtainServerRpcHandler(service: VaadinService): ServerRpcHandler {
+        val uidlHandler: UidlRequestHandler = service.requestHandlers
+            .filterIsInstance<UidlRequestHandler>()
+            .firstOrNull()
+            ?: throw IllegalStateException("No UidlRequestHandler in $service's request handlers - cannot deliver an unload beacon")
+        val createRpcHandler = UidlRequestHandler::class.java.getDeclaredMethod("createRpcHandler")
+        createRpcHandler.isAccessible = true
+        return createRpcHandler.invoke(uidlHandler) as ServerRpcHandler
+    }
+
+    /**
+     * Flow's end-of-request `removeClosedUIs()`: if [ui] was closed by a delivered beacon
+     * ([UI.isClosing]), detach it and remove it from the session (see [discardOldUI]). A no-op if the
+     * UI is still alive - e.g. the beacon was ignored for a [PreserveOnRefresh] target - or already
+     * removed.
+     */
+    private fun finalizeClosedUI(ui: UI) {
+        if (ui.isClosing && ui.session != null) {
+            discardOldUI(ui)
         }
     }
 
@@ -478,11 +558,21 @@ public object MockVaadin {
     }
 
     /**
-     * Closes, detaches and removes [ui] from its session - see [discardOldUI]. Exposed for
-     * [MockBrowser.closeTab] (beacon delivered).
+     * Models a browser tab closing with its unload beacon **delivered**: routes the beacon through
+     * the app's real [ServerRpcHandler] (see [deliverUnloadBeacon]) and lets Flow decide the tab's
+     * fate. A normal UI is closed, detached and removed immediately; a [PreserveOnRefresh] UI - whose
+     * beacon Flow ignores - is instead left lingering and flagged for [reapInactiveUIs], exactly as a
+     * real browser leaves it for the heartbeat/idle-UI cleanup. Exposed for [MockBrowser.closeTab].
      */
     internal fun discardUI(ui: UI) {
-        discardOldUI(ui)
+        deliverUnloadBeacon(ui)
+        if (ui.isClosing) {
+            finalizeClosedUI(ui)
+        } else {
+            // Flow ignored the beacon (@PreserveOnRefresh): the tab's UI lingers until the heartbeat
+            // reap, which reapInactiveUIs() emulates.
+            markUnloadBeaconLost(ui)
+        }
     }
 
     /**

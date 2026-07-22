@@ -3,6 +3,7 @@ package com.github.mvysny.kaributesting.v10
 import com.github.mvysny.kaributools.label
 import com.github.mvysny.kaributools.walk
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.ComponentUtil
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
@@ -200,9 +201,19 @@ public open class TestingLifecycleHookVaadin14Default : TestingLifecycleHook {
             // To maintain backwards compatibility with Karibu tests, pretend there is no Text node
             component.children.toList().filterNot { it is Text }
         }
-        // Also include virtual children.
+        // Union of three enumerators, deduped by component identity - no single one
+        // sees every child, because different components hide their children differently:
+        // * component.children (getChildren()) - the components a well-behaved component
+        //   reports, plus items that components like ContextMenu expose only via an
+        //   overridden getChildren() reaching into their internal structure.
+        // * ComponentUtil.getAllChildren() - walks the element tree directly (regular +
+        //   virtual children), so it sees through components that override getChildren()
+        //   to HIDE children: since Vaadin 25.3 Dialog filters the slotted header/footer
+        //   wrapper elements out of getChildren(), only this enumerator finds them.
+        // * _getVirtualChildren() - virtual children including shadow-root ones, which
+        //   getAllChildren() skips (ContextMenu holds its menu items there).
         // Issue: https://github.com/mvysny/karibu-testing/issues/85
-        else -> (component.children.toList() + component._getVirtualChildren()).distinct()
+        else -> (component.children.toList() + ComponentUtil.getAllChildren(component).toList() + component._getVirtualChildren()).distinct()
     }
 
     override fun getLabel(component: Component): String? = when (component) {

@@ -714,6 +714,35 @@ public static void configureKaribu() {
 `LitElement`-based components are supported. After all, from the server-side perspective
 they're just `Component`s since there's no `LitElement` server class.
 
+#### Where template sources are loaded from
+
+There is no Vite dev server and no frontend bundle in a Karibu test, so Karibu loads the
+template sources itself, from the value of the `@JsModule` annotation. For a `./`-prefixed
+URL such as `@JsModule("./src/my-form.ts")`, the following locations are searched, in order:
+
+1. Any `CustomNpmTemplateLoader` registered in `MockNpmTemplateParser.customLoaders`;
+2. the `frontend/` folder, relative to the current working directory;
+3. the `src/main/frontend/` folder;
+4. `META-INF/frontend/` on the classpath - where a jar add-on should ship its frontend files
+   according to the [Vaadin 25 docs](https://vaadin.com/docs/latest/flow/advanced/loading-resources)
+   (that is, `src/main/resources/META-INF/frontend/`). Supported since Karibu-Testing 2.7.3;
+5. `META-INF/resources/frontend/` on the classpath - the location recommended by the
+   [Vaadin 24 docs](https://vaadin.com/docs/24/flow/advanced/loading-resources), deprecated
+   in Vaadin 25 but still supported both by Vaadin and by Karibu.
+
+A bare npm specifier such as `@JsModule("@appreciated/color-picker-field/src/color-picker-field.js")`
+is loaded from the `node_modules/` folder instead, which means you need to run
+`mvn vaadin:build-frontend` (or `npm install`) before the tests.
+
+If none of the above works for your project layout, register your own loader:
+
+```kotlin
+MockNpmTemplateParser.customLoaders.add(object : CustomNpmTemplateLoader {
+    override fun getSourcesFromTemplate(tag: String, url: String): String? =
+        if (url == "./src/my-form.ts") File("some/other/place/my-form.ts").readText() else null
+})
+```
+
 ### PreserveOnRefresh
 
 The `@PreserveOnRefresh` annotation is supported since Karibu 1.3.17, see [Issue #118](https://github.com/mvysny/karibu-testing/issues/118)

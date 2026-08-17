@@ -45,7 +45,7 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
     }
 
     @Test fun `proper error message on unloadable template`() {
-        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Please:") {
+        expectThrows(RuntimeException::class, "Can't load template sources for <non-existent3> ./non-existent.js. Searched in:") {
             // mockGetSourcesFromTemplate() should fail with an informative error message; stacktrace:
 //            at com.github.mvysny.kaributesting.v10.mock.MockNpmTemplateParser$Companion.mockGetSourcesFromTemplate(MockNpmTemplateParser.kt:78)
 //            at com.github.mvysny.kaributesting.v10.mock.MockLitTemplateParserImpl.getSourcesFromTemplate(MockInstantiator.kt:75)
@@ -53,7 +53,9 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
 //            at com.vaadin.flow.component.littemplate.LitTemplateDataAnalyzer.parseTemplate(LitTemplateDataAnalyzer.java:75)
             LitUnloadableTemplate()
         }
-        expectThrows(RuntimeException::class, "load template sources for <non-existent4> @foo/non-existent.js. Please") {
+        // node_modules/ is only present in the webapp test runs; in the module test runs
+        // the parser fails earlier, with the "node_modules/ folder doesn't exist" message.
+        expectThrows(RuntimeException::class, "load template sources for <non-existent4> @foo/non-existent.js") {
             LitUnloadableTemplate2()
         }
     }
@@ -61,6 +63,16 @@ abstract class AbstractLitTemplateTests(val isModuleTest: Boolean) {
     @Test fun form() {
         UI.getCurrent().add(MyForm())
         UI.getCurrent().add(MyForm3())
+    }
+
+    /**
+     * Tests that templates are loaded from `META-INF/frontend/` on the classpath - the location
+     * Vaadin 25 tells jar add-ons to use. The Vaadin 24 location, `META-INF/resources/frontend/`,
+     * is covered by [form] in the "module" test runs. See
+     * [Issue 213](https://github.com/mvysny/karibu-testing/issues/213).
+     */
+    @Test fun `loading from classpath META-INF-frontend`() {
+        UI.getCurrent().add(MyForm4())
     }
 
     @Nested inner class includeVirtualChildrenInTemplates() {
@@ -166,6 +178,23 @@ class MyForm3 : LitTemplate() {
         binder.forField(lastNameField).bind("lastName")
         binder.forField(emailField).bind("email")
     }
+}
+
+/**
+ * The template source is only present in `src/main/resources/META-INF/frontend/src/my-form4.ts`,
+ * therefore it can only be loaded from the classpath.
+ */
+@Tag("my-form4")
+@JsModule("./src/my-form4.ts")
+class MyForm4 : LitTemplate() {
+    @Id
+    lateinit var firstNameField: TextField
+
+    @Id
+    lateinit var lastNameField: TextField
+
+    @Id
+    lateinit var emailField: EmailField
 }
 
 @Tag("my-test-element2")

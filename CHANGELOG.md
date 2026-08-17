@@ -10,6 +10,11 @@ Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
 ### Fixed
 
 - Discover `Dialog` header/footer children on Vaadin 25.3.
+- Load `LitTemplate` sources from `META-INF/frontend/` on the classpath - the location Vaadin 25
+  tells jar add-ons to use (#213). The Vaadin 24 location, `META-INF/resources/frontend/`, keeps
+  working.
+- `MockNpmTemplateParser` now lists every location it searched when it fails to load a template,
+  instead of blaming `node_modules/` (which is only consulted for bare npm specifiers).
 
 ## [2.7.2] - 2026-07-21
 

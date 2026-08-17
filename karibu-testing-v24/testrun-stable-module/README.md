@@ -17,5 +17,9 @@ the npm mode.
 
 This project is internal to Karibu-Testing and is not published anywhere.
 
-The jar project is actually able to publish `frontend/` folder in
-`src/main/resources/META-INF/resources/frontend/`, so let's test that as well.
+The jar project is actually able to publish the `frontend/` folder from the classpath,
+so let's test that as well - both locations:
+
+* `src/main/resources/META-INF/frontend/` - what the Vaadin 25 docs tell add-ons to use;
+* `src/main/resources/META-INF/resources/frontend/` - the Vaadin 24 location, deprecated
+  in Vaadin 25 but still supported.

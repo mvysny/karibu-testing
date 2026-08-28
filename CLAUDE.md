@@ -15,9 +15,9 @@ Four homes, by audience and lifecycle. Put content where it belongs and don't du
 - **`README.md` (per-module, scattered)** — user-facing "book" prose: how to *use* the library. Kept current.
 - **Code KDoc/Javadoc** — the authoritative "how it works now" (mechanics). Lives with the code so it can't drift; the single source of truth for current behavior. Don't restate mechanics in standalone docs.
 - **`ideas/`** — forward-looking design notes, one markdown file per non-trivial idea, brainstormed before/alongside implementation. **Deleted once implemented** (ideas are forward-looking only).
-- **`DECISIONS.md`** — append-only, dated log of technical decisions and their *rationale* (the "why", alternatives rejected, evidence). Permanent; never edit an old entry — supersede it with a new one.
+- **`DECISIONS.md`** — the *why-we-chose* record: one entry per live decision, carrying the rationale, the **alternatives rejected** and the evidence. Entries are **mutable** — a refined or extended decision (or one reversed before it ever shipped) is edited in place; only a *released-then-reversed* design leaves a tombstone plus a fresh entry. Cite entries by slug (`D_mock_browser_tabs`), never by position or date; `grep '^## D_' DECISIONS.md` is the index, so there's no ToC. **No entry without a real fork** — nothing rejected means it's just how the thing works, and that's KDoc. Read the file's own preamble before adding one.
 
-Handoff when an idea ships: delete its `ideas/` file, record the rationale as a new `DECISIONS.md` entry, and ensure the mechanics are covered by code KDoc.
+Handoff when an idea ships: delete its `ideas/` file, record the rationale in `DECISIONS.md` (a new `D_` entry, or an edit to the existing one the work refines), and ensure the mechanics are covered by code KDoc.
 
 ## Build / test commands
 

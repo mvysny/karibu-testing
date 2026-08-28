@@ -1,7 +1,7 @@
 # Resetting KaribuConfig between tests
 
 Status: **parked** (idea only, not scheduled). Split out of the F5 reload / unload-beacon work
-(see the `2026-07-06` entry in [../DECISIONS.md](../DECISIONS.md)).
+(see `D_f5_beacon_timing` in [../DECISIONS.md](../DECISIONS.md)).
 
 Last brainstormed: 2026-07-06. This file records what we ruled out and *why*, so we don't
 re-tread it when this is picked up. Nothing below is implemented.

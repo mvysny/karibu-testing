@@ -1,82 +1,57 @@
 # Technical decisions
 
-Append-only, dated log of non-trivial technical decisions and their rationale — the "why", the
-alternatives rejected, and the evidence they rested on. **Never edit an old entry**; if a decision
-changes, add a new entry that supersedes it (and note the supersession in both). Mechanics of *how*
-things work today live in code KDoc, not here; user-facing usage lives in the `README.md` files.
+A living record of the design decisions behind Karibu-Testing — especially the *roads not taken*.
+It exists because the other three doc homes (see [`CLAUDE.md`](CLAUDE.md)) each refuse that one
+fact class on their own stated terms: a `README.md` is user-facing prose about how to *use* the
+library; KDoc is the authoritative "how it works now", read by someone standing at the API who
+gains nothing from an argument against a design that never shipped; and `ideas/` is
+forward-looking and is *deleted* once the idea ships.
 
-Newest entries on top.
+It is the *why-we-chose* record. It is not the *how-it-works* reference (KDoc), the *how-to-use*
+book (`README.md`), the *what-changed* list (`CHANGELOG.md`), or the not-yet-decided scratchpad
+(`ideas/`). An entry links out rather than restating.
 
----
+**Format.** One entry per decision. The ID is a slug, not a number and not a date: `D_` plus a
+1–4-word snake_case hint at the subject (`D_mock_browser_tabs`), so a citation carries meaning on
+its own and survives insertion and reordering. The `(date)` on the heading is *decided*
+provenance, not a log position — git owns the edit history, so don't narrate how an entry used to
+read. Keep each entry tight: context, the decision, the alternatives rejected and why, and the
+consequences a future contributor would trip over. A decision is worth logging the moment it's
+*made*; implementation can lag (the `Status:` line says which).
 
-## 2026-08-28 — The Java shape of the lazy TreeGrid walk is `Stream`, not `Iterable`
+**No entry without a real fork.** If nothing was seriously considered and rejected, it isn't a
+decision — it's how the thing works, and that's KDoc. This is the guard against a diary.
 
-**Supersedes** decision 2 of the entry below (same day, same issue, before either shipped in a
-release), and corrects the stated rationale of its decision 1.
+**Version-pin the evidence.** A claim about Flow's internals is only true of the versions it was
+traced against, and this project runs two (`stable` and `next` — see `CLAUDE.md`). Say which.
 
-**Context.** Pushback on [#214](https://github.com/mvysny/karibu-testing/issues/214) after
-`_rowIterable()` was committed but before 2.7.3 shipped, so nothing depended on it yet.
+**Newest first.** Entries run reverse-chronologically by decided date, so a scan hits recent
+decisions first.
 
-**Decisions.**
+**Never read wholesale.** `grep '^## D_' DECISIONS.md` is the index; there is no ToC. Cite an
+entry by slug — never by position ("the entry below") and never by date, both of which rot on the
+next edit. Grep tripwire: every `D_<slug>` referenced anywhere in the repo must exist as a
+`^## D_` heading here.
 
-1. **`TreeGrid._rowStream(filter): Stream<T>` replaces `_rowIterable(filter): Iterable<T>`.**
-   Three reasons, in increasing weight:
-   - The caveat stops being a caveat. `Sequence.asIterable()` delegates rather than buffering, so
-     the result is single-pass — precisely what `Iterable` promises not to be, hence the KDoc
-     warning we had to write. `Stream` is *specified* as single-consumption and throws
-     `IllegalStateException` on reuse: same semantics, enforced by the type instead of documented
-     around it.
-   - `_rowIterable`'s own recorded weakness disappears. Java's `Iterable` has no `toList()`, so a
-     caller either hand-rolled a loop into an `ArrayList` or reached for `StreamSupport`; the entry
-     below had to say out loud that the new function did not serve the reporter's eleven call
-     sites. `Stream` has `toList()`, `filter()`, `limit()` and short-circuiting, so the lazy walk,
-     the eager walk and the stop-early walk are one door.
-   - It costs no new surface: `Grid.kt` already imports `java.util.stream.Stream` and
-     `kotlin.streams.toList`, `asStream()` is the same stdlib package, and `jvmTarget` is 21
-     (`build.gradle.kts`), so `Stream.toList()` (Java 16+) is available to every caller.
-   Kotlin callers keep `_rowSequence()`; `_rowStream()` exists for Java. We do not ship both an
-   `Iterable` and a `Stream` twin — that would be the same "third name for one operation" we
-   declined `_findAllVisibleRows()` for.
-2. **Still no eager `filter`-taking walk — but the entry below justified that decline wrongly.** It
-   claimed `_findAll().filter { }` is "just as easy at the call site". It is not the same
-   operation. `_rowSequence`'s filter goes into the `HierarchicalQuery` used at every level
-   (`getChildrenOf` is `checkedFetch(HierarchicalQuery(filter, item))`), so what it means is the
-   data provider's business, never a predicate over the flattened list. Measured, not assumed —
-   the first version of this entry claimed the filter simply prunes rejected subtrees, and the
-   test written to pin that claim failed: on a `0 -> 1 -> … -> 9` chain backed by Vaadin's
-   `TreeDataProvider`, `_rowStream { it == 9 }` returns `[0..9]` while `_findAll().filter { it == 9 }`
-   returns `[9]`, because `TreeDataProvider` keeps an item when *it or any descendant* matches, so
-   the ancestors of a match survive. A back-end provider applying the predicate strictly per level
-   does prune the subtree instead. Both are unreachable from `_findAll()`. The decline stands on
-   the *correct* rationale: with `_rowStream` the filtered eager walk is
-   `_rowStream(tree, f).toList()` in Java and `_rowSequence(f).toList()` in Kotlin, so a dedicated
-   eager overload adds a spelling, not a capability. The per-level semantics are now documented on
-   `_rowSequence`, on `_rowStream` and in the README, and pinned by the test above.
-3. **`Grid._dump(from, toInclusive)` keeps inclusive bounds.** The pushback argued for an exclusive
-   end, since the overload exists for Java and Java is exclusive-end nearly everywhere a reader has
-   been trained (`subList`, `substring`, `copyOfRange`, `IntStream.range`), and the parameter name
-   isn't visible at the call site. Declined: the two overloads share a name, and the worlds are not
-   disjoint — Kotlin can call the `(Int, Int)` form too, so `grid._dump(0, 9)` and
-   `grid._dump(0..9)` printing different row counts is a worse trap than the convention mismatch,
-   and it is a trap for the *maintainer* as well as the caller. Mitigations: the parameter is named
-   `toInclusive` (IntelliJ shows inline parameter hints for literal arguments), the KDoc says so,
-   and the stakes are a debug string, never an assertion. If the exclusive reading ever wins, the
-   way to do it is a distinct name, not a differently-behaving overload of `_dump`.
+**Entries are mutable — edit in place, don't append addendums.** Each entry is the single coherent
+home for one *live* decision; keep it current as the decision is refined or extended. Two things
+this does *not* license:
 
-**Evidence.** Java-callability re-verified by compiling a Java caller
-(`_rowStream(tree)`, `_rowStream(tree, filter)`, `.limit(3).toList()`) against the built classes.
-Laziness pinned by a test counting `TreeDataProvider.fetchChildren` calls for `limit(3)` versus a
-full walk. Full battery green on all four `testrun-*` environments.
+- **The roads not taken stay.** "We chose X, rejected Y because Z" is live content of the current
+  decision, not stale history — never edit it away. It's the most valuable thing in the file.
+- **A reversed *shipped* decision forks a tombstone, it is not overwritten.** When a design was
+  released and then thrown away, leave the old entry as the scar, set its `Status:` to
+  **Superseded by `D_<slug>`**, and write the replacement fresh. The line: *refined or extended,
+  or reversed before it ever shipped* → edit in place; *reversed after a release* → tombstone +
+  new entry.
 
 ---
 
-## 2026-08-28 — Java ergonomics for `TreeGrid._rowSequence()`: an `Iterable` twin, but no eager twin
+## D_treegrid_java_walk — Java reaches the lazy TreeGrid walk through `Stream`, and there is no eager `filter` twin (2026-08-28)
 
-**Superseded in part by the 2026-08-28 entry above**: `_rowIterable()` (decision 2) never shipped —
-it was replaced by `_rowStream()` before the 2.7.3 release, and the rationale given in decision 1
-for declining an eager `filter`-taking walk is factually wrong (the filter is applied by the data
-provider per level, so it is not `_findAll().filter { }`; see the superseding entry). The decline
-itself stands, as do decisions 3 and 4.
+**Status:** Accepted; shipped in 2.7.3. `TreeGrid._rowStream()`, `@JvmOverloads` on
+`TreeGrid._rowSequence()`, `Grid._dump(from, toInclusive)` — all in `Grid.kt`, mechanics in their
+KDoc; README "Java" section; tests in `TreeGridTest`/`GridTest`.
 
 **Context.** [#214](https://github.com/mvysny/karibu-testing/issues/214), raised while porting a
 ~180-file test corpus from Kotlin to Java. Of 23 Karibu functions the corpus used, `_rowSequence()`
@@ -96,40 +71,85 @@ proposed a `List`-returning `TreeGrid._findAllVisibleRows(filter)` plus a lazy `
    `_findAllVisibleRows` would have been a third name for one operation, and the worse of the two
    names: `_findAll` on a `TreeGrid` *already* means "visible rows", as its KDoc says. The gap was
    discoverability, not capability, so it was closed with a KDoc cross-reference on `_rowSequence`
-   and a README paragraph rather than with API. **No eager walk takes a `filter`, and none will:**
-   `_findAll().filter { it.whatever }` is just as easy at the call site, in every language we
-   target, so a `filter` parameter would buy nothing but a second way to spell it.
-2. **Ship `_rowIterable()` anyway, scoped as Java-only.** A `Sequence` and an `Iterable` are the
-   same idea, and an `Iterable` is for-each-able; if we offer the lazy walk at all, it should have a
-   Java shape, otherwise `SequencesKt` remains the only door for a caller who genuinely must stop
-   early on a large tree. Kotlin callers keep `_rowSequence()`. Accepted cost, documented in KDoc
-   and README: `asIterable()` delegates rather than buffering, so the result is single-pass — which
-   is not what `Iterable` normally promises. Rejected the alternative of buffering to make it
-   multi-pass, since that silently reintroduces the full expensive walk `_rowSequence()`'s own doc
-   warning exists to prevent.
-3. **`@JvmOverloads` on `TreeGrid._rowSequence()`** — the `HierarchicalDataProvider` twin already
+   and a README paragraph rather than with API.
+
+2. **The Java shape of the lazy walk is `TreeGrid._rowStream(filter): Stream<T>`.** Kotlin callers
+   keep `_rowSequence()`; `_rowStream()` exists for Java. We do not ship two lazy Java shapes —
+   that would be the same "third name for one operation" `_findAllVisibleRows()` was declined for.
+   Three reasons for `Stream`, in increasing weight:
+   - The caveat stops being a caveat. `Sequence.asIterable()` delegates rather than buffering, so
+     an `Iterable` twin would be single-pass — precisely what `Iterable` promises not to be, hence
+     the KDoc warning it needed. `Stream` is *specified* as single-consumption and throws
+     `IllegalStateException` on reuse: same semantics, enforced by the type instead of documented
+     around it.
+   - Java's `Iterable` has no `toList()`, so an `Iterable` caller either hand-rolls a loop into an
+     `ArrayList` or reaches for `StreamSupport` — meaning it would not even serve the reporter's
+     eleven call sites. `Stream` has `toList()`, `filter()`, `limit()` and short-circuiting, so the
+     lazy walk, the eager walk and the stop-early walk are one door.
+   - It costs no new surface: `Grid.kt` already imports `java.util.stream.Stream` and
+     `kotlin.streams.toList`, `asStream()` is the same stdlib package, and `jvmTarget` is 21
+     (`build.gradle.kts`), so `Stream.toList()` (Java 16+) is available to every caller.
+
+   **Rejected: `_rowIterable(filter): Iterable<T>`** — the issue's own proposal, and briefly
+   committed before 2.7.3 shipped (nothing depended on it, so it was replaced rather than
+   tombstoned). It loses on all three counts above. Also rejected: buffering to make the
+   `Iterable` genuinely multi-pass, since that silently reintroduces the full expensive walk that
+   `_rowSequence()`'s own doc warning exists to prevent.
+
+3. **No eager `filter`-taking walk — and *not* because `_findAll().filter { }` is the same thing.**
+   It is not the same operation, and an earlier version of this entry wrongly claimed it was.
+   `_rowSequence`'s filter goes into the `HierarchicalQuery` used at every level (`getChildrenOf`
+   is `checkedFetch(HierarchicalQuery(filter, item))`), so what it means is the data provider's
+   business, never a predicate over the flattened list. Measured, not assumed — a first draft
+   claimed the filter simply prunes rejected subtrees, and the test written to pin that claim
+   failed: on a `0 -> 1 -> … -> 9` chain backed by Vaadin's `TreeDataProvider`,
+   `_rowStream { it == 9 }` returns `[0..9]` while `_findAll().filter { it == 9 }` returns `[9]`,
+   because `TreeDataProvider` keeps an item when *it or any descendant* matches, so the ancestors
+   of a match survive. A back-end provider applying the predicate strictly per level does prune the
+   subtree instead. Both are unreachable from `_findAll()`. The decline stands on the *correct*
+   rationale: with `_rowStream` the filtered eager walk is `_rowStream(tree, f).toList()` in Java
+   and `_rowSequence(f).toList()` in Kotlin, so a dedicated eager overload adds a spelling, not a
+   capability. The per-level semantics are documented on `_rowSequence`, on `_rowStream` and in the
+   README, and pinned by the test above.
+
+4. **`@JvmOverloads` on `TreeGrid._rowSequence()`** — the `HierarchicalDataProvider` twin already
    had it; its absence on the `TreeGrid` one was an oversight, and forced Java callers to pass the
    `null` filter explicitly.
-4. **`Grid._dump(int from, int toInclusive)`** — `kotlin.ranges.IntRange` does have a Java-reachable
-   constructor, so this was reachable but in the same nobody-would-write-that class as `SequencesKt`.
-   Bounds are inclusive, mirroring the `IntRange` overload it delegates to.
+
+5. **`Grid._dump(from, toInclusive)` exists, and its bounds stay inclusive.**
+   `kotlin.ranges.IntRange` does have a Java-reachable constructor, so the range overload was
+   reachable but in the same nobody-would-write-that class as `SequencesKt`; the `(Int, Int)` form
+   delegates to it. Pushback argued for an *exclusive* end, since the overload exists for Java and
+   Java is exclusive-end nearly everywhere a reader has been trained (`subList`, `substring`,
+   `copyOfRange`, `IntStream.range`), and the parameter name isn't visible at the call site.
+   Declined: the two overloads share a name, and the worlds are not disjoint — Kotlin can call the
+   `(Int, Int)` form too, so `grid._dump(0, 9)` and `grid._dump(0..9)` printing different row
+   counts is a worse trap than the convention mismatch, and it is a trap for the *maintainer* as
+   well as the caller. Mitigations: the parameter is named `toInclusive` (IntelliJ shows inline
+   parameter hints for literal arguments), the KDoc says so, and the stakes are a debug string,
+   never an assertion. If the exclusive reading ever wins, the way to do it is a distinct name, not
+   a differently-behaving overload of `_dump`.
 
 **Not done (also in the issue, judged not worth the API).** A `Consumer`-typed adder for
 `KaribuConfig.pendingJavascriptInvocationHandlers`: the `return Unit.INSTANCE;` a Java lambda needs
 for `Function1<_, Unit>` is a real annoyance, but the field is a `MutableList` `var`, so an
 `addX(Consumer)` helper buys asymmetry with `remove`/`clear` for one niche hook.
 
-**Evidence.** Java-callability of every new and claimed-existing form
-(`_rowIterable(tree)`, `_rowIterable(tree, filter)`, `_rowSequence(tree)`, `_findAll(tree)`,
-`_dump(grid, 0, 6)`) was verified by compiling a Java caller against the built classes, not inferred
-from `@JvmOverloads`. Full battery green on all four `testrun-*` environments.
+**Evidence.** Java-callability of every new and claimed-existing form (`_rowStream(tree)`,
+`_rowStream(tree, filter)`, `.limit(3).toList()`, `_rowSequence(tree)`, `_findAll(tree)`,
+`_dump(grid, 0, 6)`) verified by compiling a Java caller against the built classes, not inferred
+from `@JvmOverloads`. Laziness pinned by a test counting `TreeDataProvider.fetchChildren` calls for
+`limit(3)` versus a full walk. Full battery green on all four `testrun-*` environments.
 
 ---
 
-## 2026-07-21 — Deliver the F5/tab-close unload beacon through Flow's *real* `ServerRpcHandler`
+## D_unload_beacon_via_rpc_handler — Deliver the F5/tab-close unload beacon through Flow's *real* `ServerRpcHandler` (2026-07-21)
 
-**Context.** [#210](https://github.com/mvysny/karibu-testing/issues/210): the F5/beacon design below
-(2026-07-06) *reimplemented* the browser unload beacon in Kotlin — Karibu decided "close the old UI"
+**Status:** Accepted; implemented 2026-07-21. Partly supersedes `D_f5_beacon_timing` (its decision
+1, for the non-preserve path).
+
+**Context.** [#210](https://github.com/mvysny/karibu-testing/issues/210): the `D_f5_beacon_timing`
+design *reimplemented* the browser unload beacon in Kotlin — Karibu decided "close the old UI"
 itself and mirrored `ServerRpcHandler.isPreserveOnRefreshTarget`. Two costs: (a) a custom
 `ServerRpcHandler` (e.g. a tab-scope add-on hooking `handleUnloadBeaconRequest`) was **invisible** to
 Karibu tests — the beacon never reached it; (b) `MockBrowser.closeTab` force-detached a
@@ -188,9 +208,8 @@ is invoked per delivery, yielding a fresh handler instance each time (Flow cache
 `getRpcHandler()`); fine for the stateless norm, revisit if a stateful custom handler needs it. The
 `closeTab`-preserve behavioral change may warrant a major-version note in the changelog.
 
-**Supersedes** decision #1 ("Reorder rather than re-implement") of the 2026-07-06 F5/beacon entry
-below *for the non-preserve path*: the old UI is no longer closed by Karibu directly but by Flow's
-real handler. The preserve path (nav-driven teleport + close) is unchanged.
+Against `D_f5_beacon_timing`: for the non-preserve path the old UI is no longer closed by Karibu
+directly but by Flow's real handler. The preserve path (nav-driven teleport + close) is unchanged.
 
 **Where it lives.** `MockVaadin.deliverUnloadBeacon()` / `obtainServerRpcHandler()` /
 `finalizeClosedUI()` / `reloadCurrentUI()` / `discardUI()`; `MockBrowser.closeTab` KDoc. Tests:
@@ -200,7 +219,10 @@ it lingering until reapInactiveUIs`).
 
 ---
 
-## 2026-07-07 — Rename stale `v24`/`kt10` build tokens to `stable`/`next` + `testrun-*`
+## D_stable_next_build_tokens — Rename stale `v24`/`kt10` build tokens to `stable`/`next` + `testrun-*` (2026-07-07)
+
+**Status:** Accepted; implemented 2026-07-07. The module-naming rule it establishes is restated in
+`CLAUDE.md`.
 
 **Context.** The Gradle Vaadin-dependency aliases were named `vaadin-v24-*` / `vaadin-v24next-*`
 but actually pointed at Vaadin **25.2.1** and **25.3.0-alpha3** (`libs.versions.toml`). The "v24"
@@ -234,14 +256,17 @@ compiles/tests against. The internal test modules carried the same rot: a `kt10-
    was chosen over reintroducing distinct leaf names so the clean `:tests` path could be kept; the
    libs are never published, so their group is cosmetic.
 
-**Module-naming rule (recorded in CLAUDE.md).** The `vNN` suffix on a *published* `karibu-testing-vNN`
-module marks the highest Vaadin version whose version-specific APIs it supports — not the version it
-runs against. `karibu-testing-v24` supports APIs up to Vaadin 24, runs fine on Vaadin 25, and is a
-frozen published coordinate; a Vaadin-25-specific API would get a new `karibu-testing-v25` module.
+**Module-naming rule (also recorded in CLAUDE.md).** The `vNN` suffix on a *published*
+`karibu-testing-vNN` module marks the highest Vaadin version whose version-specific APIs it supports
+— not the version it runs against. `karibu-testing-v24` supports APIs up to Vaadin 24, runs fine on
+Vaadin 25, and is a frozen published coordinate; a Vaadin-25-specific API would get a new
+`karibu-testing-v25` module.
 
 ---
 
-## 2026-07-07 — Browser-free login helper + OAuth stance: `MockVaadin.login()`/`logout()` (issue #143)
+## D_login_helper_no_oauth — Browser-free `MockVaadin.login()`/`logout()`, and no OAuth redirect emulation (2026-07-07)
+
+**Status:** Accepted; implemented 2026-07-07. Builds on `D_spring_security_bridge`.
 
 **Context.** [Issue #143](https://github.com/mvysny/karibu-testing/issues/143): a Keycloak-OAuth app
 with all views `@PermitAll` hit a `NotFoundException` from `MockVaadin.setup()` navigating to `""`,
@@ -249,8 +274,8 @@ and the reporter "fixed" it by relaxing the root view to `@AnonymousAllowed` —
 model under test. The issue predates two things that already changed the picture: (a) setup's initial
 navigation is now guarded by `initDefaultRoute && registry.getNavigationTarget("").isPresent`
 (`MockVaadin.kt`), so an app with no `""` route no longer crashes at setup; (b) the
-`MockSpringSecurity.mock()` bridge (entry below). What remained was ergonomics: everyone hand-copied
-the same two-line `userPrincipalInt` + `isUserInRole` snippet from the README.
+`MockSpringSecurity.mock()` bridge (`D_spring_security_bridge`). What remained was ergonomics:
+everyone hand-copied the same two-line `userPrincipalInt` + `isUserInRole` snippet from the README.
 
 **Decisions.**
 
@@ -280,7 +305,10 @@ Connect" section.
 
 ---
 
-## 2026-07-07 — Spring Security support: `MockSpringSecurity.mock()` (issues #94, #180)
+## D_spring_security_bridge — Bridge `SecurityContextHolder` onto the request, opt-in (2026-07-07)
+
+**Status:** Accepted; implemented 2026-07-07 as `MockSpringSecurity.mock()` in
+`karibu-testing-v10-spring`.
 
 **Context.** [Issue #94](https://github.com/mvysny/karibu-testing/issues/94) asked for Spring
 Security Test's `@WithMockUser` to work under Karibu; [#180](https://github.com/mvysny/karibu-testing/issues/180)
@@ -316,7 +344,7 @@ gate**. Bridging *both* methods is the actual fix.
    every subproject, so a Kotlin file gives the `mock(rolePrefix = "ROLE_")` default-arg ergonomics;
    `@JvmStatic @JvmOverloads` keep the Java call site clean (`MockSpringSecurity.mock()`).
 5. **Self-contained behavioral test in the Spring module.** The module wasn't part of the
-   `kt10-testrun-*` battery and its `src/test` had only a compile smoke test. Since `mock()` only
+   `testrun-*` battery and its `src/test` had only a compile smoke test. Since `mock()` only
    touches `mockRequestFactory` + `FakeRequest` + `SecurityContextHolder`, a plain `MockVaadin.setup()`
    test suffices; the test populates `SecurityContextHolder` directly (exactly what `@WithMockUser`
    does under the hood), avoiding a full `SpringExtension`/`spring-security-test` context.
@@ -328,12 +356,15 @@ so `getUserPrincipal()` returns `null`, identical to the default `FakeRequest`.
 
 **Where it lives.** `karibu-testing-v10-spring`: `MockSpringSecurity.kt` (mechanics in its KDoc);
 `compileOnly`/`testImplementation` `spring-security-core` in `build.gradle.kts`; tests in
-`MockSpringSecurityTest`. README "Spring Security" section rewritten. Supersedes the principal-only
+`MockSpringSecurityTest`. README "Spring Security" section rewritten, replacing the principal-only
 snippet previously documented there.
 
 ---
 
-## 2026-07-07 — Assert on `LitRenderer` HTML via JSoup (issue #175)
+## D_litrenderer_jsoup — Expose `LitRenderer` markup as a parsed JSoup tree, not a raw string (2026-07-07)
+
+**Status:** Accepted; implemented 2026-07-07 as `_getPresentationHtml()` / `_getPresentationJsoup()`
+in `Renderers.kt` + `Grid.kt`.
 
 **Context.** [Issue #175](https://github.com/mvysny/karibu-testing/issues/175): `_getFormattedRow()`
 / `_getPresentationValue()` reduce a `LitRenderer` cell to plain text (JSoup `textRecursively` over
@@ -370,7 +401,9 @@ template renderer.
 
 ---
 
-## 2026-07-07 — Open/click a `ContextMenu` via its target component (issue #20)
+## D_context_menu_via_target — Open a `ContextMenu` by firing Vaadin's own before-open event on the target (2026-07-07)
+
+**Status:** Accepted; implemented 2026-07-07 in `ContextMenu.kt` + `LocatorJ`.
 
 **Context.** [Issue #20](https://github.com/mvysny/karibu-testing/issues/20): tests could only
 interact with a `ContextMenu` if they held a reference to it; `_find(ContextMenu.class)` returned
@@ -431,14 +464,17 @@ contract relied upon is the public `vaadin-context-menu-before-open` / `closed` 
 
 ---
 
-## 2026-07-06 — Multiple browser tabs in one session: `MockBrowser`
+## D_mock_browser_tabs — Multiple browser tabs in one session live on a `MockBrowser` façade, keyed by `window.name` (2026-07-06)
+
+**Status:** Accepted; implemented 2026-07-06. Supersedes decision 2 of `D_f5_beacon_timing` (the
+`uiId` reuse). Graduated from `ideas/multiple-uis-per-session.md` + `ideas/configurable-window-name.md`
+(both deleted).
 
 **Context.** `MockVaadin.setup()` created exactly one `UI` (`createUI` was `internal`), so there was
 no public way to have a **second tab** — a second `UI` sharing the same `VaadinSession` — nor to vary a
 tab's `window.name`. Anything fundamentally *per-tab* was untestable. The downstream `vaadin-tab-scope`
 library rests entirely on this: two tabs → two independent scopes, no cross-tab leakage, independent
-lifecycles. Unparks and merges `ideas/multiple-uis-per-session.md` + `ideas/configurable-window-name.md`
-(they turned out to be one feature).
+lifecycles. The two parked ideas turned out to be one feature.
 
 **What real Flow does.** One `VaadinSession` backs many tabs; each has its own `UI` and its own
 `window.name` (surfaced as `ExtendedClientDetails.getWindowName()`); `VaadinSession.getUIs()` returns
@@ -487,9 +523,9 @@ beacon that closes its `UI`; a lost beacon leaves it to the heartbeat reap.
 7. **`userAgent` moved to `MockBrowser`.** Browser identity belongs on the browser; `MockVaadin.userAgent`
    remains as a `@Deprecated` alias delegating to `MockBrowser.userAgent` (source-compatible).
 
-**Supersedes** decision #2 of the F5/beacon entry below ("give the reloaded UI a fresh `uiId`; the
-eager path can reuse `uiId 1`"). With multiple tabs, reusing `uiId 1` on an eager reload evicts *another*
-open tab (same `uiId` key), and `oldUI.uiId + 1` on late/never/preserve can collide with a sibling tab.
+**Against `D_f5_beacon_timing` decision 2** ("give the reloaded UI a fresh `uiId`; the eager path can
+reuse `uiId 1`"). With multiple tabs, reusing `uiId 1` on an eager reload evicts *another* open tab
+(same `uiId` key), and `oldUI.uiId + 1` on late/never/preserve can collide with a sibling tab.
 `createUI` now always assigns the **next free** `uiId` (`max(uIs.uiId) + 1`, or `1` for a fresh
 session) — which still yields `uiId 1` for the single-tab eager case, so that entry's observable
 single-tab behavior is unchanged.
@@ -502,18 +538,20 @@ issues (irrelevant to a browserless test). Java sees `MockBrowser.newTab()` etc.
 **Where it lives.** `MockBrowser` (all mechanics in its KDoc); `KaribuConfig.windowName`; `MockVaadin`
 internal helpers (`openNewTab`, `focusUI`, `discardUI`, `markUnloadBeaconLost`, `currentUiFactory`,
 `discardBackgroundUIs`) and the per-UI `windowName` plumbing in `createUI`/`MockPage`; test matrix in
-`MockBrowserTest`. Superseded idea files: `ideas/multiple-uis-per-session.md`,
-`ideas/configurable-window-name.md` (deleted on implementation).
+`MockBrowserTest`.
 
 ---
 
-## 2026-07-06 — Reaping a lost-beacon UI: `MockVaadin.reapInactiveUIs()`
+## D_reap_inactive_uis — Reap a lost-beacon UI by flag, emulating Flow's outcome and not its clock (2026-07-06)
 
-**Context.** The `2026-07-06` F5/beacon entry below shipped `UnloadBeaconTiming.NEVER` = "the unload
+**Status:** Accepted; implemented 2026-07-06 as `MockVaadin.reapInactiveUIs()`. Graduated from
+`ideas/heartbeat-emulation.md` (deleted).
+
+**Context.** `D_f5_beacon_timing` shipped `UnloadBeaconTiming.NEVER` = "the unload
 beacon was lost, so the old UI lingers alive alongside the new one," but deliberately did *not* model
 the heartbeat/idle-UI reap that would eventually close it in production. A downstream Vaadin tab-scope
-library now needs exactly that follow-up: assert that a UI abandoned by a lost beacon eventually gets
-closed and detached (so its per-UI resources are released). This unparks `ideas/heartbeat-emulation.md`.
+library needs exactly that follow-up: assert that a UI abandoned by a lost beacon eventually gets
+closed and detached (so its per-UI resources are released).
 
 **What real Flow does.** `VaadinService.cleanupSession()` (from `requestEnd`) runs `closeInactiveUIs()`
 — for each UI with `!isUIActive(ui) && !ui.isClosing()`, calls `ui.close()` — then `removeClosedUIs()`
@@ -560,12 +598,16 @@ ignores the beacon there), so they are never reaped by this.
 
 **Where it lives.** `MockVaadin.reapInactiveUIs()` + `UNLOAD_BEACON_LOST_KEY` marker set in
 `reloadCurrentUI()`'s `NEVER` branch; `UnloadBeaconTiming.NEVER` KDoc points at it. Tests in
-`MockVaadinTest` (`unload beacon timing on F5` → the three `reapInactiveUIs …` cases). Superseded idea
-file: `ideas/heartbeat-emulation.md` (deleted on implementation).
+`MockVaadinTest` (`unload beacon timing on F5` → the three `reapInactiveUIs …` cases).
 
 ---
 
-## 2026-07-06 — F5 reload lifecycle: overlay teleport & unload-beacon timing
+## D_f5_beacon_timing — F5 reload lifecycle: let Flow teleport the overlays, and make beacon timing a knob (2026-07-06)
+
+**Status:** Accepted and shipped in 2.7.1; **partly superseded** — decision 1 by
+`D_unload_beacon_via_rpc_handler` (the non-preserve path now runs through Flow's real
+`ServerRpcHandler`), decision 2 by `D_mock_browser_tabs` (`uiId` is now always the next free one).
+Decisions 3 and 4 stand. Graduated from `ideas/beacon-reload-timing.md` (deleted).
 
 **Context.** [#207](https://github.com/mvysny/karibu-testing/issues/207): `MockPage.reload()` closed &
 detached the old UI *before* creating the new one, which silently dropped any open
@@ -606,11 +648,13 @@ closed+removed, one live UI); they differ only in the transient ordering that mi
 1. **Reorder rather than re-implement.** Karibu drives Flow's *real* navigation pipeline, so for the
    preserve case we simply keep the old UI alive & registered while the new UI navigates and let Flow
    do the teleport, the sentinel, the child ordering and `oldUI.close()`. Rejected: re-implementing
-   `moveElementsFrom`/ordering in Karibu — it would drift from Flow.
+   `moveElementsFrom`/ordering in Karibu — it would drift from Flow. (For the *non-preserve* path this
+   didn't go far enough — Karibu still closed the UI itself; see `D_unload_beacon_via_rpc_handler`.)
 
 2. **Give the reloaded UI a fresh `uiId`.** `uiId` is the key in `VaadinSession.uIs`; reusing `1` made
    `session.addUI(newUI)` evict the still-live old UI, collapsing the transient two-live-UI window.
-   The eager path can still reuse `uiId 1` because the old UI is removed *before* `addUI`.
+   The eager path can still reuse `uiId 1` because the old UI is removed *before* `addUI`. (That last
+   sentence held only while there was one tab; see `D_mock_browser_tabs`.)
 
 3. **Make non-preserve beacon timing configurable; default EAGER.** `KaribuConfig.unloadBeaconTiming`
    = `UnloadBeaconTiming { EAGER, LATE, NEVER }`.
@@ -619,14 +663,15 @@ closed+removed, one live UI); they differ only in the transient ordering that mi
      detach-before-attach case the tab-scope library must test.
    - **LATE**: create new, then close+detach+remove old.
    - **NEVER**: old UI lingers alongside the new one (beacon lost). We deliberately do **not** model
-     the heartbeat reap that would eventually close it (no time axis; see
-     `ideas/heartbeat-emulation.md`).
+     the heartbeat reap that would eventually close it (no time axis; `D_reap_inactive_uis` later
+     added a caller-driven reap, still with no clock).
    Ignored for `@PreserveOnRefresh` (Flow ignores the beacon there).
 
 4. **One flag, no new public primitives.** Rejected an explicit `closeUIViaBeacon()` /
    `expireInactiveUIs()` API: there is no browser, so Karibu fires the simulated beacon *inside*
    `reloadCurrentUI()` at the configured point; a caller-invoked primitive would be redundant. A
-   heartbeat-reap driver was punted to a separate idea rather than built speculatively.
+   heartbeat-reap driver was punted to a separate idea rather than built speculatively (it became
+   `D_reap_inactive_uis`).
 
 **Consequences / limitations.** For non-preserve, only the terminal state and eager/late/lost
 *orderings* are reproduced — not wall-clock timing (e.g. "old UI survives N heartbeats then dies").
@@ -640,5 +685,4 @@ otherwise restores.
 
 **Where it lives.** `MockVaadin.reloadCurrentUI()` / `discardOldUI()` / `isPreserveOnRefreshTarget()`,
 `KaribuConfig.unloadBeaconTiming`, `UnloadBeaconTiming`; test matrix in `MockVaadinTest`
-(`page reload F5 lifecycle`, `unload beacon timing on F5`). Superseded idea file:
-`ideas/beacon-reload-timing.md` (deleted on implementation).
+(`page reload F5 lifecycle`, `unload beacon timing on F5`).

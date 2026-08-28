@@ -9,7 +9,74 @@ Newest entries on top.
 
 ---
 
+## 2026-08-28 — The Java shape of the lazy TreeGrid walk is `Stream`, not `Iterable`
+
+**Supersedes** decision 2 of the entry below (same day, same issue, before either shipped in a
+release), and corrects the stated rationale of its decision 1.
+
+**Context.** Pushback on [#214](https://github.com/mvysny/karibu-testing/issues/214) after
+`_rowIterable()` was committed but before 2.7.3 shipped, so nothing depended on it yet.
+
+**Decisions.**
+
+1. **`TreeGrid._rowStream(filter): Stream<T>` replaces `_rowIterable(filter): Iterable<T>`.**
+   Three reasons, in increasing weight:
+   - The caveat stops being a caveat. `Sequence.asIterable()` delegates rather than buffering, so
+     the result is single-pass — precisely what `Iterable` promises not to be, hence the KDoc
+     warning we had to write. `Stream` is *specified* as single-consumption and throws
+     `IllegalStateException` on reuse: same semantics, enforced by the type instead of documented
+     around it.
+   - `_rowIterable`'s own recorded weakness disappears. Java's `Iterable` has no `toList()`, so a
+     caller either hand-rolled a loop into an `ArrayList` or reached for `StreamSupport`; the entry
+     below had to say out loud that the new function did not serve the reporter's eleven call
+     sites. `Stream` has `toList()`, `filter()`, `limit()` and short-circuiting, so the lazy walk,
+     the eager walk and the stop-early walk are one door.
+   - It costs no new surface: `Grid.kt` already imports `java.util.stream.Stream` and
+     `kotlin.streams.toList`, `asStream()` is the same stdlib package, and `jvmTarget` is 21
+     (`build.gradle.kts`), so `Stream.toList()` (Java 16+) is available to every caller.
+   Kotlin callers keep `_rowSequence()`; `_rowStream()` exists for Java. We do not ship both an
+   `Iterable` and a `Stream` twin — that would be the same "third name for one operation" we
+   declined `_findAllVisibleRows()` for.
+2. **Still no eager `filter`-taking walk — but the entry below justified that decline wrongly.** It
+   claimed `_findAll().filter { }` is "just as easy at the call site". It is not the same
+   operation. `_rowSequence`'s filter goes into the `HierarchicalQuery` used at every level
+   (`getChildrenOf` is `checkedFetch(HierarchicalQuery(filter, item))`), so what it means is the
+   data provider's business, never a predicate over the flattened list. Measured, not assumed —
+   the first version of this entry claimed the filter simply prunes rejected subtrees, and the
+   test written to pin that claim failed: on a `0 -> 1 -> … -> 9` chain backed by Vaadin's
+   `TreeDataProvider`, `_rowStream { it == 9 }` returns `[0..9]` while `_findAll().filter { it == 9 }`
+   returns `[9]`, because `TreeDataProvider` keeps an item when *it or any descendant* matches, so
+   the ancestors of a match survive. A back-end provider applying the predicate strictly per level
+   does prune the subtree instead. Both are unreachable from `_findAll()`. The decline stands on
+   the *correct* rationale: with `_rowStream` the filtered eager walk is
+   `_rowStream(tree, f).toList()` in Java and `_rowSequence(f).toList()` in Kotlin, so a dedicated
+   eager overload adds a spelling, not a capability. The per-level semantics are now documented on
+   `_rowSequence`, on `_rowStream` and in the README, and pinned by the test above.
+3. **`Grid._dump(from, toInclusive)` keeps inclusive bounds.** The pushback argued for an exclusive
+   end, since the overload exists for Java and Java is exclusive-end nearly everywhere a reader has
+   been trained (`subList`, `substring`, `copyOfRange`, `IntStream.range`), and the parameter name
+   isn't visible at the call site. Declined: the two overloads share a name, and the worlds are not
+   disjoint — Kotlin can call the `(Int, Int)` form too, so `grid._dump(0, 9)` and
+   `grid._dump(0..9)` printing different row counts is a worse trap than the convention mismatch,
+   and it is a trap for the *maintainer* as well as the caller. Mitigations: the parameter is named
+   `toInclusive` (IntelliJ shows inline parameter hints for literal arguments), the KDoc says so,
+   and the stakes are a debug string, never an assertion. If the exclusive reading ever wins, the
+   way to do it is a distinct name, not a differently-behaving overload of `_dump`.
+
+**Evidence.** Java-callability re-verified by compiling a Java caller
+(`_rowStream(tree)`, `_rowStream(tree, filter)`, `.limit(3).toList()`) against the built classes.
+Laziness pinned by a test counting `TreeDataProvider.fetchChildren` calls for `limit(3)` versus a
+full walk. Full battery green on all four `testrun-*` environments.
+
+---
+
 ## 2026-08-28 — Java ergonomics for `TreeGrid._rowSequence()`: an `Iterable` twin, but no eager twin
+
+**Superseded in part by the 2026-08-28 entry above**: `_rowIterable()` (decision 2) never shipped —
+it was replaced by `_rowStream()` before the 2.7.3 release, and the rationale given in decision 1
+for declining an eager `filter`-taking walk is factually wrong (the filter is applied by the data
+provider per level, so it is not `_findAll().filter { }`; see the superseding entry). The decline
+itself stands, as do decisions 3 and 4.
 
 **Context.** [#214](https://github.com/mvysny/karibu-testing/issues/214), raised while porting a
 ~180-file test corpus from Kotlin to Java. Of 23 Karibu functions the corpus used, `_rowSequence()`

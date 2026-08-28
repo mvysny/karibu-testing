@@ -1254,12 +1254,20 @@ To walk the rows the TreeGrid is actually showing (children of collapsed nodes s
 * For all of them as a list, use `treeGrid._findAll()`/`GridKt._findAll(treeGrid)` - `_findAll()`
   handles TreeGrid too, and walks exactly the row sequence described below.
 * To walk them lazily and stop early, Kotlin gets `treeGrid._rowSequence()` returning a
-  `Sequence`. Java has `GridKt._rowIterable(treeGrid)` returning an `Iterable`, so it works
-  in a for-each loop; since it delegates to the sequence rather than buffering, iterate it
-  only once. Since Karibu-Testing 2.7.3.
+  `Sequence`. Java gets `GridKt._rowStream(treeGrid)` returning a `java.util.stream.Stream`,
+  with the usual `filter()`/`limit()`/`toList()`. Since Karibu-Testing 2.7.3.
 
 Note that a full walk is a slow operation - it repeatedly polls the `HierarchicalDataProvider`
 for the list of children.
+
+The optional `filter` both functions take is *not* the same as filtering the result afterwards.
+It is handed to the `HierarchicalDataProvider` in the `HierarchicalQuery` used to fetch every
+level, so its meaning is the data provider's business: Vaadin's own `TreeDataProvider` keeps an
+item when it *or any of its descendants* matches, so the ancestors of a match survive the filter,
+while a back-end provider applying the predicate strictly per level never descends into a rejected
+item and drops its whole subtree. Either way, use
+`treeGrid._rowSequence(filter).toList()`/`GridKt._rowStream(treeGrid, filter).toList()` for a
+filtered walk - `_findAll().filter { }` gives a different result.
 
 ### Support for VirtualList
 

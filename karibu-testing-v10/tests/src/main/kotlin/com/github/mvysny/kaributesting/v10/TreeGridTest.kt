@@ -7,6 +7,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery
 import com.vaadin.flow.data.provider.hierarchy.TreeData
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import com.vaadin.flow.data.renderer.NativeButtonRenderer
+import com.vaadin.flow.function.SerializablePredicate
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -131,28 +132,47 @@ abstract class AbstractTreeGridTests {
                 grid.expectRow(14, "name 0 1 1 1", "3")
             }
         }
-        @Nested inner class _rowIterable {
+        @Nested inner class _rowStream {
             @Test fun `empty on empty grid`() {
-                expect(listOf()) { TreeGrid<String>()._rowIterable().toList() }
+                expect(listOf()) { TreeGrid<String>()._rowStream().toList() }
             }
             @Test fun simple() {
                 val g = TreeGrid<Int>()
                 g.setDataProvider(treedp((0 until 20).toList()))
-                expect((0 until 20).toList()) { g._rowIterable().toList() }
+                expect((0 until 20).toList()) { g._rowStream().toList() }
             }
             @Test fun `ignores collapsed nodes`() {
                 val g = TreeGrid<Int>()
                 g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
                 // all nodes are by default collapsed
-                expect(listOf(0)) { g._rowIterable().toList() }
+                expect(listOf(0)) { g._rowStream().toList() }
                 g._expandAll()
-                expect((0..9).toList()) { g._rowIterable().toList() }
+                expect((0..9).toList()) { g._rowStream().toList() }
             }
             @Test fun `honors filter`() {
                 val g = TreeGrid<Int>()
                 g.setDataProvider(treedp((0 until 20).toList()))
                 expect(listOf(0, 2, 4, 6, 8, 10, 12, 14, 16, 18)) {
-                    g._rowIterable { it % 2 == 0 }.toList()
+                    g._rowStream { it % 2 == 0 }.toList()
+                }
+            }
+            @Test fun `stops early without walking the rest of the tree`() {
+                // the point of returning a Stream rather than a List: limit() must not
+                // poll the data provider for the whole tree.
+                val dp = CountingTreeDataProvider(
+                    TreeData<Int>().addItems(listOf(0)) { if (it < 9) listOf(it + 1) else listOf() })
+                val g = TreeGrid<Int>()
+                g.setDataProvider(dp)
+                g._expandAll()
+                val fetchesForFullWalk: Int = dp.fetchChildrenCalls.let { before ->
+                    g._rowStream().toList(); dp.fetchChildrenCalls - before
+                }
+                val before: Int = dp.fetchChildrenCalls
+                expect(listOf(0, 1, 2)) { g._rowStream().limit(3).toList() }
+                val fetchesForLimit3: Int = dp.fetchChildrenCalls - before
+                expect(true, "limit(3) polled the dataprovider $fetchesForLimit3 times, " +
+                        "a full walk takes $fetchesForFullWalk - the stream isn't lazy") {
+                    fetchesForLimit3 < fetchesForFullWalk
                 }
             }
             @Test fun `same contents as _rowSequence and _findAll`() {
@@ -160,8 +180,19 @@ abstract class AbstractTreeGridTests {
                 g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
                 g._expandAll()
                 val expected = g._rowSequence().toList()
-                expect(expected) { g._rowIterable().toList() }
+                expect(expected) { g._rowStream().toList() }
                 expect(expected) { g._findAll() }
+            }
+            @Test fun `filtering the walk is not the same as filtering the _findAll result`() {
+                // 0 -> 1 -> ... -> 9. The filter goes into the HierarchicalQuery at every
+                // level, and TreeDataProvider keeps an item whose *descendant* matches - so
+                // filtering for 9 retains its whole ancestor chain. Filtering the flat list
+                // afterwards cannot express that.
+                val g = TreeGrid<Int>()
+                g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
+                g._expandAll()
+                expect((0..9).toList()) { g._rowStream { it == 9 }.toList() }
+                expect(listOf(9)) { g._findAll().filter { it == 9 } }
             }
         }
         @Test fun _dump() {
@@ -246,3 +277,15 @@ abstract class AbstractTreeGridTests {
 
 private fun <T> treedp(roots: List<T>, childProvider: (T) -> List<T> = { listOf() }): TreeDataProvider<T> =
         TreeDataProvider(TreeData<T>().addItems(roots, childProvider))
+
+/**
+ * A [TreeDataProvider] which counts the number of times it has been polled for children,
+ * so that a test can tell a lazy walk from an eager one.
+ */
+private class CountingTreeDataProvider<T>(data: TreeData<T>) : TreeDataProvider<T>(data) {
+    var fetchChildrenCalls: Int = 0
+    override fun fetchChildren(query: HierarchicalQuery<T, SerializablePredicate<T>>): Stream<T> {
+        fetchChildrenCalls++
+        return super.fetchChildren(query)
+    }
+}

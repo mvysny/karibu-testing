@@ -29,6 +29,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
+import kotlin.streams.asStream
 import kotlin.streams.toList
 import kotlin.test.expect
 import kotlin.test.fail
@@ -916,9 +917,16 @@ public fun <T : Any> Grid<T>._doubleClickItem(
  *
  * Honors current grid ordering.
  *
- * If you simply need all visible rows as a list, call [_findAll] instead - for a
- * [TreeGrid] it walks exactly this sequence and collects it eagerly.
- * Java callers who do need the lazy walk should use [_rowIterable].
+ * The [filter] is handed to the [HierarchicalDataProvider] in the [HierarchicalQuery]
+ * used to fetch *every* level, so what it means is up to the data provider and is never
+ * simply `_findAll().filter { }`. Vaadin's own `TreeDataProvider` keeps an item when it
+ * *or any of its descendants* matches, so the ancestors of a match survive the filter;
+ * a back-end provider applying the predicate strictly per level instead never descends
+ * into a rejected item, dropping its whole subtree.
+ *
+ * If you simply need all visible rows as a list and no filter, call [_findAll] instead -
+ * for a [TreeGrid] it walks exactly this sequence and collects it eagerly.
+ * Java callers should use [_rowStream].
  */
 @JvmOverloads
 public fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null): Sequence<T> {
@@ -932,19 +940,23 @@ public fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null
  * `kotlin.sequences.Sequence` has no idiomatic Java form; Kotlin callers should
  * use [_rowSequence] directly.
  *
- * Iterating the entire iterable is a very slow operation since it will repeatedly
+ * [Stream] rather than [Iterable] on purpose: a [Stream] is specified to be consumed
+ * at most once, which is exactly what a view over a sequence can promise, and it comes
+ * with `toList()`/`filter()`/`limit()` so the eager walk, the filtered walk and the
+ * stop-early walk are all the same door.
+ *
+ * Walking the entire stream is a very slow operation since it will repeatedly
  * poll [HierarchicalDataProvider] for list of children. If you need all visible
- * rows anyway, [_findAll] is both simpler and clearer about the cost.
+ * rows and no [filter], [_findAll] is both simpler and clearer about the cost;
+ * with a [filter] use `_rowStream(filter).toList()`, since the filter is applied by the
+ * data provider per level and therefore isn't expressible on the flat [_findAll]
+ * result - see [_rowSequence].
  *
  * Honors current grid ordering.
- *
- * Note that this delegates to the underlying sequence rather than buffering it,
- * so - unlike what [Iterable] usually promises - the result must be considered
- * single-pass: iterate it once.
  */
 @JvmOverloads
-public fun <T> TreeGrid<T>._rowIterable(filter: SerializablePredicate<T>? = null): Iterable<T> =
-    _rowSequence(filter).asIterable()
+public fun <T> TreeGrid<T>._rowStream(filter: SerializablePredicate<T>? = null): Stream<T> =
+    _rowSequence(filter).asStream()
 
 /**
  * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.

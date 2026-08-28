@@ -542,6 +542,16 @@ public fun <T : Any> Grid<T>._dump(rows: IntRange = 0..9): String =
     }
 
 /**
+ * Dumps rows [from]..[toInclusive] of the Grid; see [_dump] for more details.
+ * Both bounds are inclusive, mirroring the [IntRange] taken by [_dump].
+ *
+ * Exists purely so that Java callers can dump a row range without having to
+ * construct a `kotlin.ranges.IntRange` by hand.
+ */
+public fun <T : Any> Grid<T>._dump(from: Int, toInclusive: Int): String =
+    _dump(from..toInclusive)
+
+/**
  * Asserts that this grid's provider returns given [count] of items. If not,
  * an [AssertionError] is thrown with the Grid [_dump].
  */
@@ -905,11 +915,36 @@ public fun <T : Any> Grid<T>._doubleClickItem(
  * poll [HierarchicalDataProvider] for list of children.
  *
  * Honors current grid ordering.
+ *
+ * If you simply need all visible rows as a list, call [_findAll] instead - for a
+ * [TreeGrid] it walks exactly this sequence and collects it eagerly.
+ * Java callers who do need the lazy walk should use [_rowIterable].
  */
+@JvmOverloads
 public fun <T> TreeGrid<T>._rowSequence(filter: SerializablePredicate<T>? = null): Sequence<T> {
     val isExpanded: (T) -> Boolean = { item: T -> isExpanded(item) }
     return dataProvider._rowSequence(null, isExpanded, filter)
 }
+
+/**
+ * A Java-friendly view over [_rowSequence]: lazily walks over all rows the [TreeGrid]
+ * is actually showing, *skipping* children of collapsed nodes. Provided because
+ * `kotlin.sequences.Sequence` has no idiomatic Java form; Kotlin callers should
+ * use [_rowSequence] directly.
+ *
+ * Iterating the entire iterable is a very slow operation since it will repeatedly
+ * poll [HierarchicalDataProvider] for list of children. If you need all visible
+ * rows anyway, [_findAll] is both simpler and clearer about the cost.
+ *
+ * Honors current grid ordering.
+ *
+ * Note that this delegates to the underlying sequence rather than buffering it,
+ * so - unlike what [Iterable] usually promises - the result must be considered
+ * single-pass: iterate it once.
+ */
+@JvmOverloads
+public fun <T> TreeGrid<T>._rowIterable(filter: SerializablePredicate<T>? = null): Iterable<T> =
+    _rowSequence(filter).asIterable()
 
 /**
  * Returns a sequence which walks over all rows the [TreeGrid] is actually showing.

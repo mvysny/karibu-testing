@@ -7,6 +7,15 @@ Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
 
 ## [Unreleased] (2.7.3)
 
+### Added
+
+- Java-callable shapes for the `TreeGrid` row walk (#214): `TreeGrid._rowIterable()` returns an
+  `Iterable` instead of a `kotlin.sequences.Sequence`, and `_rowSequence()` gained `@JvmOverloads`
+  so Java callers no longer have to pass the `null` filter explicitly. For all visible rows as a
+  list, `Grid._findAll()` already covers `TreeGrid`.
+- `Grid._dump(int from, int toInclusive)` overload, so Java callers can dump a row range without
+  constructing a `kotlin.ranges.IntRange` (#214).
+
 ### Fixed
 
 - Discover `Dialog` header/footer children on Vaadin 25.3.

@@ -9,6 +9,56 @@ Newest entries on top.
 
 ---
 
+## 2026-08-28 — Java ergonomics for `TreeGrid._rowSequence()`: an `Iterable` twin, but no eager twin
+
+**Context.** [#214](https://github.com/mvysny/karibu-testing/issues/214), raised while porting a
+~180-file test corpus from Kotlin to Java. Of 23 Karibu functions the corpus used, `_rowSequence()`
+was the only one with no idiomatic Java form: `kotlin.sequences.Sequence<T>` forces a Java caller
+through `SequencesKt.toList(...)`, a stdlib facade nobody would think to reach for. The issue
+proposed a `List`-returning `TreeGrid._findAllVisibleRows(filter)` plus a lazy `_rowIterable(filter)`.
+
+**Decisions.**
+
+1. **No `_findAllVisibleRows()` — `Grid._findAll()` already is it.** `_findAll()` is
+   `_fetch(0, _saneFetchLimit)`, and `_fetch` special-cases `TreeGrid` to
+   `_rowSequence().drop(offset).take(limit).toList()`; `_saneFetchLimit` is `Int.MAX_VALUE / 1000`
+   (≈2.1M), i.e. unbounded in practice. So on a `TreeGrid`, `_findAll()` *is*
+   `_rowSequence().toList()`, returns `List<T>`, and from Java is `GridKt._findAll(tree)` — no
+   `SequencesKt`, no explicit `null`. All eleven call sites in the reporting corpus were
+   `_rowSequence().toList()` with no filter, so they were already served. Adding
+   `_findAllVisibleRows` would have been a third name for one operation, and the worse of the two
+   names: `_findAll` on a `TreeGrid` *already* means "visible rows", as its KDoc says. The gap was
+   discoverability, not capability, so it was closed with a KDoc cross-reference on `_rowSequence`
+   and a README paragraph rather than with API. **No eager walk takes a `filter`, and none will:**
+   `_findAll().filter { it.whatever }` is just as easy at the call site, in every language we
+   target, so a `filter` parameter would buy nothing but a second way to spell it.
+2. **Ship `_rowIterable()` anyway, scoped as Java-only.** A `Sequence` and an `Iterable` are the
+   same idea, and an `Iterable` is for-each-able; if we offer the lazy walk at all, it should have a
+   Java shape, otherwise `SequencesKt` remains the only door for a caller who genuinely must stop
+   early on a large tree. Kotlin callers keep `_rowSequence()`. Accepted cost, documented in KDoc
+   and README: `asIterable()` delegates rather than buffering, so the result is single-pass — which
+   is not what `Iterable` normally promises. Rejected the alternative of buffering to make it
+   multi-pass, since that silently reintroduces the full expensive walk `_rowSequence()`'s own doc
+   warning exists to prevent.
+3. **`@JvmOverloads` on `TreeGrid._rowSequence()`** — the `HierarchicalDataProvider` twin already
+   had it; its absence on the `TreeGrid` one was an oversight, and forced Java callers to pass the
+   `null` filter explicitly.
+4. **`Grid._dump(int from, int toInclusive)`** — `kotlin.ranges.IntRange` does have a Java-reachable
+   constructor, so this was reachable but in the same nobody-would-write-that class as `SequencesKt`.
+   Bounds are inclusive, mirroring the `IntRange` overload it delegates to.
+
+**Not done (also in the issue, judged not worth the API).** A `Consumer`-typed adder for
+`KaribuConfig.pendingJavascriptInvocationHandlers`: the `return Unit.INSTANCE;` a Java lambda needs
+for `Function1<_, Unit>` is a real annoyance, but the field is a `MutableList` `var`, so an
+`addX(Consumer)` helper buys asymmetry with `remove`/`clear` for one niche hook.
+
+**Evidence.** Java-callability of every new and claimed-existing form
+(`_rowIterable(tree)`, `_rowIterable(tree, filter)`, `_rowSequence(tree)`, `_findAll(tree)`,
+`_dump(grid, 0, 6)`) was verified by compiling a Java caller against the built classes, not inferred
+from `@JvmOverloads`. Full battery green on all four `testrun-*` environments.
+
+---
+
 ## 2026-07-21 — Deliver the F5/tab-close unload beacon through Flow's *real* `ServerRpcHandler`
 
 **Context.** [#210](https://github.com/mvysny/karibu-testing/issues/210): the F5/beacon design below

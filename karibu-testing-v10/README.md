@@ -1249,6 +1249,18 @@ root items of a TreeGrid. In order for the `_size()` and all index-based functio
 items in the Grid, you have to expand all of the nodes, by calling
 `treeGrid._expandAll()`/`GridKt._expandAll(treeGrid)`.
 
+To walk the rows the TreeGrid is actually showing (children of collapsed nodes skipped):
+
+* For all of them as a list, use `treeGrid._findAll()`/`GridKt._findAll(treeGrid)` - `_findAll()`
+  handles TreeGrid too, and walks exactly the row sequence described below.
+* To walk them lazily and stop early, Kotlin gets `treeGrid._rowSequence()` returning a
+  `Sequence`. Java has `GridKt._rowIterable(treeGrid)` returning an `Iterable`, so it works
+  in a for-each loop; since it delegates to the sequence rather than buffering, iterate it
+  only once. Since Karibu-Testing 2.7.3.
+
+Note that a full walk is a slow operation - it repeatedly polls the `HierarchicalDataProvider`
+for the list of children.
+
 ### Support for VirtualList
 
 Similar to Grid, but one column only, no sorting, no filtering, no header,

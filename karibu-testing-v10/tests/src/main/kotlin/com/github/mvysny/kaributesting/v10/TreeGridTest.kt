@@ -131,6 +131,39 @@ abstract class AbstractTreeGridTests {
                 grid.expectRow(14, "name 0 1 1 1", "3")
             }
         }
+        @Nested inner class _rowIterable {
+            @Test fun `empty on empty grid`() {
+                expect(listOf()) { TreeGrid<String>()._rowIterable().toList() }
+            }
+            @Test fun simple() {
+                val g = TreeGrid<Int>()
+                g.setDataProvider(treedp((0 until 20).toList()))
+                expect((0 until 20).toList()) { g._rowIterable().toList() }
+            }
+            @Test fun `ignores collapsed nodes`() {
+                val g = TreeGrid<Int>()
+                g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
+                // all nodes are by default collapsed
+                expect(listOf(0)) { g._rowIterable().toList() }
+                g._expandAll()
+                expect((0..9).toList()) { g._rowIterable().toList() }
+            }
+            @Test fun `honors filter`() {
+                val g = TreeGrid<Int>()
+                g.setDataProvider(treedp((0 until 20).toList()))
+                expect(listOf(0, 2, 4, 6, 8, 10, 12, 14, 16, 18)) {
+                    g._rowIterable { it % 2 == 0 }.toList()
+                }
+            }
+            @Test fun `same contents as _rowSequence and _findAll`() {
+                val g = TreeGrid<Int>()
+                g.setDataProvider(treedp(listOf(0), { if (it < 9) listOf(it + 1) else listOf<Int>() }))
+                g._expandAll()
+                val expected = g._rowSequence().toList()
+                expect(expected) { g._rowIterable().toList() }
+                expect(expected) { g._findAll() }
+            }
+        }
         @Test fun _dump() {
             val roots = listOf(TestPerson("name 0", 0))
             val grid = TreeGrid<TestPerson>().apply {
@@ -159,6 +192,8 @@ abstract class AbstractTreeGridTests {
 """) {
                 grid._dump(0..6)
             }
+            // the (from, toInclusive) overload exists for Java callers; must match the IntRange one
+            expect(grid._dump(0..6)) { grid._dump(0, 6) }
         }
         @Test fun `_dump balanced tree`() {
             val roots = listOf(TestPerson("name 0", 0))

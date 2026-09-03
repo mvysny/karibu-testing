@@ -47,6 +47,50 @@ this does *not* license:
 
 ---
 
+## D_service_event_bus_compat — Reach `VaadinService`'s listeners through whichever internal holds them, and invoke them by hand (2026-09-03)
+
+**Status:** Accepted; implemented 2026-09-03 in `MockVaadin.kt`
+(`fireSessionInitListeners`/`fireServiceDestroyListeners`), mechanics in their KDoc.
+
+**Context.** Karibu has to fire `SessionInitEvent` and `ServiceDestroyEvent` itself: `MockVaadin`
+fabricates the session rather than letting a servlet container do it, and `tearDown()` must not call
+`VaadinService.destroy()` (that also shuts the service's executor down, killing reuse across tests).
+Neither event has a public "fire" entry point, so Karibu reached into `VaadinService`'s private
+`sessionInitListeners` / `serviceDestroyListeners` collections by reflection.
+
+**What changed (traced flow-server 25.2.6 vs. 25.3.0-beta1).** 25.3 deletes both fields. Every
+service-level listener now lives in one `VaadinServiceEventBus eventBus`, a
+`Map<Class<? extends EventObject>, CopyOnWriteArrayList<SerializableConsumer<?>>>`;
+`addSessionInitListener`/`addServiceDestroyListener` wrap the listener into a consumer keyed by the
+*event* class. `VaadinService.getEventBus()`, `VaadinServiceEventBus.getListeners(Class)` and
+`fireEvent(EventObject)` are all public. Symptom before the fix: `NoSuchFieldException:
+sessionInitListeners` out of `MockVaadin.setup()` — i.e. **every** test in the `next` battery.
+
+**Decisions.**
+
+1. **Probe for `getEventBus()` at runtime; keep the field reflection as the 25.2 branch.** Karibu
+   compiles against `stable` (25.2) and runs on both, so the new path has to be reflective too — a
+   cached `Method?` that is `null` on 25.2. Rejected: bumping the compile baseline to 25.3 to call
+   `getEventBus()` directly. 25.3 is a beta; that would make the released Karibu unusable on the
+   Vaadin version most users are actually on, to save one `getMethod` call made once per JVM.
+
+2. **Call the listeners directly via `getListeners(eventClass)`, not `eventBus.fireEvent(event)`.**
+   `fireEvent(EventObject)` routes every listener through the bus's `LOG_ERRORS` handler, which
+   swallows a listener exception into a log line. `tearDown()` documents the opposite — that
+   exceptions thrown by session/service destroy listeners propagate to the test — and Karibu's whole
+   value is surfacing those. `getListeners` returns the consumers in registration order, so invoking
+   them in a loop reproduces the old field-iteration behaviour, exceptions and all — and is in fact
+   better-defined than the 25.2 branch, whose `serviceDestroyListeners` is an unordered `Set`. (The
+   overload `fireEvent(E, SerializableBiConsumer)` could rethrow, but only by collecting into an
+   `AtomicReference` the way `VaadinService.destroy()` does — more machinery for the same result,
+   and it wraps in `RuntimeException`.)
+
+**Consequences.** The two `fireXListeners` helpers are the only place that knows about the split;
+adding a third service-level event means adding a branch there, not a new mechanism. If Karibu ever
+drops Vaadin 25.2, the legacy branch and both `Field` lazies delete cleanly.
+
+---
+
 ## D_treegrid_java_walk — Java reaches the lazy TreeGrid walk through `Stream`, and there is no eager `filter` twin (2026-08-28)
 
 **Status:** Accepted; shipped in 2.7.3. `TreeGrid._rowStream()`, `@JvmOverloads` on

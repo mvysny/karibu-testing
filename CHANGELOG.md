@@ -18,6 +18,9 @@ Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
 
 ### Fixed
 
+- Fire session-init and service-destroy listeners on Vaadin 25.3, which replaced `VaadinService`'s
+  private `sessionInitListeners`/`serviceDestroyListeners` fields with a `VaadinServiceEventBus`.
+  Vaadin 25.2 keeps working. See `D_service_event_bus_compat`.
 - Discover `Dialog` header/footer children on Vaadin 25.3.
 - Load `LitTemplate` sources from `META-INF/frontend/` on the classpath - the location Vaadin 25
   tells jar add-ons to use (#213). The Vaadin 24 location, `META-INF/resources/frontend/`, keeps

@@ -82,25 +82,25 @@ abstract class AbstractButtonTests {
     }
 
     @Nested inner class _click() {
-        @Nested inner class ButtonTests : AbstractClickTests("Button", true, { Button() })
-        @Nested inner class CheckboxTests : AbstractClickTests("Checkbox", true, { Checkbox() })
-        @Nested inner class FormLayoutTests : AbstractClickTests("FormLayout", true, { FormLayout() })
-        @Nested inner class IconTests : AbstractClickTests("Icon", false, { Icon() })
-        @Nested inner class VerticalLayoutTests : AbstractClickTests("VerticalLayout", true, { VerticalLayout() })
-        @Nested inner class HorizontalLayoutTests : AbstractClickTests("HorizontalLayout", true, { HorizontalLayout() })
-        @Nested inner class ImageTests : AbstractClickTests("Image", true, { Image() })
-        @Nested inner class ListItemTests : AbstractClickTests("ListItem", true, { ListItem() })
-        @Nested inner class UnorderedListTests : AbstractClickTests("UnorderedList", true, { UnorderedList() })
-        @Nested inner class DivTests : AbstractClickTests("Div", true, { Div() })
-        @Nested inner class NativeButtonTests : AbstractClickTests("NativeButton", true, { NativeButton() })
-        @Nested inner class FlexLayoutTests : AbstractClickTests("FlexLayout", true, { FlexLayout() })
-        @Nested inner class ParagraphTests : AbstractClickTests("Paragraph", true, { Paragraph() })
-        @Nested inner class H1Tests : AbstractClickTests("H1", true, { H1() })
-        @Nested inner class SpanTests : AbstractClickTests("Span", true, { Span() })
+        @Nested inner class ButtonTests : AbstractClickTests("Button", { Button() })
+        @Nested inner class CheckboxTests : AbstractClickTests("Checkbox", { Checkbox() })
+        @Nested inner class FormLayoutTests : AbstractClickTests("FormLayout", { FormLayout() })
+        @Nested inner class IconTests : AbstractClickTests("Icon", { Icon() })
+        @Nested inner class VerticalLayoutTests : AbstractClickTests("VerticalLayout", { VerticalLayout() })
+        @Nested inner class HorizontalLayoutTests : AbstractClickTests("HorizontalLayout", { HorizontalLayout() })
+        @Nested inner class ImageTests : AbstractClickTests("Image", { Image() })
+        @Nested inner class ListItemTests : AbstractClickTests("ListItem", { ListItem() })
+        @Nested inner class UnorderedListTests : AbstractClickTests("UnorderedList", { UnorderedList() })
+        @Nested inner class DivTests : AbstractClickTests("Div", { Div() })
+        @Nested inner class NativeButtonTests : AbstractClickTests("NativeButton", { NativeButton() })
+        @Nested inner class FlexLayoutTests : AbstractClickTests("FlexLayout", { FlexLayout() })
+        @Nested inner class ParagraphTests : AbstractClickTests("Paragraph", { Paragraph() })
+        @Nested inner class H1Tests : AbstractClickTests("H1", { H1() })
+        @Nested inner class SpanTests : AbstractClickTests("Span", { Span() })
     }
 }
 
-abstract class AbstractClickTests(val componentName: String, val hasEnabled: Boolean, val componentProvider: () -> ClickNotifier<*>) {
+abstract class AbstractClickTests(val componentName: String, val componentProvider: () -> ClickNotifier<*>) {
     fun <T : ClickNotifier<*>> expectClickCount(button: T, clickCount: Int) {
         var clicked = 0
         button.addClickListener { e ->
@@ -126,9 +126,11 @@ abstract class AbstractClickTests(val componentName: String, val hasEnabled: Boo
     }
 
     @Test fun `click fails on disabled component`() {
-        assumeTrue(hasEnabled)
+        val c = componentProvider()
+        // whether a component implements HasEnabled is up to Vaadin and moves between versions:
+        // e.g. Image dropped it in Vaadin 25.3 when it stopped extending HtmlContainer.
+        assumeTrue(c is HasEnabled)
         expectThrows(IllegalStateException::class, "is not enabled") {
-            val c = componentProvider()
             (c as HasEnabled).isEnabled = false
             expectClickCount(c, 0)
         }

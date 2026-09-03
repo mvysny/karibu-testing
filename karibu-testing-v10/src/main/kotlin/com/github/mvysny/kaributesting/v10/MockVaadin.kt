@@ -22,7 +22,10 @@ import com.vaadin.flow.server.communication.UidlRequestHandler
 import com.vaadin.flow.shared.ApplicationConstants
 import com.vaadin.flow.shared.communication.PushMode
 import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.util.EventObject
 import java.util.concurrent.ExecutionException
+import java.util.function.Consumer
 import java.util.concurrent.locks.ReentrantLock
 import jakarta.servlet.ServletContext
 import kotlin.test.expect
@@ -801,6 +804,39 @@ public object MockVaadin {
     }
 }
 
+/**
+ * `VaadinService.getEventBus()`, or null on Vaadin 25.2 and older.
+ *
+ * Vaadin 25.3 replaced `VaadinService`'s per-listener-type fields (`sessionInitListeners`,
+ * `serviceDestroyListeners`, ...) with one `VaadinServiceEventBus` keyed by event class. Reflection
+ * because Karibu compiles against Vaadin 25.2 yet must run on both.
+ */
+private val _VaadinService_getEventBus: Method? by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    try {
+        VaadinService::class.java.getMethod("getEventBus")
+    } catch (e: NoSuchMethodException) {
+        null
+    }
+}
+
+private val _VaadinServiceEventBus_getListeners: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    Class.forName("com.vaadin.flow.server.VaadinServiceEventBus")
+        .getMethod("getListeners", Class::class.java)
+}
+
+/**
+ * The Vaadin 25.3+ event-bus listeners registered for [eventClass], in registration order.
+ *
+ * Callers invoke these directly instead of going through `VaadinServiceEventBus.fireEvent()`:
+ * `fireEvent()` swallows listener exceptions into a log, while [MockVaadin.tearDown] promises to
+ * propagate them to the test.
+ */
+private fun <E : EventObject> VaadinService.getEventBusListeners(eventClass: Class<E>): Collection<Consumer<E>> {
+    val eventBus: Any = _VaadinService_getEventBus!!.invoke(this)
+    @Suppress("UNCHECKED_CAST")
+    return _VaadinServiceEventBus_getListeners.invoke(eventBus, eventClass) as Collection<Consumer<E>>
+}
+
 private val _VaadinService_sessionInitListeners: Field by lazy(LazyThreadSafetyMode.PUBLICATION) {
     val field: Field = VaadinService::class.java.getDeclaredField("sessionInitListeners")
     field.isAccessible = true
@@ -808,11 +844,16 @@ private val _VaadinService_sessionInitListeners: Field by lazy(LazyThreadSafetyM
 }
 
 private fun VaadinService.fireSessionInitListeners(event: SessionInitEvent) {
-    @Suppress("UNCHECKED_CAST")
-    val sessionInitListeners: Collection<SessionInitListener> =
-        _VaadinService_sessionInitListeners.get(this) as Collection<SessionInitListener>
-    for (sessionInitListener in sessionInitListeners) {
-        sessionInitListener.sessionInit(event)
+    if (_VaadinService_getEventBus != null) {
+        // Vaadin 25.3+
+        getEventBusListeners(SessionInitEvent::class.java).forEach { it.accept(event) }
+    } else {
+        @Suppress("UNCHECKED_CAST")
+        val sessionInitListeners: Collection<SessionInitListener> =
+            _VaadinService_sessionInitListeners.get(this) as Collection<SessionInitListener>
+        for (sessionInitListener in sessionInitListeners) {
+            sessionInitListener.sessionInit(event)
+        }
     }
 }
 
@@ -823,11 +864,16 @@ private val _VaadinService_sessionDestroyListeners: Field by lazy(LazyThreadSafe
 }
 
 private fun VaadinService.fireServiceDestroyListeners(event: ServiceDestroyEvent) {
-    @Suppress("UNCHECKED_CAST")
-    val listeners: Collection<ServiceDestroyListener> =
-        _VaadinService_sessionDestroyListeners.get(this) as Collection<ServiceDestroyListener>
-    for (listener in listeners) {
-        listener.serviceDestroy(event)
+    if (_VaadinService_getEventBus != null) {
+        // Vaadin 25.3+
+        getEventBusListeners(ServiceDestroyEvent::class.java).forEach { it.accept(event) }
+    } else {
+        @Suppress("UNCHECKED_CAST")
+        val listeners: Collection<ServiceDestroyListener> =
+            _VaadinService_sessionDestroyListeners.get(this) as Collection<ServiceDestroyListener>
+        for (listener in listeners) {
+            listener.serviceDestroy(event)
+        }
     }
 }
 

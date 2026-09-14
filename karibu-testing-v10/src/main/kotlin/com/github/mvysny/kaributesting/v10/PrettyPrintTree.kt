@@ -80,6 +80,9 @@ public fun Component.toPrettyTree(): String = PrettyPrintTree.ofVaadin(this).pri
  * * the styles
  * * The [Component.label] and text
  * * The [HasValue.getValue]
+ *
+ * Attributes are dumped sorted by name; see [dontDumpAttributes] to skip some of them,
+ * and [unorderedAttributes] for ones whose value gets sorted too.
  */
 @Suppress("UNCHECKED_CAST")
 public fun Component.toPrettyString(): String {
@@ -155,7 +158,10 @@ public fun Component.toPrettyString(): String {
         .filter { !dontDumpAttributes.contains(it) }
         .sorted() // the attributes may come in arbitrary order; make sure to sort them, in order to have predictable order and repeatable tests.
         .forEach { attributeName ->
-            val value = element.getAttribute(attributeName)
+            var value = element.getAttribute(attributeName)
+            if (unorderedAttributes.contains(attributeName) && value != null) {
+                value = value.split(' ').filterNotBlank().sorted().joinToString(" ")
+            }
             if (!value.isNullOrBlank()) {
                 list.add("@$attributeName='$value'")
             }
@@ -204,6 +210,22 @@ public var prettyStringHook: (component: Component, list: LinkedList<String>) ->
  * * `icon` - shown via [_iconName].
  */
 public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id", "href", "icon")
+
+/**
+ * Attributes whose value is a space-separated list of tokens in no meaningful order.
+ * [toPrettyString] sorts their tokens, so that the dump stays repeatable:
+ *
+ * ```
+ * VerticalLayout[@theme='padding spacing']   // never 'spacing padding'
+ * ```
+ *
+ * Vaadin backs `theme` by a hash set ([com.vaadin.flow.dom.ThemeList]), so the order of
+ * the theme names differs between Vaadin versions. `class` needs no sorting - Vaadin backs
+ * it by an ordered list.
+ *
+ * Add your own attributes here if your components use space-separated attributes of their own.
+ */
+public var unorderedAttributes: MutableSet<String> = mutableSetOf("theme")
 
 /**
  * Pretty-prints a DataProvider.

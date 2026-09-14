@@ -3,6 +3,16 @@ name: Gradle
 on: [push, pull_request]
 
 jobs:
+  design-docs:
+    # The doc-layer tripwires, on an image that has bash and git. The Gradle build runs them too,
+    # but skips them on Windows; this job is the guarantee.
+    runs-on: ubuntu-latest
+    container: buildpack-deps:scm
+    steps:
+    - uses: actions/checkout@v6
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - run: ./design/verify_design_tripwires.sh
+
   build:
 
     strategy:

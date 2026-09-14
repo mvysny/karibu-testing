@@ -101,7 +101,7 @@ public object KaribuConfig {
      * Defaults to [UnloadBeaconTiming.EAGER], which matches both the common production ordering and
      * the pre-2.7.1 Karibu behavior for non-`@PreserveOnRefresh` reloads.
      *
-     * See `ideas/beacon-reload-timing.md` for the full analysis.
+     * See `D_f5_beacon_timing` in `design/decisions.md`.
      */
     @JvmStatic
     public var unloadBeaconTiming: UnloadBeaconTiming = UnloadBeaconTiming.EAGER

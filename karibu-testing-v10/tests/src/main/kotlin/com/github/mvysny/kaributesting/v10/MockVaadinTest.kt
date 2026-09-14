@@ -530,7 +530,7 @@ abstract class AbstractMockVaadinTests() {
 
     // The browser unload beacon (navigator.sendBeacon) closes the old UI on F5; its timing relative
     // to the new UI's creation is configurable for non-@PreserveOnRefresh targets. Flow ignores the
-    // beacon for @PreserveOnRefresh. See ideas/beacon-reload-timing.md.
+    // beacon for @PreserveOnRefresh. See D_f5_beacon_timing in design/decisions.md.
     @Nested inner class `unload beacon timing on F5` {
         @BeforeEach @AfterEach fun resetTiming() {
             KaribuConfig.unloadBeaconTiming = UnloadBeaconTiming.EAGER

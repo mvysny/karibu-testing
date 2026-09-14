@@ -153,7 +153,7 @@ public object MockVaadin {
      * Simulates a browser F5 reload of the current UI, as closely to real Vaadin Flow
      * as a server-side-only test double allows. See
      * [issue 207](https://github.com/mvysny/karibu-testing/issues/207) and
-     * `ideas/beacon-reload-timing.md` for the full analysis.
+     * `D_f5_beacon_timing` in `design/decisions.md`.
      *
      * **[com.vaadin.flow.router.PreserveOnRefresh] target.** Real Flow keeps the *old* UI alive
      * while the *new* UI navigates, so that
@@ -165,7 +165,7 @@ public object MockVaadin {
      * 3. close the old UI.
      *
      * Because Karibu drives Flow's *real* navigation pipeline, we get all of the above (the
-     * sentinel, the overlay teleport, the overlays-before-route child ordering and `oldUI.close()`)
+     * sentinel, the overlay teleport, the route-then-overlays child ordering and `oldUI.close()`)
      * for free - **as long as the old UI is still alive and still owns the preserved route root
      * when the new UI navigates.** So for this case the job is: create the new UI first, then discard
      * the old one. The browser unload beacon is ignored by Flow here

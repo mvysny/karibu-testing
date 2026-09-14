@@ -11,6 +11,17 @@ plugins {
 
 defaultTasks("clean", "build")
 
+// The design-doc tripwires: caps, cites and symlinks over AGENTS.md and design/. Needs bash and
+// git, so it is skipped on Windows; the dedicated CI job on Linux is what guarantees it runs.
+val designTripwires by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Checks the doc layer described in AGENTS.md, 'Design docs'."
+    workingDir = rootDir
+    commandLine("./design/verify_design_tripwires.sh")
+    onlyIf { !System.getProperty("os.name").startsWith("Windows", ignoreCase = true) }
+}
+tasks.named("check") { dependsOn(designTripwires) }
+
 if (JavaVersion.current() < JavaVersion.VERSION_21) {
     throw GradleException("Karibu-Testing 2+ requires JDK 21; current JDK is ${JavaVersion.current()}")
 }

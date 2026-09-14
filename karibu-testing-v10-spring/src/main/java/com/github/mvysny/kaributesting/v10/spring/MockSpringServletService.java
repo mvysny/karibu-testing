@@ -65,6 +65,10 @@ public class MockSpringServletService extends SpringVaadinServletService {
         return MockInstantiator.create(super.getInstantiator());
     }
 
+    /**
+     * Lazily wrapped by {@link #getDeploymentConfiguration()}; cached so that every caller
+     * mutates the same configuration instance.
+     */
     private FakeDeploymentConfiguration cachedConfig;
 
     @Override

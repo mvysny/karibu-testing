@@ -448,6 +448,9 @@ public class LocatorJ {
      * Opens the {@link com.vaadin.flow.component.contextmenu.ContextMenu} attached to given
      * component, clicks the menu item with given ID, then closes the menu again.
      * See {@link #_clickContextMenuItemWithCaption(Component, String)}.
+     *
+     * @param component the component the context menu is attached to.
+     * @param id the ID of the menu item to click.
      */
     public static void _clickContextMenuItemWithID(@NotNull Component component, @NotNull String id) {
         ContextMenuKt._clickContextMenuItemWithID(component, id);
@@ -457,6 +460,9 @@ public class LocatorJ {
      * Opens the {@link com.vaadin.flow.component.contextmenu.ContextMenu} attached to given
      * component, clicks the menu item with given icon, then closes the menu again.
      * See {@link #_clickContextMenuItemWithCaption(Component, String)}.
+     *
+     * @param component the component the context menu is attached to.
+     * @param icon the icon of the menu item to click.
      */
     public static void _clickContextMenuItemWithIcon(@NotNull Component component, @NotNull IconName icon) {
         ContextMenuKt._clickContextMenuItemWithIcon(component, icon);
@@ -479,35 +485,67 @@ public class LocatorJ {
     }
 
     /**
-     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}; the
+     * right-clicked column is reported as unknown.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param caption the caption of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param <T> the type of items in the grid.
      */
     public static <T> void _clickContextMenuItemWithCaption(@NotNull Grid<T> grid, @NotNull String caption, @Nullable T item) {
         ContextMenuKt._clickContextMenuItemWithCaption(grid, caption, item, null);
     }
 
     /**
-     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}, but
+     * locates the menu item by its ID.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param id the ID of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param column the column which was right-clicked, or null if unknown.
+     * @param <T> the type of items in the grid.
      */
     public static <T> void _clickContextMenuItemWithID(@NotNull Grid<T> grid, @NotNull String id, @Nullable T item, @Nullable Grid.Column<T> column) {
         ContextMenuKt._clickContextMenuItemWithID(grid, id, item, column);
     }
 
     /**
-     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     * See {@link #_clickContextMenuItemWithID(Grid, String, Object, Grid.Column)}; the
+     * right-clicked column is reported as unknown.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param id the ID of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param <T> the type of items in the grid.
      */
     public static <T> void _clickContextMenuItemWithID(@NotNull Grid<T> grid, @NotNull String id, @Nullable T item) {
         ContextMenuKt._clickContextMenuItemWithID(grid, id, item, null);
     }
 
     /**
-     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}, but
+     * locates the menu item by its icon.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param icon the icon of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param column the column which was right-clicked, or null if unknown.
+     * @param <T> the type of items in the grid.
      */
     public static <T> void _clickContextMenuItemWithIcon(@NotNull Grid<T> grid, @NotNull IconName icon, @Nullable T item, @Nullable Grid.Column<T> column) {
         ContextMenuKt._clickContextMenuItemWithIcon(grid, icon, item, column);
     }
 
     /**
-     * See {@link #_clickContextMenuItemWithCaption(Grid, String, Object, Grid.Column)}.
+     * See {@link #_clickContextMenuItemWithIcon(Grid, IconName, Object, Grid.Column)}; the
+     * right-clicked column is reported as unknown.
+     *
+     * @param grid the grid the context menu is attached to.
+     * @param icon the icon of the menu item to click.
+     * @param item the item which was right-clicked, or null when right-clicked outside of any item.
+     * @param <T> the type of items in the grid.
      */
     public static <T> void _clickContextMenuItemWithIcon(@NotNull Grid<T> grid, @NotNull IconName icon, @Nullable T item) {
         ContextMenuKt._clickContextMenuItemWithIcon(grid, icon, item, null);

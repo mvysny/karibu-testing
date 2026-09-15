@@ -108,6 +108,7 @@ Advantages over the traditional testing with [Selenium](https://www.seleniumhq.o
   stop the server in your `@AfterClass`. There is no need to use Maven's Integration plugin
   to start the server in the background (and then remember to kill it afterwards, otherwise all future CI tests
   will fail to start the server since it's already running).
+* *Perfect fit for AI*: Karibu is close to the ideal oracle for UI. It runs the component tree in-JVM, no browser, no server, no waits. Tests are fast, deterministic, and free of Selenium flake. _get<TextField>, _setValue, _click, assert. That is the "headless render the model can read" requirement satisfied directly, and it makes UI work verifiable in a way that browser-driven stacks simply are not.
 * *Robust*: the test runs in the same JVM as the server. If the
   server fails to start and throws an exception, the test method too will fail with the same exception.
   No need to go hunting for exceptions in a log located somewhere on a CI server.

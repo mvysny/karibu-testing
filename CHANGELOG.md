@@ -5,6 +5,8 @@ All notable changes to Karibu-Testing are documented here. The format is based o
 
 Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
 
+## [Unreleased] (2.7.4)
+
 ## [2.7.3] - 2026-09-16
 
 ### Added

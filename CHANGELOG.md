@@ -5,7 +5,7 @@ All notable changes to Karibu-Testing are documented here. The format is based o
 
 Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
 
-## [Unreleased] (2.7.3)
+## [2.7.3] - 2026-09-16
 
 ### Added
 
@@ -27,6 +27,14 @@ Baseline: 2.7.0. Changes prior to 2.7.0 are not documented here.
   working.
 - `MockNpmTemplateParser` now lists every location it searched when it fails to load a template,
   instead of blaming `node_modules/` (which is only consulted for bare npm specifiers).
+- `toPrettyString()` sorts the tokens of `theme` attribute values, so tree dumps stay stable on
+  Vaadin 25.3, which now keeps theme variants in insertion order. Add more set-like attributes to
+  `unorderedAttributes`.
+
+### Dependencies
+
+- Vaadin 25.2.8, Kotlin 2.4.20, Gradle 9.7.1.
+- `karibu-testing-v10-spring`: Spring Boot 4.1.1, Spring Security 7.1.1, matching Vaadin Spring 25.2.9.
 
 ## [2.7.2] - 2026-07-21
 

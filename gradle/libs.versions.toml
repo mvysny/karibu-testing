@@ -1,15 +1,15 @@
 [versions]
-slf4j = "2.0.17"
+slf4j = "2.0.19"
 kaributools = "0.27"
 karibudsl = "2.6.0"
-junit5 = "6.0.3"
+junit5 = "6.1.3"
 # Check the newest Vaadin version at https://github.com/vaadin/platform/tags
-vaadin = "25.2.6"
-vaadin_spring = "25.2.7"
+vaadin = "25.2.8"
+vaadin_spring = "25.2.9"
 vaadin_next = "25.3.0-rc1"
-vaadin_next_spring = "25.3.0-rc1"
-spring_boot = "4.0.5"
-spring_security = "7.0.6"
+vaadin_next_spring = "25.3.0-rc2"
+spring_boot = "4.1.1"
+spring_security = "7.1.1"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -26,13 +26,13 @@ vaadin-stable-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaa
 vaadin-next-all = { module = "com.vaadin:vaadin", version.ref = "vaadin_next" }
 vaadin-next-core = { module = "com.vaadin:vaadin-core", version.ref = "vaadin_next" }
 vaadin-next-spring = { module = "com.vaadin:vaadin-spring", version.ref = "vaadin_next_spring" }
-classgraph = "io.github.classgraph:classgraph:4.8.184"
+classgraph = "io.github.classgraph:classgraph:4.8.195"
 # Vaadin Flow brings JSoup in transitively; we depend on it explicitly so LitRenderer HTML
 # assertions keep working even if Flow ever drops it. See _getPresentationJsoup().
-jsoup = "org.jsoup:jsoup:1.22.2"
+jsoup = "org.jsoup:jsoup:1.23.2"
 jetbrains-annotations = "org.jetbrains:annotations:26.1.0"
-groovy = "org.apache.groovy:groovy:4.0.29"
-hibernate-validator = "org.hibernate.validator:hibernate-validator:9.1.0.Final"
+groovy = "org.apache.groovy:groovy:4.0.33"
+hibernate-validator = "org.hibernate.validator:hibernate-validator:9.1.3.Final"
 jakarta-el-api = "jakarta.el:jakarta.el-api:6.0.1"
 jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:3.0.0"
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring_boot" }

@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     container: buildpack-deps:scm
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - run: ./design/verify_design_tripwires.sh
 
@@ -23,14 +23,14 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
     - name: Set up Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v6
     - name: Build with Gradle
       run: ./gradlew --no-daemon --no-watch-fs
 

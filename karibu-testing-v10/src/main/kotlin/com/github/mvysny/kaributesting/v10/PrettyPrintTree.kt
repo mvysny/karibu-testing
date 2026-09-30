@@ -14,6 +14,7 @@ import com.vaadin.flow.data.provider.CallbackDataProvider
 import com.vaadin.flow.data.provider.DataProvider
 import com.vaadin.flow.data.provider.ListDataProvider
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider
 import java.util.*
 
 /**
@@ -228,6 +229,14 @@ public var dontDumpAttributes: MutableSet<String> = mutableSetOf("disabled", "id
 public var unorderedAttributes: MutableSet<String> = mutableSetOf("theme")
 
 /**
+ * Vaadin 25.4 gave these a `toString()` which prints the identity hash code, e.g.
+ * `ListDataProvider@79617c3d(3 backend items)`, which would make the dump unrepeatable.
+ * [toPrettyString] ignores it; a subclass's own `toString()` still wins.
+ */
+private val flowInMemoryDataProviders: Set<Class<*>> =
+    setOf(ListDataProvider::class.java, TreeDataProvider::class.java)
+
+/**
  * Pretty-prints a DataProvider.
  */
 public fun DataProvider<*, *>.toPrettyString(): String = when {
@@ -236,7 +245,7 @@ public fun DataProvider<*, *>.toPrettyString(): String = when {
         // CallbackDataProvider(fetchCallback=com.github.mvysny.kaributesting.v10.Grid19TestKt$grid19Testbatch$3$2$2$grid$1$$Lambda/0x00007441dc57ec68@7be9582e, countCallback=com.vaadin.flow.data.provider.HasLazyDataView$$Lambda/0x00007441dc57d610@2297c8bf, idGetter=com.vaadin.flow.data.provider.CallbackDataProvider$$Lambda/0x00007441dc57d828@154fcedd)
         // so it's almost useless. Fall back to just javaClass.simpleName
         this.javaClass.simpleName
-    javaClass.hasCustomToString() ->
+    javaClass.hasCustomToString() && javaClass.getMethod("toString").declaringClass !in flowInMemoryDataProviders ->
         this.toString()
     this is ListDataProvider<*> ->
         "${javaClass.simpleName}<${items.firstOrNull()?.javaClass?.simpleName ?: "?"}>(${items.size} items)"

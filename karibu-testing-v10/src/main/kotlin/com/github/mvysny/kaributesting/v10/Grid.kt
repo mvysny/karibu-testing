@@ -1154,6 +1154,7 @@ public fun <T> Grid<T>._fireColumnResizedEvent(column: Grid.Column<T>, newWidth:
 // Vaadin < 25.3 keeps the item-details DataGenerator as a top-level Grid field;
 // 25.3 moved it into Grid.detailsManager.rendererDataGenerator. Probe both so one
 // build spans versions. Absent field -> null (that version uses the other layout).
+// No public getter exists in either: R_grid_item_details_generator.
 private val __Grid_itemDetailsDataGenerator: Field? by lazy {
     runCatching { Grid::class.java.getDeclaredField("itemDetailsDataGenerator").apply { isAccessible = true } }.getOrNull()
 }

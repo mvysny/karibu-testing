@@ -37,6 +37,7 @@ Every fact lives in exactly one of these; the others link to it.
 - **`tearDown()` never calls `VaadinService.destroy()`.** That would also shut the service's executor down, killing reuse across tests. See `D_service_event_bus_compat`.
 - **Anything reached inside Flow by reflection is probed at runtime, never assumed present.** A field that exists in `stable` may be gone in `next`. See `D_service_event_bus_compat`.
 - **Vaadin is `compileOnly` in every published module.** A transitive Vaadin would silently override the version the consuming app picked.
+- **A test that changes `KaribuConfig` or `MockVaadin.mockRequestFactory` puts it back itself.** `tearDown()` resets neither, so the change leaks into every later test in the JVM.
 
 ## Module map
 

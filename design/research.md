@@ -82,6 +82,16 @@ against the one above and cut what the provenance markers already carry.
 - `VaadinService.destroy()` shuts the service's executor down as well as firing the destroy event.
   **[src, verified 2026-09-03, flow-server 25.2.6]**
 
+## R_grid_item_details_generator — the item-details `DataGenerator` has no public getter, and 25.3 moved its field
+
+- Nothing public returns the `DataGenerator` behind `Grid.setItemDetailsRenderer()`, and it is never
+  added to the grid's composite data generator, so walking `getCompositeDataGenerator()` does not
+  reach it; `DetailsManager.setRenderer()` builds it privately from
+  `Renderer.render(...).getDataGenerator()`. **[src, verified 2026-07-13]**
+- Through 25.2 it is the private field `Grid.itemDetailsDataGenerator`; 25.3 moved it to
+  `rendererDataGenerator` in the inner class `Grid$DetailsManager`, held in `Grid.detailsManager`.
+  **[verified 2026-07-13, vaadin-grid-flow 25.3.0-alpha5]**
+
 ## R_context_menu_attachment — a `ContextMenu` is not in the server-side tree until it opens
 
 - `OverlayAutoAddController` attaches the menu to the UI (`ui.addToModalComponent`) only on open and

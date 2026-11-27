@@ -104,7 +104,10 @@ public fun Component.toPrettyString(): String {
     if (!label.isNullOrBlank()) {
         list.add("label='$label'")
     }
-    if (!_text.isNullOrBlank()) {
+    val innerHTML: String? = if (this is Html) null else element.getProperty("innerHTML")
+    // From Vaadin 25.4 on, the text also holds the innerHTML's top-level text nodes:
+    // the innerHTML dumped below already shows them, and in full.
+    if (!_text.isNullOrBlank() && innerHTML.isNullOrBlank()) {
         list.add("text='$_text'")
     }
     if (this is HasValue<*, *>) {
@@ -167,10 +170,8 @@ public fun Component.toPrettyString(): String {
                 list.add("@$attributeName='$value'")
             }
         }
-    if (this !is Html && !element.getProperty("innerHTML").isNullOrBlank()) {
-        val innerHTML =
-            element.getProperty("innerHTML").trim().replace(Regex("\\s+"), " ")
-        list.add("innerHTML='$innerHTML'")
+    if (!innerHTML.isNullOrBlank()) {
+        list.add("innerHTML='${innerHTML.trim().replace(Regex("\\s+"), " ")}'")
     }
     if (this is Notification) {
         list.add("'${this.getText().ellipsize(20)}'")

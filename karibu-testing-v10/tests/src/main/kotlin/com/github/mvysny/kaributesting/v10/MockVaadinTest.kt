@@ -12,6 +12,7 @@ import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.AttachEvent
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.DetachEvent
+import com.vaadin.flow.component.ModalityMode
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -476,8 +477,10 @@ abstract class AbstractMockVaadinTests() {
         @Test fun `child order on the new UI matches Flow (route root, then teleported overlays)`() {
             navigateTo<PreserveOnRefreshView>()
             val view = _get<PreserveOnRefreshView>()
-            val dialog1 = Dialog().apply { open() }
-            val dialog2 = Dialog().apply { open() }
+            // Modeless: Flow auto-adds an opened Dialog into the open Dialog with modality, if any
+            // (UI.addToModalComponent), rather than onto the UI.
+            val dialog1 = Dialog().apply { modality = ModalityMode.MODELESS; open() }
+            val dialog2 = Dialog().apply { modality = ModalityMode.MODELESS; open() }
             _expect<Dialog>(2)
 
             UI.getCurrent().page.reload()

@@ -49,7 +49,42 @@ public fun <T> Renderer<T>._getPresentationValue(rowObject: T): String? = when {
  * particular tags or attributes. See [_getPresentationJsoup] for a directly queryable form.
  */
 public fun <T> LitRenderer<T>._getPresentationHtml(rowObject: T): String =
-    renderLitTemplate(template, valueProviders, rowObject)
+    renderLitTemplate(litTemplate, valueProviders, rowObject)
+
+private val _LitRenderer_getTemplate: Method? by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    LitRenderer::class.java.declaredMethods
+        .firstOrNull { it.name == "getTemplate" && it.parameterCount == 0 }
+        ?.apply { isAccessible = true }
+}
+
+private val _JsDefinitionProxy_findDeclaredCall: Method by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    Class.forName("com.vaadin.flow.js.JsDefinitionProxy")
+        .getMethod("findDeclaredCall", Class.forName("com.vaadin.flow.js.JsSnippet"))
+}
+
+private val compiledLitTemplateBody = Regex("""^\s*return\s+html`(.*)`;?\s*$""", RegexOption.DOT_MATCHES_ALL)
+
+/**
+ * The Lit markup this renderer renders, for both the string form
+ * (`LitRenderer.of("<b>${item.name}</b>")`) and the `CompiledLitTemplate` form of Vaadin 25.4+,
+ * whose `return html`<b>${item.name}</b>`;` expression is unwrapped to the same markup, with
+ * the declaring call's arguments substituted for `${$0}`, `${$1}`…
+ *
+ * TODO delete once karibu-tools 0.28 is out, together with the three `private val`s above it,
+ * and call karibu-tools' `template` instead: 0.28 reads `CompiledLitTemplate` itself.
+ */
+private val LitRenderer<*>.litTemplate: String
+    get() {
+        val expression = template
+        if (expression.isNotEmpty()) return expression
+        val compiled: Any = _LitRenderer_getTemplate?.invoke(this) ?: return ""
+        val call: Any = _JsDefinitionProxy_findDeclaredCall.invoke(null, compiled) ?: return ""
+        val js = call.javaClass.getMethod("getExpression").invoke(call) as String
+        val arguments = call.javaClass.getMethod("arguments").invoke(call) as List<*>
+        var markup = compiledLitTemplateBody.matchEntire(js)?.groupValues?.get(1) ?: js
+        arguments.forEachIndexed { index, arg -> markup = markup.replace("\${\$$index}", arg.toString()) }
+        return markup
+    }
 
 /**
  * Renders this Lit renderer's template for given [rowObject] and returns it parsed by JSoup,
